@@ -2,6 +2,7 @@ import "server-only";
 import { TRADE_LIMITS, type FriendCollection, type TradeResult, type TradesOverview } from "@/lib/multi/trades";
 import { Prisma } from "@/generated/prisma/client";
 import { db } from "./db";
+import { notifyFrom } from "./push";
 
 type Tx = Prisma.TransactionClient;
 const DAY = 86_400_000;
@@ -73,6 +74,7 @@ export async function proposeTrade(userId: string, friendId: string, offeredId: 
   if (pending >= TRADE_LIMITS.pending || today >= TRADE_LIMITS.perDay) return { ok: false, error: "limit" };
 
   await db().trade.create({ data: { fromId: userId, toId: friendId, offeredId, requestedId } });
+  await notifyFrom(friendId, userId, (from) => ({ type: "trade-proposed", from }));
   return { ok: true };
 }
 
@@ -120,7 +122,8 @@ export async function answerTrade(userId: string, tradeId: string, accept: boole
     db().trade.updateMany({ where: { id: trade.id, status: "pending" }, data: { status, answeredAt: new Date() } });
 
   if (!accept) {
-    await close("declined");
+    const declined = await close("declined");
+    if (declined.count > 0) await notifyFrom(trade.fromId, userId, (from) => ({ type: "trade-declined", from }));
     return { ok: true };
   }
   if (!(await areFriends(userId, trade.fromId))) {
@@ -145,6 +148,7 @@ export async function answerTrade(userId: string, tradeId: string, accept: boole
     await close("cancelled");
     return { ok: false, error: "gone" };
   }
+  await notifyFrom(trade.fromId, userId, (from) => ({ type: "trade-accepted", from }));
   return { ok: true };
 }
 

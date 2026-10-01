@@ -25,6 +25,7 @@ import type { Result, RoomSettings, RoomTicket, RoomView } from "@/lib/multi/typ
 import type { SpoilerMode } from "@/lib/spoilers";
 import { Prisma } from "@/generated/prisma/client";
 import { db } from "./db";
+import { notify } from "./push";
 import type { SessionUser } from "./session";
 
 const hashToken = (token: string) => createHash("sha256").update(token).digest("hex");
@@ -451,5 +452,6 @@ export async function inviteToRoom(ticket: RoomTicket, user: SessionUser | null,
     create: { roomId: found.room.id, fromId: user.id, toId: friendId },
     update: { fromId: user.id, createdAt: new Date() },
   });
+  await notify(friendId, { type: "room-invite", from: user.username, code: found.room.code });
   return { ok: true };
 }

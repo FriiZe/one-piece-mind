@@ -58,6 +58,15 @@ export async function currentUser(): Promise<SessionUser | null> {
   return user;
 }
 
+/**
+ * Identifiant en base de la session du navigateur, sans vérifier qu'elle est encore
+ * valable : à appeler après `currentUser`.
+ */
+export async function currentSessionId(): Promise<string | null> {
+  const token = (await cookies()).get(COOKIE)?.value;
+  return token ? sessionId(token) : null;
+}
+
 /** Prolonge une session proche de sa fin. À appeler là où un cookie peut être écrit (action, route). */
 export async function renewSession(): Promise<void> {
   if (!accountsEnabled) return;

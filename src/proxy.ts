@@ -54,5 +54,5 @@ function isPageVisit(request: NextRequest): boolean {
 
 export const config = {
   // Tout, sauf l'API, les fichiers de Next, les images du site et les fichiers servis à la racine
-  matcher: ["/((?!api/|_next/|images/|icon\\.svg|favicon\\.ico|robots\\.txt|sitemap\\.xml).*)"],
+  matcher: ["/((?!api/|_next/|images/|icon\\.svg|apple-icon\\.png|favicon\\.ico|robots\\.txt|sitemap\\.xml|manifest\\.webmanifest|sw\\.js).*)"],
 };

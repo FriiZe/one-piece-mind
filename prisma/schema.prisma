@@ -62,7 +62,25 @@ model Session {
   expiresAt DateTime
   createdAt DateTime @default(now())
 
+  pushSubscriptions PushSubscription[]
+
   @@index([userId])
+}
+
+/// Appareil qui reçoit les notifications push. L'abonnement suit la session du navigateur : il disparaît avec elle.
+model PushSubscription {
+  /// Adresse du service de notification du navigateur.
+  endpoint  String   @id
+  sessionId String
+  session   Session  @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  /// Clés du navigateur, pour chiffrer les messages qui lui sont envoyés.
+  p256dh    String
+  auth      String
+  /// Langue des notifications : celle du site lors de la dernière visite.
+  lang      String
+  createdAt DateTime @default(now())
+
+  @@index([sessionId])
 }
 
 model CollectionEntry {

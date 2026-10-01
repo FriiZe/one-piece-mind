@@ -127,6 +127,8 @@ src/components/quiz/       liste, formulaire de création, écran de jeu
 src/lib/multi/            règles (points, classement, Berrys), types, appels depuis le navigateur
 src/lib/server/rooms.ts   salons : création, arrivée des joueurs, déroulé, réponses, récompenses
 src/lib/server/friends.ts amis : demandes, acceptation, retrait
+src/lib/server/push.ts    notifications push : abonnements des appareils, envoi
+public/sw.js              service worker : affiche les notifications, ouvre la bonne page au clic
 src/app/api/rooms/        routes interrogées par les navigateurs
 src/components/multi/     page d'accueil du multijoueur et écran du salon
 ```
@@ -137,6 +139,8 @@ src/components/multi/     page d'accueil du multijoueur et écran du salon
 - **Joueurs sans compte.** À son arrivée, un joueur reçoit un ticket (identifiant et jeton) gardé dans son navigateur ; il le renvoie à chaque appel. Recharger la page ne fait pas quitter le salon.
 - **Berrys.** Payés une seule fois par partie aux joueurs connectés, selon le score et la place, dans la limite du plafond journalier.
 - **Notifications.** La cloche de l'en-tête compte les demandes d'ami reçues, les invitations dans un salon et, pour un administrateur, les quiz masqués à relire (`/api/notifications`). Elle est relue toutes les quarante-cinq secondes tant que l'onglet est visible ; le détail n'est chargé qu'à l'ouverture.
+- **Notifications push.** Depuis la cloche, un joueur connecté peut être prévenu sur son appareil, site fermé : demande d'ami reçue ou acceptée, invitation dans un salon, échange proposé, accepté ou refusé et, pour un administrateur, quiz masqué (`PushEvent` dans `src/lib/multi/push.ts`). Le message part dans la langue du site sur cet appareil. L'abonnement d'un navigateur (`PushSubscription`) est rattaché à sa session : se déconnecter, ou laisser la session expirer, arrête les notifications. Un abonnement résilié par le navigateur est oublié au premier envoi refusé. L'envoi se fait pendant l'action qui le déclenche, sans jamais la faire échouer, et le serveur n'écrit qu'aux services de notification connus (Chrome, Firefox, Safari, Edge). Sur iPhone et iPad, il faut d'abord ajouter le site à l'écran d'accueil (`src/app/manifest.ts`). Sans clés VAPID, rien n'est proposé.
+- **Les tests de `tests/push.test.ts`** couvrent les messages, le contrôle des abonnements et, sur la base locale, qui est prévenu de quoi ; aucun message ne part vraiment.
 - **Ménage.** Les salons de plus de 24 heures sont supprimés à la création d'un nouveau salon.
 - **Les tests de `tests/multi.test.ts`** jouent une partie complète et le parcours des amis sur la base locale ; ils sont ignorés sans `DATABASE_URL`.
 
@@ -153,6 +157,7 @@ npx vercel --prod
 - **Région** : les fonctions tournent à Francfort (`vercel.json`), à côté de la base.
 - **Réglages locaux** : `.vercelignore` empêche l'envoi de `.env`, que la CLI n'écarte pas d'elle-même.
 - **Administrateurs** : `ADMIN_USERNAMES` (pseudos séparés par des virgules) est à définir dans les variables d'environnement de production pour modérer les quiz de la communauté et ouvrir l'administration (`/admin`).
+- **Notifications push** : `NEXT_PUBLIC_VAPID_PUBLIC_KEY` et `VAPID_PRIVATE_KEY`, une paire tirée avec `npx web-push generate-vapid-keys`, à définir avant le build (la clé publique est inscrite dans le code du navigateur). Sans elles, le site fonctionne sans notifications push. En changer désabonne tous les appareils.
 - **Adresse du site** : déduite du domaine de production ; `NEXT_PUBLIC_SITE_URL` ne sert qu'à en imposer une autre (domaine personnalisé).
 
 Les préversions et le poste de développement ne sont pas reliés à la base de production : les préversions tournent en mode invité, le développement sur la base Docker locale.

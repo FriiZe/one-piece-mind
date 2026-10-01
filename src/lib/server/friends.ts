@@ -2,6 +2,7 @@ import "server-only";
 import { playerBounty } from "@/lib/economy";
 import { MAX_FRIENDS, type FriendResult, type FriendsOverview, type NotificationCounts } from "@/lib/multi/friends";
 import { db } from "./db";
+import { notifyFrom } from "./push";
 
 /** Durée de validité d'une invitation dans un salon. */
 const INVITE_LIFETIME_MS = 2 * 3_600_000;
@@ -79,6 +80,7 @@ export async function requestFriend(userId: string, username: string): Promise<F
   if (existing) {
     if (existing.status === "pending" && existing.requesterId === target.id) {
       await db().friendship.update({ where: { id: existing.id }, data: { status: "accepted" } });
+      await notifyFrom(target.id, userId, (from) => ({ type: "friend-accepted", from }));
       return { ok: true, accepted: true };
     }
     return { ok: false, error: "already" };
@@ -88,6 +90,7 @@ export async function requestFriend(userId: string, username: string): Promise<F
   if (count >= MAX_FRIENDS) return { ok: false, error: "limit" };
 
   await db().friendship.create({ data: { requesterId: userId, addresseeId: target.id } });
+  await notifyFrom(target.id, userId, (from) => ({ type: "friend-request", from }));
   return { ok: true };
 }
 
@@ -95,8 +98,13 @@ export async function requestFriend(userId: string, username: string): Promise<F
 export async function answerFriendRequest(userId: string, requestId: string, accept: boolean): Promise<FriendResult> {
   const request = await db().friendship.findFirst({ where: { id: requestId, addresseeId: userId, status: "pending" } });
   if (!request) return { ok: false, error: "not-found" };
-  if (accept) await db().friendship.update({ where: { id: request.id }, data: { status: "accepted" } });
-  else await db().friendship.delete({ where: { id: request.id } });
+  if (accept) {
+    await db().friendship.update({ where: { id: request.id }, data: { status: "accepted" } });
+    await notifyFrom(request.requesterId, userId, (from) => ({ type: "friend-accepted", from }));
+  } else {
+    // Un refus reste silencieux : celui qui a demandé n'en est pas prévenu
+    await db().friendship.delete({ where: { id: request.id } });
+  }
   return { ok: true, accepted: accept };
 }
 

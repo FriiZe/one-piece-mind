@@ -16,19 +16,21 @@ import type { QuizDetail, QuizList, QuizPlayResult, QuizResult, QuizSummary } fr
 import type { SpoilerMode } from "@/lib/spoilers";
 import { Prisma } from "@/generated/prisma/client";
 import { db } from "./db";
+import { notify } from "./push";
 import type { SessionUser } from "./session";
 
 const LIST_SIZE = 60;
 const DAY = 86_400_000;
 
 /** Administrateurs : pseudos listés dans `ADMIN_USERNAMES`, séparés par des virgules. */
-export function isAdmin(user: SessionUser | null): boolean {
-  if (!user) return false;
-  const admins = (process.env.ADMIN_USERNAMES ?? "")
+const adminNames = () =>
+  (process.env.ADMIN_USERNAMES ?? "")
     .split(",")
     .map((name) => name.trim().toLowerCase())
     .filter(Boolean);
-  return admins.includes(user.username.toLowerCase());
+
+export function isAdmin(user: SessionUser | null): boolean {
+  return !!user && adminNames().includes(user.username.toLowerCase());
 }
 
 const summarySelect = {
@@ -147,7 +149,7 @@ export async function deleteQuiz(user: SessionUser, id: string): Promise<QuizRes
 
 /** Signale un quiz. Au bout de `REPORTS_TO_HIDE` signalements, il est masqué jusqu'à relecture. */
 export async function reportQuiz(user: SessionUser, id: string, reason: string): Promise<QuizResult<{ hidden: boolean }>> {
-  const quiz = await db().quiz.findUnique({ where: { id }, select: { authorId: true, status: true, reviewedAt: true } });
+  const quiz = await db().quiz.findUnique({ where: { id }, select: { authorId: true, title: true, status: true, reviewedAt: true } });
   if (!quiz || quiz.status !== "public") return { ok: false, error: "not-found" };
   if (quiz.authorId === user.id) return { ok: false, error: "own" };
 
@@ -160,7 +162,14 @@ export async function reportQuiz(user: SessionUser, id: string, reason: string):
   // Un quiz déjà relu par un administrateur n'est plus masqué automatiquement
   const reports = await db().quizReport.count({ where: { quizId: id } });
   const hidden = reports >= REPORTS_TO_HIDE && !quiz.reviewedAt;
-  if (hidden) await db().quiz.updateMany({ where: { id }, data: { status: "hidden" } });
+  if (hidden) {
+    const masked = await db().quiz.updateMany({ where: { id, status: "public" }, data: { status: "hidden" } });
+    // Deux signalements simultanés ne préviennent les administrateurs qu'une fois
+    if (masked.count > 0) {
+      const admins = await db().user.findMany({ where: { usernameKey: { in: adminNames() } }, select: { id: true } });
+      await Promise.all(admins.map((admin) => notify(admin.id, { type: "quiz-hidden", title: quiz.title })));
+    }
+  }
   return { ok: true, hidden };
 }
 

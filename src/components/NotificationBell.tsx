@@ -6,6 +6,60 @@ import { useT } from "@/lib/i18n/client";
 import { notificationsChanged, useFriends, useNotifications } from "@/lib/multi/client";
 import { answerFriendRequestAction } from "@/lib/player/friend-actions";
 import { usePlayer } from "@/lib/player/PlayerProvider";
+import { usePush } from "@/lib/player/usePush";
+
+/** Notifications push de cet appareil : les activer, les couper, ou savoir pourquoi elles ne passent pas. */
+function PushSetting({ state, busy, enable, disable }: ReturnType<typeof usePush>) {
+  const t = useT();
+  if (!state) return null;
+
+  return (
+    <div className="flex items-center justify-between gap-3 border-t border-sea-700 pt-3 text-mist">
+      {state === "off" && (
+        <>
+          <span>{t("Être prévenu sur cet appareil, même site fermé.", "Get notified on this device, even with the site closed.")}</span>
+          <button
+            type="button"
+            disabled={busy}
+            onClick={enable}
+            className="shrink-0 rounded-lg bg-straw px-3 py-1.5 font-bold text-ink hover:bg-straw-dark disabled:opacity-50"
+          >
+            {t("Activer", "Turn on")}
+          </button>
+        </>
+      )}
+      {state === "on" && (
+        <>
+          <span>{t("Notifications activées sur cet appareil.", "Notifications are on for this device.")}</span>
+          <button
+            type="button"
+            disabled={busy}
+            onClick={disable}
+            className="shrink-0 font-semibold underline underline-offset-4 hover:text-foam disabled:opacity-50"
+          >
+            {t("Couper", "Turn off")}
+          </button>
+        </>
+      )}
+      {state === "denied" && (
+        <span>
+          {t(
+            "Les notifications de ce site sont bloquées dans ton navigateur : autorise-les dans ses réglages pour être prévenu.",
+            "Notifications from this site are blocked in your browser: allow them in its settings to get notified.",
+          )}
+        </span>
+      )}
+      {state === "install" && (
+        <span>
+          {t(
+            "Pour être prévenu sur iPhone ou iPad, ajoute d'abord le site à l'écran d'accueil : Partager, puis « Sur l'écran d'accueil ».",
+            "To get notified on iPhone or iPad, first add the site to your Home Screen: Share, then “Add to Home Screen”.",
+          )}
+        </span>
+      )}
+    </div>
+  );
+}
 
 /**
  * Cloche de l'en-tête, pour le joueur connecté : demandes d'ami reçues,
@@ -19,6 +73,8 @@ export function NotificationBell() {
   const [open, setOpen] = useState(false);
   // Le détail n'est chargé qu'à l'ouverture : la cloche fermée ne demande que des nombres
   const { friends, reload } = useFriends(enabled && open);
+  // Lu dès l'arrivée du joueur, cloche fermée : l'abonnement de l'appareil suit sa session
+  const push = usePush(enabled);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const root = useRef<HTMLDivElement>(null);
@@ -179,6 +235,7 @@ export function NotificationBell() {
               {error}
             </p>
           )}
+          <PushSetting {...push} />
           <p className="border-t border-sea-700 pt-3">
             <Link href="/profil#amis" onClick={() => setOpen(false)} className="font-semibold text-mist underline underline-offset-4 hover:text-foam">
               {t("Gérer mes amis", "Manage my friends")}
