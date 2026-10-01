@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import Link from "@/components/Link";
 import { CheckIcon } from "@/components/GameBadge";
 import { useEffect, useMemo, useState } from "react";
 import { formatNumber } from "@/games/engine/text";
@@ -9,6 +9,8 @@ import { Button, Panel, ShareButton } from "@/games/ui/primitives";
 import { useIsClient } from "@/games/ui/storage";
 import { DIFFICULTIES } from "@/games/engine/difficulty";
 import { getGame } from "@/lib/games/catalog";
+import { LOCALE_NAMES, localePath } from "@/lib/i18n";
+import { useLocale, useT } from "@/lib/i18n/client";
 import { forgetTicket, loadTicket, ROOM_ERRORS, roomAction, saveTicket, useFriends, useNow, useRoom } from "@/lib/multi/client";
 import { CODE_PATTERN } from "@/lib/multi/rules";
 import type { RoomPlayerView, RoomQuestionView, RoomTicket, RoomView } from "@/lib/multi/types";
@@ -17,7 +19,16 @@ import { usePlayer } from "@/lib/player/PlayerProvider";
 const INPUT =
   "w-full rounded-lg border-2 border-sea-600 bg-sea-900 px-3 py-2.5 text-foam placeholder:text-mist/70 focus:border-straw focus:outline-none";
 
+/** Rang en anglais : 1st, 2nd, 3rd, 4th… */
+function englishOrdinal(rank: number): string {
+  const lastTwo = rank % 100;
+  const suffix = lastTwo >= 11 && lastTwo <= 13 ? "th" : (["th", "st", "nd", "rd"][rank % 10] ?? "th");
+  return `${rank}${suffix}`;
+}
+
 function Join({ code, onJoined }: { code: string; onJoined: (ticket: RoomTicket) => void }) {
+  const t = useT();
+  const locale = useLocale();
   const { status, username } = usePlayer();
   const [name, setName] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -30,22 +41,22 @@ function Join({ code, onJoined }: { code: string; onJoined: (ticket: RoomTicket)
     const result = await roomAction<{ ticket: RoomTicket }>(code, null, "join", status === "user" ? {} : { name });
     setBusy(false);
     if (result.ok) onJoined(result.ticket);
-    else setError(ROOM_ERRORS[result.error]);
+    else setError(ROOM_ERRORS[locale][result.error]);
   }
 
   return (
     <Panel className="mx-auto max-w-4xl">
       <form onSubmit={join} className="space-y-4">
         <h1 className="font-display text-4xl tracking-wide text-foam">
-          Salon <span className="tracking-[0.2em] text-straw">{code}</span>
+          {t("Salon", "Room")} <span className="tracking-[0.2em] text-straw">{code}</span>
         </h1>
         {status === "user" ? (
           <p className="text-mist">
-            Tu vas entrer en tant que <strong className="text-foam">{username}</strong>.
+            {t("Tu vas entrer en tant que", "You'll join as")} <strong className="text-foam">{username}</strong>.
           </p>
         ) : (
           <label className="block">
-            <span className="mb-1 block text-sm font-semibold text-foam">Ton pseudo</span>
+            <span className="mb-1 block text-sm font-semibold text-foam">{t("Ton pseudo", "Your name")}</span>
             <input
               value={name}
               onChange={(event) => setName(event.target.value)}
@@ -65,10 +76,10 @@ function Join({ code, onJoined }: { code: string; onJoined: (ticket: RoomTicket)
         )}
         <div className="flex flex-wrap items-center gap-3">
           <Button type="submit" disabled={busy || status === "loading"}>
-            {busy ? "Entrée…" : "Entrer dans le salon"}
+            {busy ? t("Entrée…", "Entering…") : t("Entrer dans le salon", "Enter the room")}
           </Button>
           <Link href="/multi" className="text-sm text-mist underline underline-offset-4 hover:text-foam">
-            Retour
+            {t("Retour", "Back")}
           </Link>
         </div>
       </form>
@@ -88,6 +99,8 @@ function PlayerList({
   /** Pendant une question : qui a déjà répondu. */
   showAnswered?: boolean;
 }) {
+  const t = useT();
+  const locale = useLocale();
   return (
     <ol className="space-y-2">
       {players.map((player) => (
@@ -110,16 +123,16 @@ function PlayerList({
           </span>
           <span className="min-w-0 flex-1 truncate font-extrabold text-foam">
             {player.name}
-            {player.id === youId && <span className="ml-1.5 font-normal text-mist">(toi)</span>}
-            {player.isHost && <span className="ml-2 text-xs font-semibold text-mist">hôte</span>}
-            {!player.connected && <span className="ml-2 text-xs font-semibold text-mist">absent</span>}
+            {player.id === youId && <span className="ml-1.5 font-normal text-mist">{t("(toi)", "(you)")}</span>}
+            {player.isHost && <span className="ml-2 text-xs font-semibold text-mist">{t("hôte", "host")}</span>}
+            {!player.connected && <span className="ml-2 text-xs font-semibold text-mist">{t("absent", "away")}</span>}
           </span>
-          {showScores && <span className="font-extrabold text-foam">{formatNumber(player.score)}</span>}
+          {showScores && <span className="font-extrabold text-foam">{formatNumber(player.score, locale)}</span>}
           {showAnswered &&
             (player.answered ? (
               <CheckIcon className="size-4 shrink-0 text-emerald-300" />
             ) : (
-              <span className="shrink-0 text-xs font-bold text-mist">réfléchit</span>
+              <span className="shrink-0 text-xs font-bold text-mist">{t("réfléchit", "thinking")}</span>
             ))}
         </li>
       ))}
@@ -128,6 +141,7 @@ function PlayerList({
 }
 
 function InviteFriends({ code, ticket }: { code: string; ticket: RoomTicket }) {
+  const t = useT();
   const { status } = usePlayer();
   const { friends } = useFriends(status === "user");
   const [invited, setInvited] = useState<string[]>([]);
@@ -140,12 +154,14 @@ function InviteFriends({ code, ticket }: { code: string; ticket: RoomTicket }) {
 
   return (
     <div>
-      <h3 className="mb-2 font-bold text-foam">Inviter un ami</h3>
+      <h3 className="mb-2 font-bold text-foam">{t("Inviter un ami", "Invite a friend")}</h3>
       <ul className="flex flex-wrap gap-2">
         {friends.friends.map((friend) => (
           <li key={friend.id}>
             <Button variant="secondary" className="py-1.5 text-sm" disabled={invited.includes(friend.id)} onClick={() => invite(friend.id)}>
-              {invited.includes(friend.id) ? `${friend.username} invité` : friend.username}
+              {invited.includes(friend.id)
+                ? t(`${friend.username} invité`, `${friend.username} invited`)
+                : friend.username}
             </Button>
           </li>
         ))}
@@ -155,40 +171,59 @@ function InviteFriends({ code, ticket }: { code: string; ticket: RoomTicket }) {
 }
 
 function Lobby({ view, ticket, act }: { view: RoomView; ticket: RoomTicket; act: (action: string) => Promise<void> }) {
+  const t = useT();
+  const locale = useLocale();
   const { settings } = view;
-  const difficulty = DIFFICULTIES.find((d) => d.id === settings.difficulty)?.label;
+  const difficulty = DIFFICULTIES.find((d) => d.id === settings.difficulty)?.label[locale];
   return (
     <div className="space-y-6">
       <div className="rounded-2xl bg-parchment p-5 text-center text-ink sm:p-6">
-        <p className="text-sm font-bold tracking-[0.25em] uppercase">Code du salon</p>
+        <p className="text-sm font-bold tracking-[0.25em] uppercase">{t("Code du salon", "Room code")}</p>
         <p className="font-display text-6xl tracking-[0.25em]">{view.code}</p>
         <div className="mt-3 flex justify-center">
-          <ShareButton label="Copier le lien d'invitation" getText={() => `${window.location.origin}/multi/${view.code}`} />
+          {/* Le lien mène à la page dans la langue du salon, celle de ses questions */}
+          <ShareButton
+            label={t("Copier le lien d'invitation", "Copy the invite link")}
+            getText={() => `${window.location.origin}${localePath(settings.lang, `/multi/${view.code}`)}`}
+          />
         </div>
       </div>
 
       <Panel className="space-y-4">
         <h2 className="font-display text-2xl tracking-wide text-straw">
-          Joueurs <span className="font-sans text-base font-semibold text-mist">· {view.players.length}</span>
+          {t("Joueurs", "Players")}{" "}
+          <span className="font-sans text-base font-semibold text-mist">· {view.players.length}</span>
         </h2>
         <PlayerList players={view.players} youId={view.you.id} showScores={false} />
         <InviteFriends code={view.code} ticket={ticket} />
         <p className="text-sm text-mist">
-          {settings.questionCount} questions · {settings.seconds} s par question · difficulté {difficulty?.toLowerCase()} ·
-          joueurs à jour sur {settings.mode === "anime" ? "l'anime" : "le manga"}
+          {t(
+            `${settings.questionCount} questions · ${settings.seconds} s par question · difficulté ${difficulty?.toLowerCase()} · joueurs à jour sur ${settings.mode === "anime" ? "l'anime" : "le manga"}`,
+            `${settings.questionCount} questions · ${settings.seconds} s per question · ${difficulty?.toLowerCase()} difficulty · players caught up with ${settings.mode === "anime" ? "the anime" : "the manga"}`,
+          )}
+          {/* Le salon se joue dans la langue de son hôte, qui n'est pas forcément celle de l'invité */}
+          {" · "}
+          {t("langue des questions : ", "question language: ")}
+          {LOCALE_NAMES[settings.lang]}
           <br />
-          Quiz : {settings.games.map((slug) => getGame(slug)?.title ?? slug).join(", ")}
+          {t("Quiz : ", "Quizzes: ")}
+          {settings.games.map((slug) => getGame(slug)?.title[locale] ?? slug).join(", ")}
         </p>
         {view.you.isHost ? (
           <div className="space-y-2">
-            <Button onClick={() => act("start")}>Lancer la partie</Button>
+            <Button onClick={() => act("start")}>{t("Lancer la partie", "Start the game")}</Button>
             {view.players.length < 2 && (
-              <p className="text-sm text-mist">Tu es seul pour l&apos;instant : une partie en solitaire ne rapporte pas de Berrys.</p>
+              <p className="text-sm text-mist">
+                {t(
+                  "Tu es seul pour l'instant : une partie en solitaire ne rapporte pas de Berrys.",
+                  "You're on your own for now: a solo game doesn't earn Berries.",
+                )}
+              </p>
             )}
           </div>
         ) : (
           <p className="font-semibold text-foam" aria-live="polite">
-            En attente du lancement par l&apos;hôte…
+            {t("En attente du lancement par l'hôte…", "Waiting for the host to start…")}
           </p>
         )}
       </Panel>
@@ -207,6 +242,8 @@ function Question({
   clockOffset: number;
   onAnswer: (optionId: string) => void;
 }) {
+  const t = useT();
+  const locale = useLocale();
   const now = useNow(true);
   const [picked, setPicked] = useState<{ index: number; optionId: string } | null>(null);
   const reveal = question.reveal;
@@ -232,7 +269,12 @@ function Question({
           )}
         </div>
         <span aria-live="off" className={`text-right whitespace-nowrap ${reveal ? "text-sm font-bold text-mist" : "w-14 font-display text-[34px] leading-none tracking-wide text-straw"}`}>
-          {reveal ? `Suite dans ${Math.max(0, Math.ceil((reveal.nextAt - serverNow) / 1000))} s` : `${Math.ceil(remaining / 1000)} s`}
+          {reveal
+            ? t(
+                `Suite dans ${Math.max(0, Math.ceil((reveal.nextAt - serverNow) / 1000))} s`,
+                `Next in ${Math.max(0, Math.ceil((reveal.nextAt - serverNow) / 1000))} s`,
+              )
+            : `${Math.ceil(remaining / 1000)} s`}
         </span>
       </div>
 
@@ -277,7 +319,9 @@ function Question({
                     {option.label}
                   </span>
                   {option.detail && <span className="block text-sm text-mist">{option.detail}</span>}
-                  {!reveal && isChosen && <span className="block text-[13px] font-extrabold text-straw">Ta réponse</span>}
+                  {!reveal && isChosen && (
+                    <span className="block text-[13px] font-extrabold text-straw">{t("Ta réponse", "Your answer")}</span>
+                  )}
                 </span>
               </span>
               {reveal && <span className="shrink-0 text-sm font-semibold text-mist">{reveal.counts[option.id] ?? 0}</span>}
@@ -288,10 +332,25 @@ function Question({
 
       <p className={`min-h-6 text-center ${reveal ? "font-bold text-foam" : "text-[15px] text-mist"}`} aria-live="polite">
         {reveal
-          ? `${reveal.yourPoints > 0 ? `Bonne réponse : +${formatNumber(reveal.yourPoints)} points.` : chosen ? "Raté." : "Pas de réponse."} ${reveal.explanation}`
+          ? `${
+              reveal.yourPoints > 0
+                ? t(
+                    `Bonne réponse : +${formatNumber(reveal.yourPoints, locale)} points.`,
+                    `Correct: +${formatNumber(reveal.yourPoints, locale)} ${reveal.yourPoints === 1 ? "point" : "points"}.`,
+                  )
+                : chosen
+                  ? t("Raté.", "Wrong.")
+                  : t("Pas de réponse.", "No answer.")
+            } ${reveal.explanation}`
           : chosen
-            ? `Réponse enregistrée. La correction s'affiche quand tout le monde a répondu, ou à la fin du temps (${answered} sur ${view.players.length}).`
-            : "Plus tu réponds vite, plus la bonne réponse rapporte."}
+            ? t(
+                `Réponse enregistrée. La correction s'affiche quand tout le monde a répondu, ou à la fin du temps (${answered} sur ${view.players.length}).`,
+                `Answer saved. The right answer shows once everyone has answered, or when time runs out (${answered} of ${view.players.length}).`,
+              )
+            : t(
+                "Plus tu réponds vite, plus la bonne réponse rapporte.",
+                "The faster you answer, the more a correct answer is worth.",
+              )}
       </p>
     </section>
   );
@@ -299,6 +358,8 @@ function Question({
 
 function Final({ view, act }: { view: RoomView; act: (action: string) => Promise<void> }) {
   // Les Berrys de la partie viennent d'être versés : le solde affiché dans l'en-tête doit suivre
+  const t = useT();
+  const locale = useLocale();
   const { refresh } = usePlayer();
   const rewarded = view.reward?.berrys ?? null;
   useEffect(() => {
@@ -310,38 +371,52 @@ function Final({ view, act }: { view: RoomView; act: (action: string) => Promise
   return (
     <div className="space-y-6">
       <div className="rounded-2xl bg-parchment p-5 text-ink sm:p-6" role="status">
-        <p className="text-sm font-bold tracking-[0.25em] uppercase">Partie terminée</p>
+        <p className="text-sm font-bold tracking-[0.25em] uppercase">{t("Partie terminée", "Game over")}</p>
         <h2 className="font-display text-4xl tracking-wide">
-          {winner.id === view.you.id ? "Tu l'emportes !" : `${winner.name} l'emporte`}
+          {winner.id === view.you.id
+            ? t("Tu l'emportes !", "You win!")
+            : t(`${winner.name} l'emporte`, `${winner.name} wins`)}
         </h2>
         {you && (
           <p className="mt-1 font-semibold">
-            Tu finis {you.rank === 1 ? "1er" : `${you.rank}e`} sur {view.players.length}, avec {formatNumber(you.score)} points.
+            {t(
+              `Tu finis ${you.rank === 1 ? "1er" : `${you.rank}e`} sur ${view.players.length}, avec ${formatNumber(you.score, locale)} points.`,
+              `You finish ${englishOrdinal(you.rank)} out of ${view.players.length}, with ${formatNumber(you.score, locale)} ${you.score === 1 ? "point" : "points"}.`,
+            )}
           </p>
         )}
         {view.reward ? (
-          <p className="mt-2 font-display text-3xl tracking-wide text-vest-dark">+{formatNumber(view.reward.berrys)} ฿</p>
+          <p className="mt-2 font-display text-3xl tracking-wide text-vest-dark">
+            +{formatNumber(view.reward.berrys, locale)} ฿
+          </p>
         ) : (
           <p className="mt-2 text-sm">
-            Avec un compte, cette partie t&apos;aurait rapporté des Berrys.{" "}
+            {t(
+              "Avec un compte, cette partie t'aurait rapporté des Berrys.",
+              "With an account, this game would have earned you Berries.",
+            )}{" "}
             <Link href="/profil" className="underline underline-offset-4">
-              Créer un compte
+              {t("Créer un compte", "Create an account")}
             </Link>
           </p>
         )}
         <div className="mt-4 flex flex-wrap items-center gap-3">
           {view.you.isHost ? (
-            <Button onClick={() => act("restart")}>Rejouer avec les mêmes joueurs</Button>
+            <Button onClick={() => act("restart")}>
+              {t("Rejouer avec les mêmes joueurs", "Play again with the same players")}
+            </Button>
           ) : (
-            <span className="font-semibold">L&apos;hôte peut relancer une partie.</span>
+            <span className="font-semibold">
+              {t("L'hôte peut relancer une partie.", "The host can start a new game.")}
+            </span>
           )}
           <Link href="/multi" className="underline underline-offset-4">
-            Quitter le salon
+            {t("Quitter le salon", "Leave the room")}
           </Link>
         </div>
       </div>
       <Panel className="space-y-3">
-        <h2 className="font-display text-2xl tracking-wide text-straw">Classement</h2>
+        <h2 className="font-display text-2xl tracking-wide text-straw">{t("Classement", "Leaderboard")}</h2>
         <PlayerList players={view.players} youId={view.you.id} showScores />
       </Panel>
     </div>
@@ -349,6 +424,8 @@ function Final({ view, act }: { view: RoomView; act: (action: string) => Promise
 }
 
 export function Room({ code }: { code: string }) {
+  const t = useT();
+  const locale = useLocale();
   const isClient = useIsClient();
   const [joined, setJoined] = useState<RoomTicket | null>(null);
   const [left, setLeft] = useState(false);
@@ -362,14 +439,14 @@ export function Room({ code }: { code: string }) {
   if (!CODE_PATTERN.test(code)) {
     return (
       <Panel className="mx-auto max-w-4xl space-y-3">
-        <p className="text-foam">Ce code de salon n&apos;est pas valide.</p>
+        <p className="text-foam">{t("Ce code de salon n'est pas valide.", "This room code isn't valid.")}</p>
         <Link href="/multi" className="font-bold text-straw underline underline-offset-4">
-          Retour au multijoueur
+          {t("Retour au multijoueur", "Back to multiplayer")}
         </Link>
       </Panel>
     );
   }
-  if (!isClient) return <Panel className="mx-auto max-w-4xl">Chargement du salon…</Panel>;
+  if (!isClient) return <Panel className="mx-auto max-w-4xl">{t("Chargement du salon…", "Loading the room…")}</Panel>;
 
   if (!ticket) {
     return (
@@ -387,7 +464,12 @@ export function Room({ code }: { code: string }) {
   if (error === "not-found") {
     return (
       <Panel className="mx-auto max-w-4xl space-y-3">
-        <p className="text-foam">Ce salon n&apos;existe plus, ou ta place n&apos;y est plus réservée.</p>
+        <p className="text-foam">
+          {t(
+            "Ce salon n'existe plus, ou ta place n'y est plus réservée.",
+            "This room no longer exists, or your seat in it is no longer held.",
+          )}
+        </p>
         <div className="flex flex-wrap gap-3">
           <Button
             onClick={() => {
@@ -396,21 +478,21 @@ export function Room({ code }: { code: string }) {
               setLeft(true);
             }}
           >
-            Essayer d&apos;y entrer
+            {t("Essayer d'y entrer", "Try to join it")}
           </Button>
           <Link href="/multi" className="self-center text-mist underline underline-offset-4 hover:text-foam">
-            Retour au multijoueur
+            {t("Retour au multijoueur", "Back to multiplayer")}
           </Link>
         </div>
       </Panel>
     );
   }
-  if (!view) return <Panel className="mx-auto max-w-4xl">Connexion au salon…</Panel>;
+  if (!view) return <Panel className="mx-auto max-w-4xl">{t("Connexion au salon…", "Connecting to the room…")}</Panel>;
 
   async function act(action: string, payload: Record<string, unknown> = {}) {
     setActionError(null);
     const result = await roomAction(code, ticket, action, payload);
-    if (!result.ok) setActionError(ROOM_ERRORS[result.error]);
+    if (!result.ok) setActionError(ROOM_ERRORS[locale][result.error]);
     refresh();
   }
 
@@ -427,11 +509,13 @@ export function Room({ code }: { code: string }) {
           />
           <aside className="space-y-3.5 rounded-[20px] border border-sea-700 bg-sea-800 p-5">
             <div className="flex items-baseline justify-between gap-3">
-              <h2 className="text-lg font-extrabold text-foam">Classement</h2>
+              <h2 className="text-lg font-extrabold text-foam">{t("Classement", "Leaderboard")}</h2>
               {!view.question.reveal && (
                 <span className="text-[13px] text-mist">
-                  {view.players.filter((p) => p.answered).length} réponse{view.players.filter((p) => p.answered).length > 1 ? "s" : ""} sur{" "}
-                  {view.players.length}
+                  {t(
+                    `${view.players.filter((p) => p.answered).length} réponse${view.players.filter((p) => p.answered).length > 1 ? "s" : ""} sur ${view.players.length}`,
+                    `${view.players.filter((p) => p.answered).length} of ${view.players.length} answered`,
+                  )}
                 </span>
               )}
             </div>
@@ -441,7 +525,8 @@ export function Room({ code }: { code: string }) {
       )}
       {view.status === "finished" && <Final view={view} act={act} />}
       <p className="min-h-6 text-sm font-semibold text-vest" aria-live="polite">
-        {actionError ?? (stale ? "Connexion au salon perdue : nouvelle tentative…" : "")}
+        {actionError ??
+          (stale ? t("Connexion au salon perdue : nouvelle tentative…", "Lost connection to the room: retrying…") : "")}
       </p>
     </div>
   );

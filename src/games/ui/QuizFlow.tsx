@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, type ReactNode } from "react";
+import { useT } from "@/lib/i18n/client";
 import { Portrait } from "./Portrait";
 import { Button, Panel, Progress } from "./primitives";
 
@@ -24,6 +25,7 @@ export function QuizFlow({
   columns?: 2 | 3;
   onFinish: (score: number, answers: string[]) => void;
 }) {
+  const t = useT();
   const [index, setIndex] = useState(0);
   const [score, setScore] = useState(0);
   const [chosen, setChosen] = useState<string | null>(null);
@@ -51,7 +53,7 @@ export function QuizFlow({
 
   return (
     <Panel className="space-y-4">
-      <Progress current={index + 1} total={questions.length} score={`Score : ${score}`} />
+      <Progress current={index + 1} total={questions.length} score={t(`Score : ${score}`, `Score: ${score}`)} />
       <div>{question.prompt}</div>
       <div className={`grid gap-2 ${columns === 3 ? "sm:grid-cols-3" : "sm:grid-cols-2"}`}>
         {question.options.map((option) => {
@@ -87,12 +89,12 @@ export function QuizFlow({
         <div className="flex flex-wrap items-center justify-between gap-3" aria-live="polite">
           <p className="text-mist">
             <strong className={chosen === question.answerId ? "text-emerald-300" : "text-vest"}>
-              {chosen === question.answerId ? "Bonne réponse." : "Raté."}
+              {chosen === question.answerId ? t("Bonne réponse.", "Correct.") : t("Raté.", "Wrong.")}
             </strong>{" "}
             {question.explanation}
           </p>
           <Button autoFocus onClick={next}>
-            {last ? "Voir mon score" : "Suivant"}
+            {last ? t("Voir mon score", "See my score") : t("Suivant", "Next")}
           </Button>
         </div>
       )}

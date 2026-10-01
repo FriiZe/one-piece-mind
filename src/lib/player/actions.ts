@@ -6,6 +6,7 @@
  */
 import type { GameReport } from "@/games/report";
 import { SIGNUP_BERRYS } from "@/lib/economy";
+import { DEFAULT_LOCALE, isLocale, translator, type Locale } from "@/lib/i18n";
 import { accountsEnabled, db } from "@/lib/server/db";
 import { DUMMY_HASH, hashPassword, verifyPassword } from "@/lib/server/password";
 import { buyBoosterFor, buyRecruitFor, sanitizeGuestState, sellDuplicatesFor, setCrewFor, submitGame } from "@/lib/server/player";
@@ -24,11 +25,12 @@ import type { BoosterResult, CrewResult, GameResult, RecruitResult, SellResult }
 
 const isMode = (value: unknown): value is SpoilerMode => value === "anime" || value === "manga";
 
-export async function submitGameAction(report: GameReport): Promise<GameResult> {
+/** `lang` : langue dans laquelle la partie a été jouée. */
+export async function submitGameAction(report: GameReport, lang: Locale): Promise<GameResult> {
   const user = await currentUser();
   if (!user) return { ok: false, reason: "unavailable" };
   await renewSession();
-  return submitGame(user.id, report);
+  return submitGame(user.id, report, undefined, isLocale(lang) ? lang : DEFAULT_LOCALE);
 }
 
 export async function buyRecruitAction(mode: SpoilerMode): Promise<RecruitResult> {
@@ -75,21 +77,37 @@ const field = (form: FormData, name: string) => {
   return typeof value === "string" ? value : "";
 };
 
+/** Langue du formulaire (champ caché `lang`), pour répondre dans celle du joueur. */
+const translatorOf = (form: FormData) => {
+  const lang = field(form, "lang");
+  return translator(isLocale(lang) ? lang : DEFAULT_LOCALE);
+};
+
 export async function signupAction(_: AuthState, form: FormData): Promise<AuthState> {
-  if (!accountsEnabled) return { ok: false, error: "Les comptes ne sont pas encore ouverts." };
+  const t = translatorOf(form);
+  if (!accountsEnabled) return { ok: false, error: t("Les comptes ne sont pas encore ouverts.", "Accounts aren't open yet.") };
   const username = field(form, "username").trim();
   const password = field(form, "password");
 
   const refuse = (error: string): AuthState => ({ ok: false, error, username });
 
   if (!USERNAME.test(username)) {
-    return refuse("Le pseudo doit faire 3 à 20 caractères : lettres, chiffres, tiret ou tiret bas.");
+    return refuse(
+      t(
+        "Le pseudo doit faire 3 à 20 caractères : lettres, chiffres, tiret ou tiret bas.",
+        "Your username must be 3 to 20 characters long: letters, digits, hyphen or underscore.",
+      ),
+    );
   }
   if (password.length < PASSWORD_MIN || password.length > PASSWORD_MAX) {
-    return refuse(`Le mot de passe doit faire au moins ${PASSWORD_MIN} caractères.`);
+    return refuse(
+      t(`Le mot de passe doit faire au moins ${PASSWORD_MIN} caractères.`, `Your password must be at least ${PASSWORD_MIN} characters long.`),
+    );
   }
   if (!(await allowAttempt(`signup:${await clientAddress()}`, 5, 60 * MINUTE))) {
-    return refuse("Trop de comptes créés depuis cette connexion. Réessaie plus tard.");
+    return refuse(
+      t("Trop de comptes créés depuis cette connexion. Réessaie plus tard.", "Too many accounts created from this connection. Try again later."),
+    );
   }
 
   // La progression d'invité, gardée dans le navigateur, est reprise à la création du compte
@@ -120,24 +138,27 @@ export async function signupAction(_: AuthState, form: FormData): Promise<AuthSt
     return { ok: true };
   } catch (error) {
     if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2002") {
-      return refuse("Ce pseudo est déjà pris.");
+      return refuse(t("Ce pseudo est déjà pris.", "That username is already taken."));
     }
     throw error;
   }
 }
 
 export async function loginAction(_: AuthState, form: FormData): Promise<AuthState> {
-  if (!accountsEnabled) return { ok: false, error: "Les comptes ne sont pas encore ouverts." };
+  const t = translatorOf(form);
+  if (!accountsEnabled) return { ok: false, error: t("Les comptes ne sont pas encore ouverts.", "Accounts aren't open yet.") };
   const username = field(form, "username").trim();
   const usernameKey = username.toLowerCase();
   const password = field(form, "password");
-  const refused = { ok: false, error: "Pseudo ou mot de passe incorrect.", username };
+  const refused = { ok: false, error: t("Pseudo ou mot de passe incorrect.", "Wrong username or password."), username };
   if (!usernameKey || !password || password.length > PASSWORD_MAX) return refused;
 
   const accountKey = `login:${usernameKey}`;
   const allowed =
     (await allowAttempt(accountKey, 5, 15 * MINUTE)) && (await allowAttempt(`login-ip:${await clientAddress()}`, 30, 15 * MINUTE));
-  if (!allowed) return { ok: false, error: "Trop de tentatives. Réessaie dans un quart d'heure.", username };
+  if (!allowed) {
+    return { ok: false, error: t("Trop de tentatives. Réessaie dans un quart d'heure.", "Too many attempts. Try again in fifteen minutes."), username };
+  }
 
   const user = await db().user.findUnique({ where: { usernameKey }, select: { id: true, passwordHash: true } });
   // Le calcul a lieu même sans compte : le temps de réponse ne dit pas si le pseudo existe

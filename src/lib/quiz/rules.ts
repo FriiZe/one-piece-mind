@@ -7,6 +7,7 @@ import { z } from "zod";
 import { DCC_KINDS, scoreAnswers, type DccAnswer, type DccQuestion } from "@/games/duo-carre-cash/logic";
 import { createRng, shuffle } from "@/games/engine/rng";
 import { normalizeText } from "@/games/engine/text";
+import { translator, type Locale } from "@/lib/i18n";
 
 export const QUIZ_LIMITS = {
   title: { min: 4, max: 60 },
@@ -99,42 +100,62 @@ export function draftToInput(draft: QuizDraft) {
 }
 
 /** Ce qui empêche de publier le brouillon, en clair ; vide s'il est prêt. */
-export function draftProblems(draft: QuizDraft): string[] {
+export function draftProblems(draft: QuizDraft, locale: Locale): string[] {
+  const t = translator(locale);
   const problems: string[] = [];
   const title = cleanText(draft.title);
   if (title.length < QUIZ_LIMITS.title.min || title.length > QUIZ_LIMITS.title.max) {
-    problems.push(`Le titre doit faire ${QUIZ_LIMITS.title.min} à ${QUIZ_LIMITS.title.max} caractères.`);
+    problems.push(
+      t(
+        `Le titre doit faire ${QUIZ_LIMITS.title.min} à ${QUIZ_LIMITS.title.max} caractères.`,
+        `The title must be ${QUIZ_LIMITS.title.min} to ${QUIZ_LIMITS.title.max} characters long.`,
+      ),
+    );
   }
   if (cleanText(draft.description).length > QUIZ_LIMITS.description) {
-    problems.push(`La description ne doit pas dépasser ${QUIZ_LIMITS.description} caractères.`);
+    problems.push(
+      t(
+        `La description ne doit pas dépasser ${QUIZ_LIMITS.description} caractères.`,
+        `The description can't be longer than ${QUIZ_LIMITS.description} characters.`,
+      ),
+    );
   }
   if (draft.questions.length < QUIZ_LIMITS.questions.min) {
-    problems.push(`Il faut au moins ${QUIZ_LIMITS.questions.min} questions.`);
+    problems.push(t(`Il faut au moins ${QUIZ_LIMITS.questions.min} questions.`, `You need at least ${QUIZ_LIMITS.questions.min} questions.`));
   }
   if (draft.questions.length > QUIZ_LIMITS.questions.max) {
-    problems.push(`Pas plus de ${QUIZ_LIMITS.questions.max} questions.`);
+    problems.push(t(`Pas plus de ${QUIZ_LIMITS.questions.max} questions.`, `No more than ${QUIZ_LIMITS.questions.max} questions.`));
   }
 
   draftToInput(draft).questions.forEach((question, index) => {
     const label = `Question ${index + 1}`;
     const prompt = cleanText(question.prompt);
     const choices = [question.answer, ...question.wrong].map(cleanText);
-    if (prompt.length < QUIZ_LIMITS.prompt.min) problems.push(`${label} : l'énoncé est trop court.`);
-    else if (prompt.length > QUIZ_LIMITS.prompt.max) problems.push(`${label} : l'énoncé dépasse ${QUIZ_LIMITS.prompt.max} caractères.`);
-    if (choices.some((choice) => !choice)) problems.push(`${label} : il faut une bonne réponse et trois mauvaises.`);
-    else if (new Set(choices.map(normalizeText)).size < 4) problems.push(`${label} : les quatre réponses doivent être différentes.`);
+    if (prompt.length < QUIZ_LIMITS.prompt.min) problems.push(t(`${label} : l'énoncé est trop court.`, `${label}: the prompt is too short.`));
+    else if (prompt.length > QUIZ_LIMITS.prompt.max) {
+      problems.push(
+        t(`${label} : l'énoncé dépasse ${QUIZ_LIMITS.prompt.max} caractères.`, `${label}: the prompt is over ${QUIZ_LIMITS.prompt.max} characters.`),
+      );
+    }
+    if (choices.some((choice) => !choice)) {
+      problems.push(t(`${label} : il faut une bonne réponse et trois mauvaises.`, `${label}: it needs one right answer and three wrong ones.`));
+    } else if (new Set(choices.map(normalizeText)).size < 4) {
+      problems.push(t(`${label} : les quatre réponses doivent être différentes.`, `${label}: the four answers must all be different.`));
+    }
     if ([...choices, ...question.alternatives].some((choice) => choice.length > QUIZ_LIMITS.answer)) {
-      problems.push(`${label} : une réponse dépasse ${QUIZ_LIMITS.answer} caractères.`);
+      problems.push(t(`${label} : une réponse dépasse ${QUIZ_LIMITS.answer} caractères.`, `${label}: an answer is over ${QUIZ_LIMITS.answer} characters.`));
     }
     if (question.alternatives.length > QUIZ_LIMITS.alternatives) {
-      problems.push(`${label} : pas plus de ${QUIZ_LIMITS.alternatives} autres graphies.`);
+      problems.push(
+        t(`${label} : pas plus de ${QUIZ_LIMITS.alternatives} autres graphies.`, `${label}: no more than ${QUIZ_LIMITS.alternatives} alternative spellings.`),
+      );
     }
   });
   return problems;
 }
 
 /** Les questions d'un quiz, prêtes à être jouées : propositions mélangées selon la graine. */
-export function toDccQuestions(title: string, questions: readonly QuizQuestion[], seed: number): DccQuestion[] {
+export function toDccQuestions(title: string, questions: readonly QuizQuestion[], seed: number, locale: Locale): DccQuestion[] {
   return questions.map((question, index) => ({
     id: String(index),
     title,
@@ -144,7 +165,7 @@ export function toDccQuestions(title: string, questions: readonly QuizQuestion[]
     duoIds: [question.answer, question.wrong[0]],
     accepted: [question.answer, ...question.alternatives],
     rejected: question.wrong,
-    explanation: `La bonne réponse : ${question.answer}.`,
+    explanation: translator(locale)(`La bonne réponse : ${question.answer}.`, `The right answer: ${question.answer}.`),
   }));
 }
 

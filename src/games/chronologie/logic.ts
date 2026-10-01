@@ -2,6 +2,7 @@
 import type { PlayCharacter, ResolvedData } from "../cards";
 import { byDifficulty, type Difficulty } from "../engine/difficulty";
 import { createRng, sample, shuffle, type Rng } from "../engine/rng";
+import { translator } from "@/lib/i18n";
 
 export const ROUNDS = 5;
 export const ROUND_SIZE = 5;
@@ -11,28 +12,34 @@ export type RankingItem = { id: string; label: string; /** Position dans l'histo
 export type RankingRound = { prompt: string; items: RankingItem[] };
 
 function arcRound(rng: Rng, data: ResolvedData): RankingRound {
+  const t = translator(data.locale);
   const lastArc = Math.max(...data.characters.map((c) => c.arc ?? 0));
   const arcs = [...data.arcs].filter(([number]) => number <= lastArc);
   const items = sample(rng, arcs, ROUND_SIZE).map(([number, title]) => ({
     id: `arc-${number}`,
     label: title,
-    detail: `Arc n° ${arcs.findIndex(([n]) => n === number) + 1}`,
+    detail: t(`Arc n° ${arcs.findIndex(([n]) => n === number) + 1}`, `Arc #${arcs.findIndex(([n]) => n === number) + 1}`),
     order: number,
   }));
-  return { prompt: "Remets ces arcs dans l'ordre de l'histoire, du premier au dernier.", items };
+  return { prompt: t("Remets ces arcs dans l'ordre de l'histoire, du premier au dernier.", "Put these arcs in story order, from first to last."), items };
 }
 
 function characterRound(rng: Rng, data: ResolvedData, pool: readonly PlayCharacter[]): RankingRound {
+  const t = translator(data.locale);
   // Un personnage par arc : deux apparitions à quelques chapitres d'écart seraient impossibles à départager
   const items: RankingItem[] = [];
   const arcs = new Set<number>();
   for (const c of shuffle(rng, pool)) {
     if (c.arc === null || arcs.has(c.arc)) continue;
     arcs.add(c.arc);
-    items.push({ id: c.id, label: c.name, detail: `Arc ${data.arcs.get(c.arc)}`, order: c.debut });
+    const arc = data.arcs.get(c.arc);
+    items.push({ id: c.id, label: c.name, detail: t(`Arc ${arc}`, `${arc} arc`), order: c.debut });
     if (items.length === ROUND_SIZE) break;
   }
-  return { prompt: "Range ces personnages par ordre d'apparition, du premier au dernier.", items };
+  return {
+    prompt: t("Range ces personnages par ordre d'apparition, du premier au dernier.", "Sort these characters by order of appearance, from first to last."),
+    items,
+  };
 }
 
 /** La manche n° `index` : les manches paires portent sur les arcs, les impaires sur les personnages. */

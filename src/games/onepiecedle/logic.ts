@@ -4,20 +4,21 @@ import { createRng, pick, seedFromString, shuffle } from "../engine/rng";
 import { dailyNumber } from "../engine/daily";
 import { formatBounty, formatHeight } from "../engine/text";
 import { FRUIT_TYPE_LABELS, HAKI_LABELS, SEA_LABELS } from "@/lib/data/labels";
+import { translator } from "@/lib/i18n";
 
 export type Verdict = "exact" | "partial" | "wrong";
 /** `up` : la valeur à trouver est plus grande (ou plus tardive) que celle proposée. */
 export type Direction = "up" | "down";
 
 export const COLUMNS = [
-  { key: "gender", title: "Genre" },
-  { key: "affiliation", title: "Affiliation" },
-  { key: "fruit", title: "Fruit" },
-  { key: "haki", title: "Haki" },
-  { key: "bounty", title: "Prime" },
-  { key: "height", title: "Taille" },
-  { key: "sea", title: "Origine" },
-  { key: "arc", title: "Premier arc" },
+  { key: "gender", title: { fr: "Genre", en: "Gender" } },
+  { key: "affiliation", title: { fr: "Affiliation", en: "Affiliation" } },
+  { key: "fruit", title: { fr: "Fruit", en: "Fruit" } },
+  { key: "haki", title: { fr: "Haki", en: "Haki" } },
+  { key: "bounty", title: { fr: "Prime", en: "Bounty" } },
+  { key: "height", title: { fr: "Taille", en: "Height" } },
+  { key: "sea", title: { fr: "Origine", en: "Origin" } },
+  { key: "arc", title: { fr: "Premier arc", en: "First arc" } },
 ] as const;
 
 export type ColumnKey = (typeof COLUMNS)[number]["key"];
@@ -37,6 +38,8 @@ function numeric(key: ColumnKey, label: string, guess: number | null, target: nu
 const isZoan = (type: string | undefined) => !!type?.startsWith("zoan");
 
 export function compare(guess: PlayCharacter, target: PlayCharacter, data: ResolvedData): Cell[] {
+  const { locale } = data;
+  const t = translator(locale);
   const fruitType = (c: PlayCharacter) => (c.fruitId ? data.fruitById.get(c.fruitId)?.type : undefined);
   const guessFruit = fruitType(guess);
   const targetFruit = fruitType(target);
@@ -46,34 +49,34 @@ export function compare(guess: PlayCharacter, target: PlayCharacter, data: Resol
   return [
     {
       key: "gender",
-      label: guess.gender === "male" ? "Homme" : guess.gender === "female" ? "Femme" : "Inconnu",
+      label: guess.gender === "male" ? t("Homme", "Male") : guess.gender === "female" ? t("Femme", "Female") : t("Inconnu", "Unknown"),
       verdict: guess.gender === target.gender ? "exact" : "wrong",
     },
     {
       key: "affiliation",
-      label: guess.affiliation ?? "Aucune",
+      label: guess.affiliation ?? t("Aucune", "None"),
       verdict: guess.affiliation === target.affiliation ? "exact" : "wrong",
     },
     {
       key: "fruit",
-      label: guessFruit ? FRUIT_TYPE_LABELS[guessFruit] : "Aucun",
+      label: guessFruit ? FRUIT_TYPE_LABELS[locale][guessFruit] : t("Aucun", "None"),
       verdict:
         guessFruit === targetFruit ? "exact" : isZoan(guessFruit) && isZoan(targetFruit) ? "partial" : "wrong",
     },
     {
       key: "haki",
-      label: guess.haki.length ? guess.haki.map((h) => HAKI_LABELS[h]).join(", ") : "Aucun",
+      label: guess.haki.length ? guess.haki.map((h) => HAKI_LABELS[locale][h]).join(", ") : t("Aucun", "None"),
       verdict: sameHaki ? "exact" : sharedHaki > 0 ? "partial" : "wrong",
     },
     // Sans prime connue, on compare comme une prime nulle : la flèche reste utile
-    numeric("bounty", formatBounty(guess.bounty), guess.bounty ?? 0, target.bounty ?? 0),
-    numeric("height", formatHeight(guess.height), guess.height, target.height),
+    numeric("bounty", formatBounty(guess.bounty, locale), guess.bounty ?? 0, target.bounty ?? 0),
+    numeric("height", formatHeight(guess.height, locale), guess.height, target.height),
     {
       key: "sea",
-      label: guess.sea ? SEA_LABELS[guess.sea] : "Inconnue",
+      label: guess.sea ? SEA_LABELS[locale][guess.sea] : t("Inconnue", "Unknown"),
       verdict: guess.sea === target.sea ? "exact" : "wrong",
     },
-    numeric("arc", (guess.arc !== null && data.arcs.get(guess.arc)) || "Inconnu", guess.arc, target.arc),
+    numeric("arc", (guess.arc !== null && data.arcs.get(guess.arc)) || t("Inconnu", "Unknown"), guess.arc, target.arc),
   ];
 }
 

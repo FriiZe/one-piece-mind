@@ -49,9 +49,9 @@ const manga = resolveGameData(raw, "manga");
 
 describe("doublons de la collection", () => {
   const pool = new Map<string, Recruitable>([
-    ["luffy", { id: "luffy", tier: 1, affiliation: null }],
-    ["pell", { id: "pell", tier: 3, affiliation: null }],
-    ["figurant", { id: "figurant", tier: 4, affiliation: null }],
+    ["luffy", { id: "luffy", tier: 1, org: null, affiliation: null }],
+    ["pell", { id: "pell", tier: 3, org: null, affiliation: null }],
+    ["figurant", { id: "figurant", tier: 4, org: null, affiliation: null }],
   ]);
   const state: PlayerState = {
     ...EMPTY_PLAYER,
@@ -122,10 +122,10 @@ describe("doublons de la collection", () => {
 
 describe("booster de la boutique", () => {
   const pool: Recruitable[] = [
-    { id: "legende", tier: 1, affiliation: null },
-    { id: "rare", tier: 2, affiliation: null },
-    ...Array.from({ length: 10 }, (_, i) => ({ id: `peu-commun-${i}`, tier: 3, affiliation: null })),
-    ...Array.from({ length: 30 }, (_, i) => ({ id: `commun-${i}`, tier: 4, affiliation: null })),
+    { id: "legende", tier: 1, org: null, affiliation: null },
+    { id: "rare", tier: 2, org: null, affiliation: null },
+    ...Array.from({ length: 10 }, (_, i) => ({ id: `peu-commun-${i}`, tier: 3, org: null, affiliation: null })),
+    ...Array.from({ length: 30 }, (_, i) => ({ id: `commun-${i}`, tier: 4, org: null, affiliation: null })),
   ];
   const tierOf = new Map(pool.map((c) => [c.id, c.tier]));
   const rich: PlayerState = { ...EMPTY_PLAYER, berrys: 10_000, lifetimeBerrys: 10_000 };
@@ -165,7 +165,7 @@ describe("booster de la boutique", () => {
   });
 
   it("signale un doublon tiré deux fois dans le même booster", () => {
-    const tiny: Recruitable[] = [{ id: "seul", tier: 2, affiliation: null }];
+    const tiny: Recruitable[] = [{ id: "seul", tier: 2, org: null, affiliation: null }];
     const bought = buyBooster(rich, tiny, createRng(3));
     if (typeof bought === "string") throw new Error(bought);
     expect(bought.recruits.map((recruit) => recruit.duplicate)).toEqual([false, true, true, true, true]);
@@ -316,13 +316,14 @@ describe("règles des quiz de la communauté", () => {
   });
 
   it("dit en clair ce qui manque à un brouillon", () => {
-    expect(draftProblems(draft())).toEqual([]);
-    expect(draftProblems(draft(2))).toContain("Il faut au moins 5 questions.");
+    expect(draftProblems(draft(), "fr")).toEqual([]);
+    expect(draftProblems(draft(2), "fr")).toContain("Il faut au moins 5 questions.");
+    expect(draftProblems(draft(2), "en")).toContain("You need at least 5 questions.");
     const bad = draft();
     bad.title = "ab";
     bad.questions[1].wrong[0] = "bonne 1";
     bad.questions[2].answer = " ";
-    const problems = draftProblems(bad);
+    const problems = draftProblems(bad, "fr");
     expect(problems).toContain("Le titre doit faire 4 à 60 caractères.");
     expect(problems).toContain("Question 2 : les quatre réponses doivent être différentes.");
     expect(problems).toContain("Question 3 : il faut une bonne réponse et trois mauvaises.");
@@ -331,7 +332,7 @@ describe("règles des quiz de la communauté", () => {
 
   it("mélange les propositions sans perdre la bonne réponse, et note comme le jeu", () => {
     const { questions } = quizInputSchema.parse(draftToInput(draft()));
-    const played = toDccQuestions("Titre", questions, 42);
+    const played = toDccQuestions("Titre", questions, 42, "fr");
     expect(played).toHaveLength(5);
     for (const [index, question] of played.entries()) {
       expect(question.options.map((o) => o.id).sort()).toEqual([questions[index].answer, ...questions[index].wrong].sort());

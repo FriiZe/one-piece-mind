@@ -1,4 +1,5 @@
 import { GAME_CATEGORIES, type GameCategoryId } from "@/lib/games/catalog";
+import type { Localized } from "@/lib/i18n";
 import { POST_IDS, type CollectionEntry, type PlayerState, type PostId, type Recruitable } from "./types";
 
 type BonusKind =
@@ -7,17 +8,57 @@ type BonusKind =
   | { kind: "golden" }
   | { kind: "discount" };
 
-export const POSTS: Record<PostId, { label: string; effect: string; bonus: BonusKind }> = {
-  capitaine: { label: "Capitaine", effect: "Berrys sur tous les jeux", bonus: { kind: "berrys", scope: "all" } },
-  sabreur: { label: "Sabreur", effect: "Berrys sur les défis", bonus: { kind: "berrys", scope: "defis" } },
-  navigateur: { label: "Navigateur", effect: "Chances de recruter après une partie", bonus: { kind: "recruit" } },
-  tireur: { label: "Tireur d'élite", effect: "Berrys sur les jeux « À l'œil »", bonus: { kind: "berrys", scope: "oeil" } },
-  cuisinier: { label: "Cuisinier", effect: "Berrys sur le défi du jour", bonus: { kind: "berrys", scope: "daily" } },
-  medecin: { label: "Médecin", effect: "Berrys sur les jeux « Savoir »", bonus: { kind: "berrys", scope: "savoir" } },
-  archeologue: { label: "Archéologue", effect: "Berrys sur les jeux « Mots et indices »", bonus: { kind: "berrys", scope: "mots" } },
-  charpentier: { label: "Charpentier", effect: "Berrys sur les jeux « Primes et mesures »", bonus: { kind: "berrys", scope: "primes" } },
-  musicien: { label: "Musicien", effect: "Réduction à la boutique", bonus: { kind: "discount" } },
-  timonier: { label: "Timonier", effect: "Chances d'obtenir un avis doré", bonus: { kind: "golden" } },
+export const POSTS: Record<PostId, { label: Localized; effect: Localized; bonus: BonusKind }> = {
+  capitaine: {
+    label: { fr: "Capitaine", en: "Captain" },
+    effect: { fr: "Berrys sur tous les jeux", en: "Berries on every game" },
+    bonus: { kind: "berrys", scope: "all" },
+  },
+  sabreur: {
+    label: { fr: "Sabreur", en: "Swordsman" },
+    effect: { fr: "Berrys sur les défis", en: "Berries on challenges" },
+    bonus: { kind: "berrys", scope: "defis" },
+  },
+  navigateur: {
+    label: { fr: "Navigateur", en: "Navigator" },
+    effect: { fr: "Chances de recruter après une partie", en: "Chance to recruit after a game" },
+    bonus: { kind: "recruit" },
+  },
+  tireur: {
+    label: { fr: "Tireur d'élite", en: "Sniper" },
+    effect: { fr: "Berrys sur les jeux « À l'œil »", en: "Berries on “By Eye” games" },
+    bonus: { kind: "berrys", scope: "oeil" },
+  },
+  cuisinier: {
+    label: { fr: "Cuisinier", en: "Cook" },
+    effect: { fr: "Berrys sur le défi du jour", en: "Berries on the daily challenge" },
+    bonus: { kind: "berrys", scope: "daily" },
+  },
+  medecin: {
+    label: { fr: "Médecin", en: "Doctor" },
+    effect: { fr: "Berrys sur les jeux « Savoir »", en: "Berries on “Knowledge” games" },
+    bonus: { kind: "berrys", scope: "savoir" },
+  },
+  archeologue: {
+    label: { fr: "Archéologue", en: "Archaeologist" },
+    effect: { fr: "Berrys sur les jeux « Mots et indices »", en: "Berries on “Words and Clues” games" },
+    bonus: { kind: "berrys", scope: "mots" },
+  },
+  charpentier: {
+    label: { fr: "Charpentier", en: "Shipwright" },
+    effect: { fr: "Berrys sur les jeux « Primes et mesures »", en: "Berries on “Bounties and Stats” games" },
+    bonus: { kind: "berrys", scope: "primes" },
+  },
+  musicien: {
+    label: { fr: "Musicien", en: "Musician" },
+    effect: { fr: "Réduction à la boutique", en: "Discount at the shop" },
+    bonus: { kind: "discount" },
+  },
+  timonier: {
+    label: { fr: "Timonier", en: "Helmsman" },
+    effect: { fr: "Chances d'obtenir un avis doré", en: "Chance to get a golden poster" },
+    bonus: { kind: "golden" },
+  },
 };
 
 /** Force d'un bonus selon la rareté du personnage placé au poste (1 = légendaire). */
@@ -33,47 +74,54 @@ const CAPTAIN_FACTOR = 0.5;
  */
 export const TRAIT_STEPS = [3, 5, 7] as const;
 
-type TraitDefinition = { name: string; bonus: BonusKind; values: readonly [number, number, number] };
+type TraitDefinition = { name: Localized; bonus: BonusKind; values: readonly [number, number, number] };
 const allGames = { kind: "berrys", scope: "all" } as const;
 const category = (scope: GameCategoryId) => ({ kind: "berrys", scope }) as const;
 
-/** Trait de chaque grande affiliation (libellé français, comme sur les avis de recherche). */
+/**
+ * Trait de chaque grande affiliation. La clé est le nom de l'organisation sur
+ * le wiki (`org` d'un personnage) : il ne dépend pas de la langue du joueur.
+ */
 export const TRAITS: Record<string, TraitDefinition> = {
-  "Équipage du Chapeau de paille": { name: "Nakama", bonus: allGames, values: [0.08, 0.14, 0.22] },
-  "Équipage de Barbe Blanche": { name: "Fils de Barbe Blanche", bonus: allGames, values: [0.05, 0.09, 0.14] },
-  "Armée révolutionnaire": { name: "Vent de révolte", bonus: { kind: "discount" }, values: [0.1, 0.18, 0.25] },
-  "Équipage de Barbe Noire": { name: "Pillage", bonus: { kind: "discount" }, values: [0.08, 0.15, 0.22] },
-  Marine: { name: "Justice", bonus: category("savoir"), values: [0.1, 0.18, 0.28] },
-  "Équipage aux Cent Bêtes": { name: "Loi du plus fort", bonus: category("defis"), values: [0.1, 0.18, 0.28] },
-  "Cipher Pol": { name: "Agents de l'ombre", bonus: category("oeil"), values: [0.1, 0.18, 0.28] },
-  "Équipage de Don Quijote": { name: "Marionnettes", bonus: category("mots"), values: [0.1, 0.18, 0.28] },
-  "Famille Kozuki": { name: "Fourreaux rouges", bonus: category("primes"), values: [0.1, 0.18, 0.28] },
-  "Équipage du Roux": { name: "Banquet", bonus: { kind: "berrys", scope: "daily" }, values: [0.15, 0.3, 0.5] },
-  "Famille Charlotte": { name: "Thé de la reine", bonus: { kind: "recruit" }, values: [0.1, 0.2, 0.3] },
-  "Équipage de Big Mom": { name: "Totto Land", bonus: { kind: "recruit" }, values: [0.1, 0.2, 0.3] },
-  "Équipage de Roger": { name: "Laugh Tale", bonus: { kind: "golden" }, values: [0.2, 0.4, 0.6] },
+  "Straw Hat Pirates": { name: { fr: "Nakama", en: "Nakama" }, bonus: allGames, values: [0.08, 0.14, 0.22] },
+  "Whitebeard Pirates": { name: { fr: "Fils de Barbe Blanche", en: "Sons of Whitebeard" }, bonus: allGames, values: [0.05, 0.09, 0.14] },
+  "Revolutionary Army": { name: { fr: "Vent de révolte", en: "Winds of Revolt" }, bonus: { kind: "discount" }, values: [0.1, 0.18, 0.25] },
+  "Blackbeard Pirates": { name: { fr: "Pillage", en: "Plunder" }, bonus: { kind: "discount" }, values: [0.08, 0.15, 0.22] },
+  Marines: { name: { fr: "Justice", en: "Justice" }, bonus: category("savoir"), values: [0.1, 0.18, 0.28] },
+  "Beasts Pirates": { name: { fr: "Loi du plus fort", en: "Survival of the Fittest" }, bonus: category("defis"), values: [0.1, 0.18, 0.28] },
+  "Cipher Pol": { name: { fr: "Agents de l'ombre", en: "Shadow Agents" }, bonus: category("oeil"), values: [0.1, 0.18, 0.28] },
+  "Donquixote Pirates": { name: { fr: "Marionnettes", en: "Puppets" }, bonus: category("mots"), values: [0.1, 0.18, 0.28] },
+  "Kouzuki Family": { name: { fr: "Fourreaux rouges", en: "Red Scabbards" }, bonus: category("primes"), values: [0.1, 0.18, 0.28] },
+  "Red Hair Pirates": { name: { fr: "Banquet", en: "Feast" }, bonus: { kind: "berrys", scope: "daily" }, values: [0.15, 0.3, 0.5] },
+  "Charlotte Family": { name: { fr: "Thé de la reine", en: "The Queen's Tea Party" }, bonus: { kind: "recruit" }, values: [0.1, 0.2, 0.3] },
+  "Big Mom Pirates": { name: { fr: "Totto Land", en: "Totto Land" }, bonus: { kind: "recruit" }, values: [0.1, 0.2, 0.3] },
+  "Roger Pirates": { name: { fr: "Laugh Tale", en: "Laugh Tale" }, bonus: { kind: "golden" }, values: [0.2, 0.4, 0.6] },
 };
 /** Les autres affiliations partagent un trait plus modeste. */
-export const DEFAULT_TRAIT: TraitDefinition = { name: "Esprit d'équipage", bonus: allGames, values: [0.04, 0.07, 0.1] };
+export const DEFAULT_TRAIT: TraitDefinition = { name: { fr: "Esprit d'équipage", en: "Crew Spirit" }, bonus: allGames, values: [0.04, 0.07, 0.1] };
 
-export const traitOf = (affiliation: string): TraitDefinition => TRAITS[affiliation] ?? DEFAULT_TRAIT;
+export const traitOf = (org: string): TraitDefinition => TRAITS[org] ?? DEFAULT_TRAIT;
 
 /** Ce qu'un bonus améliore, en clair. */
-export function bonusLabel(bonus: BonusKind): string {
-  if (bonus.kind === "recruit") return "Chances de recruter après une partie";
-  if (bonus.kind === "golden") return "Chances d'obtenir un avis doré";
-  if (bonus.kind === "discount") return "Réduction à la boutique";
-  if (bonus.scope === "all") return "Berrys sur tous les jeux";
-  if (bonus.scope === "daily") return "Berrys sur le défi du jour";
+export function bonusLabel(bonus: BonusKind): Localized {
+  if (bonus.kind === "recruit") return { fr: "Chances de recruter après une partie", en: "Chance to recruit after a game" };
+  if (bonus.kind === "golden") return { fr: "Chances d'obtenir un avis doré", en: "Chance to get a golden poster" };
+  if (bonus.kind === "discount") return { fr: "Réduction à la boutique", en: "Discount at the shop" };
+  if (bonus.scope === "all") return { fr: "Berrys sur tous les jeux", en: "Berries on every game" };
+  if (bonus.scope === "daily") return { fr: "Berrys sur le défi du jour", en: "Berries on the daily challenge" };
   const scope = bonus.scope;
-  return `Berrys sur les jeux « ${GAME_CATEGORIES.find((c) => c.id === scope)?.title ?? scope} »`;
+  const title = GAME_CATEGORIES.find((c) => c.id === scope)?.title ?? { fr: scope, en: scope };
+  return { fr: `Berrys sur les jeux « ${title.fr} »`, en: `Berries on “${title.en}” games` };
 }
 
 /** Trait d'une affiliation présente dans l'équipage, actif ou non. */
 export type CrewTrait = {
+  /** Organisation, sous son nom du wiki. */
+  org: string;
+  /** La même, telle qu'elle s'affiche dans la langue du joueur. */
   affiliation: string;
-  name: string;
-  effect: string;
+  name: Localized;
+  effect: Localized;
   /** Membres de cette affiliation placés à un poste. */
   count: number;
   /** Palier atteint : 0 (inactif) à 3. */
@@ -84,10 +132,11 @@ export type CrewTrait = {
   values: readonly number[];
 };
 
-export function traitFor(affiliation: string, count: number): CrewTrait {
-  const definition = traitOf(affiliation);
+export function traitFor(org: string, affiliation: string, count: number): CrewTrait {
+  const definition = traitOf(org);
   const level = TRAIT_STEPS.filter((step) => count >= step).length;
   return {
+    org,
     affiliation,
     name: definition.name,
     effect: bonusLabel(definition.bonus),
@@ -121,7 +170,7 @@ export function crewBonuses(
   characterById: ReadonlyMap<string, Recruitable>,
 ): CrewBonuses {
   const bonuses: CrewBonuses = { berrys: {}, recruit: 0, golden: 0, discount: 0, traits: [], full: false };
-  const affiliations = new Map<string, number>();
+  const affiliations = new Map<string, { label: string; count: number }>();
   let filled = 0;
 
   for (const post of POST_IDS) {
@@ -130,7 +179,10 @@ export function crewBonuses(
     // Un personnage masqué par le mode spoiler du joueur ne donne pas de bonus
     if (!id || !character || !state.collection[id]) continue;
     filled++;
-    if (character.affiliation) affiliations.set(character.affiliation, (affiliations.get(character.affiliation) ?? 0) + 1);
+    if (character.org) {
+      const members = affiliations.get(character.org)?.count ?? 0;
+      affiliations.set(character.org, { label: character.affiliation ?? character.org, count: members + 1 });
+    }
 
     const strength = postStrength(character, state.collection[id], post);
     const { bonus } = POSTS[post];
@@ -138,11 +190,11 @@ export function crewBonuses(
     else bonuses[bonus.kind] += strength;
   }
 
-  for (const [affiliation, count] of affiliations) {
-    const trait = traitFor(affiliation, count);
+  for (const [org, { label, count }] of affiliations) {
+    const trait = traitFor(org, label, count);
     bonuses.traits.push(trait);
     if (trait.level === 0) continue;
-    const { bonus } = traitOf(affiliation);
+    const { bonus } = traitOf(org);
     if (bonus.kind === "berrys") bonuses.berrys[bonus.scope] = (bonuses.berrys[bonus.scope] ?? 0) + trait.value;
     else bonuses[bonus.kind] += trait.value;
   }

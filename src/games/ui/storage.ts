@@ -7,6 +7,7 @@
  */
 import { useCallback, useSyncExternalStore } from "react";
 import { dailyKey } from "../engine/daily";
+import { useLocale } from "@/lib/i18n/client";
 
 const listeners = new Set<() => void>();
 const parsed = new Map<string, { raw: string | null; value: unknown }>();
@@ -91,18 +92,26 @@ export function useDailyKey(): string {
 
 const parisClock = new Intl.DateTimeFormat("fr-FR", { timeZone: "Europe/Paris", hour: "2-digit", minute: "2-digit", hourCycle: "h23" });
 
-function untilMidnight(): string {
+/** Minutes restantes avant minuit à Paris. */
+function minutesUntilMidnight(): number {
   const parts = parisClock.formatToParts(new Date());
   const read = (type: string) => Number(parts.find((part) => part.type === type)?.value ?? 0);
-  const left = 24 * 60 - (read("hour") * 60 + read("minute"));
-  const hours = Math.floor(left / 60);
-  return hours > 0 ? `${hours} h ${String(left % 60).padStart(2, "0")}` : `${left} min`;
+  return 24 * 60 - (read("hour") * 60 + read("minute"));
 }
 const noCountdown = () => null;
 
-/** Temps restant avant minuit à Paris (« 5 h 12 »), quand la sélection du jour change. Nul avant que le navigateur soit prêt. */
+/**
+ * Temps restant avant minuit à Paris (« 5 h 12 », « 5h 12m » en anglais), quand la sélection du jour change.
+ * Nul avant que le navigateur soit prêt.
+ */
 export function useUntilMidnight(): string | null {
-  return useSyncExternalStore(subscribeToClock, untilMidnight, noCountdown);
+  const locale = useLocale();
+  const left = useSyncExternalStore<number | null>(subscribeToClock, minutesUntilMidnight, noCountdown);
+  if (left === null) return null;
+  const hours = Math.floor(left / 60);
+  if (hours === 0) return `${left} min`;
+  const minutes = String(left % 60).padStart(2, "0");
+  return locale === "en" ? `${hours}h ${minutes}m` : `${hours} h ${minutes}`;
 }
 
 /** Meilleur score d'un jeu ; `submit` ne l'écrase que s'il est battu (un score nul n'est pas un record). */

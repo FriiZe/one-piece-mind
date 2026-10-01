@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, type ButtonHTMLAttributes, type ReactNode } from "react";
+import { useT } from "@/lib/i18n/client";
 
 type Variant = "primary" | "secondary" | "ghost";
 
@@ -29,7 +30,8 @@ export function Panel({ children, className = "" }: { children: ReactNode; class
 }
 
 /** Copie un texte dans le presse-papiers (résultat à partager). */
-export function ShareButton({ getText, label = "Partager mon résultat" }: { getText: () => string; label?: string }) {
+export function ShareButton({ getText, label }: { getText: () => string; label?: string }) {
+  const t = useT();
   const [state, setState] = useState<"idle" | "copied" | "failed">("idle");
 
   async function share() {
@@ -45,7 +47,11 @@ export function ShareButton({ getText, label = "Partager mon résultat" }: { get
   return (
     <Button variant="secondary" onClick={share}>
       <span aria-live="polite">
-        {state === "copied" ? "Copié !" : state === "failed" ? "Copie impossible" : label}
+        {state === "copied"
+          ? t("Copié !", "Copied!")
+          : state === "failed"
+            ? t("Copie impossible", "Couldn't copy")
+            : (label ?? t("Partager mon résultat", "Share my result"))}
       </span>
     </Button>
   );
@@ -64,14 +70,17 @@ export function ResultPanel({
   newBest?: boolean;
   actions: ReactNode;
 }) {
+  const t = useT();
   return (
     <div role="status" className="rounded-2xl bg-parchment p-5 text-ink sm:p-6">
       <h3 className="font-display text-3xl tracking-wide">{title}</h3>
       {children && <div className="mt-2 space-y-1">{children}</div>}
       {best && (
         <p className="mt-2 text-sm font-semibold">
-          {newBest ? "Nouveau record ! " : ""}
-          {best.label} : {best.value}
+          {newBest ? t("Nouveau record ! ", "New best! ") : ""}
+          {best.label}
+          {t(" : ", ": ")}
+          {best.value}
         </p>
       )}
       <div className="mt-4 flex flex-wrap gap-3">{actions}</div>

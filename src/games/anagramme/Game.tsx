@@ -6,6 +6,7 @@ import { Portrait } from "../ui/Portrait";
 import { Button, Panel, Progress } from "../ui/primitives";
 import type { GameProps } from "../ui/types";
 import { useRun } from "../ui/useRun";
+import { useT } from "@/lib/i18n/client";
 import { generateRounds, isCorrect } from "./logic";
 
 type Progression = {
@@ -21,6 +22,7 @@ type Progression = {
 const START: Progression = { index: 0, answers: [], missed: false, done: false, score: 0 };
 
 export default function Anagramme({ data }: GameProps) {
+  const t = useT();
   const base = useRun("anagramme");
   const [state, setState] = useState<Progression>(START);
   const [input, setInput] = useState("");
@@ -39,7 +41,12 @@ export default function Anagramme({ data }: GameProps) {
   if (!run || !rounds.length) {
     return (
       <GameStart game={game}>
-        <p className="text-mist">Huit noms dont les lettres ont été mélangées. Remets-les dans l&apos;ordre.</p>
+        <p className="text-mist">
+          {t(
+            "Huit noms dont les lettres ont été mélangées. Remets-les dans l'ordre.",
+            "Eight names with their letters scrambled. Put them back in order.",
+          )}
+        </p>
       </GameStart>
     );
   }
@@ -71,8 +78,18 @@ export default function Anagramme({ data }: GameProps) {
 
   return (
     <Panel className="space-y-4">
-      <Progress current={state.index + 1} total={rounds.length} score={`Score : ${state.score}`} />
-      <p className="flex flex-wrap justify-center gap-1.5" aria-label={`Lettres mélangées : ${[...round.letters].join(" ")}`}>
+      <Progress
+        current={state.index + 1}
+        total={rounds.length}
+        score={t(`Score : ${state.score}`, `Score: ${state.score}`)}
+      />
+      <p
+        className="flex flex-wrap justify-center gap-1.5"
+        aria-label={t(
+          `Lettres mélangées : ${[...round.letters].join(" ")}`,
+          `Scrambled letters: ${[...round.letters].join(" ")}`,
+        )}
+      >
         {[...round.letters].map((letter, i) => (
           <span
             key={i}
@@ -83,7 +100,12 @@ export default function Anagramme({ data }: GameProps) {
           </span>
         ))}
       </p>
-      {round.target.affiliation && <p className="text-center text-sm text-mist">Indice : {round.target.affiliation}</p>}
+      {round.target.affiliation && (
+        <p className="text-center text-sm text-mist">
+          {t("Indice : ", "Hint: ")}
+          {round.target.affiliation}
+        </p>
+      )}
 
       {!state.done ? (
         <form
@@ -94,7 +116,7 @@ export default function Anagramme({ data }: GameProps) {
           }}
         >
           <label htmlFor="anagramme-saisie" className="sr-only">
-            Ta réponse
+            {t("Ta réponse", "Your answer")}
           </label>
           <input
             id="anagramme-saisie"
@@ -106,15 +128,15 @@ export default function Anagramme({ data }: GameProps) {
             autoComplete="off"
             autoCapitalize="off"
             spellCheck={false}
-            placeholder="Ta réponse…"
+            placeholder={t("Ta réponse…", "Your answer…")}
             className="min-w-0 flex-1 rounded-lg border-2 border-sea-600 bg-sea-900 px-4 py-3 text-foam placeholder:text-mist/70 focus:border-straw focus:outline-none"
           />
-          <Button type="submit">Valider</Button>
+          <Button type="submit">{t("Valider", "Submit")}</Button>
           <Button
             variant="secondary"
             onClick={() => setState({ ...state, answers: [...state.answers, ""], missed: false, done: true })}
           >
-            Passer
+            {t("Passer", "Skip")}
           </Button>
         </form>
       ) : (
@@ -122,17 +144,21 @@ export default function Anagramme({ data }: GameProps) {
           {round.target.img && <Portrait img={round.target.img} />}
           <div className="flex flex-wrap items-center justify-between gap-3">
             <p className={`font-bold ${found ? "text-emerald-300" : "text-vest"}`}>
-              {found ? `${round.target.name} : +1 point.` : `C'était ${round.target.name}.`}
+              {found
+                ? t(`${round.target.name} : +1 point.`, `${round.target.name}: +1 point.`)
+                : t(`C'était ${round.target.name}.`, `It was ${round.target.name}.`)}
             </p>
             {/* Entrée valide une réponse, puis passe à la manche suivante */}
             <Button autoFocus onClick={next}>
-              {last ? "Voir mon score" : "Suivant"}
+              {last ? t("Voir mon score", "See my score") : t("Suivant", "Next")}
             </Button>
           </div>
         </div>
       )}
       <p className="min-h-6 text-sm font-semibold text-vest" aria-live="polite">
-        {state.missed && !state.done ? "Ce n'est pas ça. Essaie encore, ou passe." : ""}
+        {state.missed && !state.done
+          ? t("Ce n'est pas ça. Essaie encore, ou passe.", "That's not it. Try again, or skip.")
+          : ""}
       </p>
     </Panel>
   );

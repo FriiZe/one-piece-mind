@@ -5,6 +5,7 @@
 import type { PlayCharacter, ResolvedData } from "../cards";
 import { byDifficulty, type Difficulty } from "../engine/difficulty";
 import { createRng, sample, type Rng } from "../engine/rng";
+import { translator } from "@/lib/i18n";
 
 export const ESTIMATE_LENGTH = 8;
 export const POINTS_PER_QUESTION = 5;
@@ -41,18 +42,32 @@ export function valueToSlider(question: Pick<EstimateQuestion, "min" | "max" | "
   return (Math.log(v) - Math.log(question.min)) / (Math.log(question.max) - Math.log(question.min));
 }
 
-const MULTIPLIERS: Record<string, number> = { k: 1e3, m: 1e6, million: 1e6, millions: 1e6, md: 1e9, mds: 1e9, milliard: 1e9, milliards: 1e9 };
+const MULTIPLIERS: Record<string, number> = {
+  k: 1e3,
+  m: 1e6,
+  million: 1e6,
+  millions: 1e6,
+  md: 1e9,
+  mds: 1e9,
+  milliard: 1e9,
+  milliards: 1e9,
+  b: 1e9,
+  bn: 1e9,
+  billion: 1e9,
+  billions: 1e9,
+};
 
 /**
- * Nombre saisi au clavier : « 1 500 000 000 », « 1,5 md », « 320 M », « 56k ».
- * `null` si la saisie n'est pas un nombre.
+ * Nombre saisi au clavier : « 1 500 000 000 », « 1,5 md », « 320 M », « 56k »,
+ * ou à l'anglaise « 1,500,000,000 », « 1.5 billion ». `null` si la saisie n'est
+ * pas un nombre.
  */
 export function parseEstimate(text: string): number | null {
   const compact = text
     .toLowerCase()
-    .replace(/berrys?|฿/g, "")
+    .replace(/berr(?:ies|ys?)|฿/g, "")
     .replace(/[\s\u00a0\u202f]/g, "");
-  const short = compact.match(/^(\d+(?:[.,]\d+)?)(k|m|md|mds|millions?|milliards?)$/);
+  const short = compact.match(/^(\d+(?:[.,]\d+)?)(k|m|md|mds|millions?|milliards?|b|bn|billions?)$/);
   if (short) return Math.round(Number(short[1].replace(",", ".")) * MULTIPLIERS[short[2]]);
   // Sans unité, points et virgules ne peuvent être que des séparateurs de milliers
   if (!/^\d[\d.,']*$/.test(compact)) return null;
@@ -84,10 +99,10 @@ type Generator = (rng: Rng, data: ResolvedData, pool: readonly PlayCharacter[], 
 
 const MIN_BOUNTY = 1_000_000;
 
-const devineLaPrime: Generator = (rng, _data, pool, count) =>
+const devineLaPrime: Generator = (rng, data, pool, count) =>
   sample(rng, pool.filter((c) => c.bounty !== null && c.bounty >= MIN_BOUNTY), count).map((c) => ({
     id: c.id,
-    title: "À combien s'élève sa prime ?",
+    title: translator(data.locale)("À combien s'élève sa prime ?", "How much is their bounty?"),
     subject: c.name,
     detail: c.affiliation ?? undefined,
     img: c.img,
@@ -100,11 +115,14 @@ const devineLaPrime: Generator = (rng, _data, pool, count) =>
 
 const premiereApparition: Generator = (rng, data, pool, count) => {
   // Un joueur qui suit l'anime compte en épisodes, un lecteur du manga en chapitres
+  const t = translator(data.locale);
   const byEpisode = data.mode === "anime";
   const known = pool.filter((c) => (byEpisode ? c.episode !== null && c.episode > 0 : c.debut > 0));
   return sample(rng, known, count).map((c) => ({
     id: c.id,
-    title: byEpisode ? "Dans quel épisode apparaît-il pour la première fois ?" : "Dans quel chapitre apparaît-il pour la première fois ?",
+    title: byEpisode
+      ? t("Dans quel épisode apparaît-il pour la première fois ?", "In which episode do they first appear?")
+      : t("Dans quel chapitre apparaît-il pour la première fois ?", "In which chapter do they first appear?"),
     subject: c.name,
     detail: c.affiliation ?? undefined,
     img: c.img,
@@ -130,18 +148,20 @@ export function crewBounties(characters: readonly PlayCharacter[]): { crew: stri
     .sort((a, b) => a.crew.localeCompare(b.crew, "fr"));
 }
 
-const primeDEquipage: Generator = (rng, data, _pool, count) =>
-  sample(rng, crewBounties(data.characters), count).map((entry) => ({
+const primeDEquipage: Generator = (rng, data, _pool, count) => {
+  const t = translator(data.locale);
+  return sample(rng, crewBounties(data.characters), count).map((entry) => ({
     id: entry.crew,
-    title: "Quel est le total des primes connues de ses membres ?",
+    title: t("Quel est le total des primes connues de ses membres ?", "What do its members' known bounties add up to?"),
     subject: entry.crew,
-    detail: `${entry.members} membres primés`,
+    detail: t(`${entry.members} membres primés`, `${entry.members} members with a bounty`),
     answer: entry.total,
     min: 10_000_000,
     max: 30_000_000_000,
     scale: "log" as const,
     unit: "berrys" as const,
   }));
+};
 
 const GENERATORS = {
   "devine-la-prime": devineLaPrime,

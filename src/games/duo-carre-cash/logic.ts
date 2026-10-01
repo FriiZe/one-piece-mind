@@ -44,10 +44,12 @@ export type DccKey = Pick<DccQuestion, "answerId" | "accepted" | "rejected">;
 const SOURCES: MixSlug[] = ["equipage", "navires", "origine-et-race", "dans-quel-arc", "techniques", "armes-et-sabres", "surnoms"];
 
 const LABEL_PREFIX = /^(?:équipage|royaume|famille|duché|pays|flotte)\s+(?:de la\s+|de l['’]|des\s+|du\s+|de\s+|d['’]|aux\s+|au\s+)?/i;
+/** En anglais, le mot générique vient à la fin : « Straw Hat Pirates ». */
+const LABEL_SUFFIX = /\s+(?:pirates|kingdom|family|dukedom|country)$/i;
 
-/** « Équipage du Chapeau de paille » s'écrit aussi « Chapeau de paille ». */
+/** « Équipage du Chapeau de paille » s'écrit aussi « Chapeau de paille », « Straw Hat Pirates » aussi « Straw Hat ». */
 export function labelForms(label: string): string[] {
-  const short = label.replace(LABEL_PREFIX, "").trim();
+  const short = label.replace(LABEL_PREFIX, "").replace(LABEL_SUFFIX, "").trim();
   return short && short !== label ? [label, short] : [label];
 }
 

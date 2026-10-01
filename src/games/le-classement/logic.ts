@@ -3,9 +3,9 @@ import { byDifficulty, type Difficulty } from "../engine/difficulty";
 import { createRng, pick, shuffle, type Rng } from "../engine/rng";
 
 export const CRITERIA = {
-  bounty: { label: "prime", order: "de la plus haute à la plus basse" },
-  height: { label: "taille", order: "du plus grand au plus petit" },
-  age: { label: "âge", order: "du plus âgé au plus jeune" },
+  bounty: { label: { fr: "prime", en: "bounty" }, order: { fr: "de la plus haute à la plus basse", en: "from highest to lowest" } },
+  height: { label: { fr: "taille", en: "height" }, order: { fr: "du plus grand au plus petit", en: "from tallest to shortest" } },
+  age: { label: { fr: "âge", en: "age" }, order: { fr: "du plus âgé au plus jeune", en: "from oldest to youngest" } },
 } as const;
 export type Criterion = keyof typeof CRITERIA;
 

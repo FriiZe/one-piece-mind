@@ -1,12 +1,13 @@
 "use client";
 
-import Link from "next/link";
-import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
+import Link from "@/components/Link";
 import { formatNumber } from "@/games/engine/text";
+import { useLocale, usePath, useT } from "@/lib/i18n/client";
 import { usePlayer } from "@/lib/player/PlayerProvider";
 import { useDaily } from "@/lib/player/useDaily";
 import { SITE_NAME } from "@/lib/site";
+import { LanguageSwitch } from "./LanguageSwitch";
 import { NotificationBell } from "./NotificationBell";
 
 /** Pages du navire : équipage, collection, boutique, échanges. */
@@ -14,10 +15,10 @@ const SHIP_PATHS = ["/navire", "/collection", "/boutique", "/echanges"];
 const under = (pathname: string, ...roots: string[]) => roots.some((root) => pathname === root || pathname.startsWith(`${root}/`));
 
 const LINKS = [
-  { href: "/jeux", label: "Jeux", active: (pathname: string) => under(pathname, "/jeux") },
-  { href: "/multi", label: "Multi", active: (pathname: string) => under(pathname, "/multi") },
-  { href: "/quiz", label: "Quiz", active: (pathname: string) => under(pathname, "/quiz") },
-  { href: "/navire", label: "Mon navire", active: (pathname: string) => under(pathname, ...SHIP_PATHS) },
+  { href: "/jeux", label: { fr: "Jeux", en: "Games" }, active: (pathname: string) => under(pathname, "/jeux") },
+  { href: "/multi", label: { fr: "Multi", en: "Multi" }, active: (pathname: string) => under(pathname, "/multi") },
+  { href: "/quiz", label: { fr: "Quiz", en: "Quizzes" }, active: (pathname: string) => under(pathname, "/quiz") },
+  { href: "/navire", label: { fr: "Mon navire", en: "My ship" }, active: (pathname: string) => under(pathname, ...SHIP_PATHS) },
 ];
 
 function Icon({ children }: { children: ReactNode }) {
@@ -31,7 +32,7 @@ function Icon({ children }: { children: ReactNode }) {
 const TABS = [
   {
     href: "/",
-    label: "Aujourd'hui",
+    label: { fr: "Aujourd'hui", en: "Today" },
     active: (pathname: string) => pathname === "/" || under(pathname, "/defis"),
     icon: (
       <>
@@ -42,7 +43,7 @@ const TABS = [
   },
   {
     href: "/jeux",
-    label: "Jeux",
+    label: { fr: "Jeux", en: "Games" },
     active: (pathname: string) => under(pathname, "/jeux"),
     icon: (
       <>
@@ -53,7 +54,7 @@ const TABS = [
   },
   {
     href: "/navire",
-    label: "Navire",
+    label: { fr: "Navire", en: "Ship" },
     active: (pathname: string) => under(pathname, ...SHIP_PATHS),
     icon: (
       <>
@@ -64,7 +65,7 @@ const TABS = [
   },
   {
     href: "/multi",
-    label: "À plusieurs",
+    label: { fr: "À plusieurs", en: "Together" },
     active: (pathname: string) => under(pathname, "/multi", "/quiz"),
     icon: (
       <>
@@ -75,7 +76,7 @@ const TABS = [
   },
   {
     href: "/profil",
-    label: "Moi",
+    label: { fr: "Moi", en: "Me" },
     active: (pathname: string) => under(pathname, "/profil"),
     icon: (
       <>
@@ -89,18 +90,19 @@ const TABS = [
 /** Avancement des jeux du jour : toujours sous les yeux, il mène aux défis. */
 function DailyPill() {
   const { ready, count, total } = useDaily();
-  const pathname = usePathname();
+  const pathname = usePath();
+  const t = useT();
   const current = under(pathname, "/defis");
   return (
     <Link
       href="/defis"
-      aria-label={`Jeux du jour : ${count} validés sur ${total}`}
+      aria-label={t(`Jeux du jour : ${count} validés sur ${total}`, `Daily games: ${count} cleared out of ${total}`)}
       aria-current={current ? "page" : undefined}
       className={`rounded-full border border-straw px-3 py-1.5 whitespace-nowrap transition-colors ${
         current ? "bg-straw text-ink" : "text-straw hover:bg-straw/15"
       }`}
     >
-      Jour <span className={ready ? "" : "invisible"}>{count}</span>/{total}
+      {t("Jour", "Daily")} <span className={ready ? "" : "invisible"}>{count}</span>/{total}
     </Link>
   );
 }
@@ -108,7 +110,10 @@ function DailyPill() {
 /** En-tête du site. Sur téléphone, les rubriques passent dans la barre d'onglets du bas. */
 export function SiteHeader() {
   const { status, accountsEnabled, state, username } = usePlayer();
-  const pathname = usePathname();
+  const pathname = usePath();
+  const t = useT();
+  const locale = useLocale();
+  const berrys = formatNumber(state.berrys, locale);
 
   return (
     <header className="border-b border-sea-700/60">
@@ -116,7 +121,7 @@ export function SiteHeader() {
         <Link href="/" className="font-display text-[22px] tracking-wide text-straw md:text-[26px]">
           {SITE_NAME}
         </Link>
-        <nav aria-label="Navigation principale" className="hidden items-center gap-6 text-[15px] font-bold text-mist md:flex">
+        <nav aria-label={t("Navigation principale", "Main navigation")} className="hidden items-center gap-6 text-[15px] font-bold text-mist md:flex">
           {LINKS.map((link) => {
             const active = link.active(pathname);
             return (
@@ -126,7 +131,7 @@ export function SiteHeader() {
                 aria-current={active ? "page" : undefined}
                 className={`border-b-2 py-1 transition-colors hover:text-foam ${active ? "border-straw text-foam" : "border-transparent"}`}
               >
-                {link.label}
+                {link.label[locale]}
               </Link>
             );
           })}
@@ -137,12 +142,13 @@ export function SiteHeader() {
           {/* Le solde n'est connu qu'une fois le navigateur prêt : on réserve sa place pour éviter un saut */}
           <Link
             href="/boutique"
-            aria-label={`${formatNumber(state.berrys)} Berrys, aller à la boutique`}
+            aria-label={t(`${berrys} Berrys, aller à la boutique`, `${berrys} Berries, go to the shop`)}
             className={`whitespace-nowrap hover:text-straw ${status === "loading" ? "invisible" : ""}`}
           >
-            ฿ {formatNumber(state.berrys)}
+            ฿ {berrys}
           </Link>
           <NotificationBell />
+          <LanguageSwitch className="hidden md:inline-flex" />
           {status === "user" && (
             <Link
               href="/profil"
@@ -158,7 +164,7 @@ export function SiteHeader() {
           )}
           {status === "guest" && accountsEnabled && (
             <Link href="/profil" className="rounded-full bg-straw px-4 py-1.5 whitespace-nowrap text-ink hover:bg-straw-dark">
-              Connexion
+              {t("Connexion", "Log in")}
             </Link>
           )}
         </div>
@@ -169,10 +175,12 @@ export function SiteHeader() {
 
 /** Barre d'onglets du téléphone, fixée en bas de l'écran. */
 export function TabBar() {
-  const pathname = usePathname();
+  const pathname = usePath();
+  const t = useT();
+  const locale = useLocale();
   return (
     <nav
-      aria-label="Rubriques"
+      aria-label={t("Rubriques", "Sections")}
       className="fixed inset-x-0 bottom-0 z-30 grid grid-cols-5 border-t border-sea-700 bg-sea-900 pb-[env(safe-area-inset-bottom)] text-[11px] font-bold text-mist md:hidden"
     >
       {TABS.map((tab) => {
@@ -185,7 +193,7 @@ export function TabBar() {
             className={`flex h-[68px] flex-col items-center justify-center gap-1 ${active ? "text-straw" : "hover:text-foam"}`}
           >
             <Icon>{tab.icon}</Icon>
-            {tab.label}
+            {tab.label[locale]}
           </Link>
         );
       })}

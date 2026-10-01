@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import Link from "@/components/Link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { DIFFICULTIES, type Difficulty } from "@/games/engine/difficulty";
@@ -8,6 +8,7 @@ import { MIX_SLUGS, type MixSlug } from "@/games/qcm/logic";
 import { Button, Panel } from "@/games/ui/primitives";
 import { useStored } from "@/games/ui/storage";
 import { getGame } from "@/lib/games/catalog";
+import { useLocale, useLocalePath, useT } from "@/lib/i18n/client";
 import { createRoomRequest, ROOM_ERRORS, saveTicket, useFriends } from "@/lib/multi/client";
 import { ANSWER_SECONDS, CODE_LENGTH, DEFAULT_SETTINGS, MAX_PLAYERS, normalizeCode, QUESTION_COUNTS } from "@/lib/multi/rules";
 import { usePlayer } from "@/lib/player/PlayerProvider";
@@ -56,6 +57,9 @@ function Choice<T extends string | number>({
 }
 
 function CreateRoom() {
+  const t = useT();
+  const locale = useLocale();
+  const path = useLocalePath();
   const router = useRouter();
   const { status } = usePlayer();
   const [storedMode] = useStored<SpoilerMode | null>("opm.mode", null);
@@ -79,24 +83,24 @@ function CreateRoom() {
     setBusy(true);
     setError(null);
     const result = await createRoomRequest(
-      { mode: chosenMode, difficulty, games, questionCount, seconds },
+      { mode: chosenMode, difficulty, games, questionCount, seconds, lang: locale },
       status === "user" ? undefined : name,
     );
     if (!result.ok) {
       setBusy(false);
-      setError(ROOM_ERRORS[result.error]);
+      setError(ROOM_ERRORS[locale][result.error]);
       return;
     }
     saveTicket(result.ticket);
-    router.push(`/multi/${result.ticket.code}`);
+    router.push(path(`/multi/${result.ticket.code}`));
   }
 
   return (
     <form onSubmit={create} className="space-y-5 rounded-[20px] border-2 border-straw bg-straw/5 p-5 sm:p-6">
-      <h2 className="text-xl font-extrabold text-foam">Créer un salon</h2>
+      <h2 className="text-xl font-extrabold text-foam">{t("Créer un salon", "Create a room")}</h2>
       {status !== "user" && (
         <label className="block max-w-sm">
-          <span className={`block ${LEGEND}`}>Ton pseudo</span>
+          <span className={`block ${LEGEND}`}>{t("Ton pseudo", "Your name")}</span>
           <input
             value={name}
             onChange={(event) => setName(event.target.value)}
@@ -111,7 +115,10 @@ function CreateRoom() {
 
       <fieldset>
         <legend className={LEGEND}>
-          Jeux tirés au sort · {games.length} choisi{games.length > 1 ? "s" : ""}
+          {t(
+            `Jeux tirés au sort · ${games.length} choisi${games.length > 1 ? "s" : ""}`,
+            `Games drawn at random · ${games.length} selected`,
+          )}
         </legend>
         <div className="flex flex-wrap gap-2">
           {MIX_SLUGS.map((slug) => {
@@ -124,7 +131,7 @@ function CreateRoom() {
                 }`}
               >
                 <input type="checkbox" checked={checked} onChange={() => toggle(slug)} className="sr-only" />
-                {getGame(slug)?.title ?? slug}
+                {getGame(slug)?.title[locale] ?? slug}
               </label>
             );
           })}
@@ -134,7 +141,7 @@ function CreateRoom() {
               onClick={() => setGames([...MIX_SLUGS])}
               className="min-h-11 cursor-pointer px-2 text-sm font-bold text-straw underline underline-offset-4"
             >
-              Tout cocher
+              {t("Tout cocher", "Select all")}
             </button>
           )}
         </div>
@@ -148,21 +155,34 @@ function CreateRoom() {
           options={QUESTION_COUNTS.map((n) => ({ value: n, label: String(n) }))}
         />
         <Choice
-          legend="Temps par question"
+          legend={t("Temps par question", "Time per question")}
           value={seconds}
           onChange={setSeconds}
           options={ANSWER_SECONDS.map((n) => ({ value: n, label: `${n} s` }))}
         />
-        <Choice legend="Difficulté" value={difficulty} onChange={setDifficulty} options={DIFFICULTIES.map((d) => ({ value: d.id, label: d.label }))} />
+        <Choice
+          legend={t("Difficulté", "Difficulty")}
+          value={difficulty}
+          onChange={setDifficulty}
+          options={DIFFICULTIES.map((d) => ({ value: d.id, label: d.label[locale] }))}
+        />
       </div>
 
       <fieldset>
-        <legend className={LEGEND}>Jusqu&apos;où va l&apos;histoire</legend>
+        <legend className={LEGEND}>{t("Jusqu'où va l'histoire", "How far the story goes")}</legend>
         <div className="grid gap-2.5 sm:grid-cols-2">
           {(
             [
-              { value: "anime", title: "À jour sur l'anime", detail: "Rien de ce qui n'est paru qu'en manga" },
-              { value: "manga", title: "À jour sur le manga", detail: "Tout, jusqu'aux derniers chapitres" },
+              {
+                value: "anime",
+                title: t("À jour sur l'anime", "Caught up with the anime"),
+                detail: t("Rien de ce qui n'est paru qu'en manga", "Nothing that's only out in the manga"),
+              },
+              {
+                value: "manga",
+                title: t("À jour sur le manga", "Caught up with the manga"),
+                detail: t("Tout, jusqu'aux derniers chapitres", "Everything, up to the latest chapters"),
+              },
             ] as const
           ).map((option) => (
             <label
@@ -184,7 +204,12 @@ function CreateRoom() {
           ))}
         </div>
         {chosenMode === "manga" && (
-          <p className="mt-2 text-sm text-straw">Les questions pourront spoiler ceux qui ne suivent que l&apos;anime.</p>
+          <p className="mt-2 text-sm text-straw">
+            {t(
+              "Les questions pourront spoiler ceux qui ne suivent que l'anime.",
+              "The questions may spoil those who only follow the anime.",
+            )}
+          </p>
         )}
       </fieldset>
 
@@ -195,10 +220,13 @@ function CreateRoom() {
       )}
       <div className="flex flex-wrap items-center gap-4 border-t border-sea-700 pt-4">
         <p className="min-w-0 flex-1 text-sm text-mist">
-          Jusqu&apos;à {MAX_PLAYERS} joueurs. Pas besoin de compte pour jouer ; avec un compte, la partie rapporte des Berrys.
+          {t(
+            `Jusqu'à ${MAX_PLAYERS} joueurs. Pas besoin de compte pour jouer ; avec un compte, la partie rapporte des Berrys.`,
+            `Up to ${MAX_PLAYERS} players. No account needed to play; with an account, the game earns you Berries.`,
+          )}
         </p>
         <Button type="submit" disabled={busy || games.length === 0} className="min-h-[52px] px-7 text-[17px]">
-          {busy ? "Création…" : "Créer le salon"}
+          {busy ? t("Création…", "Creating…") : t("Créer le salon", "Create the room")}
         </Button>
       </div>
     </form>
@@ -206,6 +234,8 @@ function CreateRoom() {
 }
 
 function JoinRoom() {
+  const t = useT();
+  const path = useLocalePath();
   const router = useRouter();
   const [code, setCode] = useState("");
   const clean = normalizeCode(code);
@@ -215,12 +245,12 @@ function JoinRoom() {
       className="space-y-4 rounded-[20px] border border-sea-700 bg-sea-800 p-5 sm:p-6"
       onSubmit={(event) => {
         event.preventDefault();
-        if (clean.length === CODE_LENGTH) router.push(`/multi/${clean}`);
+        if (clean.length === CODE_LENGTH) router.push(path(`/multi/${clean}`));
       }}
     >
-      <h2 className="text-xl font-extrabold text-foam">Rejoindre avec un code</h2>
+      <h2 className="text-xl font-extrabold text-foam">{t("Rejoindre avec un code", "Join with a code")}</h2>
       <label className="block">
-        <span className="sr-only">Code du salon</span>
+        <span className="sr-only">{t("Code du salon", "Room code")}</span>
         <input
           value={code}
           onChange={(event) => setCode(event.target.value)}
@@ -233,13 +263,14 @@ function JoinRoom() {
         />
       </label>
       <Button type="submit" variant={clean.length === CODE_LENGTH ? "primary" : "secondary"} disabled={clean.length !== CODE_LENGTH} className="min-h-12 w-full">
-        Rejoindre le salon
+        {t("Rejoindre le salon", "Join the room")}
       </Button>
     </form>
   );
 }
 
 function Invites() {
+  const t = useT();
   const { status } = usePlayer();
   const { friends } = useFriends(status === "user");
   if (!friends?.invites.length) return null;
@@ -250,9 +281,11 @@ function Invites() {
           <span aria-hidden="true" className="flex size-11 shrink-0 items-center justify-center rounded-full bg-sea-700 font-extrabold text-mist">
             {invite.from.charAt(0).toLocaleUpperCase("fr")}
           </span>
-          <span className="min-w-0 flex-1 font-extrabold text-foam">{invite.from} t&apos;invite dans son salon</span>
+          <span className="min-w-0 flex-1 font-extrabold text-foam">
+            {t(`${invite.from} t'invite dans son salon`, `${invite.from} invites you to their room`)}
+          </span>
           <Link href={`/multi/${invite.code}`} className="flex min-h-11 items-center rounded-[10px] bg-straw px-5 text-[15px] font-extrabold text-ink hover:bg-straw-dark">
-            Rejoindre
+            {t("Rejoindre", "Join")}
           </Link>
         </li>
       ))}
@@ -261,11 +294,17 @@ function Invites() {
 }
 
 export function MultiHome() {
+  const t = useT();
   const { status, accountsEnabled } = usePlayer();
   if (status !== "loading" && !accountsEnabled) {
     return (
       <Panel>
-        <p className="text-mist">Le multijoueur n&apos;est pas disponible sur cette version du site.</p>
+        <p className="text-mist">
+          {t(
+            "Le multijoueur n'est pas disponible sur cette version du site.",
+            "Multiplayer isn't available on this version of the site.",
+          )}
+        </p>
       </Panel>
     );
   }

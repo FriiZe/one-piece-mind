@@ -1,47 +1,68 @@
 "use client";
 
-import Link from "next/link";
-import { usePathname } from "next/navigation";
+import Link from "@/components/Link";
 import type { ResolvedData } from "@/games/cards";
 import { formatNumber } from "@/games/engine/text";
 import { useUntilMidnight } from "@/games/ui/storage";
 import { OFF_DAY_RECRUIT_CHANCE } from "@/lib/economy";
+import { useLocale, usePath, useT } from "@/lib/i18n/client";
 import { usePlayer } from "@/lib/player/PlayerProvider";
 import { useDaily } from "@/lib/player/useDaily";
 import type { RewardView } from "@/lib/player/useGameReward";
 import { CharacterCard } from "./CharacterCard";
 
 const REFUSALS = {
-  duplicate: "Cette partie a déjà été récompensée.",
-  invalid: "Cette partie n'a pas pu être validée : pas de récompense.",
-  limit: "Trop de parties en peu de temps : pas de récompense pour celle-ci.",
-  unavailable: "Récompense indisponible pour l'instant. Réessaie dans un moment.",
+  fr: {
+    duplicate: "Cette partie a déjà été récompensée.",
+    invalid: "Cette partie n'a pas pu être validée : pas de récompense.",
+    limit: "Trop de parties en peu de temps : pas de récompense pour celle-ci.",
+    unavailable: "Récompense indisponible pour l'instant. Réessaie dans un moment.",
+  },
+  en: {
+    duplicate: "This game has already been rewarded.",
+    invalid: "This game couldn't be verified: no reward.",
+    limit: "Too many games in a short time: no reward for this one.",
+    unavailable: "Rewards are unavailable right now. Try again in a moment.",
+  },
 } as const;
 
 /** Pourquoi une partie n'a pas rapporté de Berrys : seuls les jeux du jour en paient, une fois chacun. */
 const UNPAID = {
-  off: `Hors sélection du jour : pas de Berrys. Une partie réussie a ${Math.round(OFF_DAY_RECRUIT_CHANCE * 100)} % de chances de rapporter une recrue.`,
-  done: "Tu as déjà validé ce jeu aujourd'hui : il rapportera de nouveau des Berrys un autre jour.",
-  missed: "Jeu du jour non validé : il faut au moins la moitié des points. Tu peux retenter ta chance.",
+  fr: {
+    off: `Hors sélection du jour : pas de Berrys. Une partie réussie a ${Math.round(OFF_DAY_RECRUIT_CHANCE * 100)} % de chances de rapporter une recrue.`,
+    done: "Tu as déjà validé ce jeu aujourd'hui : il rapportera de nouveau des Berrys un autre jour.",
+    missed: "Jeu du jour non validé : il faut au moins la moitié des points. Tu peux retenter ta chance.",
+  },
+  en: {
+    off: `Not in today's selection: no Berries. A successful game has a ${Math.round(OFF_DAY_RECRUIT_CHANCE * 100)}% chance of earning you a recruit.`,
+    done: "You've already cleared this game today: it will pay Berries again another day.",
+    missed: "Daily game not cleared: you need at least half the points. You can try your luck again.",
+  },
 } as const;
 
 /** Où en sont les jeux du jour, et le prochain à jouer : la fin d'une partie mène à la suivante. */
 function DailyNext() {
   const { ready, entries, count, total } = useDaily();
-  const pathname = usePathname();
+  const pathname = usePath();
   const countdown = useUntilMidnight();
+  const t = useT();
+  const locale = useLocale();
   if (!ready) return null;
   const next = entries.find((entry) => !entry.done && entry.href !== pathname);
 
   return (
     <div className="space-y-2">
       <p className="flex justify-between gap-3 text-sm font-bold">
-        <span>Jeux du jour</span>
+        <span>{t("Jeux du jour", "Daily games")}</span>
         <span>
-          {count} / {total} validés
+          {count} / {total} {t("validés", "cleared")}
         </span>
       </p>
-      <span className="flex gap-1.5" role="img" aria-label={`${count} jeux du jour validés sur ${total}`}>
+      <span
+        className="flex gap-1.5"
+        role="img"
+        aria-label={t(`${count} jeux du jour validés sur ${total}`, `${count} daily games cleared out of ${total}`)}
+      >
         {entries.map((entry, index) => (
           <span key={entry.key} className={`h-2 flex-1 rounded-full ${index < count ? "bg-emerald-700" : "bg-parchment-dark"}`} />
         ))}
@@ -52,9 +73,12 @@ function DailyNext() {
           className="flex min-h-14 items-center justify-between gap-3 rounded-xl bg-ink px-4 py-2 text-parchment transition-colors hover:bg-ink/85"
         >
           <span>
-            <span className="block text-xs font-extrabold tracking-[0.15em] uppercase opacity-80">Jeu du jour suivant</span>
+            <span className="block text-xs font-extrabold tracking-[0.15em] uppercase opacity-80">
+              {t("Jeu du jour suivant", "Next daily game")}
+            </span>
             <span className="block text-lg leading-tight font-extrabold">
-              {next.challenge ? "Le défi du jour" : next.title} · {formatNumber(next.berrys)} ฿
+              {next.challenge ? t("Le défi du jour", "The daily challenge") : next.title[locale]} ·{" "}
+              {formatNumber(next.berrys, locale)} ฿
             </span>
           </span>
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" className="size-5 shrink-0">
@@ -63,8 +87,13 @@ function DailyNext() {
         </Link>
       ) : (
         <p className="text-sm font-semibold">
-          {count === total ? "Tous les jeux du jour sont validés." : "Il ne te reste que ce jeu à valider aujourd'hui."} Nouvelle sélection dans{" "}
-          {countdown ?? "quelques heures"}.
+          {count === total
+            ? t("Tous les jeux du jour sont validés.", "All daily games are cleared.")
+            : t(
+                "Il ne te reste que ce jeu à valider aujourd'hui.",
+                "This is the only game you have left to clear today.",
+              )}{" "}
+          {t("Nouvelle sélection dans", "New selection in")} {countdown ?? t("quelques heures", "a few hours")}.
         </p>
       )}
     </div>
@@ -74,9 +103,13 @@ function DailyNext() {
 /** Ce que la partie a rapporté : Berrys et, parfois, un avis de recherche. Puis le jeu du jour suivant. */
 export function RewardSummary({ view, data }: { view: RewardView | null; data: ResolvedData }) {
   const { status, accountsEnabled } = usePlayer();
+  const t = useT();
+  const locale = useLocale();
   if (!view) return null;
-  if (view.status === "pending") return <p className="text-sm font-semibold">Calcul de la récompense…</p>;
-  if (!view.result.ok) return <p className="text-sm font-semibold">{REFUSALS[view.result.reason]}</p>;
+  if (view.status === "pending") {
+    return <p className="text-sm font-semibold">{t("Calcul de la récompense…", "Working out your reward…")}</p>;
+  }
+  if (!view.result.ok) return <p className="text-sm font-semibold">{REFUSALS[locale][view.result.reason]}</p>;
 
   const { reward } = view.result;
   const recruit = reward.recruit;
@@ -87,27 +120,43 @@ export function RewardSummary({ view, data }: { view: RewardView | null; data: R
       <div className="flex flex-wrap items-center gap-4 rounded-xl border-2 border-ink/15 bg-white/50 p-3">
         <div className="min-w-0 flex-1">
           {reward.daily === "paid" ? (
-            <p className="text-xs font-extrabold tracking-[0.15em] uppercase">Jeu du jour validé</p>
+            <p className="text-xs font-extrabold tracking-[0.15em] uppercase">{t("Jeu du jour validé", "Daily game cleared")}</p>
           ) : (
             <p className="text-sm font-semibold">
-              {reward.daily === "off" && recruit ? "Hors sélection du jour : pas de Berrys, mais une recrue." : UNPAID[reward.daily]}
+              {reward.daily === "off" && recruit
+                ? t(
+                    "Hors sélection du jour : pas de Berrys, mais une recrue.",
+                    "Not in today's selection: no Berries, but a recruit.",
+                  )
+                : UNPAID[locale][reward.daily]}
             </p>
           )}
           {(reward.daily === "paid" || reward.total > 0) && (
-            <p className="font-display text-[34px] leading-tight tracking-wide text-vest-dark">+{formatNumber(reward.total)} ฿</p>
+            <p className="font-display text-[34px] leading-tight tracking-wide text-vest-dark">+{formatNumber(reward.total, locale)} ฿</p>
           )}
-          {reward.bonus > 0 && <p className="text-sm">dont {formatNumber(reward.bonus)} ฿ grâce à ton équipage</p>}
-          {reward.capped && <p className="text-sm font-semibold">Plafond de gains du jour atteint.</p>}
+          {reward.bonus > 0 && (
+            <p className="text-sm">
+              {t(
+                `dont ${formatNumber(reward.bonus, locale)} ฿ grâce à ton équipage`,
+                `including ${formatNumber(reward.bonus, locale)} ฿ thanks to your crew`,
+              )}
+            </p>
+          )}
+          {reward.capped && (
+            <p className="text-sm font-semibold">{t("Plafond de gains du jour atteint.", "Daily earnings cap reached.")}</p>
+          )}
           {(reward.objectives.length > 0 || reward.weekly.length > 0) && (
             <ul className="mt-1 space-y-0.5 text-sm font-semibold">
               {reward.objectives.map((objective) => (
-                <li key={objective.label}>
-                  Objectif atteint : {objective.label} (+{formatNumber(objective.berrys)} ฿)
+                <li key={objective.label.fr}>
+                  {t("Objectif atteint : ", "Goal reached: ")}
+                  {objective.label[locale]} (+{formatNumber(objective.berrys, locale)} ฿)
                 </li>
               ))}
               {reward.weekly.map((challenge) => (
-                <li key={challenge.label}>
-                  Défi de la semaine réussi : {challenge.label} (+{formatNumber(challenge.berrys)} ฿)
+                <li key={challenge.label.fr}>
+                  {t("Défi de la semaine réussi : ", "Weekly challenge completed: ")}
+                  {challenge.label[locale]} (+{formatNumber(challenge.berrys, locale)} ฿)
                 </li>
               ))}
             </ul>
@@ -115,9 +164,15 @@ export function RewardSummary({ view, data }: { view: RewardView | null; data: R
           {recruit && (
             <p className="mt-1 font-semibold">
               {recruit.duplicate
-                ? `Nouvel avis de ${character?.name ?? "ce personnage"} : tu l'avais déjà.`
-                : `${character?.name ?? "Un personnage"} rejoint ta collection !`}
-              {recruit.golden && " Avis doré !"}
+                ? t(
+                    `Nouvel avis de ${character?.name ?? "ce personnage"} : tu l'avais déjà.`,
+                    `New poster of ${character?.name ?? "this character"}: you already had it.`,
+                  )
+                : t(
+                    `${character?.name ?? "Un personnage"} rejoint ta collection !`,
+                    `${character?.name ?? "A character"} joins your collection!`,
+                  )}
+              {recruit.golden && t(" Avis doré !", " Golden poster!")}
             </p>
           )}
           {(recruit || (status === "guest" && accountsEnabled)) && (
@@ -125,17 +180,17 @@ export function RewardSummary({ view, data }: { view: RewardView | null; data: R
               {recruit &&
                 (recruit.duplicate ? (
                   <Link href="/collection" className="underline underline-offset-4">
-                    Voir ma collection
+                    {t("Voir ma collection", "View my collection")}
                   </Link>
                 ) : (
                   <Link href="/navire" className="underline underline-offset-4">
-                    Lui confier un poste
+                    {t("Lui confier un poste", "Give them a post")}
                   </Link>
                 ))}
               {recruit && status === "guest" && accountsEnabled && " · "}
               {status === "guest" && accountsEnabled && (
                 <Link href="/profil" className="underline underline-offset-4">
-                  Créer un compte pour tout garder
+                  {t("Créer un compte pour tout garder", "Create an account to keep everything")}
                 </Link>
               )}
             </p>

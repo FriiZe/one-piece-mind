@@ -5,6 +5,7 @@ import { dailyKey } from "@/games/engine/daily";
 import type { Difficulty } from "@/games/engine/difficulty";
 import { generateMixed, type MixSlug, type QcmQuestion } from "@/games/qcm/logic";
 import { DAILY_BERRY_CAP } from "@/lib/economy";
+import { DEFAULT_LOCALE, isLocale, type Locale } from "@/lib/i18n";
 import {
   ANSWER_SECONDS,
   cleanName,
@@ -30,19 +31,25 @@ const hashToken = (token: string) => createHash("sha256").update(token).digest("
 /** La graine est stockée dans une colonne entière de Postgres, limitée à 31 bits. */
 const MAX_SEED = 0x7fffffff;
 
-let raw: GameData | undefined;
-const resolved = new Map<SpoilerMode, ResolvedData>();
-function gameData(mode: SpoilerMode): ResolvedData {
-  raw ??= buildGameData();
-  if (!resolved.has(mode)) resolved.set(mode, resolveGameData(raw, mode));
-  return resolved.get(mode)!;
+const raw = new Map<Locale, GameData>();
+const resolved = new Map<string, ResolvedData>();
+function gameData(mode: SpoilerMode, locale: Locale): ResolvedData {
+  const key = `${locale}:${mode}`;
+  if (!resolved.has(key)) {
+    if (!raw.has(locale)) raw.set(locale, buildGameData(locale));
+    resolved.set(key, resolveGameData(raw.get(locale)!, mode));
+  }
+  return resolved.get(key)!;
 }
+
+/** Langue d'un salon : celle de son hôte. Un salon créé avant l'arrivée de l'anglais est en français. */
+const roomLocale = (room: { lang: string }): Locale => (isLocale(room.lang) ? room.lang : DEFAULT_LOCALE);
 
 type RoomRow = Prisma.RoomGetPayload<{ include: { players: true } }>;
 
 /** Questions d'un salon : recalculées à partir de la graine, et gardées en mémoire le temps de la partie. */
 const questionCache = new Map<string, QcmQuestion[]>();
-function questionsOf(room: Pick<RoomRow, "id" | "seed" | "mode" | "difficulty" | "games" | "questionCount">): QcmQuestion[] {
+function questionsOf(room: Pick<RoomRow, "id" | "seed" | "mode" | "lang" | "difficulty" | "games" | "questionCount">): QcmQuestion[] {
   const key = `${room.id}:${room.seed}`;
   let questions = questionCache.get(key);
   if (!questions) {
@@ -51,7 +58,7 @@ function questionsOf(room: Pick<RoomRow, "id" | "seed" | "mode" | "difficulty" |
       room.games as MixSlug[],
       room.questionCount,
       room.difficulty as Difficulty,
-      gameData(room.mode as SpoilerMode),
+      gameData(room.mode as SpoilerMode, roomLocale(room)),
     );
     if (questionCache.size > 200) questionCache.delete(questionCache.keys().next().value!);
     questionCache.set(key, questions);
@@ -68,14 +75,21 @@ function displayName(identity: Identity): string | null {
 
 function parseSettings(input: unknown): RoomSettings | null {
   if (typeof input !== "object" || input === null) return null;
-  const { mode, difficulty, games, questionCount, seconds } = input as Record<string, unknown>;
+  const { mode, difficulty, games, questionCount, seconds, lang } = input as Record<string, unknown>;
   const validGameList = validGames(games);
   if (mode !== "anime" && mode !== "manga") return null;
   if (difficulty !== "facile" && difficulty !== "normal" && difficulty !== "expert") return null;
   if (!validGameList) return null;
   if (!(QUESTION_COUNTS as readonly unknown[]).includes(questionCount)) return null;
   if (!(ANSWER_SECONDS as readonly unknown[]).includes(seconds)) return null;
-  return { mode, difficulty, games: validGameList, questionCount: questionCount as number, seconds: seconds as number };
+  return {
+    mode,
+    difficulty,
+    games: validGameList,
+    questionCount: questionCount as number,
+    seconds: seconds as number,
+    lang: isLocale(lang) ? lang : DEFAULT_LOCALE,
+  };
 }
 
 const isUniqueViolation = (error: unknown) =>
@@ -264,6 +278,7 @@ async function toView(room: RoomRow, player: RoomRow["players"][number]): Promis
       games: room.games as MixSlug[],
       questionCount: room.questionCount,
       seconds: room.seconds,
+      lang: roomLocale(room),
     },
     you: { id: player.id, isHost: room.hostId === player.id },
     players: ranking.map((p) => ({

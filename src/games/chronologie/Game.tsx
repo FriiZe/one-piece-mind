@@ -6,6 +6,7 @@ import { Button, Panel, Progress } from "../ui/primitives";
 import { SortableList } from "../ui/SortableList";
 import type { GameProps } from "../ui/types";
 import { useRun } from "../ui/useRun";
+import { useT } from "@/lib/i18n/client";
 import { correctOrder, MAX_SCORE, roundAt, ROUNDS, scoreRound } from "./logic";
 
 type Progression = {
@@ -19,6 +20,7 @@ type Progression = {
 const START: Progression = { round: 0, order: null, submitted: false, orders: [], score: 0 };
 
 export default function Chronologie({ data }: GameProps) {
+  const t = useT();
   const base = useRun("chronologie");
   const [state, setState] = useState<Progression>(START);
   const game = {
@@ -39,8 +41,10 @@ export default function Chronologie({ data }: GameProps) {
     return (
       <GameStart game={game}>
         <p className="text-mist">
-          Cinq manches. À chaque fois, cinq arcs ou cinq personnages à remettre dans l&apos;ordre de l&apos;histoire, en les
-          faisant glisser. Un point par élément au bon rang.
+          {t(
+            "Cinq manches. À chaque fois, cinq arcs ou cinq personnages à remettre dans l'ordre de l'histoire, en les faisant glisser. Un point par élément au bon rang.",
+            "Five rounds. Each time, drag five arcs or five characters back into story order. One point for each item in the right spot.",
+          )}
         </p>
       </GameStart>
     );
@@ -69,7 +73,7 @@ export default function Chronologie({ data }: GameProps) {
 
   return (
     <Panel className="space-y-4">
-      <Progress current={state.round + 1} total={ROUNDS} score={`Score : ${state.score}`} />
+      <Progress current={state.round + 1} total={ROUNDS} score={t(`Score : ${state.score}`, `Score: ${state.score}`)} />
       <p className="text-lg text-foam">{round.prompt}</p>
       <SortableList
         order={order}
@@ -80,10 +84,10 @@ export default function Chronologie({ data }: GameProps) {
       />
       {state.submitted ? (
         <Button autoFocus onClick={next}>
-          {last ? "Voir mon score" : "Manche suivante"}
+          {last ? t("Voir mon score", "See my score") : t("Manche suivante", "Next round")}
         </Button>
       ) : (
-        <Button onClick={submit}>Valider</Button>
+        <Button onClick={submit}>{t("Valider", "Submit")}</Button>
       )}
     </Panel>
   );

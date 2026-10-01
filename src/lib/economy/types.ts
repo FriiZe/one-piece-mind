@@ -5,6 +5,7 @@
  */
 import type { Difficulty } from "@/games/engine/difficulty";
 import type { GameCategoryId, LiveSlug } from "@/lib/games/catalog";
+import type { Localized } from "@/lib/i18n";
 import type { DailyStatus } from "./daily";
 
 export const POST_IDS = [
@@ -73,8 +74,12 @@ export function normalizePlayer(state: Partial<PlayerState> | null | undefined):
   return { ...EMPTY_PLAYER, ...state, day: { ...EMPTY_PLAYER.day, ...state?.day } };
 }
 
-/** Ce que l'économie a besoin de savoir d'un personnage. */
-export type Recruitable = { id: string; tier: number; affiliation: string | null };
+/**
+ * Ce que l'économie a besoin de savoir d'un personnage. `org` : son organisation,
+ * sous un nom qui ne dépend pas de la langue (c'est elle qui décide des traits
+ * d'équipage) ; `affiliation` : la même, telle qu'elle s'affiche.
+ */
+export type Recruitable = { id: string; tier: number; org: string | null; affiliation: string | null };
 
 /** Résultat d'une partie, tel que le calcule `evaluateReport`. */
 export type GameOutcome = {
@@ -97,7 +102,7 @@ export type Recruit = {
 };
 
 /** Prime versée pour un objectif ou un défi atteint à l'occasion d'une partie. */
-export type Milestone = { label: string; berrys: number };
+export type Milestone = { label: Localized; berrys: number };
 
 export type Reward = {
   /** Ce que la partie vaut au regard des jeux du jour : seule une partie `paid` rapporte des Berrys. */

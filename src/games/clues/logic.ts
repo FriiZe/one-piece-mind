@@ -7,6 +7,7 @@ import { byDifficulty, type Difficulty } from "../engine/difficulty";
 import { createRng, sample, type Rng } from "../engine/rng";
 import { formatBounty, normalizeText, revealsName } from "../engine/text";
 import { FRUIT_TYPE_LABELS, hakiLabel, RACE_LABELS, SEA_LABELS } from "@/lib/data/labels";
+import { translator, type Translate } from "@/lib/i18n";
 
 export const CLUE_ROUNDS = 5;
 export const MAX_POINTS = 5;
@@ -21,8 +22,8 @@ export function pointsFor(revealed: number): number {
   return Math.max(1, MAX_POINTS - (revealed - 1));
 }
 
-const initialOf = (c: PlayCharacter) =>
-  `${c.name[0].toUpperCase()}… (${normalizeText(c.name).replace(/ /g, "").length} lettres)`;
+const initialOf = (c: PlayCharacter, t: Translate) =>
+  `${c.name[0].toUpperCase()}… (${normalizeText(c.name).replace(/ /g, "").length} ${t("lettres", "letters")})`;
 
 type Generator = (rng: Rng, data: ResolvedData, pool: readonly PlayCharacter[], count: number) => ClueRound[];
 
@@ -35,33 +36,43 @@ function usable(target: PlayCharacter, clues: (Clue | null)[]): Clue[] {
 }
 
 /** Du plus vague au plus précis : l'arc, l'origine, le fruit, le haki, l'affiliation, la prime, l'initiale. */
-const lesIndices: Generator = (rng, data, pool, count) =>
-  sample(rng, pool.filter((c) => c.arc !== null && c.affiliation), count).map((target) => {
+const lesIndices: Generator = (rng, data, pool, count) => {
+  const { locale } = data;
+  const t = translator(locale);
+  return sample(rng, pool.filter((c) => c.arc !== null && c.affiliation), count).map((target) => {
     const fruit = target.fruitId ? data.fruitById.get(target.fruitId) : undefined;
     const race = target.races.find((r) => r !== "human");
+    const arc = data.arcs.get(target.arc!);
     const clues: (Clue | null)[] = [
-      { title: "Première apparition", value: `Arc ${data.arcs.get(target.arc!)}` },
-      target.sea ? { title: "Origine", value: SEA_LABELS[target.sea] + (race ? ` · ${RACE_LABELS[race]}` : "") } : null,
-      { title: "Fruit du démon", value: fruit ? FRUIT_TYPE_LABELS[fruit.type] : "Aucun" },
-      { title: "Haki", value: hakiLabel(target.haki) },
+      { title: t("Première apparition", "First appearance"), value: t(`Arc ${arc}`, `${arc} arc`) },
+      target.sea
+        ? { title: t("Origine", "Origin"), value: SEA_LABELS[locale][target.sea] + (race ? ` · ${RACE_LABELS[locale][race]}` : "") }
+        : null,
+      { title: t("Fruit du démon", "Devil Fruit"), value: fruit ? FRUIT_TYPE_LABELS[locale][fruit.type] : t("Aucun", "None") },
+      { title: "Haki", value: hakiLabel(target.haki, locale) },
       { title: "Affiliation", value: target.affiliation! },
-      { title: "Prime", value: formatBounty(target.bounty) },
+      { title: t("Prime", "Bounty"), value: formatBounty(target.bounty, locale) },
     ];
     // L'initiale vient toujours en dernier, hors filtre : elle ne peut pas contenir le nom
-    return { target, clues: [...usable(target, clues), { title: "Initiale", value: initialOf(target) }] };
+    return { target, clues: [...usable(target, clues), { title: t("Initiale", "Initial"), value: initialOf(target, t) }] };
   });
+};
 
-const emojis: Generator = (rng, data, _pool, count) =>
-  sample(rng, data.extras.emojis, count).map((entry) => {
+const emojis: Generator = (rng, data, _pool, count) => {
+  const { locale } = data;
+  const t = translator(locale);
+  return sample(rng, data.extras.emojis, count).map((entry) => {
     const target = data.characterById.get(entry.characterId)!;
+    const arc = target.arc !== null ? data.arcs.get(target.arc) : undefined;
     const clues: (Clue | null)[] = [
-      { title: "Qui est-ce ?", value: entry.emojis, big: true },
-      target.sea ? { title: "Origine", value: SEA_LABELS[target.sea] } : null,
+      { title: t("Qui est-ce ?", "Who is it?"), value: entry.emojis, big: true },
+      target.sea ? { title: t("Origine", "Origin"), value: SEA_LABELS[locale][target.sea] } : null,
       target.affiliation ? { title: "Affiliation", value: target.affiliation } : null,
-      target.arc !== null ? { title: "Première apparition", value: `Arc ${data.arcs.get(target.arc)}` } : null,
+      arc ? { title: t("Première apparition", "First appearance"), value: t(`Arc ${arc}`, `${arc} arc`) } : null,
     ];
-    return { target, clues: [...usable(target, clues), { title: "Initiale", value: initialOf(target) }] };
+    return { target, clues: [...usable(target, clues), { title: t("Initiale", "Initial"), value: initialOf(target, t) }] };
   });
+};
 
 const GENERATORS = { "les-indices": lesIndices, emojis } satisfies Record<string, Generator>;
 

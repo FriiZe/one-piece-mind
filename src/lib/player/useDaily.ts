@@ -12,6 +12,7 @@ import {
   weeklyChallenges,
 } from "@/lib/economy";
 import { getGame, type GameCategoryId, type LiveSlug } from "@/lib/games/catalog";
+import type { Localized } from "@/lib/i18n";
 import { usePlayer } from "./PlayerProvider";
 
 export type DailyEntry = {
@@ -19,8 +20,8 @@ export type DailyEntry = {
   key: string;
   slug: LiveSlug;
   href: string;
-  title: string;
-  pitch: string;
+  title: Localized;
+  pitch: Localized;
   category: GameCategoryId;
   berrys: number;
   /** Le défi du jour, à part des cinq jeux tirés. */
@@ -46,7 +47,7 @@ export function useDaily() {
       slug: "onepiecedle",
       href: "/jeux/onepiecedle",
       title: onepiecedle.title,
-      pitch: "Le personnage mystère, le même pour tous les joueurs.",
+      pitch: { fr: "Le personnage mystère, le même pour tous les joueurs.", en: "The mystery character, the same for every player." },
       category: onepiecedle.category,
       berrys: DAILY_CHALLENGE_BERRYS,
       challenge: true,

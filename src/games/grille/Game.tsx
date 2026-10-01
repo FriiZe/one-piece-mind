@@ -8,11 +8,13 @@ import { GameEnd, GameStart } from "../ui/GameEnd";
 import { Button, Panel } from "../ui/primitives";
 import type { GameProps } from "../ui/types";
 import { useRun } from "../ui/useRun";
+import { useT } from "@/lib/i18n/client";
 import { CELLS, exampleFor, fits, generate, SIZE } from "./logic";
 
 const NO_ANSWERS: (string | null)[] = Array(CELLS).fill(null);
 
 export default function Grille({ data }: GameProps) {
+  const t = useT();
   const base = useRun("grille");
   /** Réponse donnée dans chaque case ; `null` tant qu'elle n'a pas été tentée. */
   const [answers, setAnswers] = useState<(string | null)[]>(NO_ANSWERS);
@@ -35,8 +37,10 @@ export default function Grille({ data }: GameProps) {
     return (
       <GameStart game={game}>
         <p className="text-mist">
-          Neuf cases, chacune au croisement de deux critères. Donne pour chaque case un personnage qui remplit les deux :
-          tu n&apos;as qu&apos;un essai par case, et un personnage ne sert qu&apos;une fois.
+          {t(
+            "Neuf cases, chacune au croisement de deux critères. Donne pour chaque case un personnage qui remplit les deux : tu n'as qu'un essai par case, et un personnage ne sert qu'une fois.",
+            "Nine squares, each where two criteria cross. For each square, name a character who meets both: you only get one try per square, and each character can only be used once.",
+          )}
         </p>
       </GameStart>
     );
@@ -67,7 +71,8 @@ export default function Grille({ data }: GameProps) {
   return (
     <Panel className="space-y-4">
       <p className="text-sm font-semibold text-mist">
-        Score : {score} / {CELLS}
+        {t("Score : ", "Score: ")}
+        {score} / {CELLS}
       </p>
 
       <div className="grid grid-cols-[minmax(4.5rem,1fr)_repeat(3,minmax(0,1.3fr))] gap-1.5 sm:gap-2">
@@ -101,7 +106,10 @@ export default function Grille({ data }: GameProps) {
                 type="button"
                 disabled={!!id || over}
                 aria-pressed={active === cell}
-                aria-label={`Case ${grid.rows[r].label} et ${grid.columns[c].label}${character ? ` : ${character.name}` : ""}`}
+                aria-label={t(
+                  `Case ${grid.rows[r].label} et ${grid.columns[c].label}${character ? ` : ${character.name}` : ""}`,
+                  `Square ${grid.rows[r].label} and ${grid.columns[c].label}${character ? `: ${character.name}` : ""}`,
+                )}
                 onClick={() => setActive(cell)}
                 className={`flex aspect-square flex-col items-center justify-center gap-1 overflow-hidden rounded-xl border-2 p-1 text-center transition-colors disabled:cursor-default ${tone}`}
               >
@@ -111,7 +119,13 @@ export default function Grille({ data }: GameProps) {
                   </span>
                 )}
                 <span className="text-[0.7rem] leading-tight font-bold break-words text-foam sm:text-xs">
-                  {character ? `${right[cell] ? "✓" : "✗"} ${character.name}` : example ? `Par exemple : ${example.name}` : active === cell ? "…" : "?"}
+                  {character
+                    ? `${right[cell] ? "✓" : "✗"} ${character.name}`
+                    : example
+                      ? t(`Par exemple : ${example.name}`, `For example: ${example.name}`)
+                      : active === cell
+                        ? "…"
+                        : "?"}
                 </span>
               </button>
             );
@@ -122,31 +136,41 @@ export default function Grille({ data }: GameProps) {
       {over ? (
         <div className="flex flex-wrap items-center justify-between gap-3" aria-live="polite">
           <p className="font-bold text-foam">
-            {score === CELLS ? "Grille complète !" : `${score} case${score > 1 ? "s" : ""} sur ${CELLS}.`}
+            {score === CELLS
+              ? t("Grille complète !", "Grid complete!")
+              : t(
+                  `${score} case${score > 1 ? "s" : ""} sur ${CELLS}.`,
+                  `${score} ${score === 1 ? "square" : "squares"} out of ${CELLS}.`,
+                )}
           </p>
           <Button autoFocus onClick={finish}>
-            Voir mon score
+            {t("Voir mon score", "See my score")}
           </Button>
         </div>
       ) : active === null || !row || !column ? (
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <p className="text-mist">Choisis une case, puis donne un personnage qui remplit ses deux critères.</p>
+          <p className="text-mist">
+            {t(
+              "Choisis une case, puis donne un personnage qui remplit ses deux critères.",
+              "Pick a square, then name a character who meets both of its criteria.",
+            )}
+          </p>
           <Button variant="secondary" onClick={() => setStopped(true)}>
-            Arrêter là
+            {t("Arrêter là", "Stop here")}
           </Button>
         </div>
       ) : (
         <div className="space-y-2">
           <p className="font-semibold text-foam">
-            {row.label} <span className="text-mist">et</span> {column.label}
+            {row.label} <span className="text-mist">{t("et", "and")}</span> {column.label}
           </p>
           <CharacterSearch
             key={active}
             characters={data.characters}
             excludeIds={used}
             onPick={answer}
-            label="Personnage pour cette case"
-            placeholder="Qui remplit cette case ?"
+            label={t("Personnage pour cette case", "Character for this square")}
+            placeholder={t("Qui remplit cette case ?", "Who fits this square?")}
           />
         </div>
       )}

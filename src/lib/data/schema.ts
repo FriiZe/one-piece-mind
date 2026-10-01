@@ -164,7 +164,7 @@ export const swordSchema = z.object({
 
 export const groupSchema = z.object({
   id: slug,
-  title: z.string().min(1),
+  title: localizedSchema,
   /** Chapitre à partir duquel la composition complète du groupe est connue. */
   since: chapter,
   memberIds: z.array(slug).min(2),

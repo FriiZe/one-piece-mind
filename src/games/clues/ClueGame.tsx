@@ -8,11 +8,19 @@ import { Portrait } from "../ui/Portrait";
 import { Button, Progress } from "../ui/primitives";
 import type { GameProps } from "../ui/types";
 import { useRun } from "../ui/useRun";
+import type { Localized } from "@/lib/i18n";
+import { useLocale, useT } from "@/lib/i18n/client";
 import { generateRounds, MAX_POINTS, pointsFor, usesDifficulty, type ClueEvent, type ClueSlug } from "./logic";
 
-const INTROS: Record<ClueSlug, string> = {
-  "les-indices": "Cinq personnages à retrouver. Les indices vont du plus vague au plus précis : moins tu en utilises, plus tu marques.",
-  emojis: "Cinq personnages résumés en quelques emojis. Chaque erreur dévoile un indice supplémentaire.",
+const INTROS: Record<ClueSlug, Localized> = {
+  "les-indices": {
+    fr: "Cinq personnages à retrouver. Les indices vont du plus vague au plus précis : moins tu en utilises, plus tu marques.",
+    en: "Five characters to identify. The clues go from vaguest to most precise: the fewer you use, the more you score.",
+  },
+  emojis: {
+    fr: "Cinq personnages résumés en quelques emojis. Chaque erreur dévoile un indice supplémentaire.",
+    en: "Five characters summed up in a few emojis. Each wrong guess reveals one more clue.",
+  },
 };
 
 type Progression = {
@@ -27,6 +35,8 @@ type Progression = {
 const START: Progression = { index: 0, revealed: 1, wrong: [], log: [[]], outcome: null, score: 0 };
 
 export default function ClueGame({ data, slug }: GameProps & { slug: ClueSlug }) {
+  const t = useT();
+  const locale = useLocale();
   const base = useRun(slug);
   const [state, setState] = useState<Progression>(START);
   const game = {
@@ -44,7 +54,7 @@ export default function ClueGame({ data, slug }: GameProps & { slug: ClueSlug })
   if (!run || !rounds.length) {
     return (
       <GameStart game={game} withDifficulty={withDifficulty}>
-        <p className="text-mist">{INTROS[slug]}</p>
+        <p className="text-mist">{INTROS[slug][locale]}</p>
       </GameStart>
     );
   }
@@ -80,8 +90,12 @@ export default function ClueGame({ data, slug }: GameProps & { slug: ClueSlug })
 
   return (
     <div className="space-y-4">
-      <Progress current={state.index + 1} total={rounds.length} score={`Score : ${state.score}`} />
-      <ul className="space-y-2" aria-label="Indices" aria-live="polite">
+      <Progress
+        current={state.index + 1}
+        total={rounds.length}
+        score={t(`Score : ${state.score}`, `Score: ${state.score}`)}
+      />
+      <ul className="space-y-2" aria-label={t("Indices", "Clues")} aria-live="polite">
         {round.clues.map((clue, i) => {
           const shown = i < state.revealed || done;
           return (
@@ -101,12 +115,15 @@ export default function ClueGame({ data, slug }: GameProps & { slug: ClueSlug })
             characters={data.characters}
             excludeIds={new Set(state.wrong)}
             onPick={guess}
-            label="Qui est-ce ?"
-            placeholder="Qui est-ce ?"
+            label={t("Qui est-ce ?", "Who is it?")}
+            placeholder={t("Qui est-ce ?", "Who is it?")}
           />
           <div className="flex flex-wrap items-center justify-between gap-2 text-sm text-mist">
             <span>
-              Cette manche vaut encore {pointsFor(state.revealed)} point{pointsFor(state.revealed) > 1 ? "s" : ""}.
+              {t(
+                `Cette manche vaut encore ${pointsFor(state.revealed)} point${pointsFor(state.revealed) > 1 ? "s" : ""}.`,
+                `This round is still worth ${pointsFor(state.revealed)} point${pointsFor(state.revealed) === 1 ? "" : "s"}.`,
+              )}
             </span>
             <span className="flex gap-4">
               {state.revealed < round.clues.length && (
@@ -115,7 +132,7 @@ export default function ClueGame({ data, slug }: GameProps & { slug: ClueSlug })
                   className="underline underline-offset-4 hover:text-foam"
                   onClick={() => setState({ ...state, log: logged({ type: "hint" }), revealed: state.revealed + 1 })}
                 >
-                  Un indice
+                  {t("Un indice", "Clue")}
                 </button>
               )}
               <button
@@ -123,7 +140,7 @@ export default function ClueGame({ data, slug }: GameProps & { slug: ClueSlug })
                 className="underline underline-offset-4 hover:text-foam"
                 onClick={() => setState({ ...state, log: logged({ type: "pass" }), outcome: 0 })}
               >
-                Passer
+                {t("Passer", "Skip")}
               </button>
             </span>
           </div>
@@ -135,11 +152,14 @@ export default function ClueGame({ data, slug }: GameProps & { slug: ClueSlug })
         <div className="flex flex-wrap items-center justify-between gap-3" aria-live="polite">
           <p className={`font-bold ${state.outcome ? "text-emerald-300" : "text-vest"}`}>
             {state.outcome
-              ? `${round.target.name} : +${state.outcome} point${state.outcome > 1 ? "s" : ""}.`
-              : `C'était ${round.target.name}.`}
+              ? t(
+                  `${round.target.name} : +${state.outcome} point${state.outcome > 1 ? "s" : ""}.`,
+                  `${round.target.name}: +${state.outcome} point${state.outcome === 1 ? "" : "s"}.`,
+                )
+              : t(`C'était ${round.target.name}.`, `It was ${round.target.name}.`)}
           </p>
           <Button autoFocus onClick={next}>
-            {last ? "Voir mon score" : "Manche suivante"}
+            {last ? t("Voir mon score", "See my score") : t("Manche suivante", "Next round")}
           </Button>
         </div>
       )}

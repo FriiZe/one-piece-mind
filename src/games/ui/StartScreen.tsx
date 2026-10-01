@@ -2,6 +2,7 @@
 
 import type { ReactNode } from "react";
 import { DIFFICULTIES, type Difficulty } from "../engine/difficulty";
+import { useLocale, useT } from "@/lib/i18n/client";
 import { Button, Panel } from "./primitives";
 import { useStored } from "./storage";
 
@@ -9,12 +10,14 @@ import { useStored } from "./storage";
 export function StartScreen({
   children,
   onStart,
-  startLabel = "Jouer",
+  startLabel,
 }: {
   children?: ReactNode;
   onStart: (difficulty: Difficulty) => void;
   startLabel?: string;
 }) {
+  const t = useT();
+  const locale = useLocale();
   const [difficulty, setDifficulty] = useStored<Difficulty>("opm.difficulty", "normal");
 
   const current = DIFFICULTIES.find((d) => d.id === difficulty) ?? DIFFICULTIES[0];
@@ -23,7 +26,7 @@ export function StartScreen({
     <Panel className="space-y-5">
       {children}
       <fieldset className="space-y-2">
-        <legend className="mb-2 text-sm font-bold text-mist">Difficulté</legend>
+        <legend className="mb-2 text-sm font-bold text-mist">{t("Difficulté", "Difficulty")}</legend>
         <div className="grid grid-cols-3 rounded-xl border border-sea-700 bg-sea-900 p-1">
           {DIFFICULTIES.map((d) => (
             <label
@@ -40,16 +43,18 @@ export function StartScreen({
                 onChange={() => setDifficulty(d.id)}
                 className="sr-only"
               />
-              {d.label}
+              {d.label[locale]}
             </label>
           ))}
         </div>
         <p className="text-sm text-mist" aria-live="polite">
-          {current.label} : {current.hint.charAt(0).toLowerCase() + current.hint.slice(1)}
+          {current.label[locale]}
+          {t(" : ", ": ")}
+          {current.hint[locale].charAt(0).toLowerCase() + current.hint[locale].slice(1)}
         </p>
       </fieldset>
       <Button onClick={() => onStart(difficulty)} className="min-h-14 w-full text-lg">
-        {startLabel}
+        {startLabel ?? t("Jouer", "Play")}
       </Button>
     </Panel>
   );

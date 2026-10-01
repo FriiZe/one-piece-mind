@@ -6,9 +6,11 @@ import { Portrait } from "../ui/Portrait";
 import { Button, Panel } from "../ui/primitives";
 import type { GameProps } from "../ui/types";
 import { useRun } from "../ui/useRun";
+import { useT } from "@/lib/i18n/client";
 import { BOSS_EVERY, generateRoute, LIVES, replay } from "./logic";
 
 export default function RouteDeGrandLine({ data }: GameProps) {
+  const t = useT();
   const base = useRun("la-route-de-grand-line");
   const [answers, setAnswers] = useState<string[]>([]);
   /** Île affichée : elle reste à l'écran, avec sa correction, jusqu'à ce que le joueur reprenne la mer. */
@@ -29,9 +31,10 @@ export default function RouteDeGrandLine({ data }: GameProps) {
     return (
       <GameStart game={game} withDifficulty={false}>
         <p className="text-mist">
-          Une île par arc, de Romance Dawn jusqu&apos;où tu en es. Une question par île, sur les personnages qui y
-          apparaissent. Tu as {LIVES} vies ; toutes les {BOSS_EVERY} îles, un boss : le rater coûte deux vies, le battre en
-          rend une.
+          {t(
+            `Une île par arc, de Romance Dawn jusqu'où tu en es. Une question par île, sur les personnages qui y apparaissent. Tu as ${LIVES} vies ; toutes les ${BOSS_EVERY} îles, un boss : le rater coûte deux vies, le battre en rend une.`,
+            `One island per arc, from Romance Dawn up to where you are in the story. One question per island, about the characters who appear there. You have ${LIVES} lives; every ${BOSS_EVERY} islands, a boss: losing to it costs two lives, beating it gives one back.`,
+          )}
         </p>
       </GameStart>
     );
@@ -41,8 +44,11 @@ export default function RouteDeGrandLine({ data }: GameProps) {
       <GameEnd game={game} data={data} max={stages.length} withDifficulty={false}>
         <p>
           {finished.score === stages.length
-            ? "Tu as conquis toutes les îles de la route."
-            : `Ta traversée s'arrête à l'arc ${stages[Math.min(answers.length, stages.length) - 1]?.title ?? stages[0].title}.`}
+            ? t("Tu as conquis toutes les îles de la route.", "You conquered every island on the route.")
+            : t(
+                `Ta traversée s'arrête à l'arc ${stages[Math.min(answers.length, stages.length) - 1]?.title ?? stages[0].title}.`,
+                `Your voyage ends at the ${stages[Math.min(answers.length, stages.length) - 1]?.title ?? stages[0].title} arc.`,
+              )}
         </p>
       </GameEnd>
     );
@@ -75,9 +81,12 @@ export default function RouteDeGrandLine({ data }: GameProps) {
     <Panel className="space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-2 text-sm font-semibold text-mist">
         <span>
-          Île {index + 1} / {stages.length} · {state.conquered} conquise{state.conquered > 1 ? "s" : ""}
+          {t(
+            `Île ${index + 1} / ${stages.length} · ${state.conquered} conquise${state.conquered > 1 ? "s" : ""}`,
+            `Island ${index + 1} / ${stages.length} · ${state.conquered} conquered`,
+          )}
         </span>
-        <span aria-label={`${state.lives} vies sur ${LIVES}`}>
+        <span aria-label={t(`${state.lives} vies sur ${LIVES}`, `${state.lives} of ${LIVES} lives`)}>
           {Array.from({ length: LIVES }, (_, i) => (
             <span key={i} aria-hidden="true" className={`text-lg ${i < state.lives ? "text-vest" : "text-sea-600"}`}>
               ♥
@@ -91,7 +100,8 @@ export default function RouteDeGrandLine({ data }: GameProps) {
 
       <div className="space-y-2 text-center">
         <p className={`text-sm font-bold tracking-[0.2em] uppercase ${stage.boss ? "text-vest" : "text-mist"}`}>
-          {stage.boss ? "Boss · " : ""}Arc {stage.title}
+          {stage.boss ? "Boss · " : ""}
+          {t(`Arc ${stage.title}`, `${stage.title} arc`)}
         </p>
         <p className="text-mist">{question.title}</p>
         {question.img && <Portrait img={question.img} />}
@@ -139,16 +149,16 @@ export default function RouteDeGrandLine({ data }: GameProps) {
             <strong className={right ? "text-emerald-300" : "text-vest"}>
               {right
                 ? stage.boss
-                  ? "Boss battu : île conquise, une vie rendue."
-                  : "Île conquise."
+                  ? t("Boss battu : île conquise, une vie rendue.", "Boss beaten: island conquered, one life back.")
+                  : t("Île conquise.", "Island conquered.")
                 : stage.boss
-                  ? "Le boss te coûte deux vies."
-                  : "Une vie perdue."}
+                  ? t("Le boss te coûte deux vies.", "The boss costs you two lives.")
+                  : t("Une vie perdue.", "One life lost.")}
             </strong>{" "}
             {question.explanation}
           </p>
           <Button autoFocus onClick={next}>
-            {after.over ? "Voir mon score" : "Reprendre la mer"}
+            {after.over ? t("Voir mon score", "See my score") : t("Reprendre la mer", "Set sail again")}
           </Button>
         </div>
       )}

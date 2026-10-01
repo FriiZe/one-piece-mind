@@ -4,7 +4,7 @@
     "number": 1,
     "title": {
       "fr": "Arc Romance Dawn",
-      "en": "Arc Romance Dawn"
+      "en": "Romance Dawn Arc"
     },
     "sagaId": "east-blue",
     "kind": "manga",
@@ -22,7 +22,7 @@
     "number": 2,
     "title": {
       "fr": "Arc Village d'Orange",
-      "en": "Arc Village d'Orange"
+      "en": "Orange Town Arc"
     },
     "sagaId": "east-blue",
     "kind": "manga",
@@ -40,7 +40,7 @@
     "number": 3,
     "title": {
       "fr": "Arc Village de Sirop",
-      "en": "Arc Village de Sirop"
+      "en": "Syrup Village Arc"
     },
     "sagaId": "east-blue",
     "kind": "manga",
@@ -58,7 +58,7 @@
     "number": 4,
     "title": {
       "fr": "Arc Baratie",
-      "en": "Arc Baratie"
+      "en": "Baratie Arc"
     },
     "sagaId": "east-blue",
     "kind": "manga",
@@ -76,7 +76,7 @@
     "number": 5,
     "title": {
       "fr": "Arc Arlong Park",
-      "en": "Arc Arlong Park"
+      "en": "Arlong Park Arc"
     },
     "sagaId": "east-blue",
     "kind": "manga",
@@ -94,7 +94,7 @@
     "number": 6,
     "title": {
       "fr": "Arc Les aventures de Baggy",
-      "en": "Arc The adventures of Baggy"
+      "en": "Buggy’s Crew Adventure Chronicles Arc"
     },
     "sagaId": "east-blue",
     "kind": "cover",
@@ -109,7 +109,7 @@
     "number": 7,
     "title": {
       "fr": "Arc Loguetown",
-      "en": "Arc Loguetown"
+      "en": "Loguetown Arc"
     },
     "sagaId": "east-blue",
     "kind": "manga",
@@ -127,7 +127,7 @@
     "number": 8,
     "title": {
       "fr": "Arc île du navire de guerre",
-      "en": "Arc île du navire de guerre"
+      "en": "Warship Island Arc"
     },
     "sagaId": "east-blue",
     "kind": "filler",
@@ -142,7 +142,7 @@
     "number": 9,
     "title": {
       "fr": "Arc Reverse Mountain",
-      "en": "Arc Reverse Mountain"
+      "en": "Reverse Mountain Arc"
     },
     "sagaId": "alabasta",
     "kind": "manga",
@@ -160,7 +160,7 @@
     "number": 10,
     "title": {
       "fr": "Arc Whiskey Peak",
-      "en": "Arc Whiskey Peak"
+      "en": "Whisky Peak Arc"
     },
     "sagaId": "alabasta",
     "kind": "manga",
@@ -178,7 +178,7 @@
     "number": 11,
     "title": {
       "fr": "Arc Kobby et Hermep",
-      "en": "Arc Kobby and Hermep"
+      "en": "Diary of Koby-Meppo Arc"
     },
     "sagaId": "alabasta",
     "kind": "cover",
@@ -193,7 +193,7 @@
     "number": 12,
     "title": {
       "fr": "Arc Little Garden",
-      "en": "Arc Little Garden"
+      "en": "Little Garden Arc"
     },
     "sagaId": "alabasta",
     "kind": "manga",
@@ -211,7 +211,7 @@
     "number": 13,
     "title": {
       "fr": "Arc Île de Drum",
-      "en": "Arc Île de Drum"
+      "en": "Drum Island Arc"
     },
     "sagaId": "alabasta",
     "kind": "manga",
@@ -229,7 +229,7 @@
     "number": 14,
     "title": {
       "fr": "Arc Alabasta",
-      "en": "Arc Alabasta"
+      "en": "Alabasta Arc"
     },
     "sagaId": "alabasta",
     "kind": "manga",
@@ -247,7 +247,7 @@
     "number": 15,
     "title": {
       "fr": "Arc Post Alabasta",
-      "en": "Arc Post Alabasta"
+      "en": "Post-Alabasta Arc"
     },
     "sagaId": "alabasta",
     "kind": "filler",
@@ -262,7 +262,7 @@
     "number": 16,
     "title": {
       "fr": "Arc Île de Chèvre",
-      "en": "Arc Île de Chèvre"
+      "en": "Goat Island Arc"
     },
     "sagaId": "alabasta",
     "kind": "filler",
@@ -277,7 +277,7 @@
     "number": 17,
     "title": {
       "fr": "Arc Brume Arc-en-Ciel",
-      "en": "Arc Brume Arc-en-Ciel"
+      "en": "Rainbow Mist Arc"
     },
     "sagaId": "alabasta",
     "kind": "filler",
@@ -292,7 +292,7 @@
     "number": 18,
     "title": {
       "fr": "Arc Jaya",
-      "en": "Arc Jaya"
+      "en": "Jaya Arc"
     },
     "sagaId": "celestial-island",
     "kind": "manga",
@@ -310,7 +310,7 @@
     "number": 19,
     "title": {
       "fr": "Arc Skypiea",
-      "en": "Skypiea Arch"
+      "en": "Skypiea Arc"
     },
     "sagaId": "celestial-island",
     "kind": "manga",
@@ -328,7 +328,7 @@
     "number": 20,
     "title": {
       "fr": "Arc G8",
-      "en": "Arc G8"
+      "en": "G-8 Arc"
     },
     "sagaId": "celestial-island",
     "kind": "filler",
@@ -343,7 +343,7 @@
     "number": 21,
     "title": {
       "fr": "Arc Long Ring Long Land / Davy Back Fight",
-      "en": "Arc Long Ring Long Land / Davy Back Fight"
+      "en": "Long Ring Long Land / Davy Back Fight Arc"
     },
     "sagaId": "water-seven-cp9",
     "kind": "manga",
@@ -361,7 +361,7 @@
     "number": 22,
     "title": {
       "fr": "Arc Le voleur de Mémoire",
-      "en": "Arc Le voleur de Mémoire"
+      "en": "Ocean’s Dream Arc"
     },
     "sagaId": "water-seven-cp9",
     "kind": "filler",
@@ -376,7 +376,7 @@
     "number": 23,
     "title": {
       "fr": "Arc Le Retour de Foxy",
-      "en": "Arc Le Retour de Foxy"
+      "en": "Foxy’s Return Arc"
     },
     "sagaId": "water-seven-cp9",
     "kind": "filler",
@@ -391,7 +391,7 @@
     "number": 24,
     "title": {
       "fr": "Arc Water Seven",
-      "en": "Arc Water Seven"
+      "en": "Water Seven Arc"
     },
     "sagaId": "water-seven-cp9",
     "kind": "manga",
@@ -409,7 +409,7 @@
     "number": 25,
     "title": {
       "fr": "Arc Enies Lobby",
-      "en": "Arc Enies Lobby"
+      "en": "Enies Lobby Arc"
     },
     "sagaId": "water-seven-cp9",
     "kind": "manga",
@@ -427,7 +427,7 @@
     "number": 26,
     "title": {
       "fr": "Arc Post-Enies Lobby",
-      "en": "Arc Post-Enies Lobby"
+      "en": "Post-Enies Lobby Arc"
     },
     "sagaId": "water-seven-cp9",
     "kind": "manga",
@@ -445,7 +445,7 @@
     "number": 27,
     "title": {
       "fr": "Arc Chasseur de Glace",
-      "en": "Ice Hunter Bow"
+      "en": "Ice Hunter Arc"
     },
     "sagaId": "thriller-bark",
     "kind": "filler",
@@ -460,7 +460,7 @@
     "number": 28,
     "title": {
       "fr": "Arc Thriller Bark",
-      "en": "Arc Thriller Bark"
+      "en": "Thriller Bark Arc"
     },
     "sagaId": "thriller-bark",
     "kind": "manga",
@@ -478,7 +478,7 @@
     "number": 29,
     "title": {
       "fr": "Arc Île Spa",
-      "en": "Arc Île Spa"
+      "en": "Spa Island Arc"
     },
     "sagaId": "thriller-bark",
     "kind": "filler",
@@ -511,7 +511,7 @@
     "number": 31,
     "title": {
       "fr": "Arc Amazon Lily",
-      "en": "Amazon Lily bow"
+      "en": "Amazon Lily Arc"
     },
     "sagaId": "war-at-the-top",
     "kind": "manga",
@@ -529,7 +529,7 @@
     "number": 32,
     "title": {
       "fr": "Arc Impel Down",
-      "en": "Impel Down Bow"
+      "en": "Impel Down Arc"
     },
     "sagaId": "war-at-the-top",
     "kind": "manga",
@@ -547,7 +547,7 @@
     "number": 33,
     "title": {
       "fr": "Arc Little East Blue",
-      "en": "Little East Blue bow"
+      "en": "Little East Blue Arc"
     },
     "sagaId": "war-at-the-top",
     "kind": "filler",
@@ -562,7 +562,7 @@
     "number": 34,
     "title": {
       "fr": "Arc Marine Ford",
-      "en": "Arc Marine Ford"
+      "en": "Marineford Arc"
     },
     "sagaId": "war-at-the-top",
     "kind": "manga",
@@ -580,7 +580,7 @@
     "number": 35,
     "title": {
       "fr": "Arc Post Marine Ford",
-      "en": "Arc Post Marine Ford"
+      "en": "Post-War Arc"
     },
     "sagaId": "war-at-the-top",
     "kind": "manga",
@@ -598,7 +598,7 @@
     "number": 36,
     "title": {
       "fr": "Arc Retour à Sabaody",
-      "en": "Arc Return to Sabaody"
+      "en": "Return to Sabaody Arc"
     },
     "sagaId": "ile-des-hommes-poissons",
     "kind": "manga",
@@ -616,7 +616,7 @@
     "number": 37,
     "title": {
       "fr": "Arc Île des Hommes-Poissons",
-      "en": "Arc Île des Hommes-Poissons"
+      "en": "Fish-Man Island Arc"
     },
     "sagaId": "ile-des-hommes-poissons",
     "kind": "manga",
@@ -634,7 +634,7 @@
     "number": 38,
     "title": {
       "fr": "Arc l'Ambition de Z",
-      "en": "Arc l'Ambition de Z"
+      "en": "Z’s Ambition Arc"
     },
     "sagaId": "ile-des-hommes-poissons",
     "kind": "filler",
@@ -649,7 +649,7 @@
     "number": 39,
     "title": {
       "fr": "Arc Punk Hazard",
-      "en": "Arc Punk Hazard"
+      "en": "Punk Hazard Arc"
     },
     "sagaId": "dressrosa-pirate-alliance",
     "kind": "manga",
@@ -667,7 +667,7 @@
     "number": 40,
     "title": {
       "fr": "Arc Récupération de César",
-      "en": "Arc Récupération de César"
+      "en": "Caesar Retrieval Arc"
     },
     "sagaId": "dressrosa-pirate-alliance",
     "kind": "filler",
@@ -682,7 +682,7 @@
     "number": 41,
     "title": {
       "fr": "Arc Dressrosa",
-      "en": "Arc Dressrosa"
+      "en": "Dressrosa Arc"
     },
     "sagaId": "dressrosa-pirate-alliance",
     "kind": "manga",
@@ -700,7 +700,7 @@
     "number": 42,
     "title": {
       "fr": "Arc Mine Argentée",
-      "en": "Silver Mine Bow"
+      "en": "Silver Mine Arc"
     },
     "sagaId": "four-emperors",
     "kind": "filler",
@@ -715,7 +715,7 @@
     "number": 43,
     "title": {
       "fr": "Arc Zo",
-      "en": "Arc Zo"
+      "en": "Zou Arc"
     },
     "sagaId": "four-emperors",
     "kind": "manga",
@@ -733,7 +733,7 @@
     "number": 44,
     "title": {
       "fr": "Arc Rookies de la Marine",
-      "en": "Arc Rookies de la Marine"
+      "en": "Marine Rookie Arc"
     },
     "sagaId": "four-emperors",
     "kind": "filler",
@@ -748,7 +748,7 @@
     "number": 45,
     "title": {
       "fr": "Arc Whole Cake Island",
-      "en": "Arc Whole Cake Island"
+      "en": "Whole Cake Island Arc"
     },
     "sagaId": "four-emperors",
     "kind": "manga",
@@ -766,7 +766,7 @@
     "number": 46,
     "title": {
       "fr": "Arc Rêverie",
-      "en": "Arc Rêverie"
+      "en": "Reverie Arc"
     },
     "sagaId": "four-emperors",
     "kind": "manga",
@@ -784,7 +784,7 @@
     "number": 47,
     "title": {
       "fr": "Arc Pays des Wa",
-      "en": "Arc Pays des Wa"
+      "en": "Wano Country Arc"
     },
     "sagaId": "four-emperors",
     "kind": "manga",
@@ -802,7 +802,7 @@
     "number": 48,
     "title": {
       "fr": "Arc Roi acide carbonique",
-      "en": "Carbonic acid King Bow"
+      "en": "Cidre Guild Arc"
     },
     "sagaId": "four-emperors",
     "kind": "filler",
@@ -817,7 +817,7 @@
     "number": 49,
     "title": {
       "fr": "Arc Egg Head",
-      "en": "Egg Head Arc"
+      "en": "Egghead Arc"
     },
     "sagaId": "final-saga",
     "kind": "manga",

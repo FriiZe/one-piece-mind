@@ -9,6 +9,7 @@ import { QuizFlow, type QuizQuestion } from "../ui/QuizFlow";
 import { StartScreen } from "../ui/StartScreen";
 import { useBest } from "../ui/storage";
 import { RewardSummary } from "@/components/RewardSummary";
+import { useT } from "@/lib/i18n/client";
 import { useGameReward } from "@/lib/player/useGameReward";
 import type { GameProps } from "../ui/types";
 import { answerLabel, generateQuiz } from "./logic";
@@ -16,6 +17,7 @@ import { answerLabel, generateQuiz } from "./logic";
 type Run = { seed: number; difficulty: Difficulty };
 
 export default function QuiAMangeCeFruit({ data }: GameProps) {
+  const t = useT();
   const [run, setRun] = useState<Run | null>(null);
   const [result, setResult] = useState<{ score: number; newBest: boolean } | null>(null);
   const [best, submitBest] = useBest(`qui-a-mange-ce-fruit.${run?.difficulty ?? "normal"}`);
@@ -25,13 +27,13 @@ export default function QuiAMangeCeFruit({ data }: GameProps) {
     if (!run) return [];
     const quiz = generateQuiz(createRng(run.seed), data, byDifficulty(data.characters, run.difficulty));
     return quiz.map((q, index): QuizQuestion => {
-      const explanation = `La réponse était : ${answerLabel(q)}.`;
+      const explanation = t(`La réponse était : ${answerLabel(q)}.`, `The answer was: ${answerLabel(q)}.`);
       if (q.kind === "fruit-to-user") {
         return {
           id: `${index}-${q.fruit.id}`,
           prompt: (
             <div className="text-center">
-              <p className="text-mist">Qui a mangé ce fruit ?</p>
+              <p className="text-mist">{t("Qui a mangé ce fruit ?", "Who ate this fruit?")}</p>
               <p className="font-display text-3xl tracking-wide text-straw">{q.fruit.name}</p>
               {q.fruit.romaji && <p className="text-mist">{q.fruit.romaji}</p>}
             </div>
@@ -45,7 +47,7 @@ export default function QuiAMangeCeFruit({ data }: GameProps) {
         id: `${index}-${q.character.id}`,
         prompt: (
           <div className="space-y-2 text-center">
-            <p className="text-mist">Quel fruit a-t-il mangé ?</p>
+            <p className="text-mist">{t("Quel fruit a-t-il mangé ?", "Which fruit did they eat?")}</p>
             {q.character.img && <Portrait img={q.character.img} />}
             <p className="font-display text-3xl tracking-wide text-straw">{q.character.name}</p>
             {q.character.altName && <p className="text-mist">{q.character.altName}</p>}
@@ -56,7 +58,7 @@ export default function QuiAMangeCeFruit({ data }: GameProps) {
         explanation,
       };
     });
-  }, [run, data]);
+  }, [run, data, t]);
 
   if (!run) {
     return (
@@ -68,7 +70,10 @@ export default function QuiAMangeCeFruit({ data }: GameProps) {
         }}
       >
         <p className="text-mist">
-          Dix questions, dans les deux sens : retrouver l&apos;utilisateur d&apos;un fruit, ou le fruit d&apos;un personnage.
+          {t(
+            "Dix questions, dans les deux sens : retrouver l'utilisateur d'un fruit, ou le fruit d'un personnage.",
+            "Ten questions, going both ways: find the user of a fruit, or a character's fruit.",
+          )}
         </p>
       </StartScreen>
     );
@@ -78,7 +83,7 @@ export default function QuiAMangeCeFruit({ data }: GameProps) {
     return (
       <ResultPanel
         title={`${result.score} / ${questions.length}`}
-        best={best !== null ? { label: "Record à ce niveau", value: `${best} / ${questions.length}` } : null}
+        best={best !== null ? { label: t("Record à ce niveau", "Best at this level"), value: `${best} / ${questions.length}` } : null}
         newBest={result.newBest}
         actions={
           <>
@@ -89,10 +94,10 @@ export default function QuiAMangeCeFruit({ data }: GameProps) {
                 setRun({ seed: randomSeed(), difficulty: run.difficulty });
               }}
             >
-              Rejouer
+              {t("Rejouer", "Play again")}
             </Button>
             <Button variant="secondary" onClick={() => setRun(null)}>
-              Changer de difficulté
+              {t("Changer de difficulté", "Change difficulty")}
             </Button>
           </>
         }

@@ -529,7 +529,8 @@ function buildCharacters(
   return characters;
 }
 
-type ArcOverride = { firstChapter?: number; kind?: "cover" | "filler" };
+/** `en` : titre anglais, sans le mot « Arc » ; celui de l'API est une traduction automatique. */
+type ArcOverride = { firstChapter?: number; kind?: "cover" | "filler"; en?: string };
 
 /** Numéros de chapitre cités par un épisode (« Chap 2-3 », « Ch. 1132 »...). */
 function episodeChapters(value: string | null): number[] {
@@ -605,7 +606,7 @@ function buildArcs(
     return {
       id: arcSlugger(api.en[i].title.replace(/\barc\b/gi, ""), fr.id),
       number: fr.id,
-      title: { fr: fr.title.trim(), en: api.en[i].title.trim() },
+      title: { fr: fr.title.trim(), en: override.en ? `${override.en} Arc` : api.en[i].title.trim() },
       sagaId: sagaIdByApi.get(fr.saga.id)!,
       kind: first !== undefined ? "manga" : (override.kind ?? "filler"),
       chapters: first !== undefined ? { first, last } : null,

@@ -5,12 +5,12 @@ import type { GameStats } from "./types";
  * Chacun rapporte une prime, versée une fois, quand il est atteint.
  */
 export const OBJECTIVES = [
-  { id: "games-1", kind: "games", target: 1, berrys: 100, label: "Jouer une première partie" },
-  { id: "games-10", kind: "games", target: 10, berrys: 500, label: "Jouer 10 parties" },
-  { id: "games-50", kind: "games", target: 50, berrys: 2000, label: "Jouer 50 parties" },
-  { id: "best-50", kind: "best", target: 0.5, berrys: 200, label: "Marquer la moitié des points" },
-  { id: "best-80", kind: "best", target: 0.8, berrys: 500, label: "Marquer 80 % des points" },
-  { id: "best-100", kind: "best", target: 1, berrys: 1500, label: "Réussir un sans-faute" },
+  { id: "games-1", kind: "games", target: 1, berrys: 100, label: { fr: "Jouer une première partie", en: "Play your first game" } },
+  { id: "games-10", kind: "games", target: 10, berrys: 500, label: { fr: "Jouer 10 parties", en: "Play 10 games" } },
+  { id: "games-50", kind: "games", target: 50, berrys: 2000, label: { fr: "Jouer 50 parties", en: "Play 50 games" } },
+  { id: "best-50", kind: "best", target: 0.5, berrys: 200, label: { fr: "Marquer la moitié des points", en: "Score half the points" } },
+  { id: "best-80", kind: "best", target: 0.8, berrys: 500, label: { fr: "Marquer 80 % des points", en: "Score 80% of the points" } },
+  { id: "best-100", kind: "best", target: 1, berrys: 1500, label: { fr: "Réussir un sans-faute", en: "Get a perfect score" } },
 ] as const;
 
 export type Objective = (typeof OBJECTIVES)[number];

@@ -11,13 +11,15 @@ import { StartScreen } from "../ui/StartScreen";
 import { useBest } from "../ui/storage";
 import type { GameProps } from "../ui/types";
 import { RewardSummary } from "@/components/RewardSummary";
+import type { Locale } from "@/lib/i18n";
+import { useLocale, useT } from "@/lib/i18n/client";
 import { useGameReward } from "@/lib/player/useGameReward";
 import { CRITERIA, correctOrder, MAX_SCORE, roundAt, ROUNDS, type Criterion } from "./logic";
 
-function formatValue(character: PlayCharacter, criterion: Criterion): string {
-  if (criterion === "bounty") return formatBounty(character.bounty);
-  if (criterion === "height") return formatHeight(character.height);
-  return `${character.age} ans`;
+function formatValue(character: PlayCharacter, criterion: Criterion, locale: Locale): string {
+  if (criterion === "bounty") return formatBounty(character.bounty, locale);
+  if (criterion === "height") return formatHeight(character.height, locale);
+  return locale === "en" ? `${character.age} years old` : `${character.age} ans`;
 }
 
 type Run = {
@@ -35,6 +37,8 @@ type Run = {
 };
 
 export default function LeClassement({ data }: GameProps) {
+  const t = useT();
+  const locale = useLocale();
   const [run, setRun] = useState<Run | null>(null);
   const [best, submitBest] = useBest(`le-classement.${run?.difficulty ?? "normal"}`);
   const reward = useGameReward();
@@ -69,8 +73,10 @@ export default function LeClassement({ data }: GameProps) {
     return (
       <StartScreen onStart={start}>
         <p className="text-mist">
-          Cinq manches. À chaque fois, cinq personnages à ranger selon leur prime, leur taille ou leur âge, en
-          les faisant glisser. Un point par personnage au bon rang.
+          {t(
+            "Cinq manches. À chaque fois, cinq personnages à ranger selon leur prime, leur taille ou leur âge, en les faisant glisser. Un point par personnage au bon rang.",
+            "Five rounds. Each time, five characters to rank by bounty, height or age, by dragging them into place. One point for each character in the right spot.",
+          )}
         </p>
       </StartScreen>
     );
@@ -80,13 +86,13 @@ export default function LeClassement({ data }: GameProps) {
     return (
       <ResultPanel
         title={`${run.score} / ${MAX_SCORE}`}
-        best={best !== null ? { label: "Record à ce niveau", value: `${best} / ${MAX_SCORE}` } : null}
+        best={best !== null ? { label: t("Record à ce niveau", "Best at this level"), value: `${best} / ${MAX_SCORE}` } : null}
         newBest={run.newBest}
         actions={
           <>
-            <Button onClick={() => start(run.difficulty)}>Rejouer</Button>
+            <Button onClick={() => start(run.difficulty)}>{t("Rejouer", "Play again")}</Button>
             <Button variant="secondary" onClick={() => setRun(null)}>
-              Changer de difficulté
+              {t("Changer de difficulté", "Change difficulty")}
             </Button>
           </>
         }
@@ -97,7 +103,7 @@ export default function LeClassement({ data }: GameProps) {
   }
 
   const items = new Map<string, SortableItem>(
-    round.items.map((c) => [c.id, { id: c.id, label: c.name, detail: formatValue(c, round.criterion), img: c.img }]),
+    round.items.map((c) => [c.id, { id: c.id, label: c.name, detail: formatValue(c, round.criterion, locale), img: c.img }]),
   );
   const order = run.order ?? round.items.map((c) => c.id);
   const expected = correctOrder(round);
@@ -121,9 +127,10 @@ export default function LeClassement({ data }: GameProps) {
 
   return (
     <Panel className="space-y-4">
-      <Progress current={run.round + 1} total={ROUNDS} score={`Score : ${run.score}`} />
+      <Progress current={run.round + 1} total={ROUNDS} score={t(`Score : ${run.score}`, `Score: ${run.score}`)} />
       <p className="text-lg text-foam">
-        Range ces personnages par <strong className="text-straw">{criterion.label}</strong>, {criterion.order}.
+        {t("Range ces personnages par", "Rank these characters by")}{" "}
+        <strong className="text-straw">{criterion.label[locale]}</strong>, {criterion.order[locale]}.
       </p>
       <SortableList
         order={order}
@@ -134,10 +141,10 @@ export default function LeClassement({ data }: GameProps) {
       />
       {run.submitted ? (
         <Button autoFocus onClick={next}>
-          {run.round === ROUNDS - 1 ? "Voir mon score" : "Manche suivante"}
+          {run.round === ROUNDS - 1 ? t("Voir mon score", "See my score") : t("Manche suivante", "Next round")}
         </Button>
       ) : (
-        <Button onClick={submit}>Valider</Button>
+        <Button onClick={submit}>{t("Valider", "Submit")}</Button>
       )}
     </Panel>
   );

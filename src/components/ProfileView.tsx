@@ -1,10 +1,12 @@
 "use client";
 
-import Link from "next/link";
-import { useEffect } from "react";
+import { useEffect, type ReactNode } from "react";
+import Link from "@/components/Link";
 import { formatNumber } from "@/games/engine/text";
 import { LoadingPanel } from "@/games/ui/WithGameData";
 import { isMet, OBJECTIVES, playerBounty, POST_IDS, RANKS, rankOf, SIGNUP_BERRYS } from "@/lib/economy";
+import type { Localized } from "@/lib/i18n";
+import { useLocale, useT } from "@/lib/i18n/client";
 import { usePlayer } from "@/lib/player/PlayerProvider";
 import { AccountPanel } from "./AccountPanel";
 import { FriendsPanel } from "./FriendsPanel";
@@ -13,6 +15,8 @@ import { CheckIcon } from "./GameBadge";
 /** L'avis de recherche du joueur : sa prime, son rang et son parcours. */
 function Poster() {
   const { state, username } = usePlayer();
+  const t = useT();
+  const locale = useLocale();
   const bounty = playerBounty(state);
   const rank = rankOf(bounty);
   const from = RANKS.find((r) => r.title === rank.title)?.from ?? 0;
@@ -22,13 +26,13 @@ function Poster() {
     0,
   );
   const stats = [
-    { label: "parties", value: state.games },
-    { label: "avis recrutés", value: Object.keys(state.collection).length },
-    { label: "objectifs", value: objectives },
+    { label: t("parties", "games"), value: state.games },
+    { label: t("avis recrutés", "posters recruited"), value: Object.keys(state.collection).length },
+    { label: t("objectifs", "goals"), value: objectives },
   ];
 
   return (
-    <section aria-label="Mon avis de recherche" className="rounded-xl border-4 border-parchment-dark bg-parchment p-6 text-center text-ink sm:p-7">
+    <section aria-label={t("Mon avis de recherche", "My wanted poster")} className="rounded-xl border-4 border-parchment-dark bg-parchment p-6 text-center text-ink sm:p-7">
       <p className="font-display text-5xl leading-none tracking-[0.2em] sm:text-[52px]" aria-hidden="true">
         WANTED
       </p>
@@ -38,17 +42,26 @@ function Poster() {
       <p className="mt-3 text-xs font-extrabold tracking-[0.3em]" aria-hidden="true">
         DEAD OR ALIVE
       </p>
-      <p className="mt-1 truncate font-display text-4xl tracking-wide sm:text-[40px]">{username ?? "Pirate anonyme"}</p>
-      <p className="font-display text-3xl tracking-wide sm:text-[34px]">฿ {formatNumber(bounty)}</p>
+      <p className="mt-1 truncate font-display text-4xl tracking-wide sm:text-[40px]">
+        {username ?? t("Pirate anonyme", "Anonymous pirate")}
+      </p>
+      <p className="font-display text-3xl tracking-wide sm:text-[34px]">฿ {formatNumber(bounty, locale)}</p>
 
       <div className="mt-4 space-y-1.5">
         <p className="flex justify-between gap-3 text-sm font-bold">
-          <span>{rank.title}</span>
-          <span>{rank.next ? `${rank.next.title} à ${formatNumber(rank.next.from)} ฿` : "Rang le plus élevé"}</span>
+          <span>{rank.title[locale]}</span>
+          <span>
+            {rank.next
+              ? t(
+                  `${rank.next.title.fr} à ${formatNumber(rank.next.from, "fr")} ฿`,
+                  `${rank.next.title.en} at ${formatNumber(rank.next.from, "en")} ฿`,
+                )
+              : t("Rang le plus élevé", "Highest rank")}
+          </span>
         </p>
         <div
           role="progressbar"
-          aria-label="Progression vers le rang suivant"
+          aria-label={t("Progression vers le rang suivant", "Progress toward the next rank")}
           aria-valuemin={0}
           aria-valuemax={100}
           aria-valuenow={Math.round(progress * 100)}
@@ -62,53 +75,93 @@ function Poster() {
         {stats.map((stat) => (
           <div key={stat.label} className="flex flex-col-reverse">
             <dt className="text-[13px]">{stat.label}</dt>
-            <dd className="font-display text-[26px] tracking-wide">{formatNumber(stat.value)}</dd>
+            <dd className="font-display text-[26px] tracking-wide">{formatNumber(stat.value, locale)}</dd>
           </div>
         ))}
       </dl>
-      <p className="mt-4 text-[13px]">Ta prime monte avec tous les Berrys que tu gagnes, même une fois dépensés.</p>
+      <p className="mt-4 text-[13px]">
+        {t(
+          "Ta prime monte avec tous les Berrys que tu gagnes, même une fois dépensés.",
+          "Your bounty grows with every Berry you earn, even once they're spent.",
+        )}
+      </p>
     </section>
   );
 }
 
 function ShipLink() {
   const { state } = usePlayer();
+  const t = useT();
   const filled = POST_IDS.filter((post) => state.crew[post]).length;
   return (
     <Link
       href="/navire"
       className="flex flex-wrap items-center justify-between gap-2 rounded-2xl border border-sea-700 px-5 py-4 font-bold text-foam transition-colors hover:border-straw"
     >
-      <span>Mon navire : équipage, collection, boutique, échanges</span>
+      <span>
+        {t("Mon navire : équipage, collection, boutique, échanges", "My ship: crew, collection, shop, trades")}
+      </span>
       <span className="text-sm text-mist">
-        {filled} poste{filled > 1 ? "s" : ""} pourvu{filled > 1 ? "s" : ""} sur {POST_IDS.length}
+        {t(
+          `${filled} poste${filled > 1 ? "s" : ""} pourvu${filled > 1 ? "s" : ""} sur ${POST_IDS.length}`,
+          `${filled} of ${POST_IDS.length} posts filled`,
+        )}
       </span>
     </Link>
   );
 }
 
-const BENEFITS = [
-  { key: "berrys", text: <><strong>{formatNumber(SIGNUP_BERRYS)} ฿ offerts</strong> dès l&apos;inscription</> },
-  { key: "appareils", text: <>Ta collection sur <strong>tous tes appareils</strong></> },
-  { key: "amis", text: <>Des <strong>amis</strong>, des échanges d&apos;avis et des salons à plusieurs</> },
-  { key: "quiz", text: <>Tes propres <strong>quiz</strong>, joués par la commu</> },
+const BENEFITS: { key: string; text: Localized<ReactNode> }[] = [
+  {
+    key: "berrys",
+    text: {
+      fr: <><strong>{formatNumber(SIGNUP_BERRYS, "fr")} ฿ offerts</strong> dès l&apos;inscription</>,
+      en: <><strong>{formatNumber(SIGNUP_BERRYS, "en")} ฿ free</strong> as soon as you sign up</>,
+    },
+  },
+  {
+    key: "appareils",
+    text: {
+      fr: <>Ta collection sur <strong>tous tes appareils</strong></>,
+      en: <>Your collection on <strong>all your devices</strong></>,
+    },
+  },
+  {
+    key: "amis",
+    text: {
+      fr: <>Des <strong>amis</strong>, des échanges d&apos;avis et des salons à plusieurs</>,
+      en: <><strong>Friends</strong>, poster trades and multiplayer rooms</>,
+    },
+  },
+  {
+    key: "quiz",
+    text: {
+      fr: <>Tes propres <strong>quiz</strong>, joués par la commu</>,
+      en: <>Your own <strong>quizzes</strong>, played by the community</>,
+    },
+  },
 ];
 
 /** Le visiteur sans compte : ce qu'il a déjà gagné sur cet appareil, et ce qu'un compte lui apporte. */
 function GuestProfile() {
   const { state, accountsEnabled } = usePlayer();
+  const t = useT();
+  const locale = useLocale();
   const owned = Object.keys(state.collection).length;
 
   return (
     <div className="grid grid-cols-1 gap-7 lg:grid-cols-[minmax(0,1fr)_460px] lg:items-start lg:gap-x-16 lg:pt-6">
       <div>
         <h1 className="font-display text-4xl leading-[1.05] tracking-wide text-foam sm:text-[52px]">
-          Monte à bord,
+          {t("Monte à bord,", "Come aboard,")}
           <br />
-          garde ton butin
+          {t("garde ton butin", "keep your loot")}
         </h1>
         <p className="mt-3 max-w-xl text-lg text-mist">
-          Tu joues déjà sans compte. Avec un pseudo, tes Berrys et ton équipage te suivent partout.
+          {t(
+            "Tu joues déjà sans compte. Avec un pseudo, tes Berrys et ton équipage te suivent partout.",
+            "You're already playing without an account. With a username, your Berries and your crew follow you everywhere.",
+          )}
         </p>
       </div>
 
@@ -117,19 +170,31 @@ function GuestProfile() {
         <AccountPanel />
       </div>
 
-      <section aria-label="Ce qu'apporte un compte" className="space-y-7">
+      <section aria-label={t("Ce qu'apporte un compte", "What an account gives you")} className="space-y-7">
         <div className="flex items-center gap-5 rounded-2xl border border-sea-700 bg-sea-800 p-5">
           <div className="w-[104px] shrink-0 overflow-hidden rounded-lg border-4 border-parchment-dark bg-parchment text-center text-ink" aria-hidden="true">
             <p className="pt-1.5 font-display tracking-[0.2em]">Wanted</p>
             <p className="mx-2 my-1 flex h-20 items-center justify-center bg-[#d9c9a0] font-display text-5xl text-[#a8966a]">?</p>
-            <p className="px-1 pb-2 font-display text-sm">Pirate anonyme</p>
+            <p className="px-1 pb-2 font-display text-sm">{t("Pirate anonyme", "Anonymous pirate")}</p>
           </div>
           <div className="space-y-1.5">
-            <h2 className="text-[17px] font-extrabold text-foam">Ta progression sur cet appareil</h2>
+            <h2 className="text-[17px] font-extrabold text-foam">
+              {t("Ta progression sur cet appareil", "Your progress on this device")}
+            </h2>
             <p className="text-[15px] text-mist">
-              {formatNumber(state.games)} partie{state.games > 1 ? "s" : ""} · {formatNumber(state.berrys)} ฿ · {owned} avis de recherche
+              {t(
+                `${formatNumber(state.games, locale)} partie${state.games > 1 ? "s" : ""} · ${formatNumber(state.berrys, locale)} ฿ · ${owned} avis de recherche`,
+                `${formatNumber(state.games, locale)} ${state.games === 1 ? "game" : "games"} · ${formatNumber(state.berrys, locale)} ฿ · ${owned} wanted ${owned === 1 ? "poster" : "posters"}`,
+              )}
             </p>
-            {accountsEnabled && <p className="text-[15px] font-bold text-emerald-300">Elle est reprise telle quelle à la création du compte.</p>}
+            {accountsEnabled && (
+              <p className="text-[15px] font-bold text-emerald-300">
+                {t(
+                  "Elle est reprise telle quelle à la création du compte.",
+                  "It carries over as is when you create your account.",
+                )}
+              </p>
+            )}
           </div>
         </div>
 
@@ -145,7 +210,7 @@ function GuestProfile() {
                 >
                   {index === 0 ? "฿" : <CheckIcon />}
                 </span>
-                <span>{benefit.text}</span>
+                <span>{benefit.text[locale]}</span>
               </li>
             ))}
           </ul>
@@ -157,6 +222,7 @@ function GuestProfile() {
 
 export function ProfileView() {
   const { status } = usePlayer();
+  const t = useT();
 
   // Les rubriques n'apparaissent qu'une fois le joueur reconnu : un lien vers « #amis » ou « #compte » est suivi à ce moment-là
   useEffect(() => {
@@ -165,12 +231,12 @@ export function ProfileView() {
     if (id) document.getElementById(id)?.scrollIntoView();
   }, [status]);
 
-  if (status === "loading") return <LoadingPanel label="Chargement du profil…" />;
+  if (status === "loading") return <LoadingPanel label={t("Chargement du profil…", "Loading profile…")} />;
   if (status === "guest") return <GuestProfile />;
 
   return (
     <div className="grid grid-cols-1 gap-6 lg:grid-cols-[420px_minmax(0,1fr)] lg:items-start">
-      <h1 className="sr-only">Mon profil</h1>
+      <h1 className="sr-only">{t("Mon profil", "My profile")}</h1>
       <Poster />
       <div className="space-y-5">
         <FriendsPanel />

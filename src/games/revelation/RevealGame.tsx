@@ -10,6 +10,8 @@ import { StartScreen } from "../ui/StartScreen";
 import { useBest } from "../ui/storage";
 import type { GameProps } from "../ui/types";
 import { RewardSummary } from "@/components/RewardSummary";
+import type { Localized } from "@/lib/i18n";
+import { useLocale, useT } from "@/lib/i18n/client";
 import { useGameReward } from "@/lib/player/useGameReward";
 import {
   generateRounds,
@@ -43,6 +45,7 @@ function MysteryImage({
   revealed: boolean;
   focus: Focus;
 }) {
+  const t = useT();
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [image, setImage] = useState<HTMLImageElement | null>(null);
 
@@ -89,7 +92,7 @@ function MysteryImage({
         width={230}
         height={345}
         role="img"
-        aria-label={revealed ? "Portrait du personnage" : "Image mystère"}
+        aria-label={revealed ? t("Portrait du personnage", "Character portrait") : t("Image mystère", "Mystery picture")}
         className="h-full w-auto max-w-full rounded-xl border-2 border-sea-600 bg-sea-900"
       />
     </div>
@@ -111,12 +114,20 @@ type Run = {
   newBest: boolean;
 };
 
-const INTRO: Record<Variant, string> = {
-  pixel: "Huit portraits pixelisés. L'image ne se précise qu'après chaque proposition : moins il t'en faut, plus tu marques.",
-  zoom: "Huit portraits vus de très près. L'image ne dézoome qu'après chaque proposition : moins il t'en faut, plus tu marques.",
+const INTRO: Record<Variant, Localized> = {
+  pixel: {
+    fr: "Huit portraits pixelisés. L'image ne se précise qu'après chaque proposition : moins il t'en faut, plus tu marques.",
+    en: "Eight pixelated portraits. The picture only sharpens after each guess: the fewer you need, the more you score.",
+  },
+  zoom: {
+    fr: "Huit portraits vus de très près. L'image ne dézoome qu'après chaque proposition : moins il t'en faut, plus tu marques.",
+    en: "Eight portraits seen from very close up. The picture only zooms out after each guess: the fewer you need, the more you score.",
+  },
 };
 
 export function RevealGame({ data, variant }: GameProps & { variant: Variant }) {
+  const t = useT();
+  const locale = useLocale();
   const slug = variant === "pixel" ? "revelation" : "zoom-extreme";
   const [run, setRun] = useState<Run | null>(null);
   const [best, submitBest] = useBest(`${slug}.${run?.difficulty ?? "normal"}`);
@@ -153,7 +164,7 @@ export function RevealGame({ data, variant }: GameProps & { variant: Variant }) 
   if (!run || !rounds.length) {
     return (
       <StartScreen onStart={start}>
-        <p className="text-mist">{INTRO[variant]}</p>
+        <p className="text-mist">{INTRO[variant][locale]}</p>
       </StartScreen>
     );
   }
@@ -162,13 +173,13 @@ export function RevealGame({ data, variant }: GameProps & { variant: Variant }) 
     return (
       <ResultPanel
         title={`${run.score} / ${MAX_SCORE}`}
-        best={best !== null ? { label: "Record à ce niveau", value: `${best} / ${MAX_SCORE}` } : null}
+        best={best !== null ? { label: t("Record à ce niveau", "Best at this level"), value: `${best} / ${MAX_SCORE}` } : null}
         newBest={run.newBest}
         actions={
           <>
-            <Button onClick={() => start(run.difficulty)}>Rejouer</Button>
+            <Button onClick={() => start(run.difficulty)}>{t("Rejouer", "Play again")}</Button>
             <Button variant="secondary" onClick={() => setRun(null)}>
-              Changer de difficulté
+              {t("Changer de difficulté", "Change difficulty")}
             </Button>
           </>
         }
@@ -210,7 +221,7 @@ export function RevealGame({ data, variant }: GameProps & { variant: Variant }) 
 
   return (
     <div className="space-y-4">
-      <Progress current={run.index + 1} total={rounds.length} score={`Score : ${run.score}`} />
+      <Progress current={run.index + 1} total={rounds.length} score={t(`Score : ${run.score}`, `Score: ${run.score}`)} />
       <MysteryImage
         key={target.id}
         src={portraitUrl(target.img)}
@@ -226,13 +237,15 @@ export function RevealGame({ data, variant }: GameProps & { variant: Variant }) 
             characters={data.characters}
             excludeIds={new Set(run.wrong)}
             onPick={guess}
-            label="Qui est-ce ?"
-            placeholder="Qui est-ce ?"
+            label={t("Qui est-ce ?", "Who is it?")}
+            placeholder={t("Qui est-ce ?", "Who is it?")}
           />
           <p className="flex flex-wrap items-center justify-between gap-2 text-sm text-mist" aria-live="polite">
             <span>
-              Palier {run.step + 1} sur {STEPS} : cette image vaut encore {pointsFor(run.step)} point
-              {pointsFor(run.step) > 1 ? "s" : ""}.
+              {t(
+                `Palier ${run.step + 1} sur ${STEPS} : cette image vaut encore ${pointsFor(run.step)} point${pointsFor(run.step) > 1 ? "s" : ""}.`,
+                `Stage ${run.step + 1} of ${STEPS}: this picture is still worth ${pointsFor(run.step)} ${pointsFor(run.step) === 1 ? "point" : "points"}.`,
+              )}
             </span>
             <span className="flex gap-4">
               {/* Sans idée, on peut faire avancer l'image sans nommer quelqu'un : cela coûte autant qu'une erreur */}
@@ -242,7 +255,9 @@ export function RevealGame({ data, variant }: GameProps & { variant: Variant }) 
                   className="underline underline-offset-4 hover:text-foam"
                   onClick={() => setRun({ ...run, log: logged({ type: "hint" }), step: run.step + 1 })}
                 >
-                  {variant === "pixel" ? "Aucune idée : préciser l'image" : "Aucune idée : dézoomer"}
+                  {variant === "pixel"
+                    ? t("Aucune idée : préciser l'image", "No idea: sharpen the picture")
+                    : t("Aucune idée : dézoomer", "No idea: zoom out")}
                 </button>
               )}
               <button
@@ -250,7 +265,7 @@ export function RevealGame({ data, variant }: GameProps & { variant: Variant }) 
                 className="underline underline-offset-4 hover:text-foam"
                 onClick={() => setRun({ ...run, log: logged({ type: "pass" }), outcome: 0 })}
               >
-                Passer
+                {t("Passer", "Skip")}
               </button>
             </span>
           </p>
@@ -261,11 +276,14 @@ export function RevealGame({ data, variant }: GameProps & { variant: Variant }) 
         <div className="flex flex-wrap items-center justify-between gap-3" aria-live="polite">
           <p className={`font-bold ${run.outcome ? "text-emerald-300" : "text-vest"}`}>
             {run.outcome
-              ? `${target.name} : +${run.outcome} point${run.outcome > 1 ? "s" : ""}.`
-              : `C'était ${target.name}.`}
+              ? t(
+                  `${target.name} : +${run.outcome} point${run.outcome > 1 ? "s" : ""}.`,
+                  `${target.name}: +${run.outcome} ${run.outcome === 1 ? "point" : "points"}.`,
+                )
+              : t(`C'était ${target.name}.`, `It was ${target.name}.`)}
           </p>
           <Button autoFocus onClick={next}>
-            {last ? "Voir mon score" : "Image suivante"}
+            {last ? t("Voir mon score", "See my score") : t("Image suivante", "Next picture")}
           </Button>
         </div>
       )}

@@ -6,12 +6,17 @@ import type { ClueSlug } from "../clues/logic";
 import type { EstimateSlug } from "../estimate/logic";
 import type { QcmSlug } from "../qcm/logic";
 import type { LiveSlug } from "@/lib/games/catalog";
+import { useT } from "@/lib/i18n/client";
 import { ModeBar, SpoilerGate } from "./SpoilerGate";
 import { LoadingPanel, WithGameData } from "./WithGameData";
 import type { GameProps } from "./types";
 
-const load = (loader: () => Promise<{ default: ComponentType<GameProps> }>) =>
-  dynamic(loader, { loading: () => <LoadingPanel label="Chargement du jeu…" /> });
+function LoadingGame() {
+  const t = useT();
+  return <LoadingPanel label={t("Chargement du jeu…", "Loading the game…")} />;
+}
+
+const load = (loader: () => Promise<{ default: ComponentType<GameProps> }>) => dynamic(loader, { loading: LoadingGame });
 
 // Les jeux d'une même famille partagent un composant, paramétré par leur identifiant
 function qcm(slug: QcmSlug) {
@@ -74,9 +79,10 @@ const GAME_COMPONENTS = {
 } satisfies Record<LiveSlug, ComponentType<GameProps>>;
 
 export function GameRunner({ slug }: { slug: LiveSlug }) {
+  const t = useT();
   const Game = GAME_COMPONENTS[slug];
   return (
-    <WithGameData loading="Chargement du jeu…">
+    <WithGameData loading={t("Chargement du jeu…", "Loading the game…")}>
       {({ raw, mode, setMode, data }) =>
         mode === null ? (
           <SpoilerGate data={raw} onChoose={setMode} />

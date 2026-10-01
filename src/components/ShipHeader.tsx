@@ -1,22 +1,24 @@
 "use client";
 
-import Link from "next/link";
-import { usePathname } from "next/navigation";
+import Link from "@/components/Link";
 import { spareCopies } from "@/lib/economy";
+import { useLocale, usePath, useT } from "@/lib/i18n/client";
 import { useNotifications } from "@/lib/multi/client";
 import { usePlayer } from "@/lib/player/PlayerProvider";
 
 const TABS = [
-  { href: "/navire", label: "Équipage" },
-  { href: "/collection", label: "Collection" },
-  { href: "/boutique", label: "Boutique" },
-  { href: "/echanges", label: "Échanges" },
+  { href: "/navire", label: { fr: "Équipage", en: "Crew" } },
+  { href: "/collection", label: { fr: "Collection", en: "Collection" } },
+  { href: "/boutique", label: { fr: "Boutique", en: "Shop" } },
+  { href: "/echanges", label: { fr: "Échanges", en: "Trades" } },
 ];
 
 /** En-tête commun aux pages du navire : ce que possède le joueur, et les quatre rubriques. */
 export function ShipHeader() {
   const { state, status } = usePlayer();
-  const pathname = usePathname();
+  const pathname = usePath();
+  const t = useT();
+  const locale = useLocale();
   const counts = useNotifications(status === "user");
 
   const owned = Object.keys(state.collection).length;
@@ -28,20 +30,23 @@ export function ShipHeader() {
   return (
     <header className="space-y-5">
       <div className="flex flex-wrap items-end justify-between gap-3">
-        <h1 className="font-display text-4xl tracking-wide text-foam sm:text-[40px]">Mon navire</h1>
+        <h1 className="font-display text-4xl tracking-wide text-foam sm:text-[40px]">{t("Mon navire", "My ship")}</h1>
         <p className={`flex flex-wrap gap-2 text-sm font-bold ${status === "loading" ? "invisible" : ""}`}>
           <span className="rounded-full border border-sea-700 px-3.5 py-2">
-            {owned} avis recruté{owned > 1 ? "s" : ""}
+            {t(`${owned} avis recruté${owned > 1 ? "s" : ""}`, `${owned} ${owned === 1 ? "poster" : "posters"} recruited`)}
           </span>
           {spare > 0 && (
             <Link href="/collection" className="rounded-full border border-straw/50 px-3.5 py-2 text-straw hover:bg-straw/10">
-              {spare} doublon{spare > 1 ? "s" : ""} à défaire
+              {t(
+                `${spare} doublon${spare > 1 ? "s" : ""} à défaire`,
+                `${spare} ${spare === 1 ? "duplicate" : "duplicates"} to scrap`,
+              )}
             </Link>
           )}
         </p>
       </div>
 
-      <nav aria-label="Mon navire" className="flex gap-4 overflow-x-auto border-b border-sea-700 text-[15px] font-extrabold text-mist [scrollbar-width:none] sm:gap-7 sm:text-base">
+      <nav aria-label={t("Mon navire", "My ship")} className="flex gap-4 overflow-x-auto border-b border-sea-700 text-[15px] font-extrabold text-mist [scrollbar-width:none] sm:gap-7 sm:text-base">
         {TABS.map((tab) => {
           const active = pathname === tab.href;
           return (
@@ -53,9 +58,12 @@ export function ShipHeader() {
                 active ? "border-straw text-foam" : "border-transparent"
               }`}
             >
-              {tab.label}
+              {tab.label[locale]}
               {tab.href === "/echanges" && !!counts?.trades && (
-                <span className="rounded-full bg-vest px-2 py-px text-xs text-white" aria-label={`${counts.trades} en attente`}>
+                <span
+                  className="rounded-full bg-vest px-2 py-px text-xs text-white"
+                  aria-label={t(`${counts.trades} en attente`, `${counts.trades} pending`)}
+                >
                   {counts.trades}
                 </span>
               )}

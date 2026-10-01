@@ -7,6 +7,8 @@ import { Portrait } from "../ui/Portrait";
 import { Button, Panel, Progress } from "../ui/primitives";
 import type { GameProps } from "../ui/types";
 import { useRun } from "../ui/useRun";
+import type { Locale, Localized } from "@/lib/i18n";
+import { useLocale, useT } from "@/lib/i18n/client";
 import {
   generateEstimates,
   parseEstimate,
@@ -19,21 +21,38 @@ import {
   type EstimateSlug,
 } from "./logic";
 
-const INTROS: Record<EstimateSlug, string> = {
-  "devine-la-prime": "Huit personnages primés. Estime la prime de chacun : plus tu es proche, plus tu marques.",
-  "premiere-apparition": "Huit personnages. À quel moment de l'histoire chacun apparaît-il pour la première fois ?",
-  "prime-d-equipage": "Huit équipages. Estime le total des primes connues de leurs membres.",
+const INTROS: Record<EstimateSlug, Localized> = {
+  "devine-la-prime": {
+    fr: "Huit personnages primés. Estime la prime de chacun : plus tu es proche, plus tu marques.",
+    en: "Eight characters with a bounty. Estimate each one's bounty: the closer you are, the more you score.",
+  },
+  "premiere-apparition": {
+    fr: "Huit personnages. À quel moment de l'histoire chacun apparaît-il pour la première fois ?",
+    en: "Eight characters. At what point in the story does each one first appear?",
+  },
+  "prime-d-equipage": {
+    fr: "Huit équipages. Estime le total des primes connues de leurs membres.",
+    en: "Eight crews. Estimate the total of their members' known bounties.",
+  },
+};
+
+/** Libellé des unités autres que les Berrys : `unit` est un code, pas un texte à afficher. */
+const UNIT_LABELS: Record<Exclude<EstimateQuestion["unit"], "berrys">, Localized> = {
+  chapitre: { fr: "Chapitre", en: "Chapter" },
+  épisode: { fr: "Épisode", en: "Episode" },
 };
 
 const SLIDER_STEPS = 1000;
 const NOT_TYPED = { text: "", value: null };
 
-function format(question: EstimateQuestion, value: number): string {
-  if (question.unit === "berrys") return formatBounty(value);
-  return `${question.unit === "chapitre" ? "Chapitre" : "Épisode"} ${formatNumber(value)}`;
+function format(question: EstimateQuestion, value: number, locale: Locale): string {
+  if (question.unit === "berrys") return formatBounty(value, locale);
+  return `${UNIT_LABELS[question.unit][locale]} ${formatNumber(value, locale)}`;
 }
 
 export default function EstimateGame({ data, slug }: GameProps & { slug: EstimateSlug }) {
+  const t = useT();
+  const locale = useLocale();
   const base = useRun(slug);
   const [index, setIndex] = useState(0);
   const [position, setPosition] = useState(SLIDER_STEPS / 2);
@@ -64,7 +83,7 @@ export default function EstimateGame({ data, slug }: GameProps & { slug: Estimat
   if (!run || !questions.length) {
     return (
       <GameStart game={game} withDifficulty={withDifficulty}>
-        <p className="text-mist">{INTROS[slug]}</p>
+        <p className="text-mist">{INTROS[slug][locale]}</p>
       </GameStart>
     );
   }
@@ -102,7 +121,7 @@ export default function EstimateGame({ data, slug }: GameProps & { slug: Estimat
 
   return (
     <Panel className="space-y-4">
-      <Progress current={index + 1} total={questions.length} score={`Score : ${score}`} />
+      <Progress current={index + 1} total={questions.length} score={t(`Score : ${score}`, `Score: ${score}`)} />
       <div className="space-y-2 text-center">
         <p className="text-mist">{question.title}</p>
         {question.img && <Portrait img={question.img} />}
@@ -119,10 +138,10 @@ export default function EstimateGame({ data, slug }: GameProps & { slug: Estimat
       >
         <div className="space-y-2">
           <p className="text-center font-display text-4xl tracking-wide text-foam" aria-live="polite">
-            {format(question, answered ? answers[index] : guess)}
+            {format(question, answered ? answers[index] : guess, locale)}
           </p>
           <label className="block">
-            <span className="sr-only">Ton estimation, au curseur</span>
+            <span className="sr-only">{t("Ton estimation, au curseur", "Your estimate, with the slider")}</span>
             <input
               type="range"
               min={0}
@@ -134,13 +153,13 @@ export default function EstimateGame({ data, slug }: GameProps & { slug: Estimat
                 setPosition(Number(event.target.value));
                 setTyped(NOT_TYPED);
               }}
-              aria-valuetext={format(question, guess)}
+              aria-valuetext={format(question, guess, locale)}
               className="w-full accent-straw"
             />
           </label>
           <div className="flex justify-between text-xs text-mist">
-            <span>{format(question, question.min)}</span>
-            <span>{format(question, question.max)}</span>
+            <span>{format(question, question.min, locale)}</span>
+            <span>{format(question, question.max, locale)}</span>
           </div>
         </div>
 
@@ -149,33 +168,40 @@ export default function EstimateGame({ data, slug }: GameProps & { slug: Estimat
           <div key="correction" className="flex flex-wrap items-center justify-between gap-3" aria-live="polite">
             <p className="text-mist">
               <strong className={points >= 3 ? "text-emerald-300" : points > 0 ? "text-straw" : "text-vest"}>
-                {points > 0 ? `+${points} point${points > 1 ? "s" : ""}.` : "Trop loin."}
+                {points > 0
+                  ? t(`+${points} point${points > 1 ? "s" : ""}.`, `+${points} point${points === 1 ? "" : "s"}.`)
+                  : t("Trop loin.", "Too far off.")}
               </strong>{" "}
-              La bonne réponse : {format(question, question.answer)}.
+              {t("La bonne réponse : ", "The correct answer: ")}
+              {format(question, question.answer, locale)}.
             </p>
             <Button autoFocus onClick={next}>
-              {last ? "Voir mon score" : "Suivant"}
+              {last ? t("Voir mon score", "See my score") : t("Suivant", "Next")}
             </Button>
           </div>
         ) : (
           <div key="saisie" className="flex flex-wrap items-start gap-2">
             <label className="min-w-0 flex-1">
-              <span className="sr-only">Ton estimation, au clavier</span>
+              <span className="sr-only">{t("Ton estimation, au clavier", "Your estimate, typed")}</span>
               <input
                 type="text"
                 inputMode={question.unit === "berrys" ? "text" : "numeric"}
                 value={typed.text}
                 onChange={(event) => type(event.target.value)}
                 autoComplete="off"
-                placeholder={question.unit === "berrys" ? "Ou tape un montant : 320 M, 1,5 Md…" : "Ou tape un numéro…"}
+                placeholder={
+                  question.unit === "berrys"
+                    ? t("Ou tape un montant : 320 M, 1,5 Md…", "Or type an amount: 320M, 1.5 billion, 56k…")
+                    : t("Ou tape un numéro…", "Or type a number…")
+                }
                 aria-invalid={typed.text !== "" && typed.value === null}
                 className="w-full rounded-lg border-2 border-sea-600 bg-sea-900 px-4 py-2.5 text-foam placeholder:text-mist/70 focus:border-straw focus:outline-none aria-invalid:border-vest"
               />
               <span className="mt-1 block min-h-5 text-sm text-vest" aria-live="polite">
-                {typed.text !== "" && typed.value === null ? "Ce n'est pas un nombre." : ""}
+                {typed.text !== "" && typed.value === null ? t("Ce n'est pas un nombre.", "That's not a number.") : ""}
               </span>
             </label>
-            <Button type="submit">Valider</Button>
+            <Button type="submit">{t("Valider", "Submit")}</Button>
           </div>
         )}
       </form>

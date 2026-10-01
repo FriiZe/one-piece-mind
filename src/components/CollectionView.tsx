@@ -1,12 +1,13 @@
 "use client";
 
-import Link from "next/link";
 import { useMemo, useState } from "react";
+import Link from "@/components/Link";
 import type { ResolvedData } from "@/games/cards";
 import { formatNumber } from "@/games/engine/text";
 import { Button, Panel } from "@/games/ui/primitives";
 import { WithGameData } from "@/games/ui/WithGameData";
 import { duplicatesValue, RARITY_LABELS, spareCopies } from "@/lib/economy";
+import { useLocale, useT } from "@/lib/i18n/client";
 import { usePlayer } from "@/lib/player/PlayerProvider";
 import { CharacterCard } from "./CharacterCard";
 import { CharacterDetails } from "./CharacterDetails";
@@ -19,6 +20,8 @@ const MISSING_SHOWN = 30;
 /** Tous les doublons visibles, défaits d'un coup : la vente est définitive, d'où la confirmation. */
 function Duplicates({ data }: { data: ResolvedData }) {
   const { state, sell } = usePlayer();
+  const t = useT();
+  const locale = useLocale();
   const [confirming, setConfirming] = useState(false);
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
@@ -39,8 +42,11 @@ function Duplicates({ data }: { data: ResolvedData }) {
     setConfirming(false);
     setMessage(
       result.ok
-        ? `${result.sold} doublon${result.sold > 1 ? "s" : ""} défait${result.sold > 1 ? "s" : ""} : +${formatNumber(result.berrys)} ฿.`
-        : "Les doublons n'ont pas pu être défaits.",
+        ? t(
+            `${result.sold} doublon${result.sold > 1 ? "s" : ""} défait${result.sold > 1 ? "s" : ""} : +${formatNumber(result.berrys, locale)} ฿.`,
+            `${result.sold} ${result.sold === 1 ? "duplicate" : "duplicates"} scrapped: +${formatNumber(result.berrys, locale)} ฿.`,
+          )
+        : t("Les doublons n'ont pas pu être défaits.", "The duplicates couldn't be scrapped."),
     );
   }
 
@@ -51,12 +57,14 @@ function Duplicates({ data }: { data: ResolvedData }) {
         <strong className="text-sm text-emerald-300">{message}</strong>
       ) : confirming ? (
         <>
-          <span className="text-sm text-mist">Tu gardes un exemplaire de chaque avis.</span>
+          <span className="text-sm text-mist">
+            {t("Tu gardes un exemplaire de chaque avis.", "You keep one copy of each poster.")}
+          </span>
           <Button onClick={sellAll} disabled={busy} className="min-h-11 py-0 text-sm">
-            Confirmer : +{formatNumber(value)} ฿
+            {t("Confirmer : ", "Confirm: ")}+{formatNumber(value, locale)} ฿
           </Button>
           <Button variant="secondary" onClick={() => setConfirming(false)} disabled={busy} className="min-h-11 py-0 text-sm">
-            Annuler
+            {t("Annuler", "Cancel")}
           </Button>
         </>
       ) : (
@@ -65,7 +73,10 @@ function Duplicates({ data }: { data: ResolvedData }) {
           onClick={() => setConfirming(true)}
           className="min-h-11 cursor-pointer rounded-full border border-straw/50 px-4 text-sm font-bold text-straw transition-colors hover:bg-straw/10"
         >
-          Défaire {count} doublon{count > 1 ? "s" : ""} · +{formatNumber(value)} ฿
+          {t(
+            `Défaire ${count} doublon${count > 1 ? "s" : ""} · +${formatNumber(value, locale)} ฿`,
+            `Scrap ${count} ${count === 1 ? "duplicate" : "duplicates"} · +${formatNumber(value, locale)} ฿`,
+          )}
         </button>
       )}
     </span>
@@ -74,6 +85,8 @@ function Duplicates({ data }: { data: ResolvedData }) {
 
 function Collection({ data }: { data: ResolvedData }) {
   const { state } = usePlayer();
+  const t = useT();
+  const locale = useLocale();
   const [tier, setTier] = useState<number | null>(null);
   const [withMissing, setWithMissing] = useState(false);
   const [openId, setOpenId] = useState<string | null>(null);
@@ -83,23 +96,28 @@ function Collection({ data }: { data: ResolvedData }) {
     () =>
       data.characters
         .filter((c) => state.collection[c.id])
-        .sort((a, b) => a.tier - b.tier || a.name.localeCompare(b.name, "fr")),
-    [data.characters, state.collection],
+        .sort((a, b) => a.tier - b.tier || a.name.localeCompare(b.name, locale)),
+    [data.characters, state.collection, locale],
   );
   const shown = tier === null ? owned : owned.filter((c) => c.tier === tier);
   const missing = useMemo(
     () => (withMissing ? data.characters.filter((c) => !state.collection[c.id] && (tier === null || c.tier === tier)).sort((a, b) => a.tier - b.tier) : []),
     [withMissing, data.characters, state.collection, tier],
   );
+  const hidden = missing.length - MISSING_SHOWN;
 
   return (
     <section aria-labelledby="avis" className="space-y-5">
       <h2 id="avis" className="sr-only">
-        Mes avis de recherche
+        {t("Mes avis de recherche", "My wanted posters")}
       </h2>
 
       <div className="flex flex-wrap items-center gap-2">
-        <div role="group" aria-label="Filtrer par rareté" className="-mx-4 flex gap-2 overflow-x-auto px-4 [scrollbar-width:none] sm:mx-0 sm:flex-wrap sm:overflow-visible sm:px-0">
+        <div
+          role="group"
+          aria-label={t("Filtrer par rareté", "Filter by rarity")}
+          className="-mx-4 flex gap-2 overflow-x-auto px-4 [scrollbar-width:none] sm:mx-0 sm:flex-wrap sm:overflow-visible sm:px-0"
+        >
           {[null, ...TIERS].map((value) => {
             const total = value === null ? data.characters.length : data.characters.filter((c) => c.tier === value).length;
             const have = value === null ? owned.length : owned.filter((c) => c.tier === value).length;
@@ -113,14 +131,14 @@ function Collection({ data }: { data: ResolvedData }) {
                   tier === value ? "bg-straw text-ink" : "border border-sea-700 text-mist hover:text-foam"
                 }`}
               >
-                {value === null ? "Tous" : RARITY_LABELS[value]} · {have} / {total}
+                {value === null ? t("Tous", "All") : RARITY_LABELS[locale][value]} · {have} / {total}
               </button>
             );
           })}
         </div>
         <label className="flex min-h-11 cursor-pointer items-center gap-2 px-1 text-sm font-bold text-mist">
           <input type="checkbox" checked={withMissing} onChange={(event) => setWithMissing(event.target.checked)} className="size-[18px] accent-straw" />
-          Montrer les manquants
+          {t("Montrer les manquants", "Show missing ones")}
         </label>
         <Duplicates data={data} />
       </div>
@@ -129,16 +147,19 @@ function Collection({ data }: { data: ResolvedData }) {
         <Panel>
           <p className="text-mist">
             {owned.length === 0
-              ? "Ta collection est vide. Valide un jeu du jour, ou passe à la boutique, pour recruter ton premier personnage."
-              : "Aucun avis de cette rareté pour l'instant."}
+              ? t(
+                  "Ta collection est vide. Valide un jeu du jour, ou passe à la boutique, pour recruter ton premier personnage.",
+                  "Your collection is empty. Clear a daily game, or drop by the shop, to recruit your first character.",
+                )
+              : t("Aucun avis de cette rareté pour l'instant.", "No posters of this rarity yet.")}
           </p>
           {owned.length === 0 && (
             <p className="mt-3 flex flex-wrap gap-x-5 gap-y-2 font-bold">
               <Link href="/" className="text-straw underline underline-offset-4">
-                Voir les jeux du jour
+                {t("Voir les jeux du jour", "See the daily games")}
               </Link>
               <Link href="/boutique" className="text-straw underline underline-offset-4">
-                Aller à la boutique
+                {t("Aller à la boutique", "Go to the shop")}
               </Link>
             </p>
           )}
@@ -158,7 +179,7 @@ function Collection({ data }: { data: ResolvedData }) {
                 <button
                   type="button"
                   onClick={() => setOpenId(character.id)}
-                  aria-label={`Détails de l'avis de ${character.name}`}
+                  aria-label={t(`Détails de l'avis de ${character.name}`, `Details of ${character.name}'s poster`)}
                   className="absolute inset-0 cursor-pointer rounded-md focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-straw"
                 />
               </li>
@@ -172,14 +193,19 @@ function Collection({ data }: { data: ResolvedData }) {
               <span aria-hidden="true" className="font-display text-4xl">
                 ?
               </span>
-              <span className="px-1 text-center text-xs font-bold">Manquant · {RARITY_LABELS[character.tier].toLowerCase()}</span>
+              <span className="px-1 text-center text-xs font-bold">
+                {t("Manquant", "Missing")} · {RARITY_LABELS[locale][character.tier].toLowerCase()}
+              </span>
             </li>
           ))}
         </ul>
       )}
-      {missing.length > MISSING_SHOWN && (
+      {hidden > 0 && (
         <p className="text-sm text-mist">
-          Et {formatNumber(missing.length - MISSING_SHOWN)} autres avis à recruter{tier === null ? "" : " dans cette rareté"}.
+          {t(
+            `Et ${formatNumber(hidden, locale)} autres avis à recruter${tier === null ? "" : " dans cette rareté"}.`,
+            `And ${formatNumber(hidden, locale)} more ${hidden === 1 ? "poster" : "posters"} to recruit${tier === null ? "" : " in this rarity"}.`,
+          )}
         </p>
       )}
       {open && state.collection[open.id] && <CharacterDetails character={open} data={data} onClose={() => setOpenId(null)} />}
@@ -188,5 +214,10 @@ function Collection({ data }: { data: ResolvedData }) {
 }
 
 export function CollectionView() {
-  return <WithGameData loading="Chargement de la collection…">{({ data }) => <Collection data={data} />}</WithGameData>;
+  const t = useT();
+  return (
+    <WithGameData loading={t("Chargement de la collection…", "Loading the collection…")}>
+      {({ data }) => <Collection data={data} />}
+    </WithGameData>
+  );
 }

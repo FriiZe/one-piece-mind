@@ -350,13 +350,23 @@ describe("catalogue", () => {
     const { GAME_CONTENT } = await import("@/games/content");
     expect(GAMES.filter((g) => g.status === "live").map((g) => g.slug).sort()).toEqual([...LIVE_SLUGS].sort());
     expect(new Set(GAMES.map((g) => g.slug)).size).toBe(GAMES.length);
-    for (const slug of LIVE_SLUGS) {
-      const content = GAME_CONTENT[slug];
-      expect(content.metaTitle.length, slug).toBeLessThanOrEqual(70);
-      expect(content.metaDescription.length, slug).toBeGreaterThanOrEqual(110);
-      expect(content.metaDescription.length, slug).toBeLessThanOrEqual(200);
-      expect(content.howTo.length).toBeGreaterThanOrEqual(3);
-      expect(content.faq.length).toBeGreaterThanOrEqual(3);
+    const { LOCALES } = await import("@/lib/i18n");
+    for (const locale of LOCALES) {
+      for (const slug of LIVE_SLUGS) {
+        const content = GAME_CONTENT[locale][slug];
+        const where = `${slug} (${locale})`;
+        expect(content.metaTitle.length, where).toBeLessThanOrEqual(70);
+        expect(content.metaDescription.length, where).toBeGreaterThanOrEqual(110);
+        expect(content.metaDescription.length, where).toBeLessThanOrEqual(200);
+        expect(content.howTo.length, where).toBeGreaterThanOrEqual(3);
+        expect(content.faq.length, where).toBeGreaterThanOrEqual(3);
+        // La page anglaise dit la même chose que la française : autant d'étapes, autant de questions
+        expect(content.howTo.length, where).toBe(GAME_CONTENT.fr[slug].howTo.length);
+        expect(content.faq.length, where).toBe(GAME_CONTENT.fr[slug].faq.length);
+      }
+    }
+    for (const game of GAMES) {
+      expect(game.title.fr && game.title.en && game.pitch.fr && game.pitch.en, game.slug).toBeTruthy();
     }
   });
 });

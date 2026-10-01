@@ -6,6 +6,7 @@ import { formatBounty, formatHeight, formatNumber } from "@/games/engine/text";
 import { Button } from "@/games/ui/primitives";
 import { FRUIT_TYPE_LABELS, hakiLabel, RACE_LABELS, SEA_LABELS } from "@/lib/data/labels";
 import { duplicatesValue, POST_IDS, POSTS, RARITY_LABELS, spareCopies } from "@/lib/economy";
+import { useLocale, useT } from "@/lib/i18n/client";
 import { usePlayer } from "@/lib/player/PlayerProvider";
 import { CharacterCard } from "./CharacterCard";
 import { Modal } from "./Modal";
@@ -21,6 +22,8 @@ export function CharacterDetails({
   onClose: () => void;
 }) {
   const { state, sell } = usePlayer();
+  const t = useT();
+  const locale = useLocale();
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
 
@@ -33,23 +36,39 @@ export function CharacterDetails({
   const arc = character.arc !== null ? data.arcs.get(character.arc) : undefined;
   const debut =
     data.mode === "anime" && character.episode
-      ? `épisode ${formatNumber(character.episode)}`
+      ? t(`épisode ${formatNumber(character.episode, locale)}`, `episode ${formatNumber(character.episode, locale)}`)
       : character.debut > 0
-        ? `chapitre ${formatNumber(character.debut)}`
+        ? t(`chapitre ${formatNumber(character.debut, locale)}`, `chapter ${formatNumber(character.debut, locale)}`)
         : null;
 
   const facts: { label: string; value: string }[] = [
-    { label: "Rareté", value: RARITY_LABELS[character.tier] },
-    { label: "Affiliation", value: character.affiliation ?? "Aucune connue" },
-    { label: "Prime", value: formatBounty(character.bounty) },
-    { label: "Fruit du démon", value: fruit ? `${fruit.name} (${FRUIT_TYPE_LABELS[fruit.type]})` : "Aucun connu" },
-    { label: "Haki", value: hakiLabel(character.haki) },
-    ...(character.sea ? [{ label: "Origine", value: SEA_LABELS[character.sea] }] : []),
-    ...(character.races.length ? [{ label: "Race", value: character.races.map((race) => RACE_LABELS[race]).join(", ") }] : []),
-    ...(character.age !== null ? [{ label: "Âge", value: `${character.age} ans` }] : []),
-    ...(character.height !== null ? [{ label: "Taille", value: formatHeight(character.height) }] : []),
-    ...(arc || debut ? [{ label: "Première apparition", value: [arc && `arc ${arc}`, debut].filter(Boolean).join(", ") }] : []),
-    ...(post ? [{ label: "Dans ton équipage", value: POSTS[post].label }] : []),
+    { label: t("Rareté", "Rarity"), value: RARITY_LABELS[locale][character.tier] },
+    { label: t("Affiliation", "Affiliation"), value: character.affiliation ?? t("Aucune connue", "None known") },
+    { label: t("Prime", "Bounty"), value: formatBounty(character.bounty, locale) },
+    {
+      label: t("Fruit du démon", "Devil Fruit"),
+      value: fruit ? `${fruit.name} (${FRUIT_TYPE_LABELS[locale][fruit.type]})` : t("Aucun connu", "None known"),
+    },
+    { label: t("Haki", "Haki"), value: hakiLabel(character.haki, locale) },
+    ...(character.sea ? [{ label: t("Origine", "Origin"), value: SEA_LABELS[locale][character.sea] }] : []),
+    ...(character.races.length
+      ? [{ label: t("Race", "Race"), value: character.races.map((race) => RACE_LABELS[locale][race]).join(", ") }]
+      : []),
+    ...(character.age !== null
+      ? [{ label: t("Âge", "Age"), value: t(`${character.age} ans`, `${character.age} years old`) }]
+      : []),
+    ...(character.height !== null
+      ? [{ label: t("Taille", "Height"), value: formatHeight(character.height, locale) }]
+      : []),
+    ...(arc || debut
+      ? [
+          {
+            label: t("Première apparition", "First appearance"),
+            value: [arc && t(`arc ${arc}`, `${arc} arc`), debut].filter(Boolean).join(", "),
+          },
+        ]
+      : []),
+    ...(post ? [{ label: t("Dans ton équipage", "In your crew"), value: POSTS[post].label[locale] }] : []),
   ];
 
   async function sellSpares() {
@@ -58,8 +77,11 @@ export function CharacterDetails({
     setBusy(false);
     setMessage(
       result.ok
-        ? `${result.sold} doublon${result.sold > 1 ? "s" : ""} défait${result.sold > 1 ? "s" : ""} : +${formatNumber(result.berrys)} ฿.`
-        : "Les doublons n'ont pas pu être défaits.",
+        ? t(
+            `${result.sold} doublon${result.sold > 1 ? "s" : ""} défait${result.sold > 1 ? "s" : ""} : +${formatNumber(result.berrys, locale)} ฿.`,
+            `${result.sold} ${result.sold === 1 ? "duplicate" : "duplicates"} scrapped: +${formatNumber(result.berrys, locale)} ฿.`,
+          )
+        : t("Les doublons n'ont pas pu être défaits.", "The duplicates couldn't be scrapped."),
     );
   }
 
@@ -86,16 +108,27 @@ export function CharacterDetails({
         <div className="space-y-2 rounded-xl border border-sea-600 bg-sea-900/60 p-3">
           <p className="text-sm text-mist">
             <strong className="text-foam">
-              {entry.count} exemplaire{entry.count > 1 ? "s" : ""}
+              {t(
+                `${entry.count} exemplaire${entry.count > 1 ? "s" : ""}`,
+                `${entry.count} ${entry.count === 1 ? "copy" : "copies"}`,
+              )}
             </strong>
-            {entry.golden > 0 && `, dont ${entry.golden} doré${entry.golden > 1 ? "s" : ""}`}.{" "}
+            {entry.golden > 0 &&
+              t(`, dont ${entry.golden} doré${entry.golden > 1 ? "s" : ""}`, `, including ${entry.golden} golden`)}
+            .{" "}
             {spares > 0
-              ? "Tu peux défaire les doublons contre des Berrys : il te restera un exemplaire, le doré si tu en as un."
-              : "Pas de doublon à défaire."}
+              ? t(
+                  "Tu peux défaire les doublons contre des Berrys : il te restera un exemplaire, le doré si tu en as un.",
+                  "You can scrap the duplicates for Berries: you'll keep one copy, the golden one if you have it.",
+                )
+              : t("Pas de doublon à défaire.", "No duplicates to scrap.")}
           </p>
           {spares > 0 && (
             <Button onClick={sellSpares} disabled={busy}>
-              Défaire {spares} doublon{spares > 1 ? "s" : ""} : +{formatNumber(value)} ฿
+              {t(
+                `Défaire ${spares} doublon${spares > 1 ? "s" : ""} : +${formatNumber(value, locale)} ฿`,
+                `Scrap ${spares} ${spares === 1 ? "duplicate" : "duplicates"}: +${formatNumber(value, locale)} ฿`,
+              )}
             </Button>
           )}
           <p className="min-h-5 text-sm font-semibold text-emerald-300" aria-live="polite">

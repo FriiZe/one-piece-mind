@@ -3,6 +3,7 @@ import { byDifficulty, type Difficulty } from "../engine/difficulty";
 import { createRng, sample, type Rng } from "../engine/rng";
 import { normalizeText, revealsName } from "../engine/text";
 import { SEA_LABELS } from "@/lib/data/labels";
+import { translator, type Translate } from "@/lib/i18n";
 import { bountyPool, type Bountied } from "../plus-ou-moins/logic";
 
 export const MAX_POINTS = 5;
@@ -10,22 +11,23 @@ export const POSTERS = 5;
 export const MAX_SCORE = POSTERS * MAX_POINTS;
 export type Hint = { key: "affiliation" | "sea" | "arc" | "initial"; title: string; value: string };
 
-function initialOf(character: PlayCharacter): string {
+function initialOf(character: PlayCharacter, t: Translate): string {
   const letters = normalizeText(character.name).replace(/ /g, "");
-  return `${character.name[0].toUpperCase()}… (${letters.length} lettres)`;
+  return `${character.name[0].toUpperCase()}… (${letters.length} ${t("lettres", "letters")})`;
 }
 
 /** Indices d'une affiche, du plus vague au plus précis, l'initiale en dernier ; ceux sans valeur sont omis. */
 export function hintsFor(character: PlayCharacter, data: ResolvedData): Hint[] {
+  const t = translator(data.locale);
   const arc = character.arc !== null ? data.arcs.get(character.arc) : undefined;
   const hints: (Hint | null)[] = [
     character.affiliation ? { key: "affiliation", title: "Affiliation", value: character.affiliation } : null,
-    character.sea ? { key: "sea", title: "Mer d'origine", value: SEA_LABELS[character.sea] } : null,
-    arc ? { key: "arc", title: "Première apparition", value: arc } : null,
+    character.sea ? { key: "sea", title: t("Mer d'origine", "Home sea"), value: SEA_LABELS[data.locale][character.sea] } : null,
+    arc ? { key: "arc", title: t("Première apparition", "First appearance"), value: arc } : null,
   ];
   // Un indice qui contient le nom du personnage (« Équipage d'Arlong ») donnerait la réponse
   const safe = hints.filter((h): h is Hint => h !== null && !revealsName(h.value, character.name));
-  return [...safe, { key: "initial", title: "Initiale", value: initialOf(character) }];
+  return [...safe, { key: "initial", title: t("Initiale", "Initial"), value: initialOf(character, t) }];
 }
 
 /** Points gagnés selon le nombre d'indices dévoilés : de 5 (aucun) à 1. */

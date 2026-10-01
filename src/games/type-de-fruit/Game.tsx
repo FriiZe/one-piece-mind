@@ -6,6 +6,7 @@ import { Button, Panel, ResultPanel } from "../ui/primitives";
 import { QuizFlow, type QuizQuestion } from "../ui/QuizFlow";
 import { useBest } from "../ui/storage";
 import { RewardSummary } from "@/components/RewardSummary";
+import { useLocale, useT } from "@/lib/i18n/client";
 import { useGameReward } from "@/lib/player/useGameReward";
 import type { GameProps } from "../ui/types";
 import { FRUIT_TYPE_LABELS } from "@/lib/data/labels";
@@ -15,6 +16,8 @@ const FAMILY_LABELS = { paramecia: "Paramecia", logia: "Logia", zoan: "Zoan" } a
 const LENGTH = QUIZ_LENGTH;
 
 export default function TypeDeFruit({ data }: GameProps) {
+  const t = useT();
+  const locale = useLocale();
   const [seed, setSeed] = useState<number | null>(null);
   const [result, setResult] = useState<{ score: number; newBest: boolean } | null>(null);
   const [best, submitBest] = useBest("type-de-fruit");
@@ -32,9 +35,12 @@ export default function TypeDeFruit({ data }: GameProps) {
       ),
       options: FAMILIES.map((family) => ({ id: family, label: FAMILY_LABELS[family] })),
       answerId: familyOf(fruit.type)!,
-      explanation: `C'est un fruit de type ${FRUIT_TYPE_LABELS[fruit.type]}.`,
+      explanation: t(
+        `C'est un fruit de type ${FRUIT_TYPE_LABELS[locale][fruit.type]}.`,
+        `This fruit's type is ${FRUIT_TYPE_LABELS[locale][fruit.type]}.`,
+      ),
     }));
-  }, [seed, data.fruits]);
+  }, [seed, data.fruits, t, locale]);
 
   function start() {
     reward.reset();
@@ -45,8 +51,13 @@ export default function TypeDeFruit({ data }: GameProps) {
   if (seed === null) {
     return (
       <Panel className="space-y-4">
-        <p className="text-mist">Dix fruits du démon. Pour chacun, une seule question : Paramecia, Logia ou Zoan ?</p>
-        <Button onClick={start}>Jouer</Button>
+        <p className="text-mist">
+          {t(
+            "Dix fruits du démon. Pour chacun, une seule question : Paramecia, Logia ou Zoan ?",
+            "Ten Devil Fruits. For each one, a single question: Paramecia, Logia or Zoan?",
+          )}
+        </p>
+        <Button onClick={start}>{t("Jouer", "Play")}</Button>
       </Panel>
     );
   }
@@ -55,11 +66,15 @@ export default function TypeDeFruit({ data }: GameProps) {
     return (
       <ResultPanel
         title={`${result.score} / ${LENGTH}`}
-        best={best !== null ? { label: "Record", value: `${best} / ${LENGTH}` } : null}
+        best={best !== null ? { label: t("Record", "Best"), value: `${best} / ${LENGTH}` } : null}
         newBest={result.newBest}
-        actions={<Button onClick={start}>Rejouer</Button>}
+        actions={<Button onClick={start}>{t("Rejouer", "Play again")}</Button>}
       >
-        <p>{result.score === LENGTH ? "Sans faute : rien ne t'échappe." : "Les Zoan et les Logia sont plus rares qu'on ne croit."}</p>
+        <p>
+          {result.score === LENGTH
+            ? t("Sans faute : rien ne t'échappe.", "A perfect score: nothing gets past you.")
+            : t("Les Zoan et les Logia sont plus rares qu'on ne croit.", "Zoans and Logias are rarer than you'd think.")}
+        </p>
         <RewardSummary view={reward.view} data={data} />
       </ResultPanel>
     );

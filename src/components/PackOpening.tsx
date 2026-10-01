@@ -1,10 +1,11 @@
 "use client";
 
-import Link from "next/link";
 import { useEffect, useRef, useState, type CSSProperties } from "react";
+import Link from "@/components/Link";
 import type { ResolvedData } from "@/games/cards";
 import { Button } from "@/games/ui/primitives";
 import { BOOSTER_SIZE, type Recruit } from "@/lib/economy";
+import { useT } from "@/lib/i18n/client";
 import { CharacterCard } from "./CharacterCard";
 import { Modal } from "./Modal";
 
@@ -18,6 +19,7 @@ const GLOWS: Record<number, string> = {
 
 /** Le paquet scellé : il sert aussi d'illustration à l'offre, dans la boutique. */
 export function PackArt({ className = "" }: { className?: string }) {
+  const t = useT();
   return (
     <div
       className={`relative flex aspect-[3/4] flex-col items-center justify-between overflow-hidden rounded-xl border-4 border-straw bg-gradient-to-br from-vest via-vest-dark to-sea-900 p-3 text-center shadow-2xl ${className}`}
@@ -29,7 +31,9 @@ export function PackArt({ className = "" }: { className?: string }) {
       <span aria-hidden="true" className="font-display text-6xl text-parchment drop-shadow-lg">
         ☠
       </span>
-      <span className="mb-3 text-xs font-bold tracking-wide text-parchment uppercase">{BOOSTER_SIZE} avis de recherche</span>
+      <span className="mb-3 text-xs font-bold tracking-wide text-parchment uppercase">
+        {t(`${BOOSTER_SIZE} avis de recherche`, `${BOOSTER_SIZE} wanted posters`)}
+      </span>
     </div>
   );
 }
@@ -62,6 +66,7 @@ export function PackOpening({
   /** Rachat du même article, proposé une fois toutes les cartes retournées. */
   again: { label: string; disabled: boolean; run: () => void };
 }) {
+  const t = useT();
   const sealed = recruits.length > 1;
   const [stage, setStage] = useState<"pack" | "opening" | "cards">(sealed ? "pack" : "cards");
   const [flipped, setFlipped] = useState<boolean[]>(() => recruits.map(() => false));
@@ -91,20 +96,24 @@ export function PackOpening({
   }
 
   return (
-    <Modal title={sealed ? "Ouverture du booster" : "Nouvelle recrue"} onClose={onClose} wide>
+    <Modal
+      title={sealed ? t("Ouverture du booster", "Opening the booster") : t("Nouvelle recrue", "New recruit")}
+      onClose={onClose}
+      wide
+    >
       {stage !== "cards" ? (
         <div className="flex flex-col items-center gap-5 py-4">
           <button
             type="button"
             onClick={open}
             autoFocus
-            aria-label="Ouvrir le booster"
+            aria-label={t("Ouvrir le booster", "Open the booster")}
             className={`w-44 rounded-xl ${stage === "opening" ? "motion-safe:animate-pack-open" : "cursor-pointer motion-safe:animate-pack-idle"}`}
           >
             <PackArt />
           </button>
           <p className="text-mist" aria-live="polite">
-            {stage === "opening" ? "…" : "Clique sur le booster pour l'ouvrir."}
+            {stage === "opening" ? "…" : t("Clique sur le booster pour l'ouvrir.", "Click the booster to open it.")}
           </p>
         </div>
       ) : (
@@ -142,7 +151,7 @@ export function PackOpening({
                         type="button"
                         onClick={() => flip(index)}
                         autoFocus={index === 0}
-                        aria-label={`Retourner la carte ${index + 1}`}
+                        aria-label={t(`Retourner la carte ${index + 1}`, `Flip card ${index + 1}`)}
                         className="absolute inset-0 cursor-pointer rounded-md transition-transform hover:-translate-y-1 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-straw"
                       />
                     )}
@@ -151,8 +160,10 @@ export function PackOpening({
                     {shown && character && (
                       <span className="motion-safe:animate-card-label">
                         {/* La rareté est déjà sur la carte : ici, seulement ce qu'elle change pour la collection */}
-                        <span className={recruit.duplicate ? "text-mist" : "text-emerald-300"}>{recruit.duplicate ? "Doublon" : "Nouveau !"}</span>
-                        {recruit.golden && <span className="text-straw"> · doré</span>}
+                        <span className={recruit.duplicate ? "text-mist" : "text-emerald-300"}>
+                          {recruit.duplicate ? t("Doublon", "Duplicate") : t("Nouveau !", "New!")}
+                        </span>
+                        {recruit.golden && <span className="text-straw">{t(" · doré", " · golden")}</span>}
                       </span>
                     )}
                   </p>
@@ -166,12 +177,15 @@ export function PackOpening({
               <>
                 <p className="font-semibold text-foam">
                   {sealed
-                    ? `${fresh === 0 ? "Aucun nouvel" : fresh === 1 ? "1 nouvel" : `${fresh} nouveaux`} avis, ${recruits.length - fresh} doublon${recruits.length - fresh > 1 ? "s" : ""}.`
+                    ? t(
+                        `${fresh === 0 ? "Aucun nouvel" : fresh === 1 ? "1 nouvel" : `${fresh} nouveaux`} avis, ${recruits.length - fresh} doublon${recruits.length - fresh > 1 ? "s" : ""}.`,
+                        `${fresh === 0 ? "No new posters" : fresh === 1 ? "1 new poster" : `${fresh} new posters`}, ${recruits.length - fresh} ${recruits.length - fresh === 1 ? "duplicate" : "duplicates"}.`,
+                      )
                     : fresh
-                      ? "Un nouvel avis rejoint ta collection."
-                      : "Tu avais déjà cet avis : c'est un doublon."}{" "}
+                      ? t("Un nouvel avis rejoint ta collection.", "A new poster joins your collection.")
+                      : t("Tu avais déjà cet avis : c'est un doublon.", "You already had this poster: it's a duplicate.")}{" "}
                   <Link href="/collection" className="font-semibold text-straw underline underline-offset-4">
-                    Voir ma collection
+                    {t("Voir ma collection", "View my collection")}
                   </Link>
                 </p>
                 <span className="flex flex-wrap gap-2">
@@ -179,16 +193,16 @@ export function PackOpening({
                     {again.label}
                   </Button>
                   <Button variant="secondary" onClick={onClose}>
-                    Fermer
+                    {t("Fermer", "Close")}
                   </Button>
                 </span>
               </>
             ) : (
               <>
-                <p className="text-mist">Clique sur une carte pour la retourner.</p>
+                <p className="text-mist">{t("Clique sur une carte pour la retourner.", "Click a card to flip it.")}</p>
                 {sealed && (
                   <Button variant="secondary" onClick={flipAll}>
-                    Tout retourner
+                    {t("Tout retourner", "Flip all")}
                   </Button>
                 )}
               </>

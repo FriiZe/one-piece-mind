@@ -5,6 +5,7 @@ import { Button } from "@/games/ui/primitives";
 import { writeStored } from "@/games/ui/storage";
 import { formatNumber } from "@/games/engine/text";
 import { EMPTY_PLAYER, SIGNUP_BERRYS } from "@/lib/economy";
+import { useLocale, useT } from "@/lib/i18n/client";
 import { loginAction, logoutAction, signupAction, type AuthState } from "@/lib/player/actions";
 import { usePlayer } from "@/lib/player/PlayerProvider";
 
@@ -13,10 +14,13 @@ const INPUT =
   "h-12 w-full rounded-[10px] border border-sea-600 bg-sea-900 px-3.5 text-foam placeholder:text-mist/70 focus:border-straw focus:outline-none";
 
 function Credentials({ mode, username }: { mode: "signup" | "login"; username?: string }) {
+  const t = useT();
+  const locale = useLocale();
   return (
     <>
+      <input type="hidden" name="lang" value={locale} />
       <label className="block">
-        <span className="mb-1.5 block text-[15px] font-bold text-foam">Pseudo</span>
+        <span className="mb-1.5 block text-[15px] font-bold text-foam">{t("Pseudo", "Username")}</span>
         <input
           name="username"
           type="text"
@@ -31,11 +35,16 @@ function Credentials({ mode, username }: { mode: "signup" | "login"; username?: 
           className={INPUT}
         />
         {mode === "signup" && (
-          <span className="mt-1.5 block text-[13px] text-mist">3 à 20 caractères : lettres, chiffres, tiret ou tiret bas.</span>
+          <span className="mt-1.5 block text-[13px] text-mist">
+            {t(
+              "3 à 20 caractères : lettres, chiffres, tiret ou tiret bas.",
+              "3 to 20 characters: letters, digits, hyphen or underscore.",
+            )}
+          </span>
         )}
       </label>
       <label className="block">
-        <span className="mb-1.5 block text-[15px] font-bold text-foam">Mot de passe</span>
+        <span className="mb-1.5 block text-[15px] font-bold text-foam">{t("Mot de passe", "Password")}</span>
         <input
           name="password"
           type="password"
@@ -45,7 +54,9 @@ function Credentials({ mode, username }: { mode: "signup" | "login"; username?: 
           autoComplete={mode === "signup" ? "new-password" : "current-password"}
           className={INPUT}
         />
-        {mode === "signup" && <span className="mt-1.5 block text-[13px] text-mist">Au moins 8 caractères.</span>}
+        {mode === "signup" && (
+          <span className="mt-1.5 block text-[13px] text-mist">{t("Au moins 8 caractères.", "At least 8 characters.")}</span>
+        )}
       </label>
     </>
   );
@@ -53,6 +64,8 @@ function Credentials({ mode, username }: { mode: "signup" | "login"; username?: 
 
 function SignupForm() {
   const { state } = usePlayer();
+  const t = useT();
+  const locale = useLocale();
   const [result, action, pending] = useActionState(signupAction, INITIAL);
 
   // Le compte a repris la progression d'invité : on vide celle du navigateur, puis on recharge en tant que joueur connecté
@@ -73,17 +86,25 @@ function SignupForm() {
         </p>
       )}
       <Button type="submit" disabled={pending} className="min-h-[54px] w-full text-[17px]">
-        {pending ? "Création…" : `Créer mon compte · ${formatNumber(SIGNUP_BERRYS)} ฿ offerts`}
+        {pending
+          ? t("Création…", "Creating…")
+          : t(
+              `Créer mon compte · ${formatNumber(SIGNUP_BERRYS, locale)} ฿ offerts`,
+              `Create my account · ${formatNumber(SIGNUP_BERRYS, locale)} ฿ free`,
+            )}
       </Button>
       <p className="text-center text-sm text-mist">
-        Un pseudo et un mot de passe, rien d&apos;autre. Sans adresse e-mail, un mot de passe oublié ne peut pas être récupéré : note-le
-        bien.
+        {t(
+          "Un pseudo et un mot de passe, rien d'autre. Sans adresse e-mail, un mot de passe oublié ne peut pas être récupéré : note-le bien.",
+          "A username and a password, nothing else. With no email address, a forgotten password can't be recovered: write it down.",
+        )}
       </p>
     </form>
   );
 }
 
 function LoginForm() {
+  const t = useT();
   const [result, action, pending] = useActionState(loginAction, INITIAL);
 
   useEffect(() => {
@@ -99,19 +120,21 @@ function LoginForm() {
         </p>
       )}
       <Button type="submit" disabled={pending} className="min-h-[54px] w-full text-[17px]">
-        {pending ? "Connexion…" : "Me connecter"}
+        {pending ? t("Connexion…", "Logging in…") : t("Me connecter", "Log in")}
       </Button>
     </form>
   );
 }
 
 const TABS = [
-  { id: "signup", label: "Créer un compte" },
-  { id: "login", label: "J'ai déjà un compte" },
+  { id: "signup", label: { fr: "Créer un compte", en: "Create an account" } },
+  { id: "login", label: { fr: "J'ai déjà un compte", en: "I already have an account" } },
 ] as const;
 
 export function AccountPanel() {
   const { status, accountsEnabled, username } = usePlayer();
+  const t = useT();
+  const locale = useLocale();
   const [tab, setTab] = useState<(typeof TABS)[number]["id"]>("signup");
   const [leaving, setLeaving] = useState(false);
 
@@ -128,14 +151,22 @@ export function AccountPanel() {
       <section aria-labelledby="compte" className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-sea-700 p-5">
         <div className="min-w-0 flex-1">
           <h2 id="compte" className="text-xl font-extrabold text-foam">
-            Compte
+            {t("Compte", "Account")}
           </h2>
           <p className="mt-1 text-sm text-mist">
-            Connecté en tant que <strong className="text-foam">{username}</strong>. Ta progression te suit d&apos;un appareil à l&apos;autre.
+            {t(
+              <>
+                Connecté en tant que <strong className="text-foam">{username}</strong>. Ta progression te suit d&apos;un appareil à l&apos;autre.
+              </>,
+              <>
+                Logged in as <strong className="text-foam">{username}</strong>. Your progress follows you from one device to the
+                next.
+              </>,
+            )}
           </p>
         </div>
         <Button variant="secondary" onClick={logout} disabled={leaving}>
-          Me déconnecter
+          {t("Me déconnecter", "Log out")}
         </Button>
       </section>
     );
@@ -144,23 +175,28 @@ export function AccountPanel() {
   return (
     <section aria-labelledby="compte" className="space-y-5 rounded-[20px] border border-sea-600 bg-sea-800 p-5 sm:p-7">
       <h2 id="compte" className="sr-only">
-        Mon compte
+        {t("Mon compte", "My account")}
       </h2>
       {!accountsEnabled ? (
-        <p className="text-mist">Ta progression est gardée dans ce navigateur. Les comptes ne sont pas encore ouverts.</p>
+        <p className="text-mist">
+          {t(
+            "Ta progression est gardée dans ce navigateur. Les comptes ne sont pas encore ouverts.",
+            "Your progress is saved in this browser. Accounts aren't open yet.",
+          )}
+        </p>
       ) : (
         <>
-          <div role="tablist" aria-label="Compte" className="grid grid-cols-2 rounded-xl bg-sea-900 p-1 text-sm font-extrabold sm:text-[15px]">
-            {TABS.map((t) => (
+          <div role="tablist" aria-label={t("Compte", "Account")} className="grid grid-cols-2 rounded-xl bg-sea-900 p-1 text-sm font-extrabold sm:text-[15px]">
+            {TABS.map((entry) => (
               <button
-                key={t.id}
+                key={entry.id}
                 type="button"
                 role="tab"
-                aria-selected={tab === t.id}
-                onClick={() => setTab(t.id)}
-                className={`min-h-11 cursor-pointer rounded-[9px] px-2 transition-colors ${tab === t.id ? "bg-straw text-ink" : "text-mist hover:text-foam"}`}
+                aria-selected={tab === entry.id}
+                onClick={() => setTab(entry.id)}
+                className={`min-h-11 cursor-pointer rounded-[9px] px-2 transition-colors ${tab === entry.id ? "bg-straw text-ink" : "text-mist hover:text-foam"}`}
               >
-                {t.label}
+                {entry.label[locale]}
               </button>
             ))}
           </div>

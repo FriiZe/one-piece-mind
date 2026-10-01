@@ -6,20 +6,21 @@
 import type { PlayCharacter, ResolvedData } from "../cards";
 import { byDifficulty, type Difficulty } from "../engine/difficulty";
 import { createRng, shuffle } from "../engine/rng";
+import type { Localized } from "@/lib/i18n";
 
 /** Postes, du plus haut au plus bas : le premier attend la plus grosse prime. */
-export const POSTS = [
-  "Capitaine",
-  "Second",
-  "Sabreur",
-  "Tireur d'élite",
-  "Navigateur",
-  "Cuisinier",
-  "Médecin",
-  "Charpentier",
-  "Musicien",
-  "Mousse",
-] as const;
+export const POSTS: readonly Localized[] = [
+  { fr: "Capitaine", en: "Captain" },
+  { fr: "Second", en: "First mate" },
+  { fr: "Sabreur", en: "Swordsman" },
+  { fr: "Tireur d'élite", en: "Sniper" },
+  { fr: "Navigateur", en: "Navigator" },
+  { fr: "Cuisinier", en: "Cook" },
+  { fr: "Médecin", en: "Doctor" },
+  { fr: "Charpentier", en: "Shipwright" },
+  { fr: "Musicien", en: "Musician" },
+  { fr: "Mousse", en: "Cabin boy" },
+];
 export const POINTS_PER_POST = 5;
 export const MAX_SCORE = POSTS.length * POINTS_PER_POST;
 

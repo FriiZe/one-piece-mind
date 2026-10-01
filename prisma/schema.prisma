@@ -116,6 +116,8 @@ model Room {
   /// Code à cinq caractères que l'hôte partage.
   code       String   @unique
   mode       String
+  /// Langue des questions (fr ou en) : celle de l'hôte.
+  lang       String   @default("fr")
   difficulty String
   /// Quiz dans lesquels les questions sont tirées (liste d'identifiants).
   games      Json

@@ -3,15 +3,21 @@
 import { useState } from "react";
 import { Portrait } from "../ui/Portrait";
 import { Button, Panel, Progress } from "../ui/primitives";
+import type { Locale, Localized } from "@/lib/i18n";
+import { useLocale, useT } from "@/lib/i18n/client";
 import { DCC_KINDS, DCC_POINTS, isRight, type DccAnswer, type DccKind, type DccQuestion } from "./logic";
 
-const KINDS: Record<DccKind, { label: string; detail: string }> = {
-  duo: { label: "Duo", detail: "Deux propositions" },
-  carre: { label: "Carré", detail: "Quatre propositions" },
-  cash: { label: "Cash", detail: "Aucune proposition : tu écris la réponse" },
+const KINDS: Record<DccKind, { label: Localized; detail: Localized }> = {
+  duo: { label: { fr: "Duo", en: "Duo" }, detail: { fr: "Deux propositions", en: "Two choices" } },
+  carre: { label: { fr: "Carré", en: "Quad" }, detail: { fr: "Quatre propositions", en: "Four choices" } },
+  cash: {
+    label: { fr: "Cash", en: "Cash" },
+    detail: { fr: "Aucune proposition : tu écris la réponse", en: "No choices: you type the answer" },
+  },
 };
 
-const points = (count: number) => `${count} point${count > 1 ? "s" : ""}`;
+const points = (count: number, locale: Locale) =>
+  locale === "en" ? `${count} point${count === 1 ? "" : "s"}` : `${count} point${count > 1 ? "s" : ""}`;
 
 /**
  * Déroulé d'une série de questions en Duo, Carré ou Cash : choix du risque,
@@ -24,6 +30,8 @@ export function DccFlow({
   questions: DccQuestion[];
   onFinish: (score: number, answers: DccAnswer[]) => void;
 }) {
+  const t = useT();
+  const locale = useLocale();
   const [index, setIndex] = useState(0);
   const [score, setScore] = useState(0);
   const [kind, setKind] = useState<DccKind | null>(null);
@@ -57,7 +65,7 @@ export function DccFlow({
 
   return (
     <Panel className="space-y-4">
-      <Progress current={index + 1} total={questions.length} score={`Score : ${score}`} />
+      <Progress current={index + 1} total={questions.length} score={t(`Score : ${score}`, `Score: ${score}`)} />
       <div className="space-y-2 text-center">
         <p className="text-mist">{question.title}</p>
         {question.img && <Portrait img={question.img} />}
@@ -68,7 +76,7 @@ export function DccFlow({
       </div>
 
       {kind === null && (
-        <div className="grid gap-2 sm:grid-cols-3" role="group" aria-label="Choisis ton risque">
+        <div className="grid gap-2 sm:grid-cols-3" role="group" aria-label={t("Choisis ton risque", "Pick your risk")}>
           {DCC_KINDS.map((option, i) => (
             <button
               key={option}
@@ -78,10 +86,10 @@ export function DccFlow({
               className="rounded-xl border-2 border-sea-600 bg-sea-700 px-4 py-3 text-left transition-colors hover:border-straw"
             >
               <span className="flex items-baseline justify-between gap-2">
-                <span className="font-display text-2xl tracking-wide text-straw">{KINDS[option].label}</span>
-                <span className="text-sm font-bold text-foam">{points(DCC_POINTS[option])}</span>
+                <span className="font-display text-2xl tracking-wide text-straw">{KINDS[option].label[locale]}</span>
+                <span className="text-sm font-bold text-foam">{points(DCC_POINTS[option], locale)}</span>
               </span>
-              <span className="block text-sm text-mist">{KINDS[option].detail}</span>
+              <span className="block text-sm text-mist">{KINDS[option].detail[locale]}</span>
             </button>
           ))}
         </div>
@@ -130,7 +138,7 @@ export function DccFlow({
           }}
         >
           <label htmlFor="cash-saisie" className="sr-only">
-            Ta réponse
+            {t("Ta réponse", "Your answer")}
           </label>
           <input
             id="cash-saisie"
@@ -142,14 +150,14 @@ export function DccFlow({
             autoComplete="off"
             autoCapitalize="off"
             spellCheck={false}
-            placeholder="Ta réponse…"
+            placeholder={t("Ta réponse…", "Your answer…")}
             className="min-w-0 flex-1 rounded-lg border-2 border-sea-600 bg-sea-900 px-4 py-3 text-foam placeholder:text-mist/70 focus:border-straw focus:outline-none"
           />
           <Button type="submit" disabled={!input.trim()}>
-            Valider
+            {t("Valider", "Submit")}
           </Button>
           <Button variant="secondary" onClick={() => answer("")}>
-            Je ne sais pas
+            {t("Je ne sais pas", "I don't know")}
           </Button>
         </form>
       )}
@@ -161,13 +169,21 @@ export function DccFlow({
           <div className="flex flex-wrap items-center justify-between gap-3">
             <p className="text-mist">
               <strong className={right ? "text-emerald-300" : "text-vest"}>
-                {right ? `Bonne réponse : +${points(DCC_POINTS[given.kind])}.` : "Raté."}
+                {right
+                  ? t(
+                      `Bonne réponse : +${points(DCC_POINTS[given.kind], locale)}.`,
+                      `Correct: +${points(DCC_POINTS[given.kind], locale)}.`,
+                    )
+                  : t("Raté.", "Wrong.")}
               </strong>{" "}
-              {given.kind === "cash" && given.value.trim() && !right && `Tu as répondu « ${given.value.trim()} ». `}
+              {given.kind === "cash" &&
+                given.value.trim() &&
+                !right &&
+                t(`Tu as répondu « ${given.value.trim()} ». `, `You answered “${given.value.trim()}”. `)}
               {question.explanation}
             </p>
             <Button autoFocus onClick={next}>
-              {last ? "Voir mon score" : "Suivant"}
+              {last ? t("Voir mon score", "See my score") : t("Suivant", "Next")}
             </Button>
           </div>
         </div>

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useId, useRef, type ReactNode } from "react";
+import { useT } from "@/lib/i18n/client";
 
 /**
  * Fenêtre posée par-dessus la page. Elle se ferme avec Échap, la croix ou un
@@ -20,6 +21,7 @@ export function Modal({
 }) {
   const ref = useRef<HTMLDialogElement>(null);
   const titleId = useId();
+  const t = useT();
 
   useEffect(() => {
     const dialog = ref.current;
@@ -47,7 +49,7 @@ export function Modal({
           <button
             type="button"
             onClick={onClose}
-            aria-label="Fermer"
+            aria-label={t("Fermer", "Close")}
             className="rounded-lg border border-sea-600 px-3 py-1 text-lg font-bold text-mist hover:text-foam"
           >
             ×

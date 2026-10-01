@@ -4,10 +4,11 @@
  */
 import { createRng, sample, seedFromString } from "@/games/engine/rng";
 import { GAMES, isRewardless, type LiveSlug } from "@/lib/games/catalog";
+import type { Localized } from "@/lib/i18n";
 import type { GameOutcome, WeekProgress } from "./types";
 
 export type Challenge = {
-  label: string;
+  label: Localized;
   target: number;
   berrys: number;
   /** De combien cette partie fait avancer le défi. */
@@ -44,14 +45,14 @@ export function weeklyChallenges(week: string): Challenge[] {
 
   return [
     {
-      label: `Jouer 5 parties de « ${regular.title} »`,
+      label: { fr: `Jouer 5 parties de « ${regular.title.fr} »`, en: `Play 5 games of “${regular.title.en}”` },
       target: 5,
       berrys: 1500,
       slug: regular.slug as LiveSlug,
       advance: (outcome) => (outcome.slug === regular.slug ? 1 : 0),
     },
     {
-      label: `Marquer 80 % des points dans « ${skilled.title} »`,
+      label: { fr: `Marquer 80 % des points dans « ${skilled.title.fr} »`, en: `Score 80% of the points in “${skilled.title.en}”` },
       target: 1,
       berrys: 2000,
       slug: skilled.slug as LiveSlug,
@@ -60,14 +61,14 @@ export function weeklyChallenges(week: string): Challenge[] {
     // Une semaine sur deux : le défi du jour, ou les gains
     weekNumber % 2 === 0
       ? {
-          label: "Réussir 3 défis du jour",
+          label: { fr: "Réussir 3 défis du jour", en: "Win 3 daily challenges" },
           target: 3,
           berrys: 2500,
           slug: "onepiecedle",
           advance: (outcome) => (outcome.daily && outcome.performance > 0 ? 1 : 0),
         }
       : {
-          label: "Gagner 5 000 Berrys en jouant",
+          label: { fr: "Gagner 5 000 Berrys en jouant", en: "Earn 5,000 Berries by playing" },
           target: 5000,
           berrys: 1500,
           advance: (_outcome, earned) => earned,

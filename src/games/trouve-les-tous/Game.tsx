@@ -7,6 +7,7 @@ import { Button, Panel, ResultPanel } from "../ui/primitives";
 import { useStored } from "../ui/storage";
 import type { GameProps } from "../ui/types";
 import { RewardSummary } from "@/components/RewardSummary";
+import { useT } from "@/lib/i18n/client";
 import { useGameReward } from "@/lib/player/useGameReward";
 import { acceptedForms, matchMember, membersOf, timeLimit } from "./logic";
 
@@ -29,6 +30,7 @@ function formatTime(seconds: number): string {
 }
 
 export default function TrouveLesTous({ data }: GameProps) {
+  const t = useT();
   const [run, setRun] = useState<Run | null>(null);
   const [input, setInput] = useState("");
   // Records par groupe et par mode : les groupes proposés ne sont pas les mêmes
@@ -105,9 +107,15 @@ export default function TrouveLesTous({ data }: GameProps) {
     return (
       <Panel className="space-y-4">
         <p className="text-mist">
-          Choisis un groupe, puis cite tous ses membres avant la fin du chrono.
+          {t(
+            "Choisis un groupe, puis cite tous ses membres avant la fin du chrono.",
+            "Pick a group, then name all of its members before time runs out.",
+          )}
           {data.groups.some((g) => (records[g.id] ?? 0) >= g.memberIds.length) &&
-            ` Groupes complétés : ${data.groups.filter((g) => (records[g.id] ?? 0) >= g.memberIds.length).length} sur ${data.groups.length}.`}
+            t(
+              ` Groupes complétés : ${data.groups.filter((g) => (records[g.id] ?? 0) >= g.memberIds.length).length} sur ${data.groups.length}.`,
+              ` Groups completed: ${data.groups.filter((g) => (records[g.id] ?? 0) >= g.memberIds.length).length} of ${data.groups.length}.`,
+            )}
         </p>
         <ul className="grid gap-2 sm:grid-cols-2">
           {data.groups.map((g) => {
@@ -124,11 +132,13 @@ export default function TrouveLesTous({ data }: GameProps) {
                 >
                   <span className="flex items-baseline justify-between gap-2">
                     <span className="font-bold text-foam">{g.title}</span>
-                    {complete && <span className="shrink-0 text-sm font-bold text-emerald-300">✓ Tous trouvés</span>}
+                    {complete && <span className="shrink-0 text-sm font-bold text-emerald-300">{t("✓ Tous trouvés", "✓ All found")}</span>}
                   </span>
                   <span className="block text-sm text-mist">
-                    {g.memberIds.length} personnages · {formatTime(timeLimit(g.memberIds.length))}
-                    {!complete && records[g.id] !== undefined && ` · record : ${records[g.id]} / ${g.memberIds.length}`}
+                    {t(`${g.memberIds.length} personnages`, `${g.memberIds.length} characters`)} · {formatTime(timeLimit(g.memberIds.length))}
+                    {!complete &&
+                      records[g.id] !== undefined &&
+                      t(` · record : ${records[g.id]} / ${g.memberIds.length}`, ` · best: ${records[g.id]} / ${g.memberIds.length}`)}
                   </span>
                 </button>
               </li>
@@ -156,7 +166,7 @@ export default function TrouveLesTous({ data }: GameProps) {
         {!run.over && (
           <div className="flex gap-2">
             <label htmlFor="trouve-saisie" className="sr-only">
-              Nom d&apos;un membre du groupe
+              {t("Nom d'un membre du groupe", "Name of a group member")}
             </label>
             <input
               id="trouve-saisie"
@@ -171,16 +181,16 @@ export default function TrouveLesTous({ data }: GameProps) {
                 // Entrée ou Échap effacent une saisie qui ne correspond à personne
                 if (event.key === "Enter" || event.key === "Escape") setInput("");
               }}
-              placeholder="Tape un nom…"
+              placeholder={t("Tape un nom…", "Type a name…")}
               className="w-full rounded-lg border-2 border-sea-600 bg-sea-900 px-4 py-3 text-foam placeholder:text-mist/70 focus:border-straw focus:outline-none"
             />
             <Button variant="secondary" onClick={() => setRun({ ...run, over: true })}>
-              J&apos;abandonne
+              {t("J'abandonne", "I give up")}
             </Button>
           </div>
         )}
 
-        <ul className="grid grid-cols-2 gap-2 sm:grid-cols-3" aria-label="Membres du groupe">
+        <ul className="grid grid-cols-2 gap-2 sm:grid-cols-3" aria-label={t("Membres du groupe", "Group members")}>
           {members.map((member) => {
             const isFound = found.has(member.id);
             return (
@@ -203,23 +213,23 @@ export default function TrouveLesTous({ data }: GameProps) {
 
       {run.over && (
         <ResultPanel
-          title={run.found.length === members.length ? "Tous trouvés !" : `${run.found.length} / ${members.length}`}
-          best={run.previousRecord > 0 && !beaten ? { label: "Record", value: `${run.previousRecord} / ${members.length}` } : null}
+          title={run.found.length === members.length ? t("Tous trouvés !", "All found!") : `${run.found.length} / ${members.length}`}
+          best={run.previousRecord > 0 && !beaten ? { label: t("Record", "Best"), value: `${run.previousRecord} / ${members.length}` } : null}
           actions={
             <>
-              <Button onClick={() => start(run.group)}>Rejouer</Button>
+              <Button onClick={() => start(run.group)}>{t("Rejouer", "Play again")}</Button>
               <Button variant="secondary" onClick={() => setRun(null)}>
-                Choisir un autre groupe
+                {t("Choisir un autre groupe", "Pick another group")}
               </Button>
             </>
           }
         >
           {run.found.length === members.length ? (
-            <p>Il te restait {formatTime(run.remaining)}.</p>
+            <p>{t(`Il te restait ${formatTime(run.remaining)}.`, `You had ${formatTime(run.remaining)} left.`)}</p>
           ) : (
-            <p>Les oubliés sont en rouge ci-dessus.</p>
+            <p>{t("Les oubliés sont en rouge ci-dessus.", "The ones you missed are in red above.")}</p>
           )}
-          {beaten && <p className="font-semibold">Nouveau record !</p>}
+          {beaten && <p className="font-semibold">{t("Nouveau record !", "New best!")}</p>}
           <RewardSummary view={reward.view} data={data} />
         </ResultPanel>
       )}

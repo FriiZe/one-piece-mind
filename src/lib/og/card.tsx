@@ -1,6 +1,7 @@
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
 import { ImageResponse } from "next/og";
+import type { Locale, Localized } from "@/lib/i18n";
 import { SITE_NAME } from "@/lib/site";
 
 export const OG_SIZE = { width: 1200, height: 630 };
@@ -18,9 +19,13 @@ function loadFonts() {
   return fonts;
 }
 
-const PROMISES = ["Gratuit", "Sans inscription", "Sans spoiler"];
+const PROMISES: Localized<string[]> = {
+  fr: ["Gratuit", "Sans inscription", "Sans spoiler"],
+  en: ["Free", "No sign-up", "Spoiler-free"],
+};
 
 export type OgCard = {
+  locale: Locale;
   /** Un saut de ligne (« \n ») impose la coupure du titre. */
   title: string;
   subtitle: string;
@@ -38,7 +43,7 @@ export type OgCard = {
  * Image de partage (Discord, réseaux sociaux, messageries) : le titre à gauche,
  * un avis de recherche à droite, dans les couleurs et les polices du site.
  */
-export async function ogCard({ title, subtitle, eyebrow, tone = { background: "#3a2f12", color: "#f2c14e" }, mark, bounty }: OgCard) {
+export async function ogCard({ locale, title, subtitle, eyebrow, tone = { background: "#3a2f12", color: "#f2c14e" }, mark, bounty }: OgCard) {
   // Un titre long garde sa place : il rapetisse au lieu de pousser le reste hors du cadre
   const lines = title.split("\n");
   const longest = Math.max(...lines.map((line) => line.length));
@@ -83,7 +88,7 @@ export async function ogCard({ title, subtitle, eyebrow, tone = { background: "#
           </div>
 
           <div style={{ display: "flex" }}>
-            {PROMISES.map((promise) => (
+            {PROMISES[locale].map((promise) => (
               <div
                 key={promise}
                 style={{

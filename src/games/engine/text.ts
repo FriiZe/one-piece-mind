@@ -1,4 +1,5 @@
-/** Comparaison tolérante des réponses saisies : casse, accents et ponctuation ignorés. */
+/** Comparaison tolérante des réponses saisies (casse, accents et ponctuation ignorés) et mise en forme des nombres. */
+import { INTL_LOCALES, type Locale, type Localized } from "@/lib/i18n";
 
 export function normalizeText(value: string): string {
   return value
@@ -95,17 +96,21 @@ export function searchByName<T extends Named>(items: readonly T[], query: string
     .map((r) => r.item);
 }
 
-const numberFormat = new Intl.NumberFormat("fr-FR");
+const numberFormats: Localized<Intl.NumberFormat> = {
+  fr: new Intl.NumberFormat(INTL_LOCALES.fr),
+  en: new Intl.NumberFormat(INTL_LOCALES.en),
+};
 
-export function formatNumber(value: number): string {
-  return numberFormat.format(value);
+export function formatNumber(value: number, locale: Locale): string {
+  return numberFormats[locale].format(value);
 }
 
-export function formatBounty(value: number | null): string {
-  return value === null ? "Aucune" : `${formatNumber(value)} ฿`;
+export function formatBounty(value: number | null, locale: Locale): string {
+  if (value === null) return locale === "en" ? "None" : "Aucune";
+  return `${formatNumber(value, locale)} ฿`;
 }
 
-export function formatHeight(cm: number | null): string {
-  if (cm === null) return "Inconnue";
-  return cm >= 1000 ? `${formatNumber(Math.round(cm / 10) / 10)} m` : `${formatNumber(cm)} cm`;
+export function formatHeight(cm: number | null, locale: Locale): string {
+  if (cm === null) return locale === "en" ? "Unknown" : "Inconnue";
+  return cm >= 1000 ? `${formatNumber(Math.round(cm / 10) / 10, locale)} m` : `${formatNumber(cm, locale)} cm`;
 }

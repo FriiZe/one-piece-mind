@@ -12,6 +12,8 @@ import { StartScreen } from "../ui/StartScreen";
 import { useDailyKey, useStored } from "../ui/storage";
 import type { GameProps } from "../ui/types";
 import { RewardSummary } from "@/components/RewardSummary";
+import type { Localized, Translate } from "@/lib/i18n";
+import { useLocale, useLocalePath, useT } from "@/lib/i18n/client";
 import { useGameReward } from "@/lib/player/useGameReward";
 import { COLUMNS, compare, dailyTarget, freeTarget, shareGrid, type Cell } from "./logic";
 
@@ -21,7 +23,13 @@ const CELL_TONES = {
   wrong: "bg-vest-dark text-white",
 } as const;
 
+/** « 3 essais », accordé dans chaque langue. */
+const tries = (t: Translate, count: number) =>
+  t(`${count} essai${count > 1 ? "s" : ""}`, `${count} ${count === 1 ? "guess" : "guesses"}`);
+
 function Board({ rows }: { rows: { character: PlayCharacter; cells: Cell[] }[] }) {
+  const t = useT();
+  const locale = useLocale();
   if (!rows.length) return null;
   return (
     <div className="overflow-x-auto rounded-xl border border-sea-700">
@@ -29,11 +37,11 @@ function Board({ rows }: { rows: { character: PlayCharacter; cells: Cell[] }[] }
         <thead>
           <tr className="text-mist">
             <th scope="col" className="px-2 py-1 text-left font-semibold">
-              Personnage
+              {t("Personnage", "Character")}
             </th>
             {COLUMNS.map((column) => (
               <th key={column.key} scope="col" className="px-2 py-1 font-semibold">
-                {column.title}
+                {column.title[locale]}
               </th>
             ))}
           </tr>
@@ -48,7 +56,11 @@ function Board({ rows }: { rows: { character: PlayCharacter; cells: Cell[] }[] }
                 <td key={cell.key} className={`rounded-lg px-2 py-2 font-semibold ${CELL_TONES[cell.verdict]}`}>
                   {cell.label}
                   {cell.direction && (
-                    <span className="ml-1" role="img" aria-label={cell.direction === "up" ? "plus haut" : "plus bas"}>
+                    <span
+                      className="ml-1"
+                      role="img"
+                      aria-label={cell.direction === "up" ? t("plus haut", "higher") : t("plus bas", "lower")}
+                    >
                       {cell.direction === "up" ? "▲" : "▼"}
                     </span>
                   )}
@@ -63,21 +75,27 @@ function Board({ rows }: { rows: { character: PlayCharacter; cells: Cell[] }[] }
 }
 
 function Legend() {
+  const t = useT();
   return (
     <p className="flex flex-wrap gap-x-4 gap-y-1 text-sm text-mist">
       <span>
         <span className="mr-1 inline-block h-3 w-3 rounded-sm bg-emerald-600" />
-        Juste
+        {t("Juste", "Correct")}
       </span>
       <span>
         <span className="mr-1 inline-block h-3 w-3 rounded-sm bg-amber-500" />
-        En partie
+        {t("En partie", "Partly")}
       </span>
       <span>
         <span className="mr-1 inline-block h-3 w-3 rounded-sm bg-vest-dark" />
-        Faux
+        {t("Faux", "Wrong")}
       </span>
-      <span>▲ ▼ : la bonne valeur est plus haute ou plus basse (plus tard ou plus tôt pour l&apos;arc)</span>
+      <span>
+        {t(
+          "▲ ▼ : la bonne valeur est plus haute ou plus basse (plus tard ou plus tôt pour l'arc)",
+          "▲ ▼: the right value is higher or lower (later or earlier for the arc)",
+        )}
+      </span>
     </p>
   );
 }
@@ -98,6 +116,7 @@ function Play({
   gaveUp?: boolean;
   footer: (state: { won: boolean; rows: Cell[][] }) => React.ReactNode;
 }) {
+  const t = useT();
   const guesses = guessIds.map((id) => data.characterById.get(id)).filter((c): c is PlayCharacter => !!c);
   const rows = guesses.map((character) => ({ character, cells: compare(character, target, data) }));
   const won = guessIds.includes(target.id);
@@ -110,8 +129,8 @@ function Play({
           characters={data.characters}
           excludeIds={excluded}
           onPick={onGuess}
-          label="Proposer un personnage"
-          placeholder="Propose un personnage…"
+          label={t("Proposer un personnage", "Guess a character")}
+          placeholder={t("Propose un personnage…", "Guess a character…")}
         />
       )}
       {footer({ won, rows: rows.map((r) => r.cells) })}
@@ -127,6 +146,8 @@ const NO_DAILY: DailyState = { key: "", guessIds: [] };
 const NO_STREAK: Streak = { lastWin: null, count: 0 };
 
 function Daily({ data, raw }: GameProps) {
+  const t = useT();
+  const path = useLocalePath();
   const today = useDailyKey();
   const [stored, setStored] = useStored<DailyState>("opm.onepiecedle.daily", NO_DAILY);
   const [streak, setStreak] = useStored<Streak>("opm.onepiecedle.streak", NO_STREAK);
@@ -158,26 +179,34 @@ function Daily({ data, raw }: GameProps) {
       footer={({ won, rows }) =>
         won ? (
           <ResultPanel
-            title={`${target.name} !`}
+            title={t(`${target.name} !`, `${target.name}!`)}
             actions={
               <ShareButton
                 getText={() =>
-                  `OnePiecedle n°${number} · ${rows.length} essai${rows.length > 1 ? "s" : ""}\n${shareGrid(rows)}\n${window.location.origin}/jeux/onepiecedle`
+                  `OnePiecedle ${t(`n°${number}`, `#${number}`)} · ${tries(t, rows.length)}\n${shareGrid(rows)}\n${window.location.origin}${path("/jeux/onepiecedle")}`
                 }
               />
             }
           >
             {target.img && <Portrait img={target.img} className="h-32 w-24" />}
             <p>
-              Trouvé en {rows.length} essai{rows.length > 1 ? "s" : ""}. Prochain personnage à minuit.
+              {t(
+                `Trouvé en ${tries(t, rows.length)}. Prochain personnage à minuit.`,
+                `Found in ${tries(t, rows.length)}. Next character at midnight, Paris time.`,
+              )}
             </p>
-            {streak.count > 1 && <p className="font-semibold">{streak.count} jours d&apos;affilée.</p>}
+            {streak.count > 1 && (
+              <p className="font-semibold">{t(`${streak.count} jours d'affilée.`, `${streak.count} days in a row.`)}</p>
+            )}
             <RewardSummary view={reward.view} data={data} />
           </ResultPanel>
         ) : (
           <p className="text-mist">
-            Défi n°{number} : le même personnage pour tout le monde aujourd&apos;hui.
-            {rows.length > 0 && ` ${rows.length} essai${rows.length > 1 ? "s" : ""}.`}
+            {t(
+              `Défi n°${number} : le même personnage pour tout le monde aujourd'hui.`,
+              `Challenge #${number}: the same character for everyone today.`,
+            )}
+            {rows.length > 0 && ` ${tries(t, rows.length)}.`}
           </p>
         )
       }
@@ -188,6 +217,7 @@ function Daily({ data, raw }: GameProps) {
 type FreeRun = { seed: number; difficulty: Difficulty; guessIds: string[]; gaveUp: boolean };
 
 function Free({ data }: GameProps) {
+  const t = useT();
   const [run, setRun] = useState<FreeRun | null>(null);
   const reward = useGameReward();
   const seed = run?.seed;
@@ -206,7 +236,12 @@ function Free({ data }: GameProps) {
   if (!run || !target) {
     return (
       <StartScreen onStart={start}>
-        <p className="text-mist">Autant de parties que tu veux, avec un personnage tiré au hasard.</p>
+        <p className="text-mist">
+          {t(
+            "Autant de parties que tu veux, avec un personnage tiré au hasard.",
+            "As many games as you like, each with a randomly drawn character.",
+          )}
+        </p>
       </StartScreen>
     );
   }
@@ -216,9 +251,9 @@ function Free({ data }: GameProps) {
 
   const replay = (
     <>
-      <Button onClick={() => start(run.difficulty)}>Rejouer</Button>
+      <Button onClick={() => start(run.difficulty)}>{t("Rejouer", "Play again")}</Button>
       <Button variant="secondary" onClick={() => setRun(null)}>
-        Changer de difficulté
+        {t("Changer de difficulté", "Change difficulty")}
       </Button>
     </>
   );
@@ -236,23 +271,19 @@ function Free({ data }: GameProps) {
       }}
       footer={({ won, rows }) =>
         won ? (
-          <ResultPanel title={`${target.name} !`} actions={replay}>
+          <ResultPanel title={t(`${target.name} !`, `${target.name}!`)} actions={replay}>
             {target.img && <Portrait img={target.img} className="h-32 w-24" />}
-            <p>
-              Trouvé en {rows.length} essai{rows.length > 1 ? "s" : ""}.
-            </p>
+            <p>{t(`Trouvé en ${tries(t, rows.length)}.`, `Found in ${tries(t, rows.length)}.`)}</p>
             <RewardSummary view={reward.view} data={data} />
           </ResultPanel>
         ) : run.gaveUp ? (
-          <ResultPanel title={`C'était ${target.name}`} actions={replay}>
+          <ResultPanel title={t(`C'était ${target.name}`, `It was ${target.name}`)} actions={replay}>
             {target.img && <Portrait img={target.img} className="h-32 w-24" />}
             <RewardSummary view={reward.view} data={data} />
           </ResultPanel>
         ) : (
           <p className="flex flex-wrap items-center justify-between gap-2 text-mist">
-            <span>
-              {rows.length} essai{rows.length > 1 ? "s" : ""}
-            </span>
+            <span>{tries(t, rows.length)}</span>
             <Button
               variant="ghost"
               className="px-0 py-0"
@@ -261,7 +292,7 @@ function Free({ data }: GameProps) {
                 report(run.guessIds);
               }}
             >
-              Abandonner
+              {t("Abandonner", "Give up")}
             </Button>
           </p>
         )
@@ -271,28 +302,30 @@ function Free({ data }: GameProps) {
 }
 
 const TABS = [
-  { id: "daily", label: "Défi du jour" },
-  { id: "free", label: "Partie libre" },
-] as const;
+  { id: "daily", label: { fr: "Défi du jour", en: "Daily challenge" } },
+  { id: "free", label: { fr: "Partie libre", en: "Free play" } },
+] as const satisfies readonly { id: string; label: Localized }[];
 
 export default function OnePiecedle(props: GameProps) {
+  const t = useT();
+  const locale = useLocale();
   const [tab, setTab] = useState<(typeof TABS)[number]["id"]>("daily");
 
   return (
     <div className="space-y-4">
-      <div role="tablist" aria-label="Mode de jeu" className="flex gap-2">
-        {TABS.map((t) => (
+      <div role="tablist" aria-label={t("Mode de jeu", "Game mode")} className="flex gap-2">
+        {TABS.map((entry) => (
           <button
-            key={t.id}
+            key={entry.id}
             type="button"
             role="tab"
-            aria-selected={tab === t.id}
-            onClick={() => setTab(t.id)}
+            aria-selected={tab === entry.id}
+            onClick={() => setTab(entry.id)}
             className={`rounded-full px-4 py-2 text-sm font-bold transition-colors ${
-              tab === t.id ? "bg-straw text-ink" : "bg-sea-700 text-mist hover:text-foam"
+              tab === entry.id ? "bg-straw text-ink" : "bg-sea-700 text-mist hover:text-foam"
             }`}
           >
-            {t.label}
+            {entry.label[locale]}
           </button>
         ))}
       </div>

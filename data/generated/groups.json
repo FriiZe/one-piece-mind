@@ -1,7 +1,10 @@
 [
   {
     "id": "chapeau-de-paille",
-    "title": "L'équipage du Chapeau de paille",
+    "title": {
+      "fr": "L'équipage du Chapeau de paille",
+      "en": "The Straw Hat Pirates"
+    },
     "since": 976,
     "memberIds": [
       "monkey-d-luffy",
@@ -18,7 +21,10 @@
   },
   {
     "id": "supernovas",
-    "title": "Les onze Supernovas",
+    "title": {
+      "fr": "Les onze Supernovas",
+      "en": "The eleven Supernovas"
+    },
     "since": 498,
     "memberIds": [
       "monkey-d-luffy",
@@ -36,7 +42,10 @@
   },
   {
     "id": "grands-corsaires",
-    "title": "Tous les Grands Corsaires",
+    "title": {
+      "fr": "Tous les Grands Corsaires",
+      "en": "Every Warlord of the Sea"
+    },
     "since": 802,
     "memberIds": [
       "dracule-mihawk",
@@ -54,7 +63,10 @@
   },
   {
     "id": "empereurs",
-    "title": "Les Empereurs, anciens et actuels",
+    "title": {
+      "fr": "Les Empereurs, anciens et actuels",
+      "en": "The Emperors, past and present"
+    },
     "since": 1053,
     "memberIds": [
       "edward-newgate",
@@ -68,7 +80,10 @@
   },
   {
     "id": "amiraux",
-    "title": "Les amiraux de la Marine",
+    "title": {
+      "fr": "Les amiraux de la Marine",
+      "en": "The Marine admirals"
+    },
     "since": 1053,
     "memberIds": [
       "kuzan",
@@ -80,7 +95,10 @@
   },
   {
     "id": "commandants-barbe-blanche",
-    "title": "Les seize commandants de Barbe Blanche",
+    "title": {
+      "fr": "Les seize commandants de Barbe Blanche",
+      "en": "Whitebeard's sixteen division commanders"
+    },
     "since": 553,
     "memberIds": [
       "polo-marco",
@@ -103,7 +121,10 @@
   },
   {
     "id": "cp9",
-    "title": "Les agents du CP9 à Enies Lobby",
+    "title": {
+      "fr": "Les agents du CP9 à Enies Lobby",
+      "en": "The CP9 agents at Enies Lobby"
+    },
     "since": 379,
     "memberIds": [
       "rob-lucci",
@@ -117,7 +138,10 @@
   },
   {
     "id": "agents-baroque-works",
-    "title": "Les agents officiers de Baroque Works",
+    "title": {
+      "fr": "Les agents officiers de Baroque Works",
+      "en": "The Baroque Works officer agents"
+    },
     "since": 165,
     "memberIds": [
       "daz-bonez",
@@ -133,7 +157,10 @@
   },
   {
     "id": "vinsmoke",
-    "title": "Judge Vinsmoke et ses cinq enfants",
+    "title": {
+      "fr": "Judge Vinsmoke et ses cinq enfants",
+      "en": "Judge Vinsmoke and his five children"
+    },
     "since": 840,
     "memberIds": [
       "vinsmoke-judge",
@@ -146,7 +173,10 @@
   },
   {
     "id": "generaux-sucres",
-    "title": "Les Généraux sucrés de Big Mom",
+    "title": {
+      "fr": "Les Généraux sucrés de Big Mom",
+      "en": "Big Mom's Sweet Commanders"
+    },
     "since": 894,
     "memberIds": [
       "charlotte-katakuri",
@@ -157,7 +187,10 @@
   },
   {
     "id": "fourreaux-rouges",
-    "title": "Les neuf Fourreaux rouges",
+    "title": {
+      "fr": "Les neuf Fourreaux rouges",
+      "en": "The Nine Red Scabbards"
+    },
     "since": 974,
     "memberIds": [
       "kin-emon",
@@ -173,7 +206,10 @@
   },
   {
     "id": "tobi-roppo",
-    "title": "Les Tobi Roppo",
+    "title": {
+      "fr": "Les Tobi Roppo",
+      "en": "The Tobi Roppo"
+    },
     "since": 978,
     "memberIds": [
       "page-one",
@@ -186,7 +222,10 @@
   },
   {
     "id": "capitaines-titanesques",
-    "title": "Les dix Capitaines titanesques de Barbe Noire",
+    "title": {
+      "fr": "Les dix Capitaines titanesques de Barbe Noire",
+      "en": "Blackbeard's Ten Titanic Captains"
+    },
     "since": 1081,
     "memberIds": [
       "jesus-burgess",
@@ -203,7 +242,10 @@
   },
   {
     "id": "cinq-doyens",
-    "title": "Les Cinq Doyens",
+    "title": {
+      "fr": "Les Cinq Doyens",
+      "en": "The Five Elders"
+    },
     "since": 1086,
     "memberIds": [
       "jaygarcia-saturn",
@@ -215,7 +257,10 @@
   },
   {
     "id": "porteurs-du-d",
-    "title": "Dix porteurs du D.",
+    "title": {
+      "fr": "Dix porteurs du D.",
+      "en": "Ten bearers of the D."
+    },
     "since": 957,
     "memberIds": [
       "monkey-d-luffy",

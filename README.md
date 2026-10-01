@@ -39,7 +39,7 @@ npm run db:deploy
 src/games/
 ├── engine/        hasard reproductible, défi du jour, comparaison des saisies, difficulté
 ├── cards.ts       données compactes envoyées au navigateur, ramenées au mode du joueur
-├── content.ts     textes des pages de jeu (règles, questions fréquentes, métadonnées)
+├── content.ts     textes des pages de jeu (règles, questions fréquentes, métadonnées) : content.fr.ts et content.en.ts
 ├── ui/            éléments communs : lanceur, choix du mode spoiler, saisie assistée, quiz
 ├── engine/criteria.ts  propriétés vérifiables d'un personnage : Connexions, Grille 3×3, Den Den Devin
 ├── ui/SortableList.tsx liste à ranger par glisser-déposer : Le classement, Chronologie
@@ -51,18 +51,39 @@ src/games/
 
 La plupart des jeux appartiennent à une famille qui partage son déroulé, son composant et la forme de son compte rendu. Ajouter un quiz à choix revient à écrire un générateur dans `src/games/qcm/logic.ts`.
 
-Les jeux tournent dans le navigateur. Les données (`/data/jeux.json`, générées à la compilation) sont téléchargées une fois, puis filtrées selon le mode du joueur par `resolveGameData` : un jeu ne reçoit jamais un personnage ou une information que le joueur n'a pas encore vus.
+Les jeux tournent dans le navigateur. Les données (`/data/jeux.json` en français, `/en/data/jeux.json` en anglais, générées à la compilation) sont téléchargées une fois, puis filtrées selon le mode du joueur par `resolveGameData` : un jeu ne reçoit jamais un personnage ou une information que le joueur n'a pas encore vus.
 
 Pour ajouter un jeu :
 
 1. écrire sa logique (un générateur dans une famille existante, ou `src/games/<slug>/logic.ts`) et ses tests ;
 2. écrire `src/games/<slug>/Game.tsx` si aucune famille ne convient ;
-3. ajouter le slug à `LIVE_SLUGS` (`src/lib/games/catalog.ts`) : TypeScript réclame alors son composant dans `GameRunner.tsx`, ses textes dans `content.ts` et son barème dans `src/lib/economy/rewards.ts` ;
+3. ajouter le slug à `LIVE_SLUGS` (`src/lib/games/catalog.ts`) : TypeScript réclame alors son composant dans `GameRunner.tsx`, ses textes dans `content.fr.ts` et `content.en.ts` et son barème dans `src/lib/economy/rewards.ts` ;
 4. déclarer la forme de son compte rendu et son recalcul dans `src/games/report.ts`.
 
 Un jeu que le serveur ne peut pas vérifier (Den Den Devin, où c'est le joueur qui dit si l'escargophone a trouvé) figure dans `REWARDLESS_SLUGS` : il n'envoie pas de compte rendu, ne rapporte rien et n'a pas d'objectifs.
 
 La page `/jeux/<slug>`, son image de partage et son entrée dans le plan du site sont créées automatiquement.
+
+## Langues
+
+Le site existe en français et en anglais. Le français est servi à la racine (`/jeux/wordle`), l'anglais sous `/en` (`/en/jeux/wordle`) : les segments d'adresse sont les mêmes dans les deux langues.
+
+```
+src/lib/i18n/index.ts    langues, `translator`, adresses (`localePath`, `splitLocale`), langue du navigateur
+src/lib/i18n/client.tsx  `useT`, `useLocale`, `useLocalePath`, `usePath` pour les composants du navigateur
+src/lib/i18n/server.ts   `getT`, `getLocale` pour les composants serveur
+src/proxy.ts             routage : `/jeux` est rendu par `src/app/[lang]` avec `lang = fr`, `/fr/jeux` renvoie vers `/jeux`
+src/components/Link.tsx  lien interne : l'adresse s'écrit sans langue, le préfixe est ajouté tout seul
+```
+
+- **Écrire un texte.** Les deux langues s'écrivent côte à côte, là où le texte sert : `const t = useT()` (ou `await getT()` côté serveur), puis `t("Jouer", "Play")`. Un texte gardé dans une table (catalogue, postes, objectifs) est un objet `{ fr, en }` (`Localized`), lu avec `[locale]`. Aucune bibliothèque, aucun fichier de clés.
+- **Liens.** Toujours `Link` de `@/components/Link`, et `useLocalePath()` pour `router.push` : une adresse écrite en dur ramènerait le joueur en français.
+- **Choix de la langue.** À sa première visite sur une adresse française, un navigateur réglé en anglais est renvoyé vers `/en`. Le sélecteur (en-tête et pied de page) enregistre le choix dans le cookie `opm_lang`, qui prime ensuite. Les moteurs de recherche, eux, reçoivent toujours la langue de l'adresse ; chaque page annonce ses deux versions (`hreflang`, plan du site).
+- **Données des jeux.** `buildGameData(locale)` produit un jeu de données par langue : noms de personnages et de fruits, arcs, affiliations, groupes, surnoms. Les titres anglais des arcs et des groupes sont dans `data/overrides`, les surnoms et les types d'armes dans `data/curated`. L'organisation d'un personnage a deux formes : `org`, son nom sur le wiki, qui sert de clé (traits d'équipage) ; `affiliation`, son libellé dans la langue du joueur.
+- **Logique des jeux.** Les textes que produit un jeu (questions, indices, corrections) suivent `data.locale`. Les libellés servant parfois de réponses, une partie n'est rejouée juste que dans sa langue : `submitGameAction` transmet la langue du joueur, et le serveur rejoue avec les données de cette langue. Le personnage du jour et les jeux du jour sont les mêmes dans les deux langues.
+- **Multijoueur.** Un salon se joue dans la langue de son hôte (`Room.lang`) : tous ses joueurs voient les mêmes questions.
+- **Quiz de la communauté.** Ils restent dans la langue de leur auteur ; seule l'interface est traduite.
+- **Les tests de `tests/i18n.test.ts`** vérifient les adresses, les données anglaises, les jeux en anglais et, sur la base locale, la langue côté serveur.
 
 ## Économie et comptes
 

@@ -8,12 +8,14 @@ import { GameEnd, GameStart } from "../ui/GameEnd";
 import { Button, Panel } from "../ui/primitives";
 import type { GameProps } from "../ui/types";
 import { useRun } from "../ui/useRun";
+import { useT } from "@/lib/i18n/client";
 import { generate, GROUP_SIZE, GROUPS, groupOf, MAX_MISTAKES, oneAway, replay } from "./logic";
 
 /** Une couleur par famille, dans l'ordre où elles sont trouvées. */
 const TONES = ["bg-straw text-ink", "bg-emerald-400 text-ink", "bg-sky-400 text-ink", "bg-violet-400 text-ink"];
 
 export default function Connexions({ data }: GameProps) {
+  const t = useT();
   const base = useRun("connexions");
   const [guesses, setGuesses] = useState<string[][]>([]);
   const [selected, setSelected] = useState<string[]>([]);
@@ -42,8 +44,10 @@ export default function Connexions({ data }: GameProps) {
     return (
       <GameStart game={game}>
         <p className="text-mist">
-          Seize personnages, quatre familles de quatre : un équipage, une mer d&apos;origine, un type de fruit… Retrouve
-          les quatre familles avant ta quatrième erreur.
+          {t(
+            "Seize personnages, quatre familles de quatre : un équipage, une mer d'origine, un type de fruit… Retrouve les quatre familles avant ta quatrième erreur.",
+            "Sixteen characters, four groups of four: a crew, a home sea, a fruit type… Find all four groups before your fourth mistake.",
+          )}
         </p>
       </GameStart>
     );
@@ -68,13 +72,19 @@ export default function Connexions({ data }: GameProps) {
     if (selected.length !== GROUP_SIZE || state.over) return;
     const already = guesses.some((guess) => guess.length === selected.length && guess.every((id) => selected.includes(id)));
     if (already) {
-      setNote("Tu as déjà essayé ce groupe.");
+      setNote(t("Tu as déjà essayé ce groupe.", "You've already tried those four."));
       return;
     }
     const group = groupOf(puzzle!, selected);
     setGuesses([...guesses, selected]);
     setSelected([]);
-    setNote(group ? `Trouvé : ${group.label}.` : oneAway(puzzle!, selected) ? "Presque : un seul n'est pas à sa place." : "Ce n'est pas une famille.");
+    setNote(
+      group
+        ? t(`Trouvé : ${group.label}.`, `Got it: ${group.label}.`)
+        : oneAway(puzzle!, selected)
+          ? t("Presque : un seul n'est pas à sa place.", "So close: just one doesn't belong.")
+          : t("Ce n'est pas une famille.", "That's not a group."),
+    );
   }
 
   function finish() {
@@ -87,10 +97,15 @@ export default function Connexions({ data }: GameProps) {
     <Panel className="space-y-4">
       <div className="flex items-center justify-between text-sm font-semibold text-mist">
         <span>
-          {state.found.length} / {GROUPS} familles
+          {state.found.length} / {GROUPS} {t("familles", "groups")}
         </span>
-        <span aria-label={`${MAX_MISTAKES - state.mistakes} erreurs permises`}>
-          Erreurs permises :{" "}
+        <span
+          aria-label={t(
+            `${MAX_MISTAKES - state.mistakes} erreurs permises`,
+            `${MAX_MISTAKES - state.mistakes} ${MAX_MISTAKES - state.mistakes === 1 ? "mistake" : "mistakes"} left`,
+          )}
+        >
+          {t("Erreurs permises :", "Mistakes left:")}{" "}
           {Array.from({ length: MAX_MISTAKES }, (_, i) => (
             <span key={i} aria-hidden="true" className={i < MAX_MISTAKES - state.mistakes ? "text-straw" : "text-sea-600"}>
               ●
@@ -106,7 +121,7 @@ export default function Connexions({ data }: GameProps) {
             return (
               <li key={group.id} className={`rounded-xl px-4 py-3 text-center ${index >= 0 ? TONES[index] : "bg-sea-600 text-foam"}`}>
                 <p className="font-bold">
-                  {index < 0 && "Manquée : "}
+                  {index < 0 && t("Manquée : ", "Missed: ")}
                   {group.label}
                 </p>
                 <p className="text-sm">{group.memberIds.map((id) => data.characterById.get(id)?.name).join(" · ")}</p>
@@ -150,22 +165,24 @@ export default function Connexions({ data }: GameProps) {
       {state.over ? (
         <div className="flex flex-wrap items-center justify-between gap-3">
           <p className={`font-bold ${state.found.length === GROUPS ? "text-emerald-300" : "text-vest"}`}>
-            {state.found.length === GROUPS ? "Les quatre familles sont trouvées." : "Quatre erreurs : la partie s'arrête là."}
+            {state.found.length === GROUPS
+              ? t("Les quatre familles sont trouvées.", "All four groups found.")
+              : t("Quatre erreurs : la partie s'arrête là.", "Four mistakes: the game ends here.")}
           </p>
           <Button autoFocus onClick={finish}>
-            Voir mon score
+            {t("Voir mon score", "See my score")}
           </Button>
         </div>
       ) : (
         <div className="flex flex-wrap justify-center gap-2">
           <Button onClick={submit} disabled={selected.length !== GROUP_SIZE}>
-            Valider ({selected.length} / {GROUP_SIZE})
+            {t("Valider", "Submit")} ({selected.length} / {GROUP_SIZE})
           </Button>
           <Button variant="secondary" onClick={() => setSelected([])} disabled={selected.length === 0}>
-            Tout désélectionner
+            {t("Tout désélectionner", "Deselect all")}
           </Button>
           <Button variant="secondary" onClick={() => setShuffles(shuffles + 1)}>
-            Mélanger
+            {t("Mélanger", "Shuffle")}
           </Button>
         </div>
       )}

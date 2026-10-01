@@ -1,7 +1,7 @@
 {
-  "_comment": "Navires et leur équipage. `crew` est le nom de l'organisation tel qu'il figure dans les affiliations (en anglais), traduit à l'affichage.",
+  "_comment": "Navires et leur équipage. `crew` est le nom de l'organisation tel qu'il figure dans les affiliations (en anglais), traduit à l'affichage. Un nom de navire qui diffère d'une langue à l'autre s'écrit { fr, en }.",
   "ships": [
-    { "name": "Vogue Merry", "crew": "Straw Hat Pirates" },
+    { "name": { "fr": "Vogue Merry", "en": "Going Merry" }, "crew": "Straw Hat Pirates" },
     { "name": "Thousand Sunny", "crew": "Straw Hat Pirates" },
     { "name": "Moby Dick", "crew": "Whitebeard Pirates" },
     { "name": "Oro Jackson", "crew": "Roger Pirates" },
@@ -20,7 +20,7 @@
     { "name": "Perfume Yuda", "crew": "Kuja Pirates" },
     { "name": "Sexy Foxy", "crew": "Foxy Pirates" },
     { "name": "Going Luffy-senpai", "crew": "Barto Club" },
-    { "name": "Hollandais Volant", "crew": "Flying Pirates" },
+    { "name": { "fr": "Hollandais Volant", "en": "Flying Dutchman" }, "crew": "Flying Pirates" },
     { "name": "Piece of Spadille", "crew": "Spade Pirates" },
     { "name": "Great Erik", "crew": "Giant Warrior Pirates" },
     { "name": "Naglfar", "crew": "New Giant Warrior Pirates" },

@@ -9,6 +9,7 @@ import { StartScreen } from "../ui/StartScreen";
 import { useBest } from "../ui/storage";
 import type { GameProps } from "../ui/types";
 import { RewardSummary } from "@/components/RewardSummary";
+import { useLocale, useT } from "@/lib/i18n/client";
 import { useGameReward } from "@/lib/player/useGameReward";
 import { advanceChain, bountyPool, isCorrect, startChain, type Answer, type Bountied, type Chain } from "./logic";
 
@@ -41,6 +42,8 @@ function Card({ character, bounty, tone }: { character: Bountied; bounty: string
 }
 
 export default function PlusOuMoins({ data }: GameProps) {
+  const t = useT();
+  const locale = useLocale();
   const [run, setRun] = useState<Run | null>(null);
   const [best, submitBest] = useBest(`plus-ou-moins.${run?.difficulty ?? "normal"}`);
   const reward = useGameReward();
@@ -77,8 +80,10 @@ export default function PlusOuMoins({ data }: GameProps) {
     return (
       <StartScreen onStart={start}>
         <p className="text-mist">
-          Deux avis de recherche. La prime du second est-elle plus haute ou plus basse que celle du premier ? Une seule
-          erreur et la série s&apos;arrête.
+          {t(
+            "Deux avis de recherche. La prime du second est-elle plus haute ou plus basse que celle du premier ? Une seule erreur et la série s'arrête.",
+            "Two wanted posters. Is the bounty on the second one higher or lower than on the first? One mistake and the streak is over.",
+          )}
         </p>
       </StartScreen>
     );
@@ -88,49 +93,57 @@ export default function PlusOuMoins({ data }: GameProps) {
   return (
     <div className="space-y-4">
       <p className="text-sm font-semibold text-mist" aria-live="polite">
-        Série en cours : <span className="text-foam">{run.streak}</span>
-        {best !== null && <> · Record : {best}</>}
+        {t("Série en cours : ", "Current streak: ")}
+        <span className="text-foam">{run.streak}</span>
+        {best !== null && (
+          <>
+            {t(" · Record : ", " · Best: ")}
+            {best}
+          </>
+        )}
       </p>
       <div className="flex flex-col gap-3 sm:flex-row">
-        <Card character={run.current} bounty={formatBounty(run.current.bounty)} tone="known" />
+        <Card character={run.current} bounty={formatBounty(run.current.bounty, locale)} tone="known" />
         <Card
           character={run.next}
-          bounty={revealed ? formatBounty(run.next.bounty) : "? ? ?"}
+          bounty={revealed ? formatBounty(run.next.bounty, locale) : "? ? ?"}
           tone={!revealed ? "hidden" : run.lost ? "wrong" : "right"}
         />
       </div>
 
       {!revealed && (
         <div className="grid grid-cols-2 gap-3">
-          <Button onClick={() => answer("higher")}>▲ Plus haute</Button>
-          <Button onClick={() => answer("lower")}>▼ Plus basse</Button>
+          <Button onClick={() => answer("higher")}>{t("▲ Plus haute", "▲ Higher")}</Button>
+          <Button onClick={() => answer("lower")}>{t("▼ Plus basse", "▼ Lower")}</Button>
         </div>
       )}
       {revealed && !run.lost && (
         <div className="flex items-center justify-between gap-3" aria-live="polite">
-          <p className="font-bold text-emerald-300">Bien vu.</p>
+          <p className="font-bold text-emerald-300">{t("Bien vu.", "Good call.")}</p>
           <Button autoFocus onClick={advance}>
-            Continuer
+            {t("Continuer", "Continue")}
           </Button>
         </div>
       )}
       {run.lost && (
         <ResultPanel
-          title={`Série de ${run.streak}`}
-          best={best !== null ? { label: "Record à ce niveau", value: String(best) } : null}
+          title={t(`Série de ${run.streak}`, `Streak of ${run.streak}`)}
+          best={best !== null ? { label: t("Record à ce niveau", "Best at this level"), value: String(best) } : null}
           newBest={run.newBest}
           actions={
             <>
-              <Button onClick={() => start(run.difficulty)}>Rejouer</Button>
+              <Button onClick={() => start(run.difficulty)}>{t("Rejouer", "Play again")}</Button>
               <Button variant="secondary" onClick={() => setRun(null)}>
-                Changer de difficulté
+                {t("Changer de difficulté", "Change difficulty")}
               </Button>
             </>
           }
         >
           <p>
-            La prime de {run.next.name} est de {formatBounty(run.next.bounty)}, celle de {run.current.name} de{" "}
-            {formatBounty(run.current.bounty)}.
+            {t(
+              `La prime de ${run.next.name} est de ${formatBounty(run.next.bounty, locale)}, celle de ${run.current.name} de ${formatBounty(run.current.bounty, locale)}.`,
+              `The bounty on ${run.next.name} is ${formatBounty(run.next.bounty, locale)}, the one on ${run.current.name} is ${formatBounty(run.current.bounty, locale)}.`,
+            )}
           </p>
           <RewardSummary view={reward.view} data={data} />
         </ResultPanel>

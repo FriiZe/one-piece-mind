@@ -17,19 +17,27 @@ import {
   type PostId,
 } from "@/lib/economy";
 import { isLiveSlug } from "@/lib/games/catalog";
+import { DEFAULT_LOCALE, type Locale } from "@/lib/i18n";
 import type { BoosterResult, CrewResult, GameResult, RecruitResult, SellResult } from "@/lib/player/types";
 import type { SpoilerMode } from "@/lib/spoilers";
 import { Prisma } from "@/generated/prisma/client";
 import { db } from "./db";
 
-let raw: GameData | undefined;
-const resolved = new Map<SpoilerMode, ResolvedData>();
+const raw = new Map<Locale, GameData>();
+const resolved = new Map<string, ResolvedData>();
 
-/** Données des jeux dans un mode donné, calculées une fois par instance du serveur. */
-function gameData(mode: SpoilerMode): ResolvedData {
-  raw ??= buildGameData();
-  if (!resolved.has(mode)) resolved.set(mode, resolveGameData(raw, mode));
-  return resolved.get(mode)!;
+/**
+ * Données des jeux dans un mode et une langue donnés, calculées une fois par
+ * instance du serveur. La langue ne compte que pour rejouer une partie (les
+ * libellés servent de réponses) : collection et équipage n'en dépendent pas.
+ */
+function gameData(mode: SpoilerMode, locale: Locale = DEFAULT_LOCALE): ResolvedData {
+  const key = `${locale}:${mode}`;
+  if (!resolved.has(key)) {
+    if (!raw.has(locale)) raw.set(locale, buildGameData(locale));
+    resolved.set(key, resolveGameData(raw.get(locale)!, mode));
+  }
+  return resolved.get(key)!;
 }
 
 /** Tirage imprévisible pour les récompenses : la graine vient du générateur du système. */
@@ -87,15 +95,16 @@ const MAX_GAMES_PER_MINUTE = 20;
 
 /**
  * Récompense une partie. Le compte rendu vient du navigateur : il est validé,
- * la partie est rejouée ici, et seul ce recalcul fixe les gains.
+ * la partie est rejouée ici, et seul ce recalcul fixe les gains. `locale` : la
+ * langue dans laquelle la partie a été jouée, pour retrouver les mêmes tirages.
  */
-export async function submitGame(userId: string, input: unknown, today = dailyKey()): Promise<GameResult> {
+export async function submitGame(userId: string, input: unknown, today = dailyKey(), locale: Locale = DEFAULT_LOCALE): Promise<GameResult> {
   const parsed = reportSchema.safeParse(input);
   if (!parsed.success) return { ok: false, reason: "invalid" };
   const report = parsed.data;
 
-  const data = gameData(report.mode);
-  const outcome = evaluateReport(report, { data, animeCharacters: gameData("anime").characters, today });
+  const data = gameData(report.mode, locale);
+  const outcome = evaluateReport(report, { data, animeCharacters: gameData("anime", locale).characters, today });
   if (!outcome) return { ok: false, reason: "invalid" };
 
   const recent = await db().gameResult.count({ where: { userId, createdAt: { gte: new Date(Date.now() - 60_000) } } });

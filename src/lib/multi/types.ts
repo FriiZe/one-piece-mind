@@ -1,5 +1,6 @@
 import type { Difficulty } from "@/games/engine/difficulty";
 import type { MixSlug, QcmOption } from "@/games/qcm/logic";
+import type { Locale } from "@/lib/i18n";
 import type { SpoilerMode } from "@/lib/spoilers";
 
 export type RoomSettings = {
@@ -8,6 +9,8 @@ export type RoomSettings = {
   games: MixSlug[];
   questionCount: number;
   seconds: number;
+  /** Langue des questions : celle de l'hôte, pour que tout le salon joue les mêmes. */
+  lang: Locale;
 };
 
 export type RoomPlayerView = {

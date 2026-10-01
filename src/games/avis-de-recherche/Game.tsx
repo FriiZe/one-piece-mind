@@ -12,6 +12,7 @@ import { StartScreen } from "../ui/StartScreen";
 import { useBest } from "../ui/storage";
 import type { GameProps } from "../ui/types";
 import { RewardSummary } from "@/components/RewardSummary";
+import { useLocale, useT } from "@/lib/i18n/client";
 import { useGameReward } from "@/lib/player/useGameReward";
 import { generatePosters, hintsFor, isAccepted, MAX_SCORE, pointsFor, type PosterEvent } from "./logic";
 
@@ -33,6 +34,7 @@ type Run = {
 
 /** `name` et `img` ne sont donnés qu'une fois l'affiche résolue. */
 function Poster({ bounty, name, img }: { bounty: number; name: string | null; img?: string | null }) {
+  const locale = useLocale();
   return (
     <div className="mx-auto w-full max-w-xs rounded-md border-4 border-parchment-dark bg-parchment p-4 text-center text-ink shadow-xl">
       <p className="font-display text-5xl tracking-widest">WANTED</p>
@@ -43,13 +45,14 @@ function Poster({ bounty, name, img }: { bounty: number; name: string | null; im
       <p className="mt-1 min-h-9 font-display text-3xl tracking-wide">{name ?? "· · ·"}</p>
       <p className="mt-1 border-t-2 border-ink/30 pt-2 font-display text-3xl tracking-wide">
         <span className="mr-1">฿</span>
-        {formatNumber(bounty)}
+        {formatNumber(bounty, locale)}
       </p>
     </div>
   );
 }
 
 export default function AvisDeRecherche({ data }: GameProps) {
+  const t = useT();
   const [run, setRun] = useState<Run | null>(null);
   const [best, submitBest] = useBest(`avis-de-recherche.${run?.difficulty ?? "normal"}`);
   const reward = useGameReward();
@@ -84,7 +87,10 @@ export default function AvisDeRecherche({ data }: GameProps) {
     return (
       <StartScreen onStart={start}>
         <p className="text-mist">
-          Cinq avis de recherche sans nom ni photo. Chaque erreur dévoile un indice, et chaque indice coûte un point.
+          {t(
+            "Cinq avis de recherche sans nom ni photo. Chaque erreur dévoile un indice, et chaque indice coûte un point.",
+            "Five wanted posters with no name and no photo. Each wrong guess reveals a hint, and each hint costs a point.",
+          )}
         </p>
       </StartScreen>
     );
@@ -94,13 +100,17 @@ export default function AvisDeRecherche({ data }: GameProps) {
     return (
       <ResultPanel
         title={`${run.score} / ${MAX_SCORE}`}
-        best={best !== null ? { label: "Record à ce niveau", value: `${best} / ${MAX_SCORE}` } : null}
+        best={
+          best !== null
+            ? { label: t("Record à ce niveau", "Best at this level"), value: `${best} / ${MAX_SCORE}` }
+            : null
+        }
         newBest={run.newBest}
         actions={
           <>
-            <Button onClick={() => start(run.difficulty)}>Rejouer</Button>
+            <Button onClick={() => start(run.difficulty)}>{t("Rejouer", "Play again")}</Button>
             <Button variant="secondary" onClick={() => setRun(null)}>
-              Changer de difficulté
+              {t("Changer de difficulté", "Change difficulty")}
             </Button>
           </>
         }
@@ -143,12 +153,16 @@ export default function AvisDeRecherche({ data }: GameProps) {
 
   return (
     <div className="space-y-4">
-      <Progress current={run.index + 1} total={posters.length} score={`Score : ${run.score}`} />
+      <Progress
+        current={run.index + 1}
+        total={posters.length}
+        score={t(`Score : ${run.score}`, `Score: ${run.score}`)}
+      />
       <div className="grid gap-4 sm:grid-cols-2">
         <Poster bounty={target.bounty} name={done ? target.name : null} img={done ? target.img : null} />
 
         <div className="space-y-3">
-          <ul className="space-y-2" aria-label="Indices" aria-live="polite">
+          <ul className="space-y-2" aria-label={t("Indices", "Hints")} aria-live="polite">
             {hints.map((hint, index) => (
               <li key={hint.key} className="rounded-lg border border-sea-600 bg-sea-800/70 px-3 py-2">
                 <span className="block text-xs font-semibold tracking-wide text-mist uppercase">{hint.title}</span>
@@ -163,12 +177,15 @@ export default function AvisDeRecherche({ data }: GameProps) {
                 characters={data.characters}
                 excludeIds={excluded}
                 onPick={guess}
-                label="Qui est recherché ?"
-                placeholder="Qui est recherché ?"
+                label={t("Qui est recherché ?", "Who's wanted?")}
+                placeholder={t("Qui est recherché ?", "Who's wanted?")}
               />
               <div className="flex flex-wrap items-center justify-between gap-2 text-sm text-mist">
                 <span>
-                  Cette affiche vaut encore {pointsFor(run.revealed)} point{pointsFor(run.revealed) > 1 ? "s" : ""}.
+                  {t(
+                    `Cette affiche vaut encore ${pointsFor(run.revealed)} point${pointsFor(run.revealed) > 1 ? "s" : ""}.`,
+                    `This poster is still worth ${pointsFor(run.revealed)} point${pointsFor(run.revealed) === 1 ? "" : "s"}.`,
+                  )}
                 </span>
                 <span className="flex gap-4">
                   {run.revealed < hints.length && (
@@ -177,7 +194,7 @@ export default function AvisDeRecherche({ data }: GameProps) {
                       className="underline underline-offset-4 hover:text-foam"
                       onClick={() => setRun({ ...run, log: logged({ type: "hint" }), revealed: run.revealed + 1 })}
                     >
-                      Un indice
+                      {t("Un indice", "Hint")}
                     </button>
                   )}
                   <button
@@ -185,7 +202,7 @@ export default function AvisDeRecherche({ data }: GameProps) {
                     className="underline underline-offset-4 hover:text-foam"
                     onClick={() => setRun({ ...run, log: logged({ type: "pass" }), outcome: 0 })}
                   >
-                    Passer
+                    {t("Passer", "Skip")}
                   </button>
                 </span>
               </div>
@@ -196,11 +213,16 @@ export default function AvisDeRecherche({ data }: GameProps) {
             <div className="space-y-3" aria-live="polite">
               <p className={`font-bold ${run.outcome ? "text-emerald-300" : "text-vest"}`}>
                 {run.outcome
-                  ? `Trouvé : +${run.outcome} point${run.outcome > 1 ? "s" : ""}.`
-                  : `C'était ${target.name}.`}
+                  ? t(
+                      `Trouvé : +${run.outcome} point${run.outcome > 1 ? "s" : ""}.`,
+                      `Got it: +${run.outcome} point${run.outcome === 1 ? "" : "s"}.`,
+                    )
+                  : t(`C'était ${target.name}.`, `It was ${target.name}.`)}
               </p>
               <Button autoFocus onClick={next}>
-                {run.index === posters.length - 1 ? "Voir mon score" : "Affiche suivante"}
+                {run.index === posters.length - 1
+                  ? t("Voir mon score", "See my score")
+                  : t("Affiche suivante", "Next poster")}
               </Button>
             </div>
           )}

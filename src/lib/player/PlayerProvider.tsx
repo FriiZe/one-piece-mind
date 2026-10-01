@@ -23,6 +23,7 @@ import {
   sellDuplicates,
   type PlayerState,
 } from "@/lib/economy";
+import { useLocale } from "@/lib/i18n/client";
 import type { SpoilerMode } from "@/lib/spoilers";
 import { buyBoosterAction, buyRecruitAction, sellDuplicatesAction, setCrewAction, submitGameAction } from "./actions";
 import type { BoosterResult, CrewResult, GameResult, MeResponse, RecruitResult, SellResult } from "./types";
@@ -57,6 +58,7 @@ const REWARDED_KEY = "opm.player.rewarded";
 const NO_KEYS: string[] = [];
 
 export function PlayerProvider({ children }: { children: ReactNode }) {
+  const locale = useLocale();
   const [me, setMe] = useState<MeResponse | null>(null);
   const [storedGuest, setGuest] = useStored<PlayerState>("opm.player", EMPTY_PLAYER);
   // Une progression enregistrée par une version précédente du site peut ne pas avoir tous les champs
@@ -87,14 +89,14 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
   const reportGame = useCallback(
     async (report: GameReport): Promise<GameResult> => {
       if (isUser) {
-        const result = await submitGameAction(report).catch(() => ({ ok: false, reason: "unavailable" }) as const);
+        const result = await submitGameAction(report, locale).catch(() => ({ ok: false, reason: "unavailable" }) as const);
         if (result.ok) setRemote(result.state);
         return result;
       }
       const key = `${report.slug}:${"seed" in report ? report.seed : report.day}`;
       if (rewarded.includes(key)) return { ok: false, reason: "duplicate" };
 
-      const raw = await loadGameData();
+      const raw = await loadGameData(locale);
       const data = resolveGameData(raw, report.mode);
       const outcome = evaluateReport(report, {
         data,
@@ -108,7 +110,7 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
       setRewarded([...rewarded.slice(-200), key]);
       return { ok: true, state: applied.state, outcome, reward: applied.reward };
     },
-    [isUser, guest, rewarded, setGuest, setRewarded],
+    [isUser, guest, rewarded, setGuest, setRewarded, locale],
   );
 
   const recruit = useCallback(
@@ -118,13 +120,13 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
         if (result.ok) setRemote(result.state);
         return result;
       }
-      const data = resolveGameData(await loadGameData(), mode);
+      const data = resolveGameData(await loadGameData(locale), mode);
       const bought = buyRecruit(guest, data.characters, createRng(randomSeed()));
       if (typeof bought === "string") return { ok: false, reason: bought };
       setGuest(bought.state);
       return { ok: true, ...bought };
     },
-    [isUser, guest, setGuest],
+    [isUser, guest, setGuest, locale],
   );
 
   const booster = useCallback(
@@ -134,13 +136,13 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
         if (result.ok) setRemote(result.state);
         return result;
       }
-      const data = resolveGameData(await loadGameData(), mode);
+      const data = resolveGameData(await loadGameData(locale), mode);
       const bought = buyBooster(guest, data.characters, createRng(randomSeed()));
       if (typeof bought === "string") return { ok: false, reason: bought };
       setGuest(bought.state);
       return { ok: true, ...bought };
     },
-    [isUser, guest, setGuest],
+    [isUser, guest, setGuest, locale],
   );
 
   const assign = useCallback(
@@ -165,13 +167,13 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
         if (result.ok) setRemote(result.state);
         return result;
       }
-      const data = resolveGameData(await loadGameData(), mode);
+      const data = resolveGameData(await loadGameData(locale), mode);
       const sale = sellDuplicates(guest, data.characterById, characterId);
       if (typeof sale === "string") return { ok: false, reason: sale };
       setGuest(sale.state);
       return { ok: true, state: sale.state, berrys: sale.berrys, sold: sale.sold };
     },
-    [isUser, guest, setGuest],
+    [isUser, guest, setGuest, locale],
   );
 
   const value = useMemo<PlayerContext>(

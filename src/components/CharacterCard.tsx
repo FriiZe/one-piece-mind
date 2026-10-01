@@ -1,6 +1,9 @@
+"use client";
+
 import Image from "next/image";
 import { portraitUrl, type PlayCharacter } from "@/games/cards";
 import { RARITY_LABELS } from "@/lib/economy";
+import { useLocale } from "@/lib/i18n/client";
 
 const RARITY_TONES: Record<number, string> = {
   1: "bg-straw text-ink",
@@ -21,6 +24,7 @@ export function CharacterCard({
   count?: number;
   note?: string;
 }) {
+  const locale = useLocale();
   return (
     <div
       className={`overflow-hidden rounded-md border-4 bg-parchment text-center text-ink shadow-lg ${
@@ -43,7 +47,7 @@ export function CharacterCard({
           <span
             className={`absolute top-1 left-1 rounded px-1.5 py-0.5 text-[0.65rem] font-bold tracking-wide uppercase ${RARITY_TONES[character.tier]}`}
           >
-            {RARITY_LABELS[character.tier]}
+            {RARITY_LABELS[locale][character.tier]}
           </span>
         )}
         {count !== undefined && count > 1 && (

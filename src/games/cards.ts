@@ -1,7 +1,8 @@
 /**
  * Données des jeux, sous une forme compacte envoyée au navigateur. Construites
- * côté serveur à partir du jeu de données ; `resolveGameData` les ramène
- * ensuite au mode spoiler du joueur.
+ * côté serveur à partir du jeu de données, une fois par langue : noms et
+ * libellés y sont déjà dans la langue du joueur. `resolveGameData` les ramène
+ * ensuite à son mode spoiler.
  */
 import emojisJson from "@data/curated/emojis.json";
 import epithetsJson from "@data/curated/epithets.json";
@@ -10,13 +11,17 @@ import shipsJson from "@data/curated/ships.json";
 import techniquesJson from "@data/curated/techniques.json";
 import weaponsJson from "@data/curated/weapons.json";
 import { arcOfChapter, arcs, characters, fruits, groups, images, meta } from "@/lib/data";
-import { mainAffiliation, translateAffiliation, type HakiType } from "@/lib/data/labels";
+import { mainOrganization, translateAffiliation, type HakiType } from "@/lib/data/labels";
 import type { Character, FruitType, Race, Sea } from "@/lib/data/schema";
+import { DEFAULT_LOCALE, type Locale, type Localized } from "@/lib/i18n";
 import { currentBounty, isPlayableCharacter, isPlayableFruit, viewCharacter, type SpoilerMode } from "@/lib/spoilers";
 
 /** Faits d'un personnage qui peuvent différer entre le mode anime et le mode manga. */
 type ModeFacts = {
   bounty: number | null;
+  /** Organisation principale, sous son nom du wiki : le même dans toutes les langues, il sert de clé. */
+  org: string | null;
+  /** La même, telle qu'elle s'affiche dans la langue du joueur. */
   affiliation: string | null;
   sea: Sea | null;
   fruitId: string | null;
@@ -25,7 +30,7 @@ type ModeFacts = {
 export type CharacterCard = ModeFacts & {
   id: string;
   name: string;
-  /** Nom d'usage international, affiché en complément quand il diffère du nom français. */
+  /** En français, nom d'usage international, affiché en complément quand il diffère du nom français. */
   altName: string | null;
   aliases: string[];
   tier: number;
@@ -64,7 +69,7 @@ export type Extras = {
   epithets: { characterId: string; text: string }[];
   techniques: { name: string; characterId: string }[];
   weapons: { name: string; kind: string; characterId: string }[];
-  /** `crew` : nom français de l'équipage. */
+  /** `crew` : nom de l'équipage dans la langue du joueur. */
   ships: { name: string; crew: string }[];
   emojis: { characterId: string; emojis: string }[];
   /** Rire caractéristique, écrit. */
@@ -72,6 +77,7 @@ export type Extras = {
 };
 
 export type GameData = {
+  locale: Locale;
   animeCutoffChapter: number;
   latestChapter: number;
   latestEpisode: number;
@@ -84,20 +90,25 @@ export type GameData = {
 
 const fruitsById = new Map(fruits.map((f) => [f.id, f]));
 
-function modeFacts(character: Character, mode: SpoilerMode): ModeFacts {
+/** Un texte rédigé à la main : écrit une seule fois s'il est le même dans les deux langues. */
+const text = (value: string | Localized, locale: Locale) => (typeof value === "string" ? value : value[locale]);
+
+function modeFacts(character: Character, mode: SpoilerMode, locale: Locale): ModeFacts {
   const view = viewCharacter(character, mode);
   const fruit = view.fruitId ? fruitsById.get(view.fruitId) : undefined;
+  const org = mainOrganization(view);
   return {
     bounty: currentBounty(view),
-    affiliation: mainAffiliation(view),
+    org,
+    affiliation: org && translateAffiliation(org, locale),
     sea: view.origin?.sea ?? null,
     fruitId: fruit && isPlayableFruit(fruit, mode) ? fruit.id : null,
   };
 }
 
-function toCard(character: Character): CharacterCard {
-  const manga = modeFacts(character, "manga");
-  const anime = modeFacts(character, "anime");
+function toCard(character: Character, locale: Locale): CharacterCard {
+  const manga = modeFacts(character, "manga", locale);
+  const anime = modeFacts(character, "anime", locale);
   const diff: Partial<ModeFacts> = {};
   for (const key of Object.keys(manga) as (keyof ModeFacts)[]) {
     if (manga[key] !== anime[key]) Object.assign(diff, { [key]: anime[key] });
@@ -105,11 +116,13 @@ function toCard(character: Character): CharacterCard {
 
   const debut = character.debut!.chapter!;
   const { name, aliases, haki } = character;
+  const sameName = name.en.toLowerCase() === name.fr.toLowerCase();
   return {
     id: character.id,
-    name: name.fr,
-    altName: name.en.toLowerCase() === name.fr.toLowerCase() ? null : name.en,
-    aliases,
+    name: name[locale],
+    altName: locale === "fr" && !sameName ? name.en : null,
+    // En anglais, le nom français n'est pas affiché mais reste accepté à la saisie
+    aliases: locale === "fr" || sameName ? aliases : [...aliases, name.fr],
     tier: character.tier,
     debut,
     episode: character.debut!.episode,
@@ -125,27 +138,36 @@ function toCard(character: Character): CharacterCard {
   };
 }
 
-export function buildGameData(): GameData {
+export function buildGameData(locale: Locale = DEFAULT_LOCALE): GameData {
   return {
+    locale,
     animeCutoffChapter: meta.animeCutoffChapter,
     latestChapter: meta.latestChapter,
     latestEpisode: meta.latestEpisode,
     extras: {
-      epithets: Object.entries(epithetsJson.epithets).map(([characterId, text]) => ({ characterId, text })),
+      epithets: Object.entries(epithetsJson.epithets).map(([characterId, epithet]) => ({ characterId, text: epithet[locale] })),
       techniques: techniquesJson.techniques,
-      weapons: weaponsJson.weapons,
-      ships: shipsJson.ships.map((ship) => ({ name: ship.name, crew: translateAffiliation(ship.crew) })),
+      weapons: weaponsJson.weapons.map((weapon) => ({ ...weapon, name: text(weapon.name, locale), kind: text(weapon.kind, locale) })),
+      ships: shipsJson.ships.map((ship) => ({ name: text(ship.name, locale), crew: translateAffiliation(ship.crew, locale) })),
       emojis: Object.entries(emojisJson.emojis).map(([characterId, emojis]) => ({ characterId, emojis })),
       laughs: Object.entries(laughsJson.laughs).map(([characterId, text]) => ({ characterId, text })),
     },
     arcs: arcs
       .filter((arc) => arc.kind === "manga")
-      .map((arc) => ({ number: arc.number, title: arc.title.fr.replace(/^Arc\s+/i, "").trim() })),
-    characters: characters.filter((c) => isPlayableCharacter(c, "manga")).map(toCard),
+      // « Arc Skypiea » en français, « Skypiea Arc » en anglais : on ne garde que le nom
+      .map((arc) => ({ number: arc.number, title: arc.title[locale].replace(/^Arc\s+|\s+Arc$/gi, "").trim() })),
+    characters: characters.filter((c) => isPlayableCharacter(c, "manga")).map((c) => toCard(c, locale)),
     fruits: fruits
       .filter((f) => isPlayableFruit(f, "manga"))
-      .map((f) => ({ id: f.id, name: f.name.fr, romaji: f.romaji, type: f.type, debut: f.debut!.chapter! })),
-    groups: groups.map((g) => ({ id: g.id, title: g.title, since: g.since, memberIds: g.memberIds })),
+      .map((f) => ({
+        id: f.id,
+        name: f.name[locale],
+        // Le nom anglais d'un fruit est déjà son nom japonais
+        romaji: f.romaji?.toLowerCase() === f.name[locale].toLowerCase() ? null : f.romaji,
+        type: f.type,
+        debut: f.debut!.chapter!,
+      })),
+    groups: groups.map((g) => ({ id: g.id, title: g.title[locale], since: g.since, memberIds: g.memberIds })),
   };
 }
 
@@ -156,6 +178,8 @@ export type PlayCharacter = Omit<CharacterCard, "anime">;
 
 /** Les données telles que le joueur a le droit de les voir dans son mode. */
 export type ResolvedData = {
+  /** Langue des noms et des libellés : les textes que produisent les jeux la suivent. */
+  locale: Locale;
   mode: SpoilerMode;
   /** Dernier chapitre (mode manga) ou dernier chapitre adapté (mode anime) que le joueur connaît. */
   latestChapter: number;
@@ -182,6 +206,7 @@ export function resolveGameData(data: GameData, mode: SpoilerMode): ResolvedData
   const known = <T extends { characterId: string }>(items: T[]) => items.filter((item) => characterById.has(item.characterId));
 
   return {
+    locale: data.locale,
     mode,
     latestChapter: mode === "anime" ? data.animeCutoffChapter : data.latestChapter,
     latestEpisode: data.latestEpisode,

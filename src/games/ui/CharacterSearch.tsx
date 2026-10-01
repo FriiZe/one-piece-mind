@@ -3,6 +3,7 @@
 import { useId, useMemo, useState } from "react";
 import type { PlayCharacter } from "../cards";
 import { searchByName } from "../engine/text";
+import { useT } from "@/lib/i18n/client";
 
 /** Champ de saisie assistée : le joueur tape un nom et choisit dans la liste. */
 export function CharacterSearch({
@@ -10,7 +11,7 @@ export function CharacterSearch({
   excludeIds,
   onPick,
   label,
-  placeholder = "Nom du personnage…",
+  placeholder,
   disabled = false,
 }: {
   characters: readonly PlayCharacter[];
@@ -20,6 +21,7 @@ export function CharacterSearch({
   placeholder?: string;
   disabled?: boolean;
 }) {
+  const t = useT();
   const [query, setQuery] = useState("");
   const [active, setActive] = useState(0);
   const listId = useId();
@@ -55,7 +57,7 @@ export function CharacterSearch({
         enterKeyHint="done"
         disabled={disabled}
         value={query}
-        placeholder={placeholder}
+        placeholder={placeholder ?? t("Nom du personnage…", "Character name…")}
         onChange={(event) => {
           setQuery(event.target.value);
           setActive(0);

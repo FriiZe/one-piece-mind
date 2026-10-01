@@ -1,3 +1,4 @@
+import type { Localized } from "@/lib/i18n";
 import type { SpoilerMode } from "@/lib/spoilers";
 import type { QuizQuestion } from "./rules";
 
@@ -57,12 +58,23 @@ export type QuizPlayResult = {
   reward: "paid" | "already" | "own" | "limit";
 };
 
-export const QUIZ_ERRORS: Record<QuizError, string> = {
-  unavailable: "Connecte-toi pour faire ça.",
-  invalid: "Ce quiz n'est pas valide. Vérifie les questions et réessaie.",
-  limit: "Tu as atteint la limite pour aujourd'hui. Réessaie plus tard.",
-  "not-found": "Ce quiz n'existe pas, ou plus.",
-  forbidden: "Tu n'as pas le droit de faire ça.",
-  own: "C'est ton propre quiz.",
-  already: "Tu as déjà signalé ce quiz.",
+export const QUIZ_ERRORS: Localized<Record<QuizError, string>> = {
+  fr: {
+    unavailable: "Connecte-toi pour faire ça.",
+    invalid: "Ce quiz n'est pas valide. Vérifie les questions et réessaie.",
+    limit: "Tu as atteint la limite pour aujourd'hui. Réessaie plus tard.",
+    "not-found": "Ce quiz n'existe pas, ou plus.",
+    forbidden: "Tu n'as pas le droit de faire ça.",
+    own: "C'est ton propre quiz.",
+    already: "Tu as déjà signalé ce quiz.",
+  },
+  en: {
+    unavailable: "Log in to do that.",
+    invalid: "This quiz isn't valid. Check the questions and try again.",
+    limit: "You've hit today's limit. Try again later.",
+    "not-found": "This quiz doesn't exist, or no longer does.",
+    forbidden: "You're not allowed to do that.",
+    own: "That's your own quiz.",
+    already: "You've already reported this quiz.",
+  },
 };

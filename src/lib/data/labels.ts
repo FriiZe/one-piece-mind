@@ -1,62 +1,106 @@
 /**
- * Libellés français des valeurs codées du jeu de données, et traduction des
- * affiliations (que le wiki fournit en anglais).
+ * Libellés des valeurs codées du jeu de données, dans chaque langue du site,
+ * et traduction des affiliations (que le wiki fournit en anglais).
  */
+import type { Locale, Localized } from "@/lib/i18n";
 import type { Character, FruitType, Race, Sea } from "./schema";
 
-export const SEA_LABELS: Record<Sea, string> = {
-  "east-blue": "East Blue",
-  "west-blue": "West Blue",
-  "north-blue": "North Blue",
-  "south-blue": "South Blue",
-  "grand-line": "Grand Line",
-  "calm-belt": "Calm Belt",
-  "red-line": "Red Line",
-  sky: "Îles célestes",
+export const SEA_LABELS: Localized<Record<Sea, string>> = {
+  fr: {
+    "east-blue": "East Blue",
+    "west-blue": "West Blue",
+    "north-blue": "North Blue",
+    "south-blue": "South Blue",
+    "grand-line": "Grand Line",
+    "calm-belt": "Calm Belt",
+    "red-line": "Red Line",
+    sky: "Îles célestes",
+  },
+  en: {
+    "east-blue": "East Blue",
+    "west-blue": "West Blue",
+    "north-blue": "North Blue",
+    "south-blue": "South Blue",
+    "grand-line": "Grand Line",
+    "calm-belt": "Calm Belt",
+    "red-line": "Red Line",
+    sky: "Sky Islands",
+  },
 };
 
-export const RACE_LABELS: Record<Race, string> = {
-  human: "Humain",
-  giant: "Géant",
-  fishman: "Homme-poisson",
-  merfolk: "Sirène",
-  mink: "Mink",
-  dwarf: "Nain",
-  cyborg: "Cyborg",
-  lunarian: "Lunaria",
-  buccaneer: "Boucanier",
-  skypiean: "Peuple du ciel",
-  longarm: "Longs-bras",
-  longleg: "Longues-jambes",
-  snakeneck: "Long-cou",
-  homie: "Homie",
-  clone: "Clone",
-  animal: "Animal",
+export const RACE_LABELS: Localized<Record<Race, string>> = {
+  fr: {
+    human: "Humain",
+    giant: "Géant",
+    fishman: "Homme-poisson",
+    merfolk: "Sirène",
+    mink: "Mink",
+    dwarf: "Nain",
+    cyborg: "Cyborg",
+    lunarian: "Lunaria",
+    buccaneer: "Boucanier",
+    skypiean: "Peuple du ciel",
+    longarm: "Longs-bras",
+    longleg: "Longues-jambes",
+    snakeneck: "Long-cou",
+    homie: "Homie",
+    clone: "Clone",
+    animal: "Animal",
+  },
+  en: {
+    human: "Human",
+    giant: "Giant",
+    fishman: "Fish-Man",
+    merfolk: "Merfolk",
+    mink: "Mink",
+    dwarf: "Dwarf",
+    cyborg: "Cyborg",
+    lunarian: "Lunarian",
+    buccaneer: "Buccaneer",
+    skypiean: "Sky People",
+    longarm: "Longarm",
+    longleg: "Longleg",
+    snakeneck: "Snakeneck",
+    homie: "Homie",
+    clone: "Clone",
+    animal: "Animal",
+  },
 };
 
-export const FRUIT_TYPE_LABELS: Record<FruitType, string> = {
-  paramecia: "Paramecia",
-  logia: "Logia",
-  zoan: "Zoan",
-  "zoan-ancient": "Zoan antique",
-  "zoan-mythical": "Zoan mythique",
-  smile: "SMILE",
-  artificial: "Artificiel",
+export const FRUIT_TYPE_LABELS: Localized<Record<FruitType, string>> = {
+  fr: {
+    paramecia: "Paramecia",
+    logia: "Logia",
+    zoan: "Zoan",
+    "zoan-ancient": "Zoan antique",
+    "zoan-mythical": "Zoan mythique",
+    smile: "SMILE",
+    artificial: "Artificiel",
+  },
+  en: {
+    paramecia: "Paramecia",
+    logia: "Logia",
+    zoan: "Zoan",
+    "zoan-ancient": "Ancient Zoan",
+    "zoan-mythical": "Mythical Zoan",
+    smile: "SMILE",
+    artificial: "Artificial",
+  },
+};
+
+export type HakiType = "observation" | "armament" | "conqueror";
+
+export const HAKI_LABELS: Localized<Record<HakiType, string>> = {
+  fr: { observation: "Observation", armament: "Armement", conqueror: "Rois" },
+  en: { observation: "Observation", armament: "Armament", conqueror: "Conqueror's" },
 };
 
 /** Libellé d'une combinaison de hakis, pour l'affichage et les quiz. */
-export function hakiLabel(haki: readonly HakiType[]): string {
-  if (haki.length === 0) return "Aucun";
-  if (haki.length === 3) return "Les trois";
-  return haki.map((type) => HAKI_LABELS[type]).join(" et ");
+export function hakiLabel(haki: readonly HakiType[], locale: Locale): string {
+  if (haki.length === 0) return locale === "en" ? "None" : "Aucun";
+  if (haki.length === 3) return locale === "en" ? "All three" : "Les trois";
+  return haki.map((type) => HAKI_LABELS[locale][type]).join(locale === "en" ? " and " : " et ");
 }
-
-export const HAKI_LABELS = {
-  observation: "Observation",
-  armament: "Armement",
-  conqueror: "Rois",
-} as const;
-export type HakiType = keyof typeof HAKI_LABELS;
 
 /** Affiliations du wiki (en anglais) → libellé français. */
 const AFFILIATION_FR: Record<string, string> = {
@@ -154,6 +198,18 @@ const AFFILIATION_FR: Record<string, string> = {
   "Worst Generation": "Pire Génération",
 };
 
+/** Libellé anglais des affiliations dont le wiki n'emploie pas la graphie la plus courante. */
+const AFFILIATION_EN: Record<string, string> = {
+  "Arabasta Kingdom": "Alabasta Kingdom",
+  "Kouzuki Family": "Kozuki Family",
+};
+
+/** Organisations que le wiki désigne sous plusieurs noms : on n'en garde qu'un. */
+const SAME_ORGANIZATION: Record<string, string> = {
+  "New Spiders Cafe": "Baroque Works",
+  Arabasta: "Arabasta Kingdom",
+};
+
 /** Statuts et alliances : jamais l'affiliation principale si le personnage en a une autre. */
 const SECONDARY_AFFILIATIONS = new Set([
   "Clan of D.",
@@ -199,10 +255,12 @@ export function organizationOf(name: string): string {
     .trim();
   if (/^Marines?\b/.test(base)) return "Marines";
   if (/^CP-?\d|^CP-?0|^Cipher Pol/.test(base)) return "Cipher Pol";
-  return base;
+  return SAME_ORGANIZATION[base] ?? base;
 }
 
-export function translateAffiliation(name: string): string {
+/** Nom d'une organisation dans la langue du joueur, à partir de son nom sur le wiki. */
+export function translateAffiliation(name: string, locale: Locale): string {
+  if (locale === "en") return AFFILIATION_EN[name] ?? name;
   if (AFFILIATION_FR[name]) return AFFILIATION_FR[name];
   const of = (owner: string) => (/^[AEIOUYH]/i.test(owner) ? `d'${owner}` : `de ${owner}`);
   const pirates = name.match(/^(.+) Pirates$/);
@@ -215,16 +273,18 @@ export function translateAffiliation(name: string): string {
 }
 
 /**
- * Affiliation principale d'un personnage, en français : la première qu'il n'a
- * pas quittée, ou à défaut la première tout court (personnages décédés).
+ * Organisation principale d'un personnage, sous son nom du wiki (le même dans
+ * toutes les langues : c'est lui qui sert de clé, `translateAffiliation` en
+ * donne le libellé) : la première qu'il n'a pas quittée, ou à défaut la
+ * première tout court (personnages décédés).
  * À appeler sur une vue filtrée (`viewCharacter`) pour respecter les spoilers.
  */
-export function mainAffiliation(character: Pick<Character, "id" | "affiliations">): string | null {
+export function mainOrganization(character: Pick<Character, "id" | "affiliations">): string | null {
   const forced = MAIN_AFFILIATION_OVERRIDES[character.id];
-  if (forced) return translateAffiliation(forced);
+  if (forced) return forced;
 
   const primary = character.affiliations.filter((a) => !SECONDARY_AFFILIATIONS.has(organizationOf(a.name)));
   const pool = primary.length ? primary : character.affiliations;
   const chosen = pool.find((a) => !a.former) ?? pool[0];
-  return chosen ? translateAffiliation(organizationOf(chosen.name)) : null;
+  return chosen ? organizationOf(chosen.name) : null;
 }

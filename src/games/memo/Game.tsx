@@ -6,6 +6,7 @@ import { Portrait } from "../ui/Portrait";
 import { Panel } from "../ui/primitives";
 import type { GameProps } from "../ui/types";
 import { useRun } from "../ui/useRun";
+import { useT } from "@/lib/i18n/client";
 import { generateDeck, MAX_SCORE, scoreFor } from "./logic";
 
 /** Temps pendant lequel deux cartes qui ne vont pas ensemble restent visibles. */
@@ -20,6 +21,7 @@ type Progression = {
 const START: Progression = { matched: [], open: [], flips: [] };
 
 export default function Memo({ data }: GameProps) {
+  const t = useT();
   const base = useRun("memo");
   const [state, setState] = useState<Progression>(START);
   const game = {
@@ -37,7 +39,10 @@ export default function Memo({ data }: GameProps) {
     return (
       <GameStart game={game}>
         <p className="text-mist">
-          Seize cartes, huit paires : chaque personnage va avec son fruit du démon. Retrouve-les en un minimum de coups.
+          {t(
+            "Seize cartes, huit paires : chaque personnage va avec son fruit du démon. Retrouve-les en un minimum de coups.",
+            "Sixteen cards, eight pairs: each character goes with their Devil Fruit. Match them all in as few moves as you can.",
+          )}
         </p>
       </GameStart>
     );
@@ -46,7 +51,10 @@ export default function Memo({ data }: GameProps) {
     return (
       <GameEnd game={game} data={data} max={MAX_SCORE}>
         <p>
-          Toutes les paires en {state.flips.length} coup{state.flips.length > 1 ? "s" : ""}.
+          {t(
+            `Toutes les paires en ${state.flips.length} coup${state.flips.length > 1 ? "s" : ""}.`,
+            `All pairs in ${state.flips.length} ${state.flips.length === 1 ? "move" : "moves"}.`,
+          )}
         </p>
       </GameEnd>
     );
@@ -76,8 +84,10 @@ export default function Memo({ data }: GameProps) {
   return (
     <Panel className="space-y-4">
       <p className="text-sm font-semibold text-mist" aria-live="polite">
-        {state.matched.length / 2} paire{state.matched.length / 2 > 1 ? "s" : ""} sur {deck.length / 2} · {state.flips.length} coup
-        {state.flips.length > 1 ? "s" : ""}
+        {t(
+          `${state.matched.length / 2} paire${state.matched.length / 2 > 1 ? "s" : ""} sur ${deck.length / 2} · ${state.flips.length} coup${state.flips.length > 1 ? "s" : ""}`,
+          `${state.matched.length / 2} of ${deck.length / 2} pairs · ${state.flips.length} ${state.flips.length === 1 ? "move" : "moves"}`,
+        )}
       </p>
       <ul className="mx-auto grid max-w-xl grid-cols-4 gap-2">
         {deck.map((card, index) => {
@@ -89,7 +99,7 @@ export default function Memo({ data }: GameProps) {
                 type="button"
                 onClick={() => flip(index)}
                 disabled={visible}
-                aria-label={visible ? card.label : `Carte ${index + 1}, face cachée`}
+                aria-label={visible ? card.label : t(`Carte ${index + 1}, face cachée`, `Card ${index + 1}, face down`)}
                 className={`flex aspect-[3/4] w-full flex-col items-center justify-center gap-1 rounded-xl border-2 p-1 text-center text-xs font-bold transition-colors sm:text-sm ${
                   isMatched
                     ? "border-emerald-400 bg-emerald-600/20 text-foam"

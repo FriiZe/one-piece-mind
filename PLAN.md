@@ -161,7 +161,7 @@ Mode salon façon Kahoot : un hôte crée une partie, partage un code, choisit l
 - Une page statique par jeu (`/jeux/onepiecedle`...) avec un vrai texte : règles, astuces, questions fréquentes.
 - Pages de catégories et wiki des mécaniques. Pas de page « réponse du jour » : elle attire du trafic mais tue l'intérêt du défi quotidien.
 - Métadonnées, images de partage générées, plan du site, données structurées (`VideoGame`, `FAQPage`).
-- Français d'abord, structure prête pour l'anglais (`/en/...`).
+- Français à la racine, anglais sous `/en/...` : les deux langues sont en ligne, chaque page annonce ses deux versions (`hreflang`). Voir README, section « Langues ».
 - Partage des résultats en grille d'emojis, comme Wordle : c'est le principal canal d'acquisition de ce type de site.
 - Mettre en ligne dès la fin de la phase 1 : l'indexation prend des semaines, autant la démarrer tôt.
 
@@ -264,4 +264,3 @@ Le lot C peut s'intercaler plus tôt, jeu par jeu, selon l'envie.
 - Nom et domaine définitifs.
 - Défi quotidien : mis en place avec un seul tirage « sans spoiler anime » pour tout le monde. À revoir si tu préfères deux tirages distincts.
 - Origine des images : officielles (décidé). Reste à trouver des portraits détourés pour « Silhouette » et des pavillons pour « Jolly Roger ».
-- Anglais dès la phase 1 ou plus tard.

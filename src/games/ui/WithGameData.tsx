@@ -2,14 +2,16 @@
 
 import { Suspense, use, useMemo, type ReactNode } from "react";
 import { resolveGameData, type GameData, type ResolvedData } from "../cards";
+import { useLocale, useT } from "@/lib/i18n/client";
 import type { SpoilerMode } from "@/lib/spoilers";
 import { loadGameData } from "./data";
 import { useIsClient, useStored } from "./storage";
 
-export function LoadingPanel({ label = "Chargement…" }: { label?: string }) {
+export function LoadingPanel({ label }: { label?: string }) {
+  const t = useT();
   return (
     <div role="status" className="rounded-2xl border border-sea-700 bg-sea-800/70 p-8 text-center text-mist">
-      {label}
+      {label ?? t("Chargement…", "Loading…")}
     </div>
   );
 }
@@ -24,7 +26,7 @@ type Loaded = {
 };
 
 function Inner({ children }: { children: (loaded: Loaded) => ReactNode }) {
-  const raw = use(loadGameData());
+  const raw = use(loadGameData(useLocale()));
   const [mode, setMode] = useStored<SpoilerMode | null>("opm.mode", null);
   const data = useMemo(() => resolveGameData(raw, mode ?? "anime"), [raw, mode]);
   return children({ raw, mode, setMode, data });

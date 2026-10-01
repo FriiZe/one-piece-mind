@@ -8,6 +8,7 @@
 import type { PlayCharacter, ResolvedData } from "../cards";
 import { RACE_LABELS, SEA_LABELS } from "@/lib/data/labels";
 import { RACES, SEAS } from "@/lib/data/schema";
+import { translator } from "@/lib/i18n";
 
 export type CriterionKind = "affiliation" | "group" | "sea" | "race" | "fruit" | "haki" | "bounty" | "arc" | "gender" | "size" | "age";
 
@@ -30,6 +31,9 @@ export function criteriaFor(data: ResolvedData): Criterion[] {
   const cached = built.get(data);
   if (cached) return cached;
 
+  const t = translator(data.locale);
+  const seas = SEA_LABELS[data.locale];
+  const races = RACE_LABELS[data.locale];
   const zoan = (c: PlayCharacter) => !!c.fruitId && !!data.fruitById.get(c.fruitId)?.type.startsWith("zoan");
   const fruitType = (c: PlayCharacter) => (c.fruitId ? data.fruitById.get(c.fruitId)?.type : undefined);
   const all: Criterion[] = [];
@@ -41,7 +45,7 @@ export function criteriaFor(data: ResolvedData): Criterion[] {
       id: `affiliation:${affiliation}`,
       kind: "affiliation",
       label: affiliation,
-      question: `Son affiliation principale est-elle : ${affiliation} ?`,
+      question: t(`Son affiliation principale est-elle : ${affiliation} ?`, `Is their main affiliation: ${affiliation}?`),
       test: (c) => c.affiliation === affiliation,
     });
   }
@@ -52,7 +56,7 @@ export function criteriaFor(data: ResolvedData): Criterion[] {
       id: `group:${group.id}`,
       kind: "group",
       label: group.title,
-      question: `Fait-il partie de ce groupe : ${group.title} ?`,
+      question: t(`Fait-il partie de ce groupe : ${group.title} ?`, `Are they part of this group: ${group.title}?`),
       test: (c) => members.has(c.id),
     });
   }
@@ -61,8 +65,8 @@ export function criteriaFor(data: ResolvedData): Criterion[] {
     all.push({
       id: `sea:${sea}`,
       kind: "sea",
-      label: `Origine : ${SEA_LABELS[sea]}`,
-      question: `Vient-il de : ${SEA_LABELS[sea]} ?`,
+      label: t(`Origine : ${seas[sea]}`, `Origin: ${seas[sea]}`),
+      question: t(`Vient-il de : ${seas[sea]} ?`, `Are they from: ${seas[sea]}?`),
       test: (c) => c.sea === sea,
     });
   }
@@ -71,59 +75,119 @@ export function criteriaFor(data: ResolvedData): Criterion[] {
     all.push({
       id: `race:${race}`,
       kind: "race",
-      label: `Race : ${RACE_LABELS[race]}`,
-      question: `Est-il de cette race : ${RACE_LABELS[race]} ?`,
+      label: t(`Race : ${races[race]}`, `Race: ${races[race]}`),
+      question: t(`Est-il de cette race : ${races[race]} ?`, `Are they of this race: ${races[race]}?`),
       test: (c) => c.races.includes(race),
     });
   }
 
   all.push(
-    { id: "fruit:any", kind: "fruit", label: "A mangé un fruit du démon", question: "A-t-il mangé un fruit du démon ?", test: (c) => !!c.fruitId },
-    { id: "fruit:logia", kind: "fruit", label: "Fruit de type Logia", question: "Son fruit est-il un Logia ?", test: (c) => fruitType(c) === "logia" },
-    { id: "fruit:zoan", kind: "fruit", label: "Fruit de type Zoan", question: "Son fruit est-il un Zoan ?", test: zoan },
+    {
+      id: "fruit:any",
+      kind: "fruit",
+      label: t("A mangé un fruit du démon", "Ate a Devil Fruit"),
+      question: t("A-t-il mangé un fruit du démon ?", "Have they eaten a Devil Fruit?"),
+      test: (c) => !!c.fruitId,
+    },
+    {
+      id: "fruit:logia",
+      kind: "fruit",
+      label: t("Fruit de type Logia", "Logia fruit"),
+      question: t("Son fruit est-il un Logia ?", "Is their fruit a Logia?"),
+      test: (c) => fruitType(c) === "logia",
+    },
+    {
+      id: "fruit:zoan",
+      kind: "fruit",
+      label: t("Fruit de type Zoan", "Zoan fruit"),
+      question: t("Son fruit est-il un Zoan ?", "Is their fruit a Zoan?"),
+      test: zoan,
+    },
     {
       id: "fruit:paramecia",
       kind: "fruit",
-      label: "Fruit de type Paramecia",
-      question: "Son fruit est-il un Paramecia ?",
+      label: t("Fruit de type Paramecia", "Paramecia fruit"),
+      question: t("Son fruit est-il un Paramecia ?", "Is their fruit a Paramecia?"),
       test: (c) => fruitType(c) === "paramecia",
     },
     {
       id: "haki:conqueror",
       kind: "haki",
-      label: "Maîtrise le haki des rois",
-      question: "Maîtrise-t-il le haki des rois ?",
+      label: t("Maîtrise le haki des rois", "Wields Conqueror's Haki"),
+      question: t("Maîtrise-t-il le haki des rois ?", "Do they wield Conqueror's Haki?"),
       test: (c) => c.haki.includes("conqueror"),
     },
-    { id: "haki:any", kind: "haki", label: "Maîtrise au moins un haki", question: "Maîtrise-t-il un haki ?", test: (c) => c.haki.length > 0 },
-    { id: "bounty:any", kind: "bounty", label: "A une prime connue", question: "Sa tête est-elle mise à prix ?", test: (c) => c.bounty !== null },
+    {
+      id: "haki:any",
+      kind: "haki",
+      label: t("Maîtrise au moins un haki", "Wields at least one type of Haki"),
+      question: t("Maîtrise-t-il un haki ?", "Do they wield any Haki?"),
+      test: (c) => c.haki.length > 0,
+    },
+    {
+      id: "bounty:any",
+      kind: "bounty",
+      label: t("A une prime connue", "Has a known bounty"),
+      question: t("Sa tête est-elle mise à prix ?", "Is there a bounty on their head?"),
+      test: (c) => c.bounty !== null,
+    },
     {
       id: "bounty:billion",
       kind: "bounty",
-      label: "Prime d'au moins un milliard",
-      question: "Sa prime atteint-elle le milliard ?",
+      label: t("Prime d'au moins un milliard", "Bounty of at least one billion"),
+      question: t("Sa prime atteint-elle le milliard ?", "Does their bounty reach one billion?"),
       test: (c) => (c.bounty ?? 0) >= BILLION,
     },
     {
       id: "bounty:100m",
       kind: "bounty",
-      label: "Prime d'au moins 100 millions",
-      question: "Sa prime atteint-elle 100 millions ?",
+      label: t("Prime d'au moins 100 millions", "Bounty of at least 100 million"),
+      question: t("Sa prime atteint-elle 100 millions ?", "Does their bounty reach 100 million?"),
       test: (c) => (c.bounty ?? 0) >= 100_000_000,
     },
-    { id: "gender:female", kind: "gender", label: "Personnage féminin", question: "Est-ce une femme ?", test: (c) => c.gender === "female" },
-    { id: "size:3m", kind: "size", label: "Plus de trois mètres", question: "Mesure-t-il plus de trois mètres ?", test: (c) => (c.height ?? 0) > 300 },
-    { id: "size:small", kind: "size", label: "Moins de 1,70 m", question: "Mesure-t-il moins de 1,70 m ?", test: (c) => c.height !== null && c.height < 170 },
-    { id: "age:50", kind: "age", label: "Cinquante ans ou plus", question: "A-t-il cinquante ans ou plus ?", test: (c) => (c.age ?? 0) >= 50 },
-    { id: "age:25", kind: "age", label: "Moins de vingt-cinq ans", question: "A-t-il moins de vingt-cinq ans ?", test: (c) => c.age !== null && c.age < 25 },
+    {
+      id: "gender:female",
+      kind: "gender",
+      label: t("Personnage féminin", "Female character"),
+      question: t("Est-ce une femme ?", "Is the character a woman?"),
+      test: (c) => c.gender === "female",
+    },
+    {
+      id: "size:3m",
+      kind: "size",
+      label: t("Plus de trois mètres", "Over three meters tall"),
+      question: t("Mesure-t-il plus de trois mètres ?", "Are they over three meters tall?"),
+      test: (c) => (c.height ?? 0) > 300,
+    },
+    {
+      id: "size:small",
+      kind: "size",
+      label: t("Moins de 1,70 m", "Under 1.70 m"),
+      question: t("Mesure-t-il moins de 1,70 m ?", "Are they under 1.70 m tall?"),
+      test: (c) => c.height !== null && c.height < 170,
+    },
+    {
+      id: "age:50",
+      kind: "age",
+      label: t("Cinquante ans ou plus", "Fifty or older"),
+      question: t("A-t-il cinquante ans ou plus ?", "Are they fifty or older?"),
+      test: (c) => (c.age ?? 0) >= 50,
+    },
+    {
+      id: "age:25",
+      kind: "age",
+      label: t("Moins de vingt-cinq ans", "Under twenty-five"),
+      question: t("A-t-il moins de vingt-cinq ans ?", "Are they under twenty-five?"),
+      test: (c) => c.age !== null && c.age < 25,
+    },
   );
 
   for (const [number, title] of data.arcs) {
     all.push({
       id: `arc:${number}`,
       kind: "arc",
-      label: `Première apparition : arc ${title}`,
-      question: `Apparaît-il pour la première fois dans l'arc ${title} ?`,
+      label: t(`Première apparition : arc ${title}`, `First appearance: ${title} arc`),
+      question: t(`Apparaît-il pour la première fois dans l'arc ${title} ?`, `Do they first appear in the ${title} arc?`),
       test: (c) => c.arc === number,
     });
   }

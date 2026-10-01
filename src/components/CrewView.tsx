@@ -1,11 +1,12 @@
 "use client";
 
 import Image from "next/image";
-import Link from "next/link";
 import { useMemo, useState } from "react";
+import Link from "@/components/Link";
 import { portraitUrl, type ResolvedData } from "@/games/cards";
 import { Button, Panel } from "@/games/ui/primitives";
 import { WithGameData } from "@/games/ui/WithGameData";
+import { translateAffiliation } from "@/lib/data/labels";
 import {
   bonusLabel,
   crewBonuses,
@@ -21,39 +22,54 @@ import {
   type PostId,
 } from "@/lib/economy";
 import { GAME_CATEGORIES } from "@/lib/games/catalog";
+import type { Locale, Localized, Translate } from "@/lib/i18n";
+import { useLocale, useT } from "@/lib/i18n/client";
 import { usePlayer } from "@/lib/player/PlayerProvider";
 import { CharacterCard } from "./CharacterCard";
 import { Modal } from "./Modal";
 
-const percent = (value: number) => `+${Math.round(value * 100)} %`;
+const percent = (value: number, locale: Locale) => `+${Math.round(value * 100)}${locale === "en" ? "%" : " %"}`;
+
+/** Libellé d'un bonus au milieu d'une phrase : en anglais, « Berries » garde sa majuscule. */
+function midSentence(label: Localized, locale: Locale): string {
+  if (locale !== "en") return label[locale].toLowerCase();
+  return label.en.startsWith("Berries") ? label.en : label.en.charAt(0).toLowerCase() + label.en.slice(1);
+}
 
 /** Tous les bonus de l'équipage, postes et traits confondus, du plus général au plus particulier. */
-function bonusLines(bonuses: CrewBonuses): { label: string; value: number }[] {
+function bonusLines(bonuses: CrewBonuses, t: Translate): { label: string; value: number }[] {
   return [
-    { label: "Berrys sur tous les jeux", value: bonuses.berrys.all ?? 0 },
-    { label: "Berrys sur le défi du jour", value: bonuses.berrys.daily ?? 0 },
-    ...GAME_CATEGORIES.map((category) => ({ label: `Berrys « ${category.title} »`, value: bonuses.berrys[category.id] ?? 0 })),
-    { label: "Chances de recruter", value: bonuses.recruit },
-    { label: "Chances d'avis doré", value: bonuses.golden },
-    { label: "Réduction à la boutique", value: bonuses.discount },
+    { label: t("Berrys sur tous les jeux", "Berries on every game"), value: bonuses.berrys.all ?? 0 },
+    { label: t("Berrys sur le défi du jour", "Berries on the daily challenge"), value: bonuses.berrys.daily ?? 0 },
+    ...GAME_CATEGORIES.map((category) => ({
+      label: t(`Berrys « ${category.title.fr} »`, `Berries on “${category.title.en}” games`),
+      value: bonuses.berrys[category.id] ?? 0,
+    })),
+    { label: t("Chances de recruter", "Chance to recruit"), value: bonuses.recruit },
+    { label: t("Chances d'avis doré", "Chance of a golden poster"), value: bonuses.golden },
+    { label: t("Réduction à la boutique", "Discount at the shop"), value: bonuses.discount },
   ].filter((line) => line.value > 0);
 }
 
 function Summary({ bonuses }: { bonuses: CrewBonuses }) {
-  const lines = bonusLines(bonuses);
+  const t = useT();
+  const locale = useLocale();
+  const lines = bonusLines(bonuses, t);
   return (
     <section aria-labelledby="bonus" className="space-y-2.5 rounded-2xl border border-straw/50 bg-straw/5 p-5">
       <h2 id="bonus" className="font-extrabold text-foam">
-        Ce que rapporte ton équipage
+        {t("Ce que rapporte ton équipage", "What your crew brings in")}
       </h2>
       {lines.length === 0 ? (
-        <p className="text-sm text-mist">Aucun bonus pour l&apos;instant : place une recrue à un poste.</p>
+        <p className="text-sm text-mist">
+          {t("Aucun bonus pour l'instant : place une recrue à un poste.", "No bonus yet: assign a recruit to a post.")}
+        </p>
       ) : (
         <dl className="space-y-1.5">
           {lines.map((line) => (
             <div key={line.label} className="flex items-baseline justify-between gap-3 text-[15px]">
               <dt className="text-mist">{line.label}</dt>
-              <dd className="font-display text-xl tracking-wide text-straw">{percent(line.value)}</dd>
+              <dd className="font-display text-xl tracking-wide text-straw">{percent(line.value, locale)}</dd>
             </div>
           ))}
         </dl>
@@ -64,43 +80,65 @@ function Summary({ bonuses }: { bonuses: CrewBonuses }) {
 
 /** Traits d'équipage : les membres d'une même affiliation renforcent ensemble un bonus, par paliers. */
 function Traits({ traits }: { traits: CrewTrait[] }) {
+  const t = useT();
+  const locale = useLocale();
   return (
     <section aria-labelledby="traits" className="space-y-4 rounded-2xl border border-sea-700 p-5">
       <div>
         <h2 id="traits" className="font-extrabold text-foam">
-          Traits d&apos;équipage
+          {t("Traits d'équipage", "Crew traits")}
         </h2>
         <p className="mt-1 text-sm text-mist">
-          {TRAIT_STEPS[0]} membres d&apos;une même affiliation activent son trait ; il se renforce à {TRAIT_STEPS.slice(1).join(" et ")}.
+          {t(
+            `${TRAIT_STEPS[0]} membres d'une même affiliation activent son trait ; il se renforce à ${TRAIT_STEPS.slice(1).join(" et ")}.`,
+            `${TRAIT_STEPS[0]} members of the same affiliation activate its trait; it gets stronger at ${TRAIT_STEPS.slice(1).join(" and ")}.`,
+          )}
         </p>
       </div>
 
       {traits.length === 0 ? (
-        <p className="text-sm text-mist">Aucun membre d&apos;équipage n&apos;a d&apos;affiliation pour l&apos;instant.</p>
+        <p className="text-sm text-mist">
+          {t("Aucun membre d'équipage n'a d'affiliation pour l'instant.", "No crew member has an affiliation yet.")}
+        </p>
       ) : (
         <ul className="space-y-4">
           {traits.map((trait) => {
             const next = TRAIT_STEPS[trait.level];
+            const effect = midSentence(trait.effect, locale);
             return (
               <li key={trait.affiliation} className="space-y-1.5">
                 <p className="flex items-baseline justify-between gap-3">
-                  <span className="font-bold text-foam">{trait.name}</span>
+                  <span className="font-bold text-foam">{trait.name[locale]}</span>
                   {trait.level > 0 ? (
-                    <span className="font-display text-xl tracking-wide text-straw">{percent(trait.value)}</span>
+                    <span className="font-display text-xl tracking-wide text-straw">{percent(trait.value, locale)}</span>
                   ) : (
-                    <span className="text-[13px] text-mist">inactif</span>
+                    <span className="text-[13px] text-mist">{t("inactif", "inactive")}</span>
                   )}
                 </p>
-                <span className="flex gap-1.5" role="img" aria-label={`Palier ${trait.level} sur ${TRAIT_STEPS.length}`}>
+                <span
+                  className="flex gap-1.5"
+                  role="img"
+                  aria-label={t(
+                    `Palier ${trait.level} sur ${TRAIT_STEPS.length}`,
+                    `Tier ${trait.level} of ${TRAIT_STEPS.length}`,
+                  )}
+                >
                   {TRAIT_STEPS.map((step, index) => (
                     <span key={step} className={`h-2 flex-1 rounded-full ${index < trait.level ? "bg-straw" : "bg-sea-700"}`} />
                   ))}
                 </span>
                 <p className="text-[13px] text-mist">
-                  {trait.count} membre{trait.count > 1 ? "s" : ""} · {trait.affiliation}
+                  {t(
+                    `${trait.count} membre${trait.count > 1 ? "s" : ""}`,
+                    `${trait.count} ${trait.count === 1 ? "member" : "members"}`,
+                  )}{" "}
+                  · {trait.affiliation}
                   {next !== undefined
-                    ? ` · encore ${next - trait.count} pour ${percent(trait.values[trait.level])} (${trait.effect.toLowerCase()})`
-                    : ` · ${trait.effect.toLowerCase()}, palier maximal`}
+                    ? t(
+                        ` · encore ${next - trait.count} pour ${percent(trait.values[trait.level], locale)} (${effect})`,
+                        ` · ${next - trait.count} more for ${percent(trait.values[trait.level], locale)} (${effect})`,
+                      )
+                    : t(` · ${effect}, palier maximal`, ` · ${effect}, max tier`)}
                 </p>
               </li>
             );
@@ -109,12 +147,18 @@ function Traits({ traits }: { traits: CrewTrait[] }) {
       )}
 
       <details className="text-sm text-mist">
-        <summary className="cursor-pointer font-bold text-foam underline underline-offset-4">Voir tous les traits</summary>
+        <summary className="cursor-pointer font-bold text-foam underline underline-offset-4">
+          {t("Voir tous les traits", "See all traits")}
+        </summary>
         <ul className="mt-2 space-y-1.5">
-          {[...Object.entries(TRAITS), ["Toute autre affiliation", DEFAULT_TRAIT] as const].map(([affiliation, trait]) => (
+          {[
+            ...Object.entries(TRAITS).map(([org, trait]) => [translateAffiliation(org, locale), trait] as const),
+            [t("Toute autre affiliation", "Any other affiliation"), DEFAULT_TRAIT] as const,
+          ].map(([affiliation, trait]) => (
             <li key={affiliation}>
-              <strong className="text-foam">{trait.name}</strong> ({affiliation}) : {bonusLabel(trait.bonus).toLowerCase()},{" "}
-              {trait.values.map(percent).join(" / ")}
+              <strong className="text-foam">{trait.name[locale]}</strong> ({affiliation}){t(" : ", ": ")}
+              {midSentence(bonusLabel(trait.bonus), locale)},{" "}
+              {trait.values.map((value) => percent(value, locale)).join(" / ")}
             </li>
           ))}
         </ul>
@@ -125,6 +169,8 @@ function Traits({ traits }: { traits: CrewTrait[] }) {
 
 function Crew({ data }: { data: ResolvedData }) {
   const { state, assign } = usePlayer();
+  const t = useT();
+  const locale = useLocale();
   const [error, setError] = useState<string | null>(null);
   const [picking, setPicking] = useState<PostId | null>(null);
 
@@ -132,8 +178,8 @@ function Crew({ data }: { data: ResolvedData }) {
     () =>
       data.characters
         .filter((c) => state.collection[c.id])
-        .sort((a, b) => a.tier - b.tier || a.name.localeCompare(b.name, "fr")),
-    [data.characters, state.collection],
+        .sort((a, b) => a.tier - b.tier || a.name.localeCompare(b.name, locale)),
+    [data.characters, state.collection, locale],
   );
   const bonuses = crewBonuses(state, data.characterById);
   const postOf = (characterId: string) => POST_IDS.find((post) => state.crew[post] === characterId);
@@ -144,22 +190,24 @@ function Crew({ data }: { data: ResolvedData }) {
     setError(null);
     setPicking(null);
     const result = await assign(post, characterId);
-    if (!result.ok) setError("Ce changement n'a pas pu être enregistré.");
+    if (!result.ok) setError(t("Ce changement n'a pas pu être enregistré.", "This change couldn't be saved."));
   }
 
   if (owned.length === 0) {
     return (
       <Panel>
         <p className="text-mist">
-          Tu n&apos;as encore recruté personne. Valide un jeu du jour, ou passe à la boutique, pour accueillir ta première recrue : tu pourras
-          ensuite lui confier un poste.
+          {t(
+            "Tu n'as encore recruté personne. Valide un jeu du jour, ou passe à la boutique, pour accueillir ta première recrue : tu pourras ensuite lui confier un poste.",
+            "You haven't recruited anyone yet. Clear a daily game, or drop by the shop, to welcome your first recruit: you can then give them a post.",
+          )}
         </p>
         <p className="mt-3 flex flex-wrap gap-x-5 gap-y-2 font-bold">
           <Link href="/" className="text-straw underline underline-offset-4">
-            Voir les jeux du jour
+            {t("Voir les jeux du jour", "See the daily games")}
           </Link>
           <Link href="/boutique" className="text-straw underline underline-offset-4">
-            Aller à la boutique
+            {t("Aller à la boutique", "Go to the shop")}
           </Link>
         </p>
       </Panel>
@@ -170,13 +218,14 @@ function Crew({ data }: { data: ResolvedData }) {
     <div className="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_340px]">
       <section aria-labelledby="postes" className="space-y-3">
         <h2 id="postes" className="sr-only">
-          Les dix postes
+          {t("Les dix postes", "The ten posts")}
         </h2>
         <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 xl:grid-cols-5">
           {POST_IDS.map((post) => {
             const memberId = state.crew[post];
             const member = memberId ? data.characterById.get(memberId) : undefined;
             const golden = !!member && state.collection[member.id]?.golden > 0;
+            const strength = member ? percent(postStrength(member, state.collection[member.id], post), locale) : "";
             return (
               <li key={post}>
                 <button
@@ -184,8 +233,14 @@ function Crew({ data }: { data: ResolvedData }) {
                   onClick={() => setPicking(post)}
                   aria-label={
                     member
-                      ? `${POSTS[post].label} : ${member.name}, ${percent(postStrength(member, state.collection[member.id], post))}. Changer`
-                      : `${POSTS[post].label} : poste libre. Choisir un personnage`
+                      ? t(
+                          `${POSTS[post].label.fr} : ${member.name}, ${strength}. Changer`,
+                          `${POSTS[post].label.en}: ${member.name}, ${strength}. Change`,
+                        )
+                      : t(
+                          `${POSTS[post].label.fr} : poste libre. Choisir un personnage`,
+                          `${POSTS[post].label.en}: vacant post. Choose a character`,
+                        )
                   }
                   className={`flex h-full w-full cursor-pointer items-center gap-3 overflow-hidden rounded-xl p-2 text-left transition-colors sm:flex-col sm:items-stretch sm:gap-0 sm:p-0 ${
                     member
@@ -205,16 +260,16 @@ function Crew({ data }: { data: ResolvedData }) {
                     )}
                   </span>
                   <span className={`flex min-w-0 flex-1 flex-col sm:p-3 ${member ? "" : "sm:bg-transparent"}`}>
-                    <span className="text-[11px] font-extrabold tracking-wide text-mist uppercase sm:text-xs">{POSTS[post].label}</span>
+                    <span className="text-[11px] font-extrabold tracking-wide text-mist uppercase sm:text-xs">
+                      {POSTS[post].label[locale]}
+                    </span>
                     <span className={`truncate text-sm font-bold sm:text-[15px] ${member ? "text-foam" : "text-mist"}`}>
-                      {member ? member.name : "Poste libre"}
+                      {member ? member.name : t("Poste libre", "Vacant post")}
                     </span>
                     {member ? (
-                      <span className="font-display text-base tracking-wide text-straw sm:text-lg">
-                        {percent(postStrength(member, state.collection[member.id], post))}
-                      </span>
+                      <span className="font-display text-base tracking-wide text-straw sm:text-lg">{strength}</span>
                     ) : (
-                      <span className="hidden text-[13px] text-mist sm:block">{POSTS[post].effect}</span>
+                      <span className="hidden text-[13px] text-mist sm:block">{POSTS[post].effect[locale]}</span>
                     )}
                   </span>
                 </button>
@@ -223,8 +278,10 @@ function Crew({ data }: { data: ResolvedData }) {
           })}
         </ul>
         <p className="text-[13px] text-mist">
-          Touche un poste pour changer son occupant. Plus le personnage est rare, plus le bonus du poste est fort ; un avis doré le renforce
-          encore.
+          {t(
+            "Touche un poste pour changer son occupant. Plus le personnage est rare, plus le bonus du poste est fort ; un avis doré le renforce encore.",
+            "Tap a post to change who holds it. The rarer the character, the stronger the post's bonus; a golden poster boosts it even more.",
+          )}
         </p>
         {error && (
           <p role="alert" className="font-semibold text-vest">
@@ -238,19 +295,29 @@ function Crew({ data }: { data: ResolvedData }) {
         <Traits traits={bonuses.traits} />
         <p className="text-[13px] text-mist">
           {bonuses.full
-            ? `Équipage complet : ${percent(FULL_CREW_BONUS)} de Berrys sur tous les jeux.`
-            : `${free} poste${free > 1 ? "s" : ""} libre${free > 1 ? "s" : ""} : pourvois les dix pour ${percent(FULL_CREW_BONUS)} de Berrys.`}
+            ? t(
+                `Équipage complet : ${percent(FULL_CREW_BONUS, locale)} de Berrys sur tous les jeux.`,
+                `Full crew: ${percent(FULL_CREW_BONUS, locale)} Berries on every game.`,
+              )
+            : t(
+                `${free} poste${free > 1 ? "s" : ""} libre${free > 1 ? "s" : ""} : pourvois les dix pour ${percent(FULL_CREW_BONUS, locale)} de Berrys.`,
+                `${free} vacant ${free === 1 ? "post" : "posts"}: fill all ten for ${percent(FULL_CREW_BONUS, locale)} Berries.`,
+              )}
         </p>
       </aside>
 
       {picking && (
-        <Modal title={POSTS[picking].label} onClose={() => setPicking(null)} wide>
+        <Modal title={POSTS[picking].label[locale]} onClose={() => setPicking(null)} wide>
           <p className="text-mist">
-            {POSTS[picking].effect}. Choisis le personnage qui tiendra ce poste ; s&apos;il en occupe déjà un autre, il le quitte.
+            {POSTS[picking].effect[locale]}.{" "}
+            {t(
+              "Choisis le personnage qui tiendra ce poste ; s'il en occupe déjà un autre, il le quitte.",
+              "Choose the character who will hold this post; if they already hold another one, they leave it.",
+            )}
           </p>
           {state.crew[picking] && (
             <Button variant="secondary" onClick={() => change(picking, null)}>
-              Libérer le poste
+              {t("Libérer le poste", "Vacate the post")}
             </Button>
           )}
           <ul className="grid grid-cols-3 gap-3 sm:grid-cols-4 md:grid-cols-5">
@@ -263,21 +330,29 @@ function Crew({ data }: { data: ResolvedData }) {
                   <CharacterCard
                     character={character}
                     golden={entry.golden > 0}
-                    note={`${percent(postStrength(character, entry, picking))}${
-                      current ? " · en poste" : other ? ` · ${POSTS[other].label}` : ""
+                    note={`${percent(postStrength(character, entry, picking), locale)}${
+                      current ? t(" · en poste", " · in this post") : other ? ` · ${POSTS[other].label[locale]}` : ""
                     }`}
                   />
                   {/* Pour composer un trait : l'affiliation, et le nombre de ses membres déjà à bord */}
                   {character.affiliation && (
                     <p className="mt-1 truncate text-center text-xs text-mist" title={character.affiliation}>
                       {character.affiliation}
-                      {aboard.get(character.affiliation) ? ` · ${aboard.get(character.affiliation)} à bord` : ""}
+                      {aboard.get(character.affiliation)
+                        ? t(
+                            ` · ${aboard.get(character.affiliation)} à bord`,
+                            ` · ${aboard.get(character.affiliation)} aboard`,
+                          )
+                        : ""}
                     </p>
                   )}
                   <button
                     type="button"
                     onClick={() => change(picking, character.id)}
-                    aria-label={`Placer ${character.name} au poste de ${POSTS[picking].label}`}
+                    aria-label={t(
+                      `Placer ${character.name} au poste de ${POSTS[picking].label.fr}`,
+                      `Assign ${character.name} to the ${POSTS[picking].label.en} post`,
+                    )}
                     aria-pressed={current}
                     className="absolute inset-0 cursor-pointer rounded-md focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-straw"
                   />
@@ -292,5 +367,10 @@ function Crew({ data }: { data: ResolvedData }) {
 }
 
 export function CrewView() {
-  return <WithGameData loading="Chargement de l'équipage…">{({ data }) => <Crew data={data} />}</WithGameData>;
+  const t = useT();
+  return (
+    <WithGameData loading={t("Chargement de l'équipage…", "Loading the crew…")}>
+      {({ data }) => <Crew data={data} />}
+    </WithGameData>
+  );
 }

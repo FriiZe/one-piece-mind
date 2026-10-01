@@ -7,18 +7,26 @@ import { CharacterSearch } from "../ui/CharacterSearch";
 import { Portrait } from "../ui/Portrait";
 import { Button, Panel, ResultPanel } from "../ui/primitives";
 import type { GameProps } from "../ui/types";
+import type { Localized } from "@/lib/i18n";
+import { useLocale, useT } from "@/lib/i18n/client";
 import { disagreements, MAX_GUESSES, MAX_QUESTIONS, think, type Reply, type Step } from "./logic";
 
-const REPLIES: { reply: Reply; label: string }[] = [
-  { reply: "yes", label: "Oui" },
-  { reply: "no", label: "Non" },
-  { reply: "unknown", label: "Je ne sais pas" },
+const REPLIES: { reply: Reply; label: Localized }[] = [
+  { reply: "yes", label: { fr: "Oui", en: "Yes" } },
+  { reply: "no", label: { fr: "Non", en: "No" } },
+  { reply: "unknown", label: { fr: "Je ne sais pas", en: "I don't know" } },
 ];
-const REPLY_LABELS: Record<Reply, string> = { yes: "Oui", no: "Non", unknown: "Je ne sais pas" };
+const REPLY_LABELS: Record<Reply, Localized> = {
+  yes: { fr: "Oui", en: "Yes" },
+  no: { fr: "Non", en: "No" },
+  unknown: { fr: "Je ne sais pas", en: "I don't know" },
+};
 
 type Outcome = { won: true; character: PlayCharacter } | { won: false; character: PlayCharacter | null };
 
 export default function DenDenDevin({ data }: GameProps) {
+  const t = useT();
+  const locale = useLocale();
   const [playing, setPlaying] = useState(false);
   const [steps, setSteps] = useState<Step[]>([]);
   /** Personnages déjà proposés, et refusés par le joueur. */
@@ -39,11 +47,18 @@ export default function DenDenDevin({ data }: GameProps) {
     return (
       <Panel className="space-y-4">
         <p className="text-mist">
-          Pense à un personnage de One Piece, sans le dire. L&apos;escargophone te pose jusqu&apos;à {MAX_QUESTIONS} questions,
-          puis propose un nom. Réponds de ton mieux : « Je ne sais pas » est une réponse permise.
+          {t(
+            `Pense à un personnage de One Piece, sans le dire. L'escargophone te pose jusqu'à ${MAX_QUESTIONS} questions, puis propose un nom. Réponds de ton mieux : « Je ne sais pas » est une réponse permise.`,
+            `Think of a One Piece character, and keep it to yourself. The Transponder Snail asks you up to ${MAX_QUESTIONS} questions, then names someone. Answer as best you can: “I don't know” is a valid answer.`,
+          )}
         </p>
-        <p className="text-sm text-mist">Ce jeu ne rapporte pas de Berrys : c&apos;est toi qui dis si l&apos;escargophone a trouvé.</p>
-        <Button onClick={start}>J&apos;ai mon personnage</Button>
+        <p className="text-sm text-mist">
+          {t(
+            "Ce jeu ne rapporte pas de Berrys : c'est toi qui dis si l'escargophone a trouvé.",
+            "This game doesn't earn Berries: you're the one who says whether the Transponder Snail got it right.",
+          )}
+        </p>
+        <Button onClick={start}>{t("J'ai mon personnage", "I've got my character")}</Button>
       </Panel>
     );
   }
@@ -52,35 +67,58 @@ export default function DenDenDevin({ data }: GameProps) {
     const wrong = !outcome.won && outcome.character ? disagreements(outcome.character, criteria, steps) : [];
     return (
       <ResultPanel
-        title={outcome.won ? `C'était ${outcome.character.name} !` : "Tu m'as eu !"}
-        actions={<Button onClick={start}>Rejouer</Button>}
+        title={
+          outcome.won
+            ? t(`C'était ${outcome.character.name} !`, `It was ${outcome.character.name}!`)
+            : t("Tu m'as eu !", "You got me!")
+        }
+        actions={<Button onClick={start}>{t("Rejouer", "Play again")}</Button>}
       >
         {outcome.character?.img && <Portrait img={outcome.character.img} className="h-32 w-24" />}
         {outcome.won ? (
           <p>
-            Trouvé en {steps.length} question{steps.length > 1 ? "s" : ""}
-            {rejected.length > 0 && ` et ${rejected.length + 1} propositions`}.
+            {t(
+              `Trouvé en ${steps.length} question${steps.length > 1 ? "s" : ""}`,
+              `Got it in ${steps.length} question${steps.length === 1 ? "" : "s"}`,
+            )}
+            {rejected.length > 0 && t(` et ${rejected.length + 1} propositions`, ` and ${rejected.length + 1} guesses`)}.
           </p>
         ) : outcome.character ? (
           <>
-            <p>Tu pensais à {outcome.character.name}.</p>
+            <p>{t(`Tu pensais à ${outcome.character.name}.`, `You were thinking of ${outcome.character.name}.`)}</p>
             {wrong.length > 0 ? (
               <div>
-                <p className="font-semibold">Voilà où nos fiches ne sont pas d&apos;accord :</p>
+                <p className="font-semibold">
+                  {t("Voilà où nos fiches ne sont pas d'accord :", "Here's where our notes don't match:")}
+                </p>
                 <ul className="list-inside list-disc text-sm">
                   {wrong.map((item) => (
                     <li key={item.question}>
-                      {item.question} Tu as répondu « {REPLY_LABELS[item.reply]} ».
+                      {item.question}{" "}
+                      {t(
+                        `Tu as répondu « ${REPLY_LABELS[item.reply].fr} ».`,
+                        `You answered “${REPLY_LABELS[item.reply].en}”.`,
+                      )}
                     </li>
                   ))}
                 </ul>
               </div>
             ) : (
-              <p className="text-sm">Tes réponses collaient à sa fiche : je manquais de questions pour le distinguer des autres.</p>
+              <p className="text-sm">
+                {t(
+                  "Tes réponses collaient à sa fiche : je manquais de questions pour le distinguer des autres.",
+                  "Your answers matched their file: I just didn't have enough questions to tell them apart from the others.",
+                )}
+              </p>
             )}
           </>
         ) : (
-          <p>Je ne connais pas tous les personnages : celui-là m&apos;a échappé.</p>
+          <p>
+            {t(
+              "Je ne connais pas tous les personnages : celui-là m'a échappé.",
+              "I don't know every character: that one got away from me.",
+            )}
+          </p>
         )}
       </ResultPanel>
     );
@@ -94,16 +132,16 @@ export default function DenDenDevin({ data }: GameProps) {
   if (beaten) {
     return (
       <Panel className="space-y-4">
-        <p className="font-display text-3xl tracking-wide text-straw">Je donne ma langue au chat</p>
-        <p className="text-mist">À qui pensais-tu ?</p>
+        <p className="font-display text-3xl tracking-wide text-straw">{t("Je donne ma langue au chat", "I give up")}</p>
+        <p className="text-mist">{t("À qui pensais-tu ?", "Who were you thinking of?")}</p>
         <CharacterSearch
           characters={data.characters}
           onPick={(character) => setOutcome({ won: false, character })}
-          label="Le personnage auquel tu pensais"
-          placeholder="Son nom…"
+          label={t("Le personnage auquel tu pensais", "The character you were thinking of")}
+          placeholder={t("Son nom…", "Their name…")}
         />
         <Button variant="secondary" onClick={() => setOutcome({ won: false, character: null })}>
-          Il n&apos;est pas dans la liste
+          {t("Il n'est pas dans la liste", "They're not in the list")}
         </Button>
       </Panel>
     );
@@ -112,10 +150,14 @@ export default function DenDenDevin({ data }: GameProps) {
   return (
     <Panel className="space-y-4">
       <div className="flex items-center justify-between text-sm font-semibold text-mist">
-        <span>{question ? `Question ${steps.length + 1} / ${MAX_QUESTIONS}` : `Proposition ${rejected.length + 1} / ${MAX_GUESSES}`}</span>
+        <span>
+          {question
+            ? `Question ${steps.length + 1} / ${MAX_QUESTIONS}`
+            : t(`Proposition ${rejected.length + 1} / ${MAX_GUESSES}`, `Guess ${rejected.length + 1} / ${MAX_GUESSES}`)}
+        </span>
         {steps.length > 0 && (
           <button type="button" className="underline underline-offset-4 hover:text-foam" onClick={() => setSteps(steps.slice(0, -1))}>
-            Revenir à la question précédente
+            {t("Revenir à la question précédente", "Back to the previous question")}
           </button>
         )}
       </div>
@@ -132,7 +174,7 @@ export default function DenDenDevin({ data }: GameProps) {
                 variant={reply === "unknown" ? "secondary" : "primary"}
                 onClick={() => setSteps([...steps, { criterionId: question.id, reply }])}
               >
-                {label}
+                {label[locale]}
               </Button>
             ))}
           </div>
@@ -140,14 +182,16 @@ export default function DenDenDevin({ data }: GameProps) {
       ) : (
         guess && (
           <div className="space-y-3 text-center" aria-live="polite">
-            <p className="text-mist">Je crois que tu penses à…</p>
+            <p className="text-mist">{t("Je crois que tu penses à…", "I think you're thinking of…")}</p>
             {guess.img && <Portrait img={guess.img} />}
             <p className="font-display text-4xl tracking-wide text-straw">{guess.name}</p>
             {guess.affiliation && <p className="text-mist">{guess.affiliation}</p>}
             <div className="flex flex-wrap justify-center gap-2">
-              <Button onClick={() => setOutcome({ won: true, character: guess })}>Oui, c&apos;est ça</Button>
+              <Button onClick={() => setOutcome({ won: true, character: guess })}>
+                {t("Oui, c'est ça", "Yes, that's it")}
+              </Button>
               <Button variant="secondary" onClick={() => setRejected([...rejected, guess.id])}>
-                Non
+                {t("Non", "No")}
               </Button>
             </div>
           </div>

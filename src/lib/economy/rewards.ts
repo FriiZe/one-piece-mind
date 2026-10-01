@@ -1,3 +1,4 @@
+import type { Localized } from "@/lib/i18n";
 import type { Difficulty } from "@/games/engine/difficulty";
 import { randomInt, type Rng } from "@/games/engine/rng";
 import { isRewardless, type LiveSlug } from "@/lib/games/catalog";
@@ -78,7 +79,10 @@ export const BOOSTER_COST = 6000;
 
 /** Part de chaque rareté dans les recrutements (1 = légendaire, 4 = commun). */
 export const RARITY_WEIGHTS: Record<number, number> = { 1: 4, 2: 14, 3: 32, 4: 50 };
-export const RARITY_LABELS: Record<number, string> = { 1: "Légendaire", 2: "Rare", 3: "Peu commun", 4: "Commun" };
+export const RARITY_LABELS: Localized<Record<number, string>> = {
+  fr: { 1: "Légendaire", 2: "Rare", 3: "Peu commun", 4: "Commun" },
+  en: { 1: "Legendary", 2: "Rare", 3: "Uncommon", 4: "Common" },
+};
 
 export const GOLDEN_CHANCE = 0.04;
 

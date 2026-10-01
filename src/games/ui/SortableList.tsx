@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useT } from "@/lib/i18n/client";
 import { Portrait } from "./Portrait";
 
 export type SortableItem = {
@@ -37,6 +38,7 @@ export function SortableList({
   submitted: boolean;
   onReorder: (order: string[]) => void;
 }) {
+  const t = useT();
   /** Ligne en cours de déplacement, et de combien elle suit le pointeur. */
   const [drag, setDrag] = useState<{ id: string; offset: number } | null>(null);
   const nodes = useRef(new Map<string, HTMLLIElement>());
@@ -149,7 +151,7 @@ export function SortableList({
               {submitted && (
                 <span className="block text-sm text-mist">
                   {item.detail}
-                  {!right && ` · rang attendu : ${expected.indexOf(id) + 1}`}
+                  {!right && t(` · rang attendu : ${expected.indexOf(id) + 1}`, ` · expected rank: ${expected.indexOf(id) + 1}`)}
                 </span>
               )}
             </span>
@@ -157,7 +159,7 @@ export function SortableList({
               <span className="flex gap-1">
                 <button
                   type="button"
-                  aria-label={`Monter ${item.label}`}
+                  aria-label={t(`Monter ${item.label}`, `Move ${item.label} up`)}
                   disabled={index === 0}
                   onClick={() => onReorder(swap(order, index, index - 1))}
                   className="h-10 w-10 rounded-lg bg-sea-600 text-lg text-foam hover:bg-straw hover:text-ink disabled:opacity-30"
@@ -166,7 +168,7 @@ export function SortableList({
                 </button>
                 <button
                   type="button"
-                  aria-label={`Descendre ${item.label}`}
+                  aria-label={t(`Descendre ${item.label}`, `Move ${item.label} down`)}
                   disabled={index === order.length - 1}
                   onClick={() => onReorder(swap(order, index, index + 1))}
                   className="h-10 w-10 rounded-lg bg-sea-600 text-lg text-foam hover:bg-straw hover:text-ink disabled:opacity-30"

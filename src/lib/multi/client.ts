@@ -2,6 +2,7 @@
 
 /** Accès au salon depuis le navigateur : identité du joueur, appels au serveur, relecture régulière de l'état. */
 import { useCallback, useEffect, useRef, useState } from "react";
+import type { Localized } from "@/lib/i18n";
 import type { FriendsOverview, NotificationCounts } from "./friends";
 import type { FriendCollection, TradesOverview } from "./trades";
 import type { Result, RoomError, RoomTicket, RoomView } from "./types";
@@ -261,14 +262,27 @@ export function useFriendCollection(friendId: string | null): FriendCollection |
   return friendId && loaded?.id === friendId ? loaded.value : null;
 }
 
-export const ROOM_ERRORS: Record<RoomError, string> = {
-  "not-found": "Ce salon n'existe pas, ou plus.",
-  full: "Ce salon est complet.",
-  "name-taken": "Ce pseudo est déjà pris dans ce salon.",
-  "bad-name": "Choisis un pseudo de 2 à 16 caractères : lettres, chiffres, espaces.",
-  started: "La partie a déjà commencé.",
-  forbidden: "Cette action n'est pas possible maintenant.",
-  "bad-request": "Réglages invalides.",
-  "rate-limited": "Trop de tentatives. Réessaie dans quelques minutes.",
-  unavailable: "Le multijoueur est indisponible pour l'instant.",
+export const ROOM_ERRORS: Localized<Record<RoomError, string>> = {
+  fr: {
+    "not-found": "Ce salon n'existe pas, ou plus.",
+    full: "Ce salon est complet.",
+    "name-taken": "Ce pseudo est déjà pris dans ce salon.",
+    "bad-name": "Choisis un pseudo de 2 à 16 caractères : lettres, chiffres, espaces.",
+    started: "La partie a déjà commencé.",
+    forbidden: "Cette action n'est pas possible maintenant.",
+    "bad-request": "Réglages invalides.",
+    "rate-limited": "Trop de tentatives. Réessaie dans quelques minutes.",
+    unavailable: "Le multijoueur est indisponible pour l'instant.",
+  },
+  en: {
+    "not-found": "This room doesn't exist, or no longer does.",
+    full: "This room is full.",
+    "name-taken": "That name is already taken in this room.",
+    "bad-name": "Pick a name of 2 to 16 characters: letters, digits, spaces.",
+    started: "The game has already started.",
+    forbidden: "That isn't possible right now.",
+    "bad-request": "Invalid settings.",
+    "rate-limited": "Too many attempts. Try again in a few minutes.",
+    unavailable: "Multiplayer is unavailable right now.",
+  },
 };

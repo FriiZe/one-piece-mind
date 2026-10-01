@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import Link from "@/components/Link";
 import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 import { DccFlow } from "@/games/duo-carre-cash/DccFlow";
@@ -10,23 +10,38 @@ import { formatNumber } from "@/games/engine/text";
 import { Button, Panel, ResultPanel, ShareButton } from "@/games/ui/primitives";
 import { useStored } from "@/games/ui/storage";
 import { LoadingPanel } from "@/games/ui/WithGameData";
+import { getGame } from "@/lib/games/catalog";
+import type { Localized } from "@/lib/i18n";
+import { useLocale, useLocalePath, useT } from "@/lib/i18n/client";
 import { deleteQuizAction, reportQuizAction, restoreQuizAction, submitQuizAction } from "@/lib/player/quiz-actions";
 import { usePlayer } from "@/lib/player/PlayerProvider";
 import { useQuiz } from "@/lib/quiz/client";
 import { COMMUNITY_BERRYS, scoreQuiz, toDccQuestions } from "@/lib/quiz/rules";
-import { QUIZ_ERRORS, type QuizDetail, type QuizPlayResult } from "@/lib/quiz/types";
+import { QUIZ_ERRORS, type QuizDetail, type QuizError, type QuizPlayResult } from "@/lib/quiz/types";
 import type { SpoilerMode } from "@/lib/spoilers";
 
 type Finished = { score: number; max: number; server: QuizPlayResult | "pending" | "failed" | null };
 
-const REWARD_NOTES: Record<Exclude<QuizPlayResult["reward"], "paid">, string> = {
-  already: "Tu avais déjà terminé ce quiz : il ne rapporte des Berrys que la première fois.",
-  own: "C'est ton quiz : il ne te rapporte pas de Berrys.",
-  limit: "Tu as déjà été récompensé pour beaucoup de quiz aujourd'hui : pas de Berrys pour celui-ci.",
+const REWARD_NOTES: Record<Exclude<QuizPlayResult["reward"], "paid">, Localized> = {
+  already: {
+    fr: "Tu avais déjà terminé ce quiz : il ne rapporte des Berrys que la première fois.",
+    en: "You had already finished this quiz: it only earns Berries the first time.",
+  },
+  own: {
+    fr: "C'est ton quiz : il ne te rapporte pas de Berrys.",
+    en: "It's your quiz: it doesn't earn you any Berries.",
+  },
+  limit: {
+    fr: "Tu as déjà été récompensé pour beaucoup de quiz aujourd'hui : pas de Berrys pour celui-ci.",
+    en: "You've already been rewarded for a lot of quizzes today: no Berries for this one.",
+  },
 };
 
 /** Signalement, suppression, remise en ligne : ce qu'on peut faire d'un quiz en dehors d'y jouer. */
 function Moderation({ quiz, onChanged }: { quiz: QuizDetail; onChanged: () => void }) {
+  const t = useT();
+  const locale = useLocale();
+  const path = useLocalePath();
   const router = useRouter();
   const { status } = usePlayer();
   const [open, setOpen] = useState<"report" | "delete" | null>(null);
@@ -34,12 +49,12 @@ function Moderation({ quiz, onChanged }: { quiz: QuizDetail; onChanged: () => vo
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
 
-  async function run<T extends { ok: boolean; error?: keyof typeof QUIZ_ERRORS }>(action: () => Promise<T>, success: string | null) {
+  async function run<T extends { ok: boolean; error?: QuizError }>(action: () => Promise<T>, success: string | null) {
     setBusy(true);
     const result = await action().catch(() => ({ ok: false, error: "unavailable" }) as const);
     setBusy(false);
     setOpen(null);
-    setMessage(result.ok ? success : QUIZ_ERRORS[result.error ?? "unavailable"]);
+    setMessage(result.ok ? success : QUIZ_ERRORS[locale][result.error ?? "unavailable"]);
     return result.ok;
   }
 
@@ -50,15 +65,15 @@ function Moderation({ quiz, onChanged }: { quiz: QuizDetail; onChanged: () => vo
       <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-mist">
         {canReport &&
           (quiz.reported ? (
-            <span>Tu as signalé ce quiz.</span>
+            <span>{t("Tu as signalé ce quiz.", "You reported this quiz.")}</span>
           ) : (
             <button type="button" className="underline underline-offset-4 hover:text-foam" onClick={() => setOpen("report")}>
-              Signaler ce quiz
+              {t("Signaler ce quiz", "Report this quiz")}
             </button>
           ))}
         {quiz.canDelete && (
           <button type="button" className="underline underline-offset-4 hover:text-foam" onClick={() => setOpen("delete")}>
-            Supprimer ce quiz
+            {t("Supprimer ce quiz", "Delete this quiz")}
           </button>
         )}
         {quiz.isAdmin && quiz.status === "hidden" && (
@@ -67,10 +82,11 @@ function Moderation({ quiz, onChanged }: { quiz: QuizDetail; onChanged: () => vo
             disabled={busy}
             className="underline underline-offset-4 hover:text-foam"
             onClick={async () => {
-              if (await run(() => restoreQuizAction(quiz.id), "Quiz remis en ligne.")) onChanged();
+              const done = t("Quiz remis en ligne.", "Quiz back online.");
+              if (await run(() => restoreQuizAction(quiz.id), done)) onChanged();
             }}
           >
-            Remettre en ligne
+            {t("Remettre en ligne", "Put back online")}
           </button>
         )}
       </div>
@@ -80,26 +96,29 @@ function Moderation({ quiz, onChanged }: { quiz: QuizDetail; onChanged: () => vo
           className="space-y-2 rounded-xl border border-sea-600 bg-sea-900/60 p-3"
           onSubmit={async (event) => {
             event.preventDefault();
-            if (await run(() => reportQuizAction(quiz.id, reason), "Merci, ton signalement est enregistré.")) onChanged();
+            const thanks = t("Merci, ton signalement est enregistré.", "Thanks, your report has been recorded.");
+            if (await run(() => reportQuizAction(quiz.id, reason), thanks)) onChanged();
           }}
         >
           <label className="block">
-            <span className="mb-1 block font-semibold text-foam">Qu&apos;est-ce qui ne va pas ? (facultatif)</span>
+            <span className="mb-1 block font-semibold text-foam">
+              {t("Qu'est-ce qui ne va pas ? (facultatif)", "What's wrong? (optional)")}
+            </span>
             <input
               type="text"
               value={reason}
               onChange={(event) => setReason(event.target.value)}
               maxLength={200}
-              placeholder="Spoiler, insulte, réponse fausse…"
+              placeholder={t("Spoiler, insulte, réponse fausse…", "Spoiler, insult, wrong answer…")}
               className="w-full rounded-lg border-2 border-sea-600 bg-sea-900 px-3 py-2 text-foam placeholder:text-mist/60 focus:border-straw focus:outline-none"
             />
           </label>
           <div className="flex flex-wrap gap-2">
             <Button type="submit" disabled={busy}>
-              Envoyer le signalement
+              {t("Envoyer le signalement", "Send the report")}
             </Button>
             <Button variant="ghost" onClick={() => setOpen(null)}>
-              Annuler
+              {t("Annuler", "Cancel")}
             </Button>
           </div>
         </form>
@@ -107,18 +126,20 @@ function Moderation({ quiz, onChanged }: { quiz: QuizDetail; onChanged: () => vo
 
       {open === "delete" && (
         <div className="flex flex-wrap items-center gap-2 rounded-xl border border-vest/60 bg-vest/10 p-3">
-          <span className="font-semibold text-foam">Supprimer définitivement « {quiz.title} » ?</span>
+          <span className="font-semibold text-foam">
+            {t(`Supprimer définitivement « ${quiz.title} » ?`, `Permanently delete “${quiz.title}”?`)}
+          </span>
           <Button
             variant="secondary"
             disabled={busy}
             onClick={async () => {
-              if (await run(() => deleteQuizAction(quiz.id), null)) router.push("/quiz");
+              if (await run(() => deleteQuizAction(quiz.id), null)) router.push(path("/quiz"));
             }}
           >
-            Oui, supprimer
+            {t("Oui, supprimer", "Yes, delete")}
           </Button>
           <Button variant="ghost" onClick={() => setOpen(null)}>
-            Annuler
+            {t("Annuler", "Cancel")}
           </Button>
         </div>
       )}
@@ -131,6 +152,8 @@ function Moderation({ quiz, onChanged }: { quiz: QuizDetail; onChanged: () => vo
 }
 
 export function QuizPlayer({ id }: { id: string }) {
+  const t = useT();
+  const locale = useLocale();
   const { status, accountsEnabled, refresh } = usePlayer();
   const { quiz, reload } = useQuiz(id);
   const [mode] = useStored<SpoilerMode | null>("opm.mode", null);
@@ -140,17 +163,17 @@ export function QuizPlayer({ id }: { id: string }) {
 
   const loaded = quiz && quiz !== "missing" ? quiz : null;
   const questions = useMemo(
-    () => (loaded && seed !== null ? toDccQuestions(loaded.title, loaded.questions, seed) : []),
-    [loaded, seed],
+    () => (loaded && seed !== null ? toDccQuestions(loaded.title, loaded.questions, seed, locale) : []),
+    [loaded, seed, locale],
   );
 
-  if (quiz === null) return <LoadingPanel label="Chargement du quiz…" />;
+  if (quiz === null) return <LoadingPanel label={t("Chargement du quiz…", "Loading the quiz…")} />;
   if (quiz === "missing" || !loaded) {
     return (
       <Panel className="space-y-3">
-        <p className="text-mist">{QUIZ_ERRORS["not-found"]}</p>
+        <p className="text-mist">{QUIZ_ERRORS[locale]["not-found"]}</p>
         <Link href="/quiz" className="inline-block font-bold text-straw underline underline-offset-4">
-          Voir les quiz de la commu
+          {t("Voir les quiz de la commu", "See the community quizzes")}
         </Link>
       </Panel>
     );
@@ -184,16 +207,22 @@ export function QuizPlayer({ id }: { id: string }) {
   const warning = loaded.spoiler === "manga" && mode !== "manga" && !spoilersAccepted;
   const header = (
     <header className="space-y-1">
-      <nav aria-label="Fil d'Ariane" className="text-sm text-mist">
+      <nav aria-label={t("Fil d'Ariane", "Breadcrumb")} className="text-sm text-mist">
         <Link href="/quiz" className="underline underline-offset-4 hover:text-foam">
-          Quiz de la commu
+          {t("Quiz de la commu", "Community quizzes")}
         </Link>
       </nav>
       <h1 className="font-display text-4xl tracking-wide text-foam sm:text-5xl">{loaded.title}</h1>
       <p className="text-mist">
-        Par <strong className="text-foam">{loaded.author}</strong> · {loaded.questionCount} questions · joué{" "}
-        {formatNumber(loaded.plays)} fois
-        {loaded.status === "hidden" && <strong className="text-vest"> · masqué après des signalements</strong>}
+        {t("Par", "By")} <strong className="text-foam">{loaded.author}</strong> · {loaded.questionCount} questions
+        {" · "}
+        {t(
+          `joué ${formatNumber(loaded.plays, locale)} fois`,
+          `played ${formatNumber(loaded.plays, locale)} ${loaded.plays === 1 ? "time" : "times"}`,
+        )}
+        {loaded.status === "hidden" && (
+          <strong className="text-vest"> · {t("masqué après des signalements", "hidden after reports")}</strong>
+        )}
       </p>
     </header>
   );
@@ -208,6 +237,8 @@ export function QuizPlayer({ id }: { id: string }) {
   }
 
   const server = finished?.server;
+  // Le nom du jeu vient du catalogue, comme partout ailleurs
+  const dccTitle = getGame("duo-carre-cash")!.title[locale];
   return (
     <div className="space-y-4">
       {header}
@@ -217,53 +248,71 @@ export function QuizPlayer({ id }: { id: string }) {
           title={`${finished.score} / ${finished.max}`}
           actions={
             <>
-              <Button onClick={start}>Rejouer</Button>
+              <Button onClick={start}>{t("Rejouer", "Play again")}</Button>
               <ShareButton
-                label="Partager ce quiz"
-                getText={() => `${loaded.title} : ${finished.score} / ${finished.max} en Duo, Carré ou Cash\n${window.location.href}`}
+                label={t("Partager ce quiz", "Share this quiz")}
+                getText={() =>
+                  t(
+                    `${loaded.title} : ${finished.score} / ${finished.max} en ${dccTitle}\n${window.location.href}`,
+                    `${loaded.title}: ${finished.score} / ${finished.max} in ${dccTitle}\n${window.location.href}`,
+                  )
+                }
               />
               <Link href="/quiz" className="rounded-lg px-4 py-2.5 font-bold underline underline-offset-4">
-                Autres quiz
+                {t("Autres quiz", "Other quizzes")}
               </Link>
             </>
           }
         >
-          {server === "pending" && <p className="text-sm font-semibold">Enregistrement du score…</p>}
-          {server === "failed" && <p className="text-sm font-semibold">Ton score n&apos;a pas pu être enregistré.</p>}
+          {server === "pending" && (
+            <p className="text-sm font-semibold">{t("Enregistrement du score…", "Saving your score…")}</p>
+          )}
+          {server === "failed" && (
+            <p className="text-sm font-semibold">{t("Ton score n'a pas pu être enregistré.", "Your score couldn't be saved.")}</p>
+          )}
           {server && typeof server === "object" && (
             <>
               {server.reward === "paid" ? (
-                <p className="font-display text-3xl tracking-wide text-vest-dark">+{formatNumber(server.berrys)} ฿</p>
+                <p className="font-display text-3xl tracking-wide text-vest-dark">
+                  +{formatNumber(server.berrys, locale)} ฿
+                </p>
               ) : (
-                <p className="text-sm font-semibold">{REWARD_NOTES[server.reward]}</p>
+                <p className="text-sm font-semibold">{REWARD_NOTES[server.reward][locale]}</p>
               )}
               <p className="text-sm font-semibold">
-                Ton meilleur score sur ce quiz : {server.best} / {server.max}
+                {t("Ton meilleur score sur ce quiz : ", "Your best score on this quiz: ")}
+                {server.best} / {server.max}
               </p>
             </>
           )}
           {server === null && accountsEnabled && (
             <p className="text-sm">
               <Link href="/profil" className="font-semibold underline underline-offset-4">
-                Connecte-toi
+                {t("Connecte-toi", "Log in")}
               </Link>{" "}
-              pour garder ton score et gagner des Berrys sur les quiz de la commu.
+              {t(
+                "pour garder ton score et gagner des Berrys sur les quiz de la commu.",
+                "to keep your score and earn Berries on community quizzes.",
+              )}
             </p>
           )}
         </ResultPanel>
       ) : warning ? (
         <div className="space-y-3 rounded-2xl bg-parchment p-5 text-ink sm:p-6">
-          <h2 className="font-display text-3xl tracking-wide">Attention, spoilers</h2>
+          <h2 className="font-display text-3xl tracking-wide">{t("Attention, spoilers", "Careful, spoilers")}</h2>
           <p>
-            Son auteur indique que ce quiz porte sur des chapitres du manga pas encore adaptés en anime.
-            {mode === "anime" && " Tu as indiqué suivre l'anime."}
+            {t(
+              "Son auteur indique que ce quiz porte sur des chapitres du manga pas encore adaptés en anime.",
+              "Its author says this quiz covers manga chapters not yet adapted into the anime.",
+            )}
+            {mode === "anime" && t(" Tu as indiqué suivre l'anime.", " You said you follow the anime.")}
           </p>
           <div className="flex flex-wrap gap-3">
             <Button onClick={() => setSpoilersAccepted(true)} className="bg-vest text-white hover:bg-vest-dark">
-              Je suis à jour sur le manga
+              {t("Je suis à jour sur le manga", "I'm caught up with the manga")}
             </Button>
             <Link href="/quiz" className="rounded-lg px-4 py-2.5 font-bold underline underline-offset-4">
-              Choisir un autre quiz
+              {t("Choisir un autre quiz", "Pick another quiz")}
             </Link>
           </div>
         </div>
@@ -271,17 +320,28 @@ export function QuizPlayer({ id }: { id: string }) {
         <Panel className="space-y-4">
           {loaded.description && <p className="text-foam">{loaded.description}</p>}
           <p className="text-mist">
-            Avant chaque réponse, choisis ton risque : Duo (deux propositions, 1 point), Carré (quatre propositions, 3
-            points) ou Cash (aucune proposition, 5 points).
+            {t(
+              "Avant chaque réponse, choisis ton risque : Duo (deux propositions, 1 point), Carré (quatre propositions, 3 points) ou Cash (aucune proposition, 5 points).",
+              "Before each answer, pick your risk: Duo (two choices, 1 point), Quad (four choices, 3 points) or Cash (no choices, 5 points).",
+            )}
           </p>
           <p className="text-sm text-mist">
             {loaded.isAuthor
-              ? "C'est ton quiz : tu peux y jouer, mais il ne te rapporte pas de Berrys."
+              ? t(
+                  "C'est ton quiz : tu peux y jouer, mais il ne te rapporte pas de Berrys.",
+                  "It's your quiz: you can play it, but it doesn't earn you any Berries.",
+                )
               : loaded.yourBest
-                ? `Ton meilleur score : ${loaded.yourBest.score} / ${loaded.yourBest.max}. Tu as déjà touché la prime de ce quiz.`
-                : `La première fois que tu le termines, ce quiz rapporte jusqu'à ${COMMUNITY_BERRYS} ฿${status === "user" ? "" : ", si tu es connecté"}.`}
+                ? t(
+                    `Ton meilleur score : ${loaded.yourBest.score} / ${loaded.yourBest.max}. Tu as déjà touché la prime de ce quiz.`,
+                    `Your best score: ${loaded.yourBest.score} / ${loaded.yourBest.max}. You've already collected this quiz's bounty.`,
+                  )
+                : t(
+                    `La première fois que tu le termines, ce quiz rapporte jusqu'à ${COMMUNITY_BERRYS} ฿${status === "user" ? "" : ", si tu es connecté"}.`,
+                    `The first time you finish it, this quiz earns you up to ${COMMUNITY_BERRYS} ฿${status === "user" ? "" : ", if you're logged in"}.`,
+                  )}
           </p>
-          <Button onClick={start}>Jouer</Button>
+          <Button onClick={start}>{t("Jouer", "Play")}</Button>
         </Panel>
       )}
 

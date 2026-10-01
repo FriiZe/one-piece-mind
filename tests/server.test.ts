@@ -102,7 +102,7 @@ describe.skipIf(!accountsEnabled)("récompenses enregistrées en base", () => {
     expect(first.outcome).toMatchObject({ score: 10, max: 10 });
     expect(first.reward.berrys).toBe(250);
     // Première partie parfaite : les objectifs du jeu s'ajoutent aux gains
-    expect(first.reward.objectives.map((o) => o.label)).toContain("Réussir un sans-faute");
+    expect(first.reward.objectives.map((o) => o.label.fr)).toContain("Réussir un sans-faute");
     expect(first.reward.total).toBeGreaterThan(first.reward.berrys);
     expect(first.state).toMatchObject({ berrys: first.reward.total, lifetimeBerrys: first.reward.total, games: 1 });
     expect(first.state.stats["type-de-fruit"]).toEqual({ games: 1, best: 1 });

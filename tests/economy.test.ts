@@ -39,12 +39,12 @@ import {
 import { isRewardless, type LiveSlug } from "@/lib/games/catalog";
 
 const pool: Recruitable[] = [
-  { id: "luffy", tier: 1, affiliation: "Chapeau de paille" },
-  { id: "zoro", tier: 1, affiliation: "Chapeau de paille" },
-  { id: "nami", tier: 1, affiliation: "Chapeau de paille" },
-  { id: "vergo", tier: 2, affiliation: "Don Quijote" },
-  { id: "pell", tier: 3, affiliation: "Alabasta" },
-  ...Array.from({ length: 20 }, (_, i) => ({ id: `figurant-${i}`, tier: 4, affiliation: null })),
+  { id: "luffy", tier: 1, org: "Chapeau de paille", affiliation: "Chapeau de paille" },
+  { id: "zoro", tier: 1, org: "Chapeau de paille", affiliation: "Chapeau de paille" },
+  { id: "nami", tier: 1, org: "Chapeau de paille", affiliation: "Chapeau de paille" },
+  { id: "vergo", tier: 2, org: "Don Quijote", affiliation: "Don Quijote" },
+  { id: "pell", tier: 3, org: "Alabasta", affiliation: "Alabasta" },
+  ...Array.from({ length: 20 }, (_, i) => ({ id: `figurant-${i}`, tier: 4, org: null, affiliation: null })),
 ];
 const byId = new Map(pool.map((c) => [c.id, c]));
 const owning = (...ids: string[]): PlayerState => ({
@@ -291,8 +291,9 @@ describe("équipage", () => {
   });
 
   it("renforce un trait à mesure que l'équipage compte de membres de l'affiliation", () => {
-    const crewOf = (affiliation: string, count: number) => {
-      const members: Recruitable[] = Array.from({ length: count }, (_, i) => ({ id: `m${i}`, tier: 4, affiliation }));
+    // L'organisation porte son nom du wiki : c'est lui, et non le libellé affiché, qui décide du trait
+    const crewOf = (org: string, count: number, affiliation = org) => {
+      const members: Recruitable[] = Array.from({ length: count }, (_, i) => ({ id: `m${i}`, tier: 4, org, affiliation }));
       const state: PlayerState = {
         ...EMPTY_PLAYER,
         collection: Object.fromEntries(members.map((m) => [m.id, { count: 1, golden: 0 }])),
@@ -303,19 +304,23 @@ describe("équipage", () => {
     };
 
     expect(TRAIT_STEPS).toEqual([3, 5, 7]);
-    const whitebeard = "Équipage de Barbe Blanche";
-    expect(crewOf(whitebeard, 2).traits).toMatchObject([{ affiliation: whitebeard, count: 2, level: 0, value: 0 }]);
+    const whitebeard = "Whitebeard Pirates";
+    expect(crewOf(whitebeard, 2, "Équipage de Barbe Blanche").traits).toMatchObject([
+      { org: whitebeard, affiliation: "Équipage de Barbe Blanche", count: 2, level: 0, value: 0 },
+    ]);
     expect(crewOf(whitebeard, 2).berrys.all).toBeUndefined();
     const values = [3, 5, 7].map((count) => crewOf(whitebeard, count).berrys.all!);
     expect(values).toEqual([...TRAITS[whitebeard].values]);
     expect(values[0]).toBeLessThan(values[1]);
     expect(values[1]).toBeLessThan(values[2]);
-    expect(crewOf(whitebeard, 9).traits[0]).toMatchObject({ level: 3, name: "Fils de Barbe Blanche" });
+    expect(crewOf(whitebeard, 9).traits[0]).toMatchObject({ level: 3, name: { fr: "Fils de Barbe Blanche", en: "Sons of Whitebeard" } });
+    // Le libellé affiché, lui, suit la langue du joueur sans rien changer au trait
+    expect(crewOf(whitebeard, 3, "Whitebeard Pirates").berrys.all).toBe(values[0]);
 
     // L'Armée révolutionnaire fait baisser les prix de la boutique : le timonier et le musicien sont pourvus à trois
-    const revolution = crewOf("Armée révolutionnaire", 3);
-    expect(revolution.traits[0]).toMatchObject({ level: 1, effect: "Réduction à la boutique" });
-    expect(revolution.discount).toBeCloseTo(postStrength({ id: "m", tier: 4, affiliation: null }, undefined, "musicien") + 0.1);
+    const revolution = crewOf("Revolutionary Army", 3);
+    expect(revolution.traits[0]).toMatchObject({ level: 1, effect: { fr: "Réduction à la boutique", en: "Discount at the shop" } });
+    expect(revolution.discount).toBeCloseTo(postStrength({ id: "m", tier: 4, org: null, affiliation: null }, undefined, "musicien") + 0.1);
   });
 
   it("donne à chaque trait trois paliers croissants et un libellé", () => {
@@ -323,7 +328,10 @@ describe("équipage", () => {
       expect(trait.values[0], affiliation).toBeGreaterThan(0);
       expect(trait.values[1], affiliation).toBeGreaterThan(trait.values[0]);
       expect(trait.values[2], affiliation).toBeGreaterThan(trait.values[1]);
-      expect(bonusLabel(trait.bonus)).not.toBe("");
+      expect(trait.name.fr, affiliation).not.toBe("");
+      expect(trait.name.en, affiliation).not.toBe("");
+      expect(bonusLabel(trait.bonus).fr).not.toBe("");
+      expect(bonusLabel(trait.bonus).en).not.toBe("");
     }
   });
 
@@ -338,7 +346,7 @@ describe("objectifs par jeu", () => {
 
   it("verse chaque prime une seule fois, quand l'objectif est atteint", () => {
     const first = applyGame(EMPTY_PLAYER, outcome(), pool, DAY, never);
-    expect(first.reward.objectives.map((o) => o.label)).toEqual([
+    expect(first.reward.objectives.map((o) => o.label.fr)).toEqual([
       "Jouer une première partie",
       "Marquer la moitié des points",
       "Marquer 80 % des points",
@@ -358,7 +366,7 @@ describe("objectifs par jeu", () => {
     expect(state.stats["le-classement"]).toEqual({ games: 2, best: 0.6 });
 
     const other = applyGame(state, outcome({ slug: "haki", category: "savoir", performance: 0.9 }), pool, "2026-10-01", never);
-    expect(other.reward.objectives.map((o) => o.label)).toContain("Jouer une première partie");
+    expect(other.reward.objectives.map((o) => o.label.fr)).toContain("Jouer une première partie");
     expect(other.state.stats.haki).toEqual({ games: 1, best: 0.9 });
   });
 
@@ -369,7 +377,7 @@ describe("objectifs par jeu", () => {
       tenth = applyGame(state, outcome({ performance: 0.1 }), pool, "2026-10-01", never);
       state = tenth.state;
     }
-    expect(tenth!.reward.objectives).toEqual([{ label: "Jouer 10 parties", berrys: 500 }]);
+    expect(tenth!.reward.objectives).toEqual([{ label: { fr: "Jouer 10 parties", en: "Play 10 games" }, berrys: 500 }]);
     expect(isMet(OBJECTIVES[1], state.stats["le-classement"])).toBe(true);
     expect(objectiveProgress(OBJECTIVES[2], state.stats["le-classement"])).toBeCloseTo(0.2);
   });
@@ -393,8 +401,8 @@ describe("défis de la semaine", () => {
     expect(challenges).toHaveLength(3);
     expect(weeklyChallenges("2026-S40").map((c) => c.label)).toEqual(challenges.map((c) => c.label));
     expect(challenges[0].slug).not.toBe(challenges[1].slug);
-    expect(challenges[2].label).toBe("Réussir 3 défis du jour");
-    expect(weeklyChallenges("2026-S41")[2].label).toBe("Gagner 5 000 Berrys en jouant");
+    expect(challenges[2].label).toEqual({ fr: "Réussir 3 défis du jour", en: "Win 3 daily challenges" });
+    expect(weeklyChallenges("2026-S41")[2].label.fr).toBe("Gagner 5 000 Berrys en jouant");
   });
 
   it("fait avancer un défi partie après partie et le paie une fois terminé", () => {
@@ -405,7 +413,7 @@ describe("défis de la semaine", () => {
     for (let i = 0; i < 6; i++) {
       const applied = applyGame(state, game, pool, "2026-10-01", never);
       state = applied.state;
-      paid.push(applied.reward.weekly.filter((w) => w.label === regular.label).length);
+      paid.push(applied.reward.weekly.filter((w) => w.label.fr === regular.label.fr).length);
     }
     expect(paid).toEqual([0, 0, 0, 0, 1, 0]);
     expect(state.week).toMatchObject({ key: "2026-S40" });
@@ -432,9 +440,9 @@ describe("défis de la semaine", () => {
 describe("prime du joueur", () => {
   it("suit le total gagné et fixe le rang", () => {
     expect(playerBounty({ lifetimeBerrys: 12_500 })).toBe(12_500_000);
-    expect(rankOf(0)).toMatchObject({ title: "Mousse", next: { title: "Rookie" } });
-    expect(rankOf(12_500_000).title).toBe("Rookie");
-    expect(rankOf(499_999_999).title).toBe("Supernova");
-    expect(rankOf(3_000_000_000)).toEqual({ title: "Empereur", next: null });
+    expect(rankOf(0)).toMatchObject({ title: { fr: "Mousse", en: "Cabin Boy" }, next: { title: { fr: "Rookie" } } });
+    expect(rankOf(12_500_000).title.fr).toBe("Rookie");
+    expect(rankOf(499_999_999).title.fr).toBe("Supernova");
+    expect(rankOf(3_000_000_000)).toEqual({ title: { fr: "Empereur", en: "Emperor" }, next: null });
   });
 });

@@ -7,9 +7,15 @@ import { Portrait } from "../ui/Portrait";
 import { Button, Panel, Progress } from "../ui/primitives";
 import type { GameProps } from "../ui/types";
 import { useRun } from "../ui/useRun";
+import { useLocale, useT } from "@/lib/i18n/client";
 import { generateDraw, MAX_SCORE, pointsFor, POSTS, ranksOf, scorePlacement } from "./logic";
 
+/** Rang en anglais : 1st, 2nd, 3rd, 4th… (dix postes au plus). */
+const ordinal = (rank: number) => `${rank}${["th", "st", "nd", "rd"][rank] ?? "th"}`;
+
 export default function RecruteTonEquipage({ data }: GameProps) {
+  const t = useT();
+  const locale = useLocale();
   const base = useRun("recrute-ton-equipage");
   /** Poste donné à chaque personnage déjà placé, dans l'ordre du tirage. */
   const [posts, setPosts] = useState<number[]>([]);
@@ -30,8 +36,10 @@ export default function RecruteTonEquipage({ data }: GameProps) {
     return (
       <GameStart game={game}>
         <p className="text-mist">
-          Dix personnages se présentent un à un. Donne à chacun un poste, du capitaine au mousse, sans connaître les
-          suivants : l&apos;équipage idéal range les primes de la plus haute à la plus basse.
+          {t(
+            "Dix personnages se présentent un à un. Donne à chacun un poste, du capitaine au mousse, sans connaître les suivants : l'équipage idéal range les primes de la plus haute à la plus basse.",
+            "Ten characters show up one at a time. Give each one a post, from captain to cabin boy, without knowing who comes next: the ideal crew lines up the bounties from highest to lowest.",
+          )}
         </p>
       </GameStart>
     );
@@ -51,11 +59,16 @@ export default function RecruteTonEquipage({ data }: GameProps) {
 
   return (
     <Panel className="space-y-4">
-      <Progress current={Math.min(posts.length + 1, draw.length)} total={draw.length} score={done ? `Score : ${score} / ${MAX_SCORE}` : undefined} />
+      <Progress current={Math.min(posts.length + 1, draw.length)} total={draw.length} score={done ? t(`Score : ${score} / ${MAX_SCORE}`, `Score: ${score} / ${MAX_SCORE}`) : undefined} />
 
       {current && (
         <div className="space-y-2 text-center" aria-live="polite">
-          <p className="text-mist">Quel poste pour cette recrue ? Clique sur un poste, ou fais-y glisser la recrue.</p>
+          <p className="text-mist">
+            {t(
+              "Quel poste pour cette recrue ? Clique sur un poste, ou fais-y glisser la recrue.",
+              "Which post for this recruit? Click a post, or drag the recruit onto it.",
+            )}
+          </p>
           {/* La recrue se dépose sur un poste libre ; le clic sur le poste reste possible, au doigt comme au clavier */}
           <div
             draggable
@@ -73,7 +86,8 @@ export default function RecruteTonEquipage({ data }: GameProps) {
       )}
 
       <ol className="grid gap-2 sm:grid-cols-2">
-        {POSTS.map((label, post) => {
+        {POSTS.map((name, post) => {
+          const label = name[locale];
           const index = posts.indexOf(post);
           const member = index >= 0 ? draw[index] : null;
           const points = member ? pointsFor(ranks[index], post) : 0;
@@ -94,7 +108,11 @@ export default function RecruteTonEquipage({ data }: GameProps) {
                   setOver(null);
                   if (!member && !done) setPosts([...posts, post]);
                 }}
-                aria-label={member ? `${label} : ${member.name}` : `Placer au poste de ${label}`}
+                aria-label={
+                  member
+                    ? t(`${label} : ${member.name}`, `${label}: ${member.name}`)
+                    : t(`Placer au poste de ${label}`, `Assign to the ${label} post`)
+                }
                 className={`flex w-full items-center justify-between gap-3 rounded-xl border-2 px-3 py-2 text-left transition-colors disabled:cursor-default ${
                   member
                     ? done
@@ -113,12 +131,15 @@ export default function RecruteTonEquipage({ data }: GameProps) {
                   <span className="block text-xs font-semibold tracking-wide text-mist uppercase">
                     {post + 1}. {label}
                   </span>
-                  <span className="block truncate font-bold text-foam">{member ? member.name : "Poste libre"}</span>
+                  <span className="block truncate font-bold text-foam">{member ? member.name : t("Poste libre", "Open post")}</span>
                   {/* Les primes ne sont dévoilées qu'une fois l'équipage au complet */}
                   {member && done && (
                     <span className="block text-sm text-mist">
-                      {formatBounty(member.bounty)} · {ranks[index] + 1}
-                      {ranks[index] === 0 ? "re" : "e"} prime
+                      {formatBounty(member.bounty, locale)} ·{" "}
+                      {t(
+                        `${ranks[index] + 1}${ranks[index] === 0 ? "re" : "e"} prime`,
+                        ranks[index] === 0 ? "highest bounty" : `${ordinal(ranks[index] + 1)} highest bounty`,
+                      )}
                     </span>
                   )}
                 </span>
@@ -132,10 +153,13 @@ export default function RecruteTonEquipage({ data }: GameProps) {
       {done && (
         <div className="flex flex-wrap items-center justify-between gap-3" aria-live="polite">
           <p className="text-mist">
-            Cinq points pour une prime au bon poste, un de moins par poste d&apos;écart.
+            {t(
+              "Cinq points pour une prime au bon poste, un de moins par poste d'écart.",
+              "Five points for a bounty at the right post, one fewer for each post it is off by.",
+            )}
           </p>
           <Button autoFocus onClick={finish}>
-            Voir mon score
+            {t("Voir mon score", "See my score")}
           </Button>
         </div>
       )}
