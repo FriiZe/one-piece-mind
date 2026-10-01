@@ -5,6 +5,7 @@
  */
 import emojisJson from "@data/curated/emojis.json";
 import epithetsJson from "@data/curated/epithets.json";
+import laughsJson from "@data/curated/laughs.json";
 import shipsJson from "@data/curated/ships.json";
 import techniquesJson from "@data/curated/techniques.json";
 import weaponsJson from "@data/curated/weapons.json";
@@ -66,6 +67,8 @@ export type Extras = {
   /** `crew` : nom français de l'équipage. */
   ships: { name: string; crew: string }[];
   emojis: { characterId: string; emojis: string }[];
+  /** Rire caractéristique, écrit. */
+  laughs: { characterId: string; text: string }[];
 };
 
 export type GameData = {
@@ -133,6 +136,7 @@ export function buildGameData(): GameData {
       weapons: weaponsJson.weapons,
       ships: shipsJson.ships.map((ship) => ({ name: ship.name, crew: translateAffiliation(ship.crew) })),
       emojis: Object.entries(emojisJson.emojis).map(([characterId, emojis]) => ({ characterId, emojis })),
+      laughs: Object.entries(laughsJson.laughs).map(([characterId, text]) => ({ characterId, text })),
     },
     arcs: arcs
       .filter((arc) => arc.kind === "manga")
@@ -187,6 +191,7 @@ export function resolveGameData(data: GameData, mode: SpoilerMode): ResolvedData
       weapons: known(data.extras.weapons),
       ships: data.extras.ships,
       emojis: known(data.extras.emojis),
+      laughs: known(data.extras.laughs),
     },
     arcs: new Map(data.arcs.map((arc) => [arc.number, arc.title])),
     characters: resolved,

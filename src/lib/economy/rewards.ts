@@ -40,6 +40,14 @@ export const BASE_BERRYS: Record<LiveSlug, number> = {
   "mode-aleatoire": 400,
   // Le maximum suppose dix réponses justes sans proposition : la barre est haute, la prime aussi
   "duo-carre-cash": 800,
+  rires: 350,
+  connexions: 500,
+  grille: 600,
+  "recrute-ton-equipage": 500,
+  // Une traversée complète compte une trentaine d'îles : c'est le jeu le plus long
+  "la-route-de-grand-line": 1200,
+  // Sans vérification possible, pas de récompense (voir REWARDLESS_SLUGS)
+  "den-den-devin": 0,
 };
 export const DAILY_CHALLENGE_BERRYS = 1500;
 

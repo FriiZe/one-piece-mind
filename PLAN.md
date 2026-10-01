@@ -238,6 +238,11 @@ Le lot C peut s'intercaler plus tôt, jeu par jeu, selon l'envie.
 - Révélation et Zoom extrême : l'image n'avance plus avec le temps, seulement après une proposition (ou une demande d'en voir plus, qui coûte autant qu'une erreur). Le palier est déduit par le serveur du nombre d'erreurs.
 - Boutique (prévue en phase 5, avancée) : elle remplace la taverne. Une recrue pour 1 500 ฿, ou un booster de cinq avis pour 6 000 ฿, ouvert carte par carte : trois communes ou peu communes, une quatrième parfois rare, une dernière rare ou légendaire. Le halo de rareté d'une carte n'apparaît qu'au survol.
 - Traits d'équipage, façon TFT : les membres d'une même affiliation activent un trait à 3, 5 puis 7 membres (Barbe Blanche : Berrys ; Armée révolutionnaire : réduction à la boutique ; Roger : avis dorés...). Ils remplacent l'ancien bonus unique « trois membres de la même affiliation ».
+- Six jeux du lot C, ceux qui ne demandent ni images ni sons nouveaux : Rires (version écrite), Connexions, Grille 3×3, Recrute ton équipage, La Route de Grand Line, Den Den Devin. Le site compte 37 jeux.
+  - Den Den Devin ne rapporte ni Berrys ni objectifs : c'est le joueur qui dit si l'escargophone a trouvé, le serveur ne peut pas le vérifier.
+  - Recrute ton équipage est devenu un classement à l'aveugle : dix primes tirées une à une, à placer du capitaine au mousse.
+  - Restent en attente, faute de matière : Silhouette, Silhouette QCM, Jolly Roger, Avant / après l'ellipse, Fruit du démon (dessin), Voix et répliques, GeoPiece, Qui a dit ça ?
+- Glisser-déposer dans les jeux où l'on range : Le classement, Chronologie (à la souris, ou au doigt par la poignée ; les flèches restent pour le clavier) et Recrute ton équipage (à la souris).
 - Échanges entre amis : un avis contre un avis, sur proposition acceptée. Reste à faire : échanger plusieurs avis à la fois, choisir de donner l'exemplaire doré plutôt que l'ordinaire.
 
 **À reprendre plus tard**

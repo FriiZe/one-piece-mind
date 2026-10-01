@@ -41,7 +41,9 @@ src/games/
 ├── cards.ts       données compactes envoyées au navigateur, ramenées au mode du joueur
 ├── content.ts     textes des pages de jeu (règles, questions fréquentes, métadonnées)
 ├── ui/            éléments communs : lanceur, choix du mode spoiler, saisie assistée, quiz
-├── qcm/           quiz à choix : douze jeux, un générateur de questions chacun
+├── engine/criteria.ts  propriétés vérifiables d'un personnage : Connexions, Grille 3×3, Den Den Devin
+├── ui/SortableList.tsx liste à ranger par glisser-déposer : Le classement, Chronologie
+├── qcm/           quiz à choix : treize jeux, un générateur de questions chacun
 ├── estimate/      estimation d'un nombre au curseur : trois jeux
 ├── clues/         personnage à retrouver par indices successifs : deux jeux
 └── <jeu>/         logic.ts (fonctions pures, testées) et Game.tsx (affichage)
@@ -57,6 +59,8 @@ Pour ajouter un jeu :
 2. écrire `src/games/<slug>/Game.tsx` si aucune famille ne convient ;
 3. ajouter le slug à `LIVE_SLUGS` (`src/lib/games/catalog.ts`) : TypeScript réclame alors son composant dans `GameRunner.tsx`, ses textes dans `content.ts` et son barème dans `src/lib/economy/rewards.ts` ;
 4. déclarer la forme de son compte rendu et son recalcul dans `src/games/report.ts`.
+
+Un jeu que le serveur ne peut pas vérifier (Den Den Devin, où c'est le joueur qui dit si l'escargophone a trouvé) figure dans `REWARDLESS_SLUGS` : il n'envoie pas de compte rendu, ne rapporte rien et n'a pas d'objectifs.
 
 La page `/jeux/<slug>`, son image de partage et son entrée dans le plan du site sont créées automatiquement.
 

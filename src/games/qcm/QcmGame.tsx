@@ -16,6 +16,7 @@ const INTROS: Record<QcmSlug, string> = {
   "vrai-ou-faux": "Dix affirmations sur les personnages : à toi de trancher.",
   techniques: "Dix techniques. Retrouve à chaque fois le personnage qui l'utilise.",
   "armes-et-sabres": "Dix armes célèbres. Qui les manie ?",
+  rires: "Dix rires, écrits comme dans le manga. À qui appartient chacun ?",
   surnoms: "Dix surnoms. Retrouve à chaque fois le personnage qui le porte.",
   orthographe: "Dix personnages. Pour chacun, quatre graphies de son nom : une seule est la bonne.",
   "grand-ou-vieux": "Dix duels : qui est le plus grand, qui est le plus âgé ?",

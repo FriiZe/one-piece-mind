@@ -3,7 +3,7 @@
  * chaque lundi à partir du numéro de la semaine.
  */
 import { createRng, sample, seedFromString } from "@/games/engine/rng";
-import { GAMES, type LiveSlug } from "@/lib/games/catalog";
+import { GAMES, isRewardless, type LiveSlug } from "@/lib/games/catalog";
 import type { GameOutcome, WeekProgress } from "./types";
 
 export type Challenge = {
@@ -38,7 +38,7 @@ export function daysLeftInWeek(dayKey: string): number {
 
 export function weeklyChallenges(week: string): Challenge[] {
   const rng = createRng(seedFromString(`defis:${week}`));
-  const live = GAMES.filter((game) => game.status === "live");
+  const live = GAMES.filter((game) => game.status === "live" && !isRewardless(game.slug));
   const [regular, skilled] = sample(rng, live, 2);
   const weekNumber = Number(week.split("-S")[1]);
 

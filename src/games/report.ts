@@ -12,14 +12,18 @@ import * as anagramme from "./anagramme/logic";
 import * as avis from "./avis-de-recherche/logic";
 import * as chronologie from "./chronologie/logic";
 import * as clues from "./clues/logic";
+import * as connexions from "./connexions/logic";
 import * as dcc from "./duo-carre-cash/logic";
 import * as estimate from "./estimate/logic";
+import * as grille from "./grille/logic";
+import * as route from "./la-route-de-grand-line/logic";
 import * as classement from "./le-classement/logic";
 import * as memo from "./memo/logic";
 import * as onepiecedle from "./onepiecedle/logic";
 import * as plusOuMoins from "./plus-ou-moins/logic";
 import * as qcm from "./qcm/logic";
 import * as quiAMange from "./qui-a-mange-ce-fruit/logic";
+import * as recrute from "./recrute-ton-equipage/logic";
 import * as reveal from "./revelation/logic";
 import * as trouve from "./trouve-les-tous/logic";
 import * as typeDeFruit from "./type-de-fruit/logic";
@@ -99,6 +103,22 @@ export const reportSchema = z.discriminatedUnion("slug", [
     answers: z.array(z.object({ kind: z.enum(dcc.DCC_KINDS), value: z.string().max(120) })).max(dcc.DCC_LENGTH),
   }),
   z.object({
+    slug: z.literal("connexions"),
+    seed,
+    mode,
+    difficulty,
+    guesses: z.array(z.array(id).length(connexions.GROUP_SIZE)).max(connexions.GROUPS + connexions.MAX_MISTAKES),
+  }),
+  z.object({ slug: z.literal("grille"), seed, mode, difficulty, answers: z.array(id.nullable()).max(grille.CELLS) }),
+  z.object({
+    slug: z.literal("recrute-ton-equipage"),
+    seed,
+    mode,
+    difficulty,
+    posts: z.array(z.number().int().min(0).max(recrute.POSTS.length - 1)).max(recrute.POSTS.length),
+  }),
+  z.object({ slug: z.literal("la-route-de-grand-line"), seed, mode, answers: z.array(z.string().max(120)).max(80) }),
+  z.object({
     slug: z.literal("memo"),
     seed,
     mode,
@@ -173,6 +193,14 @@ export function evaluateReport(report: GameReport, { data, animeCharacters, toda
     case "premiere-apparition":
     case "prime-d-equipage":
       return outcome(estimate.evaluate(report.slug, report.seed, report.difficulty, report.answers, data));
+    case "connexions":
+      return outcome(connexions.evaluate(report.seed, report.difficulty, report.guesses, data));
+    case "grille":
+      return outcome(grille.evaluate(report.seed, report.difficulty, report.answers, data));
+    case "recrute-ton-equipage":
+      return outcome(recrute.evaluate(report.seed, report.difficulty, report.posts, data));
+    case "la-route-de-grand-line":
+      return outcome(route.evaluate(report.seed, report.answers, data));
     case "duo-carre-cash":
       return outcome(dcc.evaluate(report.seed, report.difficulty, report.answers, data));
     case "les-indices":

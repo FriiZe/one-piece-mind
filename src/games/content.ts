@@ -741,4 +741,143 @@ export const GAME_CONTENT: Record<LiveSlug, GameContent> = {
       SPOILER_FAQ,
     ],
   },
+  rires: {
+    metaTitle: "Rires One Piece : à qui appartient ce rire ?",
+    metaDescription:
+      "Shishishi, Zehahaha, Kishishishi : dix rires de One Piece écrits comme dans le manga. Retrouve à chaque fois le personnage qui rit ainsi.",
+    intro:
+      "Dans One Piece, presque chaque personnage a son rire. Dix rires, écrits comme dans le manga : à toi de rendre chacun à son propriétaire.",
+    howTo: [
+      "Lis le rire affiché.",
+      "Choisis, parmi quatre personnages, celui qui rit ainsi.",
+      "La correction s'affiche après chaque réponse. Dix questions par partie.",
+    ],
+    faq: [
+      {
+        question: "Peut-on écouter les rires ?",
+        answer: "Pas pour l'instant : les rires sont écrits, comme dans le manga.",
+      },
+      {
+        question: "Un même rire peut-il désigner deux personnages ?",
+        answer: "Non : chaque rire de la liste n'appartient qu'à un personnage. Ceux que plusieurs personnages partagent ont été écartés.",
+      },
+      SPOILER_FAQ,
+    ],
+  },
+  connexions: {
+    metaTitle: "Connexions One Piece : seize personnages, quatre familles cachées",
+    metaDescription:
+      "Seize personnages de One Piece à regrouper en quatre familles de quatre : équipage, mer d'origine, type de fruit, arc. Quatre erreurs permises.",
+    intro:
+      "Seize personnages, quatre familles de quatre. Ce qui les relie n'est pas dit : un équipage, une mer d'origine, un type de fruit, un arc. À toi de retrouver les quatre familles.",
+    howTo: [
+      "Sélectionne quatre personnages que tu crois liés, puis valide.",
+      "Si c'est une famille, elle s'affiche avec son nom. Sinon, tu perds une des quatre erreurs permises.",
+      "Le jeu te prévient quand un seul des quatre n'est pas à sa place.",
+      "Un point par famille trouvée.",
+    ],
+    faq: [
+      {
+        question: "Un personnage peut-il appartenir à deux familles ?",
+        answer: "Non : dans chaque grille, chaque personnage n'entre que dans une seule des quatre familles.",
+      },
+      {
+        question: "De quoi sont faites les familles ?",
+        answer: "D'une affiliation, d'un groupe (Supernovas, Grands Corsaires…), d'une mer d'origine, d'une race, d'un type de fruit, du haki des rois, d'une prime d'un milliard ou d'un arc de première apparition.",
+      },
+      SPOILER_FAQ,
+    ],
+  },
+  grille: {
+    metaTitle: "Grille 3×3 One Piece : croise deux critères par case",
+    metaDescription:
+      "Une grille de neuf cases à remplir avec des personnages de One Piece : chaque case croise deux critères, comme un équipage et un type de fruit.",
+    intro:
+      "Trois critères en ligne, trois en colonne. Chaque case attend un personnage qui remplit les deux à la fois : un membre de la Marine qui a mangé un Logia, par exemple.",
+    howTo: [
+      "Clique sur une case, puis tape le nom d'un personnage qui remplit ses deux critères.",
+      "Tu n'as qu'un essai par case, et un personnage ne sert qu'une fois.",
+      "À la fin, les cases manquées montrent une réponse possible. Un point par case juste.",
+    ],
+    faq: [
+      {
+        question: "Y a-t-il une seule bonne réponse par case ?",
+        answer: "Non : toute réponse qui remplit les deux critères est acceptée. En facile, chaque case a plusieurs réponses connues ; en expert, parfois une seule.",
+      },
+      {
+        question: "Quels critères peut-on rencontrer ?",
+        answer: "En ligne, une affiliation, un groupe, une mer d'origine ou un arc. En colonne, un type de fruit, un haki, une prime, une race, une taille ou un âge.",
+      },
+      SPOILER_FAQ,
+    ],
+  },
+  "recrute-ton-equipage": {
+    metaTitle: "Recrute ton équipage : classe dix primes One Piece à l'aveugle",
+    metaDescription:
+      "Dix personnages primés tirés un à un, dix postes du capitaine au mousse : place chacun sans connaître les suivants, de la plus grosse prime à la plus petite.",
+    intro:
+      "Dix personnages se présentent un à un. Tu donnes à chacun un poste, du capitaine au mousse, sans savoir qui viendra ensuite. L'équipage idéal range les primes de la plus haute à la plus basse.",
+    howTo: [
+      "Regarde le personnage tiré, puis clique sur le poste que tu lui donnes : le capitaine doit avoir la plus grosse prime, le mousse la plus petite.",
+      "Un poste donné ne se reprend pas.",
+      "À la fin, les primes sont dévoilées : 5 points pour un personnage au bon poste, un de moins par poste d'écart. Maximum : 50 points.",
+    ],
+    faq: [
+      {
+        question: "Les primes sont-elles affichées pendant la partie ?",
+        answer: "Non, seulement à la fin : c'est ta connaissance des primes qui fait la différence.",
+      },
+      {
+        question: "Comment sont comptés les points ?",
+        answer: "Le personnage à la plus grosse prime devrait être capitaine, le suivant second, et ainsi de suite. Chaque personnage rapporte 5 points au bon poste, 4 à un poste d'écart, jusqu'à 0 à cinq postes d'écart.",
+      },
+      SPOILER_FAQ,
+    ],
+  },
+  "la-route-de-grand-line": {
+    metaTitle: "La Route de Grand Line : traverse One Piece arc par arc",
+    metaDescription:
+      "Une île par arc, dans l'ordre de l'histoire, une question par île. Trois vies, un boss toutes les cinq îles : jusqu'où iras-tu sur la route de Grand Line ?",
+    intro:
+      "Une île par arc, de Romance Dawn jusqu'où tu en es. Sur chaque île, une question sur les personnages qui y apparaissent. Trois vies pour aller le plus loin possible.",
+    howTo: [
+      "Réponds à la question de l'île : une bonne réponse la conquiert, une erreur coûte une vie.",
+      "Toutes les cinq îles, un boss : le rater coûte deux vies, le battre en rend une.",
+      "La traversée s'arrête quand tu n'as plus de vie, ou au bout de la route. Un point par île conquise.",
+    ],
+    faq: [
+      {
+        question: "Combien d'îles compte la route ?",
+        answer: "Une par arc du manga, ou par arc déjà adapté si tu joues en mode anime : une trentaine en tout.",
+      },
+      {
+        question: "Sur quoi portent les questions ?",
+        answer: "Sur les personnages qui apparaissent pour la première fois dans l'arc de l'île : leur affiliation, leur origine, leur haki, l'orthographe de leur nom.",
+      },
+      SPOILER_FAQ,
+    ],
+  },
+  "den-den-devin": {
+    metaTitle: "Den Den Devin : l'escargophone devine ton personnage One Piece",
+    metaDescription:
+      "Pense à un personnage de One Piece, sans le dire : l'escargophone te pose jusqu'à vingt questions sur son équipage, son fruit ou sa prime, puis devine de qui il s'agit.",
+    intro:
+      "Pense à un personnage, sans le dire. L'escargophone te pose des questions (son équipage, son fruit, sa prime, son origine) et finit par proposer un nom.",
+    howTo: [
+      "Pense à un personnage de One Piece.",
+      "Réponds à chaque question par Oui, Non ou Je ne sais pas.",
+      "Après vingt questions au plus, l'escargophone propose un nom. S'il se trompe trois fois, il s'avoue vaincu et te montre où vos réponses divergent.",
+    ],
+    faq: [
+      {
+        question: "Ce jeu rapporte-t-il des Berrys ?",
+        answer: "Non : c'est toi qui dis si l'escargophone a trouvé, le site ne peut pas le vérifier. Il se joue pour le plaisir.",
+      },
+      {
+        question: "Pourquoi l'escargophone se trompe-t-il parfois ?",
+        answer: "Il ne connaît d'un personnage que sa fiche : affiliation, fruit, haki, prime, origine, taille, âge. Deux personnages secondaires aux fiches identiques sont pour lui indiscernables : il propose alors le plus connu.",
+      },
+      SPOILER_FAQ,
+    ],
+  },
 };

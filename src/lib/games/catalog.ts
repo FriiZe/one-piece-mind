@@ -60,8 +60,23 @@ export const LIVE_SLUGS = [
   "vrai-ou-faux",
   "mode-aleatoire",
   "duo-carre-cash",
+  // Lot C : les jeux qui n'ont besoin ni d'images ni de sons nouveaux
+  "rires",
+  "connexions",
+  "grille",
+  "recrute-ton-equipage",
+  "la-route-de-grand-line",
+  "den-den-devin",
 ] as const;
 export type LiveSlug = (typeof LIVE_SLUGS)[number];
+
+/**
+ * Jeux sans récompense : rien ne permet au serveur de vérifier la partie
+ * (dans Den Den Devin, c'est le joueur qui dit si l'escargophone a trouvé).
+ * Ils n'ont ni Berrys, ni objectifs, ni défi de la semaine.
+ */
+export const REWARDLESS_SLUGS: readonly LiveSlug[] = ["den-den-devin"];
+export const isRewardless = (slug: string) => (REWARDLESS_SLUGS as readonly string[]).includes(slug);
 
 export function isLiveSlug(slug: string): slug is LiveSlug {
   return (LIVE_SLUGS as readonly string[]).includes(slug);
@@ -86,7 +101,7 @@ export const GAMES: Game[] = [
   game("fruit-du-demon", "Fruit du démon", "oeil", "B", "Reconnais un fruit à son dessin."),
   game("memo", "Mémo", "oeil", "B", "Des paires à retrouver : personnage et fruit, personnage et pavillon."),
 
-  game("rires", "Rires", "oreille", "C", "Shishishi, Zehahaha, Kishishishi : à qui est ce rire ?"),
+  game("rires", "Rires", "oreille", "C", "Shishishi, Zehahaha, Kishishishi : à qui appartient ce rire ?"),
   game("voix-et-repliques", "Voix et répliques", "oreille", "C", "Un court extrait, devine qui parle."),
 
   game("onepiecedle", "OnePiecedle", "mots", "A", "Le personnage mystère du jour : chaque essai te dit ce qui est juste."),

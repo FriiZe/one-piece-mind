@@ -6,6 +6,7 @@ import { byDifficulty, type Difficulty } from "../engine/difficulty";
 import { randomSeed } from "../engine/rng";
 import { formatBounty, formatHeight } from "../engine/text";
 import { Button, Panel, Progress, ResultPanel } from "../ui/primitives";
+import { SortableList, type SortableItem } from "../ui/SortableList";
 import { StartScreen } from "../ui/StartScreen";
 import { useBest } from "../ui/storage";
 import type { GameProps } from "../ui/types";
@@ -68,8 +69,8 @@ export default function LeClassement({ data }: GameProps) {
     return (
       <StartScreen onStart={start}>
         <p className="text-mist">
-          Cinq manches. À chaque fois, cinq personnages à ranger selon leur prime, leur taille ou leur âge. Un point par
-          personnage au bon rang.
+          Cinq manches. À chaque fois, cinq personnages à ranger selon leur prime, leur taille ou leur âge, en
+          les faisant glisser. Un point par personnage au bon rang.
         </p>
       </StartScreen>
     );
@@ -95,19 +96,12 @@ export default function LeClassement({ data }: GameProps) {
     );
   }
 
-  const byId = new Map(round.items.map((c) => [c.id, c]));
+  const items = new Map<string, SortableItem>(
+    round.items.map((c) => [c.id, { id: c.id, label: c.name, detail: formatValue(c, round.criterion), img: c.img }]),
+  );
   const order = run.order ?? round.items.map((c) => c.id);
   const expected = correctOrder(round);
   const criterion = CRITERIA[round.criterion];
-
-  function move(index: number, delta: -1 | 1) {
-    if (!run) return;
-    const target = index + delta;
-    if (target < 0 || target >= order.length) return;
-    const nextOrder = [...order];
-    [nextOrder[index], nextOrder[target]] = [nextOrder[target], nextOrder[index]];
-    setRun({ ...run, order: nextOrder });
-  }
 
   function submit() {
     if (!run) return;
@@ -131,53 +125,13 @@ export default function LeClassement({ data }: GameProps) {
       <p className="text-lg text-foam">
         Range ces personnages par <strong className="text-straw">{criterion.label}</strong>, {criterion.order}.
       </p>
-      <ol className="space-y-2">
-        {order.map((id, index) => {
-          const character = byId.get(id)!;
-          const right = run.submitted && expected[index] === id;
-          return (
-            <li
-              key={id}
-              className={`flex items-center gap-3 rounded-xl border-2 px-3 py-2 ${
-                !run.submitted ? "border-sea-600 bg-sea-700" : right ? "border-emerald-400 bg-emerald-600/20" : "border-vest bg-vest/20"
-              }`}
-            >
-              <span className="w-6 text-center font-display text-2xl text-straw">{index + 1}</span>
-              <span className="min-w-0 flex-1">
-                <span className="block truncate font-bold text-foam">{character.name}</span>
-                {run.submitted && (
-                  <span className="block text-sm text-mist">
-                    {formatValue(character, round.criterion)}
-                    {!right && ` · rang attendu : ${expected.indexOf(id) + 1}`}
-                  </span>
-                )}
-              </span>
-              {!run.submitted && (
-                <span className="flex gap-1">
-                  <button
-                    type="button"
-                    aria-label={`Monter ${character.name}`}
-                    disabled={index === 0}
-                    onClick={() => move(index, -1)}
-                    className="h-10 w-10 rounded-lg bg-sea-600 text-lg text-foam hover:bg-straw hover:text-ink disabled:opacity-30"
-                  >
-                    ▲
-                  </button>
-                  <button
-                    type="button"
-                    aria-label={`Descendre ${character.name}`}
-                    disabled={index === order.length - 1}
-                    onClick={() => move(index, 1)}
-                    className="h-10 w-10 rounded-lg bg-sea-600 text-lg text-foam hover:bg-straw hover:text-ink disabled:opacity-30"
-                  >
-                    ▼
-                  </button>
-                </span>
-              )}
-            </li>
-          );
-        })}
-      </ol>
+      <SortableList
+        order={order}
+        items={items}
+        expected={expected}
+        submitted={run.submitted}
+        onReorder={(next) => setRun({ ...run, order: next })}
+      />
       {run.submitted ? (
         <Button autoFocus onClick={next}>
           {run.round === ROUNDS - 1 ? "Voir mon score" : "Manche suivante"}

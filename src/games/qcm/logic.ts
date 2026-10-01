@@ -283,6 +283,10 @@ const surnoms = ownerQuiz("Qui porte ce surnom ?", (data) =>
   data.extras.epithets.map((e) => ({ key: e.characterId, subject: `« ${e.text} »`, characterId: e.characterId })),
 );
 
+const rires = ownerQuiz("À qui appartient ce rire ?", (data) =>
+  data.extras.laughs.map((l) => ({ key: l.characterId, subject: `« ${l.text} »`, characterId: l.characterId })),
+);
+
 const VOWEL_SWAPS: Record<string, string> = { a: "e", e: "a", i: "y", y: "i", o: "u", u: "o" };
 const CONSONANT_SWAPS: Record<string, string> = { k: "c", c: "k", s: "z", z: "s" };
 const isLetter = (ch: string | undefined) => !!ch && /[a-zà-ÿ]/i.test(ch);
@@ -402,6 +406,7 @@ const BASE_GENERATORS = {
   techniques,
   "armes-et-sabres": armes,
   surnoms,
+  rires,
   orthographe,
   "grand-ou-vieux": grandOuVieux,
   haki,
@@ -442,13 +447,25 @@ export function generateMixed(
   return questions;
 }
 
+/** Quiz dont les questions peuvent porter sur un petit groupe de personnages donné. */
+const POOL_SLUGS: MixSlug[] = ["equipage", "origine-et-race", "haki", "vrai-ou-faux", "orthographe", "grand-ou-vieux"];
+
+/** Une question sur les personnages de `pool`, tirée dans l'un de ces quiz ; `null` si aucun n'a de quoi en poser. */
+export function questionFor(rng: Rng, data: ResolvedData, pool: readonly PlayCharacter[]): QcmQuestion | null {
+  for (const slug of shuffle(rng, POOL_SLUGS)) {
+    const [question] = BASE_GENERATORS[slug](rng, data, pool, 1);
+    if (question) return question;
+  }
+  return null;
+}
+
 const GENERATORS = { ...BASE_GENERATORS, "mode-aleatoire": modeAleatoire } satisfies Record<string, Generator>;
 
 export type QcmSlug = keyof typeof GENERATORS;
 export const QCM_SLUGS = Object.keys(GENERATORS) as [QcmSlug, ...QcmSlug[]];
 
 /** Jeux dont les questions viennent d'un contenu rédigé : la difficulté n'y change rien. */
-const FIXED_DIFFICULTY: readonly QcmSlug[] = ["navires", "techniques", "armes-et-sabres", "surnoms"];
+const FIXED_DIFFICULTY: readonly QcmSlug[] = ["navires", "techniques", "armes-et-sabres", "surnoms", "rires"];
 export const usesDifficulty = (slug: QcmSlug) => !FIXED_DIFFICULTY.includes(slug);
 
 export function generateQcm(slug: QcmSlug, seed: number, difficulty: Difficulty, data: ResolvedData): QcmQuestion[] {

@@ -5,7 +5,7 @@ import { GameObjectives } from "@/components/GameObjectives";
 import { JsonLd } from "@/components/JsonLd";
 import { GAME_CONTENT } from "@/games/content";
 import { GameRunner } from "@/games/ui/GameRunner";
-import { GAMES, getGame, isLiveSlug, LIVE_SLUGS } from "@/lib/games/catalog";
+import { GAMES, getGame, isLiveSlug, isRewardless, LIVE_SLUGS } from "@/lib/games/catalog";
 import { SITE_NAME, SITE_URL } from "@/lib/site";
 
 // Seuls les jeux en ligne ont une page : toute autre adresse renvoie une 404.
@@ -89,7 +89,7 @@ export default async function GamePage({ params }: PageProps<"/jeux/[slug]">) {
         <GameRunner slug={slug} />
       </section>
 
-      <GameObjectives slug={slug} />
+      {!isRewardless(slug) && <GameObjectives slug={slug} />}
 
       <section aria-labelledby="comment-jouer" className="space-y-3">
         <h2 id="comment-jouer" className="font-display text-3xl tracking-wide text-straw">
