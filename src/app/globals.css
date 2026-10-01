@@ -52,7 +52,6 @@ body {
   --animate-pack-idle: pack-idle 2.4s ease-in-out infinite;
   --animate-pack-open: pack-open 0.7s ease-in forwards;
   --animate-card-deal: card-deal 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) both;
-  --animate-card-glow: card-glow 1.6s ease-in-out infinite;
   --animate-shine: shine 2.4s linear infinite;
   /* Ce qui se lit sous une carte n'apparaît qu'une fois la carte assez tournée pour être vue */
   --animate-card-label: card-label 0.3s ease-out 0.4s both;
@@ -94,15 +93,6 @@ body {
       transform: none;
     }
   }
-  @keyframes card-glow {
-    0%,
-    100% {
-      box-shadow: 0 0 12px 2px var(--glow);
-    }
-    50% {
-      box-shadow: 0 0 30px 9px var(--glow);
-    }
-  }
   @keyframes card-label {
     from {
       opacity: 0;
@@ -118,5 +108,40 @@ body {
     to {
       background-position: -200% 0;
     }
+  }
+}
+
+/*
+ * Halo d'une carte de booster, à la couleur de sa rareté (--glow). Il
+ * n'apparaît qu'au survol, ou quand la carte a la main au clavier : face cachée, il laisse deviner ce
+ * qu'on va retourner. Sans souris (téléphone), il s'allume une fois la carte
+ * retournée. Les cartes rares et légendaires palpitent.
+ */
+.card-halo {
+  border-radius: 0.375rem;
+  transition: box-shadow 0.25s ease;
+}
+.card-halo:hover,
+.card-halo:has(:focus-visible) {
+  box-shadow: 0 0 26px 7px var(--glow);
+}
+@media (hover: none) {
+  .card-halo[data-shown="true"] {
+    box-shadow: 0 0 18px 4px var(--glow);
+  }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .card-halo[data-strong="true"]:hover,
+  .card-halo[data-strong="true"]:has(:focus-visible) {
+    animation: card-glow 1.4s ease-in-out infinite;
+  }
+}
+@keyframes card-glow {
+  0%,
+  100% {
+    box-shadow: 0 0 14px 3px var(--glow);
+  }
+  50% {
+    box-shadow: 0 0 34px 10px var(--glow);
   }
 }

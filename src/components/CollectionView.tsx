@@ -22,9 +22,14 @@ function ShopLink() {
         <strong className="text-foam">La boutique</strong> vend des recrues à l&apos;unité et des boosters de {BOOSTER_SIZE} avis à
         ouvrir. Tu as {formatNumber(state.berrys)} ฿.
       </p>
-      <Link href="/boutique" className="rounded-lg bg-straw px-4 py-2.5 font-bold text-ink hover:bg-straw-dark">
-        Aller à la boutique
-      </Link>
+      <span className="flex flex-wrap gap-2">
+        <Link href="/boutique" className="rounded-lg bg-straw px-4 py-2.5 font-bold text-ink hover:bg-straw-dark">
+          Aller à la boutique
+        </Link>
+        <Link href="/echanges" className="rounded-lg border border-sea-600 bg-sea-700 px-4 py-2.5 font-bold text-foam hover:bg-sea-600">
+          Échanger avec un ami
+        </Link>
+      </span>
     </Panel>
   );
 }

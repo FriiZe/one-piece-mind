@@ -9,6 +9,7 @@ import { evaluateReport, reportSchema } from "@/games/report";
 import {
   BOOSTER_COST,
   BOOSTER_SIZE,
+  BOOSTER_SLOTS,
   boosterCost,
   buyBooster,
   DUPLICATE_VALUE,
@@ -36,7 +37,9 @@ import {
   type QuizDraft,
 } from "@/lib/quiz/rules";
 import { accountsEnabled, db } from "@/lib/server/db";
+import { pendingCounts } from "@/lib/server/friends";
 import { DUMMY_HASH } from "@/lib/server/password";
+import { answerTrade, cancelTrade, friendCollection, proposeTrade, tradesOverview } from "@/lib/server/trades";
 import { buyBoosterFor, loadState, sellDuplicatesFor } from "@/lib/server/player";
 import { createQuiz, deleteQuiz, getQuiz, listQuizzes, reportQuiz, restoreQuiz, submitQuizPlay } from "@/lib/server/quizzes";
 
@@ -108,6 +111,12 @@ describe("doublons de la collection", () => {
     );
     // Même avec la réduction maximale et une collection complète, un recrutement coûte plus qu'il ne rend
     expect(expected).toBeLessThan(TAVERN_COST / 2);
+
+    const booster = BOOSTER_SLOTS.reduce((sum, slot) => {
+      const total = Object.values(slot).reduce((a, b) => a + b, 0);
+      return sum + Object.entries(slot).reduce((s, [tier, weight]) => s + (weight / total) * DUPLICATE_VALUE[Number(tier)], 0);
+    }, 0);
+    expect(booster * (1 + golden * (GOLDEN_DUPLICATE_FACTOR - 1))).toBeLessThan(BOOSTER_COST / 2);
   });
 });
 
@@ -115,6 +124,7 @@ describe("booster de la boutique", () => {
   const pool: Recruitable[] = [
     { id: "legende", tier: 1, affiliation: null },
     { id: "rare", tier: 2, affiliation: null },
+    ...Array.from({ length: 10 }, (_, i) => ({ id: `peu-commun-${i}`, tier: 3, affiliation: null })),
     ...Array.from({ length: 30 }, (_, i) => ({ id: `commun-${i}`, tier: 4, affiliation: null })),
   ];
   const tierOf = new Map(pool.map((c) => [c.id, c.tier]));
@@ -129,18 +139,29 @@ describe("booster de la boutique", () => {
     expect(buyBooster(rich, [], createRng(1))).toBe("empty");
   });
 
-  it("contient cinq avis, dont toujours un rare ou mieux", () => {
-    for (let seed = 1; seed <= 200; seed++) {
+  it("contient cinq avis, du plus commun au plus rare", () => {
+    const fourth = new Set<number>();
+    const fifth = new Set<number>();
+    for (let seed = 1; seed <= 300; seed++) {
       const bought = buyBooster(rich, pool, createRng(seed));
       if (typeof bought === "string") throw new Error(bought);
-      expect(bought.recruits).toHaveLength(BOOSTER_SIZE);
-      expect(bought.recruits.some((recruit) => tierOf.get(recruit.characterId)! <= 2)).toBe(true);
+      const tiers = bought.recruits.map((recruit) => tierOf.get(recruit.characterId)!);
+      expect(tiers).toHaveLength(BOOSTER_SIZE);
+      // Trois cartes communes ou peu communes, une quatrième au mieux rare, une dernière rare ou légendaire
+      expect(tiers.slice(0, 3).every((tier) => tier >= 3)).toBe(true);
+      expect(tiers[3]).toBeGreaterThanOrEqual(2);
+      expect(tiers[4]).toBeLessThanOrEqual(2);
+      fourth.add(tiers[3]);
+      fifth.add(tiers[4]);
       expect(bought.state.berrys).toBe(rich.berrys - BOOSTER_COST);
       // La prime du joueur ne bouge pas : il a dépensé, pas gagné
       expect(bought.state.lifetimeBerrys).toBe(rich.lifetimeBerrys);
       const counted = Object.values(bought.state.collection).reduce((sum, entry) => sum + entry.count, 0);
       expect(counted).toBe(BOOSTER_SIZE);
     }
+    // La quatrième carte est parfois rare, la dernière parfois légendaire
+    expect([...fourth].sort()).toEqual([2, 3, 4]);
+    expect([...fifth].sort()).toEqual([1, 2]);
   });
 
   it("signale un doublon tiré deux fois dans le même booster", () => {
@@ -431,6 +452,69 @@ describe.skipIf(!accountsEnabled)("quiz et doublons, en base", () => {
     expect(await restoreQuiz(player, quizId)).toEqual({ ok: false, error: "forbidden" });
     expect(await restoreQuiz(admin, quizId)).toEqual({ ok: true });
     expect((await getQuiz(quizId, player))?.status).toBe("public");
+  });
+
+  it("échange un avis contre un avis entre deux amis, d'un seul tenant", async () => {
+    const [a, b, stranger] = users;
+    const [given, wanted, other] = anime.characters.slice(0, 3).map((c) => c.id);
+    await db().collectionEntry.deleteMany({ where: { userId: { in: [a.id, b.id] } } });
+    await db().collectionEntry.createMany({
+      data: [
+        { userId: a.id, characterId: given, count: 2, golden: 0 },
+        { userId: b.id, characterId: wanted, count: 1, golden: 1 },
+      ],
+    });
+    await db().crewSlot.create({ data: { userId: b.id, post: "capitaine", characterId: wanted } });
+
+    // Sans lien d'amitié, ni collection consultable ni proposition
+    expect(await friendCollection(a.id, b.id)).toBeNull();
+    expect(await proposeTrade(a.id, b.id, given, wanted)).toEqual({ ok: false, error: "not-friends" });
+    await db().friendship.create({ data: { requesterId: a.id, addresseeId: b.id, status: "accepted" } });
+    expect((await friendCollection(a.id, b.id))?.collection).toEqual({ [wanted]: { count: 1, golden: 1 } });
+    expect(await friendCollection(stranger.id, b.id)).toBeNull();
+
+    expect(await proposeTrade(a.id, b.id, given, given)).toEqual({ ok: false, error: "same" });
+    expect(await proposeTrade(a.id, b.id, other, wanted)).toEqual({ ok: false, error: "not-owned" });
+    expect(await proposeTrade(a.id, b.id, given, other)).toEqual({ ok: false, error: "friend-not-owned" });
+    expect(await proposeTrade(a.id, b.id, given, wanted)).toEqual({ ok: true });
+    expect(await proposeTrade(a.id, b.id, given, wanted)).toEqual({ ok: false, error: "already" });
+
+    const [trade] = (await tradesOverview(b.id)).incoming;
+    expect(trade).toMatchObject({ friend: a.username, offeredId: given, requestedId: wanted });
+    expect((await tradesOverview(a.id)).outgoing).toHaveLength(1);
+    expect((await pendingCounts(b.id, false)).trades).toBe(1);
+    // Seul le destinataire répond ; rien n'a bougé d'ici là
+    expect(await answerTrade(a.id, trade.id, true)).toEqual({ ok: false, error: "not-found" });
+    expect((await loadState(a.id)).collection).toEqual({ [given]: { count: 2, golden: 0 } });
+
+    expect(await answerTrade(b.id, trade.id, true)).toEqual({ ok: true });
+    expect((await loadState(a.id)).collection).toEqual({ [given]: { count: 1, golden: 0 }, [wanted]: { count: 1, golden: 1 } });
+    const after = await loadState(b.id);
+    expect(after.collection).toEqual({ [given]: { count: 1, golden: 0 } });
+    // Son seul exemplaire est parti : l'avis quitte aussi son équipage
+    expect(after.crew).toEqual({});
+    expect((await pendingCounts(b.id, false)).trades).toBe(0);
+    expect(await answerTrade(b.id, trade.id, true)).toEqual({ ok: false, error: "not-found" });
+  });
+
+  it("annule une proposition dont un avis n'est plus là, et laisse retirer la sienne", async () => {
+    const [a, b] = users;
+    const [given, wanted] = anime.characters.slice(0, 2).map((c) => c.id);
+    // Après l'échange précédent : a possède `given` et `wanted`, b possède `given`
+    expect(await proposeTrade(b.id, a.id, given, wanted)).toEqual({ ok: true });
+    const [trade] = (await tradesOverview(a.id)).incoming;
+    await db().collectionEntry.deleteMany({ where: { userId: b.id, characterId: given } });
+    expect(await answerTrade(a.id, trade.id, true)).toEqual({ ok: false, error: "gone" });
+    expect((await loadState(a.id)).collection[wanted]).toEqual({ count: 1, golden: 1 });
+    expect((await tradesOverview(a.id)).incoming).toEqual([]);
+
+    expect(await proposeTrade(a.id, b.id, wanted, given)).toEqual({ ok: false, error: "friend-not-owned" });
+    await db().collectionEntry.create({ data: { userId: b.id, characterId: given, count: 1, golden: 0 } });
+    expect(await proposeTrade(a.id, b.id, wanted, given)).toEqual({ ok: true });
+    const [mine] = (await tradesOverview(a.id)).outgoing;
+    expect(await cancelTrade(b.id, mine.id)).toEqual({ ok: false, error: "not-found" });
+    expect(await cancelTrade(a.id, mine.id)).toEqual({ ok: true });
+    expect((await tradesOverview(b.id)).incoming).toEqual([]);
   });
 
   it("ne laisse supprimer un quiz qu'à son auteur ou à un administrateur", async () => {

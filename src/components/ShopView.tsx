@@ -7,8 +7,8 @@ import { formatNumber } from "@/games/engine/text";
 import { Button, Panel } from "@/games/ui/primitives";
 import { WithGameData } from "@/games/ui/WithGameData";
 import {
-  BOOSTER_GUARANTEED_TIER,
   BOOSTER_SIZE,
+  BOOSTER_SLOTS,
   boosterCost,
   crewBonuses,
   GOLDEN_CHANCE,
@@ -70,7 +70,7 @@ function Shop({ data }: { data: ResolvedData }) {
     {
       article: "booster",
       title: "Un booster",
-      pitch: `${BOOSTER_SIZE} avis d'un coup, dont au moins un ${RARITY_LABELS[BOOSTER_GUARANTEED_TIER].toLowerCase()} ou mieux. Moins cher qu'à l'unité.`,
+      pitch: `${BOOSTER_SIZE} avis d'un coup, du plus commun au plus rare : le dernier est toujours rare ou légendaire. Moins cher qu'à l'unité.`,
       art: <PackArt className="w-28 rotate-3" />,
     },
   ];
@@ -111,7 +111,7 @@ function Shop({ data }: { data: ResolvedData }) {
       )}
 
       <Panel className="space-y-3">
-        <h2 className="font-display text-2xl tracking-wide text-straw">Chances de tirage</h2>
+        <h2 className="font-display text-2xl tracking-wide text-straw">Chances de tirage d&apos;une recrue</h2>
         <dl className="grid grid-cols-2 gap-2 text-sm sm:grid-cols-5">
           {Object.entries(RARITY_WEIGHTS)
             .sort(([a], [b]) => Number(b) - Number(a))
@@ -126,6 +126,22 @@ function Shop({ data }: { data: ResolvedData }) {
             <dd className="font-display text-2xl tracking-wide text-straw">{Math.round(GOLDEN_CHANCE * 100)} %</dd>
           </div>
         </dl>
+        <div className="space-y-1 text-sm text-mist">
+          <p className="font-bold text-foam">Dans un booster, chaque carte a ses propres chances :</p>
+          <ol className="list-inside list-decimal space-y-0.5">
+            {BOOSTER_SLOTS.map((slot, index) => {
+              const total = Object.values(slot).reduce((sum, weight) => sum + weight, 0);
+              return (
+                <li key={index}>
+                  {Object.entries(slot)
+                    .sort(([a], [b]) => Number(b) - Number(a))
+                    .map(([tier, weight]) => `${RARITY_LABELS[Number(tier)].toLowerCase()} ${Math.round((weight / total) * 100)} %`)
+                    .join(", ")}
+                </li>
+              );
+            })}
+          </ol>
+        </div>
         <p className="text-sm text-mist">
           Chaque avis est tiré séparément : un booster peut contenir des doublons.{" "}
           <Link href="/collection" className="font-semibold text-straw underline underline-offset-4">

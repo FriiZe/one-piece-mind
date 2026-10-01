@@ -45,6 +45,9 @@ model User {
   quizzes     Quiz[]
   quizReports QuizReport[]
   quizPlays   QuizPlay[]
+
+  tradesProposed Trade[] @relation("tradeFrom")
+  tradesReceived Trade[] @relation("tradeTo")
 }
 
 model Session {
@@ -259,4 +262,24 @@ model QuizPlay {
 
   @@id([quizId, userId])
   @@index([userId, createdAt])
+}
+
+/// Échange proposé entre deux amis : un avis contre un avis.
+model Trade {
+  id          String    @id @default(cuid())
+  fromId      String
+  from        User      @relation("tradeFrom", fields: [fromId], references: [id], onDelete: Cascade)
+  toId        String
+  to          User      @relation("tradeTo", fields: [toId], references: [id], onDelete: Cascade)
+  /// Avis que donne celui qui propose.
+  offeredId   String
+  /// Avis qu'il demande en retour.
+  requestedId String
+  /// pending, accepted, declined ou cancelled.
+  status      String    @default("pending")
+  createdAt   DateTime  @default(now())
+  answeredAt  DateTime?
+
+  @@index([toId, status])
+  @@index([fromId, status])
 }

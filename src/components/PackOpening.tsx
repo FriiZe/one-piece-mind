@@ -8,11 +8,12 @@ import { BOOSTER_SIZE, type Recruit } from "@/lib/economy";
 import { CharacterCard } from "./CharacterCard";
 import { Modal } from "./Modal";
 
-/** Halo d'une carte retournée, selon sa rareté ; les communes n'en ont pas. */
+/** Couleur du halo d'une carte au survol, selon sa rareté (voir `.card-halo` dans globals.css). */
 const GLOWS: Record<number, string> = {
-  1: "rgb(242 193 78 / 0.9)",
-  2: "rgb(167 139 250 / 0.85)",
-  3: "rgb(56 189 248 / 0.55)",
+  1: "rgb(242 193 78 / 0.95)",
+  2: "rgb(167 139 250 / 0.9)",
+  3: "rgb(56 189 248 / 0.6)",
+  4: "rgb(157 178 200 / 0.4)",
 };
 
 /** Le paquet scellé : il sert aussi d'illustration à l'offre, dans la boutique. */
@@ -112,16 +113,18 @@ export function PackOpening({
             {recruits.map((recruit, index) => {
               const character = data.characterById.get(recruit.characterId) ?? null;
               const shown = flipped[index];
-              const glow = shown && character ? GLOWS[character.tier] : undefined;
+              const glow = GLOWS[character?.tier ?? 4];
               return (
                 <li key={index} className="space-y-1.5 text-center motion-safe:animate-card-deal" style={{ animationDelay: `${index * 110}ms` }}>
-                  <div className="relative perspective-[900px]">
+                  <div
+                    className="card-halo relative perspective-[900px]"
+                    data-shown={shown}
+                    data-strong={!!character && character.tier <= 2}
+                    style={{ "--glow": glow } as CSSProperties}
+                  >
                     <div className={`relative transition-transform duration-700 transform-3d ${shown ? "rotate-y-180" : ""}`}>
                       {/* Face avant : le personnage n'est écrit dans la page qu'une fois la carte retournée */}
-                      <div
-                        className={`rotate-y-180 rounded-md backface-hidden ${glow && character && character.tier <= 2 ? "motion-safe:animate-card-glow" : ""}`}
-                        style={glow ? ({ "--glow": glow, boxShadow: `0 0 16px 3px ${glow}` } as CSSProperties) : undefined}
-                      >
+                      <div className="rotate-y-180 rounded-md backface-hidden">
                         <CharacterCard character={shown ? character : null} golden={shown && recruit.golden} />
                         {shown && recruit.golden && (
                           <span

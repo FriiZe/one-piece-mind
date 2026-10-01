@@ -19,6 +19,8 @@ export type NotificationCounts = {
   requests: number;
   /** Invitations dans un salon encore ouvert. */
   invites: number;
+  /** Échanges d'avis proposés par un ami. */
+  trades: number;
   /** Quiz de la communauté masqués, à relire : pour les administrateurs seulement. */
   hiddenQuizzes: number;
 };

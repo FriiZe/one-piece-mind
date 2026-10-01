@@ -3,6 +3,7 @@
 /** Accès au salon depuis le navigateur : identité du joueur, appels au serveur, relecture régulière de l'état. */
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { FriendsOverview, NotificationCounts } from "./friends";
+import type { FriendCollection, TradesOverview } from "./trades";
 import type { Result, RoomError, RoomTicket, RoomView } from "./types";
 
 const ticketKey = (code: string) => `opm.room.${code}`;
@@ -214,6 +215,50 @@ export function useNotifications(enabled: boolean): NotificationCounts | null {
   }, [enabled]);
 
   return enabled ? counts : null;
+}
+
+/** Propositions d'échange en attente du joueur connecté ; `reload` les relit après une action. */
+export function useTrades(enabled: boolean): { trades: TradesOverview | null; reload: () => void } {
+  const [trades, setTrades] = useState<TradesOverview | null>(null);
+  const [kick, setKick] = useState(0);
+  const reload = useCallback(() => setKick((value) => value + 1), []);
+
+  useEffect(() => {
+    if (!enabled) return;
+    let cancelled = false;
+    fetch("/api/trades", { cache: "no-store" })
+      .then((response) => (response.ok ? (response.json() as Promise<TradesOverview>) : null))
+      .then((data) => {
+        if (!cancelled && data) setTrades(data);
+      })
+      .catch(() => undefined);
+    return () => {
+      cancelled = true;
+    };
+  }, [enabled, kick]);
+
+  return { trades: enabled ? trades : null, reload };
+}
+
+/** Collection d'un ami, chargée quand on le choisit pour un échange. `null` pendant le chargement. */
+export function useFriendCollection(friendId: string | null): FriendCollection | "missing" | null {
+  const [loaded, setLoaded] = useState<{ id: string; value: FriendCollection | "missing" } | null>(null);
+
+  useEffect(() => {
+    if (!friendId) return;
+    let cancelled = false;
+    fetch(`/api/trades/friends/${encodeURIComponent(friendId)}`, { cache: "no-store" })
+      .then((response): Promise<FriendCollection | "missing"> => (response.ok ? response.json() : Promise.resolve("missing")))
+      .catch((): "missing" => "missing")
+      .then((value) => {
+        if (!cancelled) setLoaded({ id: friendId, value });
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [friendId]);
+
+  return friendId && loaded?.id === friendId ? loaded.value : null;
 }
 
 export const ROOM_ERRORS: Record<RoomError, string> = {

@@ -1,12 +1,13 @@
 import { describe, expect, it } from "vitest";
 import { createRng } from "@/games/engine/rng";
 import {
-  AFFILIATION_SYNERGY,
   applyGame,
   assignPost,
   BASE_BERRYS,
   buyRecruit,
+  bonusLabel,
   crewBonuses,
+  DEFAULT_TRAIT,
   daysLeftInWeek,
   DAILY_BERRY_CAP,
   DAILY_CHALLENGE_BERRYS,
@@ -18,6 +19,9 @@ import {
   OBJECTIVES,
   playerBounty,
   POST_IDS,
+  postStrength,
+  TRAIT_STEPS,
+  TRAITS,
   rankOf,
   recruitChance,
   tavernCost,
@@ -179,12 +183,50 @@ describe("équipage", () => {
   it("récompense trois membres de la même affiliation et un équipage complet", () => {
     const trio: PlayerState = { ...owning("luffy", "zoro", "nami"), crew: { sabreur: "zoro", navigateur: "nami", tireur: "luffy" } };
     const bonuses = crewBonuses(trio, byId);
-    expect(bonuses.sharedAffiliation).toBe("Chapeau de paille");
-    expect(bonuses.berrys.all).toBeCloseTo(AFFILIATION_SYNERGY.bonus);
+    // Une affiliation sans trait à elle partage le trait commun
+    expect(bonuses.traits).toMatchObject([{ affiliation: "Chapeau de paille", name: DEFAULT_TRAIT.name, count: 3, level: 1 }]);
+    expect(bonuses.berrys.all).toBeCloseTo(DEFAULT_TRAIT.values[0]);
 
     const ids = pool.slice(5, 15).map((c) => c.id);
     const full: PlayerState = { ...owning(...ids), crew: Object.fromEntries(POST_IDS.map((post, i) => [post, ids[i]])) };
-    expect(crewBonuses(full, byId)).toMatchObject({ full: true, sharedAffiliation: null });
+    expect(crewBonuses(full, byId)).toMatchObject({ full: true, traits: [] });
+  });
+
+  it("renforce un trait à mesure que l'équipage compte de membres de l'affiliation", () => {
+    const crewOf = (affiliation: string, count: number) => {
+      const members: Recruitable[] = Array.from({ length: count }, (_, i) => ({ id: `m${i}`, tier: 4, affiliation }));
+      const state: PlayerState = {
+        ...EMPTY_PLAYER,
+        collection: Object.fromEntries(members.map((m) => [m.id, { count: 1, golden: 0 }])),
+        // Du dernier poste au premier : le capitaine, qui agit sur tous les jeux, n'est pourvu qu'à dix
+        crew: Object.fromEntries(members.map((m, i) => [POST_IDS[POST_IDS.length - 1 - i], m.id])),
+      };
+      return crewBonuses(state, new Map(members.map((m) => [m.id, m])));
+    };
+
+    expect(TRAIT_STEPS).toEqual([3, 5, 7]);
+    const whitebeard = "Équipage de Barbe Blanche";
+    expect(crewOf(whitebeard, 2).traits).toMatchObject([{ affiliation: whitebeard, count: 2, level: 0, value: 0 }]);
+    expect(crewOf(whitebeard, 2).berrys.all).toBeUndefined();
+    const values = [3, 5, 7].map((count) => crewOf(whitebeard, count).berrys.all!);
+    expect(values).toEqual([...TRAITS[whitebeard].values]);
+    expect(values[0]).toBeLessThan(values[1]);
+    expect(values[1]).toBeLessThan(values[2]);
+    expect(crewOf(whitebeard, 9).traits[0]).toMatchObject({ level: 3, name: "Fils de Barbe Blanche" });
+
+    // L'Armée révolutionnaire fait baisser les prix de la boutique : le timonier et le musicien sont pourvus à trois
+    const revolution = crewOf("Armée révolutionnaire", 3);
+    expect(revolution.traits[0]).toMatchObject({ level: 1, effect: "Réduction à la boutique" });
+    expect(revolution.discount).toBeCloseTo(postStrength({ id: "m", tier: 4, affiliation: null }, undefined, "musicien") + 0.1);
+  });
+
+  it("donne à chaque trait trois paliers croissants et un libellé", () => {
+    for (const [affiliation, trait] of Object.entries({ ...TRAITS, defaut: DEFAULT_TRAIT })) {
+      expect(trait.values[0], affiliation).toBeGreaterThan(0);
+      expect(trait.values[1], affiliation).toBeGreaterThan(trait.values[0]);
+      expect(trait.values[2], affiliation).toBeGreaterThan(trait.values[1]);
+      expect(bonusLabel(trait.bonus)).not.toBe("");
+    }
   });
 
   it("ignore un membre que le mode spoiler du joueur ne montre pas", () => {

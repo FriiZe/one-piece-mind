@@ -236,7 +236,9 @@ Le lot C peut s'intercaler plus tôt, jeu par jeu, selon l'envie.
 - Reste à faire : modifier un quiz déjà publié, jouer un quiz de la communauté en salon multijoueur.
 - Notifications : une cloche dans l'en-tête compte les demandes d'ami, les invitations dans un salon et, pour un administrateur, les quiz masqués. Le compte est mis en avant : bouton « Connexion » pour les visiteurs, pseudo et icône une fois connecté.
 - Révélation et Zoom extrême : l'image n'avance plus avec le temps, seulement après une proposition (ou une demande d'en voir plus, qui coûte autant qu'une erreur). Le palier est déduit par le serveur du nombre d'erreurs.
-- Boutique (prévue en phase 5, avancée) : elle remplace la taverne. Une recrue pour 1 500 ฿, ou un booster de cinq avis pour 6 000 ฿ avec au moins un rare, ouvert carte par carte.
+- Boutique (prévue en phase 5, avancée) : elle remplace la taverne. Une recrue pour 1 500 ฿, ou un booster de cinq avis pour 6 000 ฿, ouvert carte par carte : trois communes ou peu communes, une quatrième parfois rare, une dernière rare ou légendaire. Le halo de rareté d'une carte n'apparaît qu'au survol.
+- Traits d'équipage, façon TFT : les membres d'une même affiliation activent un trait à 3, 5 puis 7 membres (Barbe Blanche : Berrys ; Armée révolutionnaire : réduction à la boutique ; Roger : avis dorés...). Ils remplacent l'ancien bonus unique « trois membres de la même affiliation ».
+- Échanges entre amis : un avis contre un avis, sur proposition acceptée. Reste à faire : échanger plusieurs avis à la fois, choisir de donner l'exemplaire doré plutôt que l'ordinaire.
 
 **À reprendre plus tard**
 

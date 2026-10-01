@@ -51,6 +51,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
                   { href: "/defis", label: "Défis" },
                   { href: "/collection", label: "Collection" },
                   { href: "/boutique", label: "Boutique" },
+                  { href: "/echanges", label: "Échanges" },
                   { href: "/profil", label: "Mon compte" },
                 ].map((link) => (
                   <Link key={link.href} href={link.href} className="hover:text-foam">

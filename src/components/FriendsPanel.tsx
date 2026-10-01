@@ -130,8 +130,15 @@ export function FriendsPanel() {
         ) : null}
 
         <div>
-          <h3 className="mb-2 font-bold text-foam">
-            Amis <span className="font-semibold text-mist">· {friends?.friends.length ?? 0}</span>
+          <h3 className="mb-2 flex flex-wrap items-baseline justify-between gap-2 font-bold text-foam">
+            <span>
+              Amis <span className="font-semibold text-mist">· {friends?.friends.length ?? 0}</span>
+            </span>
+            {!!friends?.friends.length && (
+              <Link href="/echanges" className="text-sm font-semibold text-straw underline underline-offset-4">
+                Échanger des avis
+              </Link>
+            )}
           </h3>
           {!friends ? (
             <p className="text-mist">Chargement…</p>

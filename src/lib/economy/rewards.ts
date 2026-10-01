@@ -51,11 +51,21 @@ export const DAILY_BERRY_CAP = 20_000;
 /** Prix d'une recrue à la boutique, avant réduction. */
 export const TAVERN_COST = 1500;
 
-/** Booster : plusieurs avis d'un coup, moins chers qu'à l'unité, dont au moins un rare ou légendaire. */
-export const BOOSTER_SIZE = 5;
+/**
+ * Booster : plusieurs avis d'un coup, moins chers qu'à l'unité. Chaque carte a
+ * ses propres chances, par rareté (1 = légendaire, 4 = commun) : trois cartes
+ * communes ou peu communes, une quatrième qui peut être rare, et une dernière
+ * rare ou légendaire. Le suspense monte au fil de l'ouverture.
+ */
+export const BOOSTER_SLOTS: Record<number, number>[] = [
+  { 3: 32, 4: 50 },
+  { 3: 32, 4: 50 },
+  { 3: 32, 4: 50 },
+  { 2: 25, 3: 35, 4: 40 },
+  { 1: 20, 2: 80 },
+];
+export const BOOSTER_SIZE = BOOSTER_SLOTS.length;
 export const BOOSTER_COST = 6000;
-/** Rareté la plus commune que peut avoir la carte garantie (1 = légendaire, 2 = rare). */
-export const BOOSTER_GUARANTEED_TIER = 2;
 
 /** Part de chaque rareté dans les recrutements (1 = légendaire, 4 = commun). */
 export const RARITY_WEIGHTS: Record<number, number> = { 1: 4, 2: 14, 3: 32, 4: 50 };
@@ -71,17 +81,27 @@ export function recruitChance(performance: number, recruitBonus: number): number
   return Math.min(0.9, (0.25 + 0.35 * ((performance - 0.5) / 0.5)) * (1 + recruitBonus));
 }
 
-/** Tire un personnage : d'abord la rareté, selon son poids, puis un personnage de cette rareté. */
-export function drawRecruit(rng: Rng, pool: readonly Recruitable[], state: PlayerState, goldenBonus: number): Recruit | null {
-  const tiers = Object.keys(RARITY_WEIGHTS)
+/**
+ * Tire un personnage : d'abord la rareté, selon son poids, puis un personnage
+ * de cette rareté. `weights` : les raretés possibles et leur part (par défaut,
+ * celles d'un recrutement ordinaire).
+ */
+export function drawRecruit(
+  rng: Rng,
+  pool: readonly Recruitable[],
+  state: PlayerState,
+  goldenBonus: number,
+  weights: Record<number, number> = RARITY_WEIGHTS,
+): Recruit | null {
+  const tiers = Object.keys(weights)
     .map(Number)
     .filter((tier) => pool.some((c) => c.tier === tier));
   if (!tiers.length) return null;
 
-  let roll = rng() * tiers.reduce((sum, tier) => sum + RARITY_WEIGHTS[tier], 0);
+  let roll = rng() * tiers.reduce((sum, tier) => sum + weights[tier], 0);
   let chosen = tiers[tiers.length - 1];
   for (const tier of tiers) {
-    roll -= RARITY_WEIGHTS[tier];
+    roll -= weights[tier];
     if (roll < 0) {
       chosen = tier;
       break;
@@ -241,27 +261,21 @@ export function boosterCost(discount: number): number {
   return roundToTen(BOOSTER_COST * (1 - Math.min(discount, 0.5)));
 }
 
-/**
- * Achat d'un booster : `BOOSTER_SIZE` avis tirés comme à l'unité. Si aucun des
- * premiers n'est au moins rare, le dernier l'est à coup sûr.
- */
+/** Achat d'un booster : une carte par emplacement de `BOOSTER_SLOTS`, dans l'ordre. */
 export function buyBooster(
   state: PlayerState,
   pool: readonly Recruitable[],
   rng: Rng,
 ): { state: PlayerState; recruits: Recruit[]; cost: number } | "insufficient" | "empty" {
-  const byId = new Map(pool.map((c) => [c.id, c]));
-  const bonuses = crewBonuses(state, byId);
+  const bonuses = crewBonuses(state, new Map(pool.map((c) => [c.id, c])));
   const cost = boosterCost(bonuses.discount);
   if (state.berrys < cost) return "insufficient";
 
-  const guaranteed = pool.filter((c) => c.tier <= BOOSTER_GUARANTEED_TIER);
-  const isGood = (recruit: Recruit) => (byId.get(recruit.characterId)?.tier ?? 4) <= BOOSTER_GUARANTEED_TIER;
   let next: PlayerState = { ...state, berrys: state.berrys - cost };
   const recruits: Recruit[] = [];
-  for (let i = 0; i < BOOSTER_SIZE; i++) {
-    const owed = i === BOOSTER_SIZE - 1 && guaranteed.length > 0 && !recruits.some(isGood);
-    const recruit = drawRecruit(rng, owed ? guaranteed : pool, next, bonuses.golden);
+  for (const slot of BOOSTER_SLOTS) {
+    // Si aucun personnage visible du joueur n'a la rareté voulue, la carte est tirée comme à l'unité
+    const recruit = drawRecruit(rng, pool, next, bonuses.golden, slot) ?? drawRecruit(rng, pool, next, bonuses.golden);
     if (!recruit) return "empty";
     recruits.push(recruit);
     next = withRecruit(next, recruit);

@@ -8,8 +8,9 @@ import { formatNumber } from "@/games/engine/text";
 import { Button, Panel } from "@/games/ui/primitives";
 import { WithGameData } from "@/games/ui/WithGameData";
 import {
-  AFFILIATION_SYNERGY,
   crewBonuses,
+  DEFAULT_TRAIT,
+  bonusLabel,
   FULL_CREW_BONUS,
   playerBounty,
   POST_IDS,
@@ -17,6 +18,9 @@ import {
   postStrength,
   rankOf,
   RARITY_LABELS,
+  TRAIT_STEPS,
+  TRAITS,
+  type CrewTrait,
   type PostId,
 } from "@/lib/economy";
 import { usePlayer } from "@/lib/player/PlayerProvider";
@@ -63,6 +67,89 @@ function Bounty() {
   );
 }
 
+/** Paliers d'un trait : ceux déjà atteints sont allumés. */
+function Steps({ trait }: { trait: CrewTrait }) {
+  return (
+    <span className="flex shrink-0 gap-1" aria-label={`Palier ${trait.level} sur ${TRAIT_STEPS.length}`}>
+      {TRAIT_STEPS.map((step, index) => (
+        <span
+          key={step}
+          className={`flex size-7 items-center justify-center rounded-full border text-xs font-bold ${
+            index < trait.level ? "border-straw bg-straw text-ink" : "border-sea-600 text-mist"
+          }`}
+        >
+          {step}
+        </span>
+      ))}
+    </span>
+  );
+}
+
+/** Traits d'équipage : les membres d'une même affiliation renforcent ensemble un bonus, par paliers. */
+function Traits({ traits, full }: { traits: CrewTrait[]; full: boolean }) {
+  return (
+    <Panel className="space-y-3">
+      <div>
+        <h3 className="font-display text-2xl tracking-wide text-straw">Traits d&apos;équipage</h3>
+        <p className="text-sm text-mist">
+          Place plusieurs membres d&apos;une même affiliation : à {TRAIT_STEPS[0]} membres leur trait s&apos;active, puis il se
+          renforce à {TRAIT_STEPS.slice(1).join(" et ")}. Plusieurs traits peuvent être actifs en même temps.
+        </p>
+      </div>
+
+      {traits.length === 0 ? (
+        <p className="text-sm text-mist">Aucun membre d&apos;équipage n&apos;a d&apos;affiliation pour l&apos;instant.</p>
+      ) : (
+        <ul className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+          {traits.map((trait) => {
+            const next = TRAIT_STEPS[trait.level];
+            return (
+              <li
+                key={trait.affiliation}
+                className={`flex items-center gap-3 rounded-xl border p-3 ${
+                  trait.level > 0 ? "border-straw/60 bg-straw/10" : "border-sea-700 bg-sea-900/40"
+                }`}
+              >
+                <Steps trait={trait} />
+                <div className="min-w-0 flex-1 text-sm">
+                  <p className="font-bold text-foam">
+                    {trait.name}
+                    {trait.level > 0 && <span className="ml-2 font-display text-lg tracking-wide text-straw">{percent(trait.value)}</span>}
+                  </p>
+                  <p className="truncate text-mist">
+                    {trait.affiliation} · {trait.count} membre{trait.count > 1 ? "s" : ""}
+                  </p>
+                  <p className="text-mist">
+                    {trait.effect}
+                    {next !== undefined && ` · à ${next} : ${percent(trait.values[trait.level])}`}
+                  </p>
+                </div>
+              </li>
+            );
+          })}
+        </ul>
+      )}
+
+      <p className="text-sm text-mist">
+        {full ? "Équipage complet : " : "Les dix postes pourvus : "}
+        {percent(FULL_CREW_BONUS)} de Berrys sur tous les jeux.
+      </p>
+
+      <details className="text-sm text-mist">
+        <summary className="cursor-pointer font-semibold text-foam">Tous les traits</summary>
+        <ul className="mt-2 space-y-1">
+          {[...Object.entries(TRAITS), ["Toute autre affiliation", DEFAULT_TRAIT] as const].map(([affiliation, trait]) => (
+            <li key={affiliation}>
+              <strong className="text-foam">{trait.name}</strong> ({affiliation}) : {bonusLabel(trait.bonus).toLowerCase()},{" "}
+              {trait.values.map(percent).join(" / ")}
+            </li>
+          ))}
+        </ul>
+      </details>
+    </Panel>
+  );
+}
+
 function Crew({ data }: { data: ResolvedData }) {
   const { state, assign } = usePlayer();
   const [error, setError] = useState<string | null>(null);
@@ -77,6 +164,7 @@ function Crew({ data }: { data: ResolvedData }) {
   );
   const bonuses = crewBonuses(state, data.characterById);
   const postOf = (characterId: string) => POST_IDS.find((post) => state.crew[post] === characterId);
+  const aboard = new Map(bonuses.traits.map((trait) => [trait.affiliation, trait.count]));
 
   async function change(post: PostId, characterId: string | null) {
     setError(null);
@@ -93,7 +181,7 @@ function Crew({ data }: { data: ResolvedData }) {
         </h2>
         <p className="mt-1 text-mist">
           Chaque poste donne un bonus, d&apos;autant plus fort que le personnage est rare. Un avis doré le renforce
-          encore.
+          encore. Et des membres d&apos;une même affiliation activent ensemble un trait.
         </p>
       </div>
 
@@ -105,7 +193,7 @@ function Crew({ data }: { data: ResolvedData }) {
           </Link>
         </Panel>
       ) : (
-        <ul className="grid gap-3 sm:grid-cols-2">
+        <ul className="grid grid-cols-1 gap-3 sm:grid-cols-2">
           {POST_IDS.map((post) => {
             const memberId = state.crew[post];
             const member = memberId ? data.characterById.get(memberId) : undefined;
@@ -196,6 +284,13 @@ function Crew({ data }: { data: ResolvedData }) {
                       current ? " · en poste" : other ? ` · ${POSTS[other].label}` : ""
                     }`}
                   />
+                  {/* Pour composer un trait : l'affiliation, et le nombre de ses membres déjà à bord */}
+                  {character.affiliation && (
+                    <p className="mt-1 truncate text-center text-xs text-mist" title={character.affiliation}>
+                      {character.affiliation}
+                      {aboard.get(character.affiliation) ? ` · ${aboard.get(character.affiliation)} à bord` : ""}
+                    </p>
+                  )}
                   <button
                     type="button"
                     onClick={() => change(picking, character.id)}
@@ -210,18 +305,7 @@ function Crew({ data }: { data: ResolvedData }) {
         </Modal>
       )}
 
-      <Panel className="space-y-1 text-sm text-mist">
-        <p className="font-bold text-foam">Bonus d&apos;ensemble</p>
-        <p>
-          {bonuses.sharedAffiliation
-            ? `Esprit d'équipage (${bonuses.sharedAffiliation}) : ${percent(AFFILIATION_SYNERGY.bonus)} de Berrys sur tous les jeux.`
-            : `${AFFILIATION_SYNERGY.members} membres de la même affiliation : ${percent(AFFILIATION_SYNERGY.bonus)} de Berrys sur tous les jeux.`}
-        </p>
-        <p>
-          {bonuses.full ? "Équipage complet : " : "Les dix postes pourvus : "}
-          {percent(FULL_CREW_BONUS)} de Berrys sur tous les jeux.
-        </p>
-      </Panel>
+      <Traits traits={bonuses.traits} full={bonuses.full} />
     </section>
   );
 }

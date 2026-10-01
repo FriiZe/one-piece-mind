@@ -15,12 +15,13 @@ const openInvites = (userId: string) => ({
 
 /** Nombre de demandes et d'invitations en attente. `admin` : compte aussi les quiz masqués à relire. */
 export async function pendingCounts(userId: string, admin: boolean): Promise<NotificationCounts> {
-  const [requests, invites, hiddenQuizzes] = await Promise.all([
+  const [requests, invites, trades, hiddenQuizzes] = await Promise.all([
     db().friendship.count({ where: { addresseeId: userId, status: "pending" } }),
     db().roomInvite.count({ where: openInvites(userId) }),
+    db().trade.count({ where: { toId: userId, status: "pending" } }),
     admin ? db().quiz.count({ where: { status: "hidden" } }) : 0,
   ]);
-  return { requests, invites, hiddenQuizzes };
+  return { requests, invites, trades, hiddenQuizzes };
 }
 
 export async function friendsOverview(userId: string): Promise<FriendsOverview> {
