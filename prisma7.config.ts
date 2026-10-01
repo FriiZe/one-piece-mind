@@ -9,6 +9,8 @@ export default defineConfig({
     path: "prisma/migrations",
   },
   datasource: {
-    url: process.env["DATABASE_URL"],
+    // Les migrations passent par la connexion directe quand l'hébergeur en fournit une
+    // (Neon : DATABASE_URL_UNPOOLED) ; l'application, elle, utilise la connexion groupée.
+    url: process.env["DATABASE_URL_UNPOOLED"] ?? process.env["DATABASE_URL"],
   },
 });

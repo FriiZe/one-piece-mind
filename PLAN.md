@@ -193,14 +193,14 @@ Le lot C peut s'intercaler plus tôt, jeu par jeu, selon l'envie.
   - « Avis de recherche » donne en indices l'affiliation, la mer d'origine, l'arc et l'initiale, et non le surnom (les surnoms ne sont disponibles qu'en anglais).
 - Reste : la mise en ligne publique.
 
-**Phase 2 : faite, hors mise en production.**
+**Phase 2 : faite et en ligne.**
 
 - Fait : Berrys gagnés à chaque partie, plafond journalier, recrutement après une bonne partie, taverne (recrutement payant), collection d'avis de recherche avec raretés et avis dorés, équipage de dix postes avec bonus, prime et rang du joueur, comptes, reprise de la progression d'invité à l'inscription.
 - Décisions prises en cours de route :
   - Vérification des parties : le serveur rejoue la partie à partir des réponses envoyées, plutôt que de générer chaque manche lui-même. On ne peut pas inventer un score ; un tricheur qui lit les données du navigateur peut en revanche bien répondre.
   - Comptes : pseudo et mot de passe créés sur le site, sans Discord ni Google pour l'instant. Sans adresse e-mail, pas de récupération de mot de passe.
   - Bonus d'équipage : uniquement des bonus de gains. Les règles des jeux ne changent pas, donc les scores restent comparables.
-- Reste : créer la base Neon et renseigner `DATABASE_URL` en production (voir README). Sans elle, le site fonctionne en mode invité.
+- En ligne sur https://one-piece-mind.vercel.app, avec une base Neon : les comptes sont ouverts.
 
 **À reprendre plus tard**
 
