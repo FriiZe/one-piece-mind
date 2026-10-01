@@ -5,7 +5,7 @@
  * qu'à ce recalcul.
  */
 import { z } from "zod";
-import { getGame } from "@/lib/games/catalog";
+import { getGame, isLiveSlug } from "@/lib/games/catalog";
 import type { GameOutcome } from "@/lib/economy/types";
 import type { ResolvedData } from "./cards";
 import * as anagramme from "./anagramme/logic";
@@ -145,6 +145,8 @@ export type EvaluationContext = {
 /** Rejoue la partie décrite par le compte rendu. `null` si elle ne peut pas avoir eu lieu. */
 export function evaluateReport(report: GameReport, { data, animeCharacters, today }: EvaluationContext): GameOutcome | null {
   const slug = report.slug === "onepiecedle-daily" ? "onepiecedle" : report.slug;
+  // Un jeu en pause n'a plus de page : la partie n'a pas pu y être jouée
+  if (!isLiveSlug(slug)) return null;
   const category = getGame(slug)!.category;
   const outcome = (result: { score: number; max: number }, daily = false): GameOutcome => ({
     slug,

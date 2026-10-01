@@ -721,7 +721,7 @@ export const GAME_CONTENT_EN: Record<LiveSlug, GameContent> = {
       {
         question: "Which games are the questions drawn from?",
         answer:
-          "Crew, Ships, Origin and Race, Which Arc?, True or False, Techniques, Weapons and Swords, Epithets, Laughs, Spelling, Taller or Older and Haki.",
+          "Crew, Ships, Origin and Race, Which Arc?, True or False, Techniques, Weapons and Swords, Epithets, Spelling, Taller or Older and Haki.",
       },
       {
         question: "Can the same question come up twice?",

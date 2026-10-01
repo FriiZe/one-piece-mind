@@ -9,7 +9,8 @@ import * as qcm from "@/games/qcm/logic";
 import * as recrute from "@/games/recrute-ton-equipage/logic";
 import { evaluateReport, reportSchema, type GameReport } from "@/games/report";
 import { BASE_BERRYS, weeklyChallenges } from "@/lib/economy";
-import { GAMES, isRewardless, LIVE_SLUGS } from "@/lib/games/catalog";
+import { GAMES, getGame, isRewardless, LIVE_SLUGS, PAUSED_SLUGS } from "@/lib/games/catalog";
+import { validGames } from "@/lib/multi/rules";
 
 const raw = buildGameData();
 const modes: ResolvedData[] = [resolveGameData(raw, "anime"), resolveGameData(raw, "manga")];
@@ -56,6 +57,30 @@ describe("Rires", () => {
         expect(question.options).toHaveLength(4);
         expect(question.options.map((o) => o.id)).toContain(question.answerId);
       }
+    }
+  });
+
+  it("est en pause : hors des jeux en ligne, et une partie n'y rapporte rien", () => {
+    expect(PAUSED_SLUGS).toContain("rires");
+    expect(LIVE_SLUGS).not.toContain("rires");
+    expect(getGame("rires")?.status).toBe("soon");
+    expect(run({ slug: "rires", seed: SEEDS[0], mode: "anime", difficulty: "normal", answers: [] })).toBeNull();
+    expect(run({ slug: "surnoms", seed: SEEDS[0], mode: "anime", difficulty: "normal", answers: [] })).not.toBeNull();
+  });
+
+  it("en pause, ne pose plus de question dans le mode aléatoire ni en multijoueur", () => {
+    const laughTitle = qcm.generateQcm("rires", SEEDS[0], "normal", anime)[0].title;
+    expect(qcm.MIX_SLUGS).not.toContain("rires");
+    expect(validGames(["surnoms", "rires"])).toBeNull();
+    for (const seed of SEEDS) {
+      const questions = [
+        ...qcm.generateQcm("mode-aleatoire", seed, "normal", anime),
+        // Un salon ouvert avant la pause cite encore le jeu
+        ...qcm.generateMixed(seed, ["rires", "surnoms"], 10, "normal", anime),
+        ...qcm.generateMixed(seed, ["rires"], 10, "normal", anime),
+      ];
+      expect(questions).toHaveLength(30);
+      expect(questions.map((question) => question.title)).not.toContain(laughTitle);
     }
   });
 });

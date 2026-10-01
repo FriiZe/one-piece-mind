@@ -8,6 +8,7 @@ import { createRng, pick, randomInt, sample, shuffle, type Rng } from "../engine
 import { formatBounty, formatHeight } from "../engine/text";
 import { FRUIT_TYPE_LABELS, hakiLabel, RACE_LABELS, SEA_LABELS, type HakiType } from "@/lib/data/labels";
 import { RACES, SEAS } from "@/lib/data/schema";
+import { isLiveSlug } from "@/lib/games/catalog";
 import { translator, type Localized } from "@/lib/i18n";
 
 export const QCM_LENGTH = 10;
@@ -438,19 +439,22 @@ const BASE_GENERATORS = {
   haki,
 } satisfies Record<string, Generator>;
 
+/**
+ * Quiz utilisables en multijoueur et dans le mode aléatoire : tous ceux dont le
+ * jeu est en ligne, sauf le mode aléatoire qui n'est qu'un mélange des autres.
+ */
+export type MixSlug = keyof typeof BASE_GENERATORS;
+export const MIX_SLUGS = (Object.keys(BASE_GENERATORS) as MixSlug[]).filter((slug) => isLiveSlug(slug));
+
 /** Une question de chaque jeu, tirée au hasard. */
 const modeAleatoire: Generator = (rng, data, pool, count) => {
   const questions: QcmQuestion[] = [];
   for (let attempt = 0; questions.length < count && attempt < count * 5; attempt++) {
-    const [question] = pick(rng, Object.values(BASE_GENERATORS))(rng, data, pool, 1);
+    const [question] = BASE_GENERATORS[pick(rng, MIX_SLUGS)](rng, data, pool, 1);
     if (question && !questions.some((q) => q.id === question.id)) questions.push(question);
   }
   return questions;
 };
-
-/** Quiz utilisables en multijoueur : tous, sauf le mode aléatoire qui n'est qu'un mélange des autres. */
-export type MixSlug = keyof typeof BASE_GENERATORS;
-export const MIX_SLUGS = Object.keys(BASE_GENERATORS) as [MixSlug, ...MixSlug[]];
 
 /** `count` questions tirées parmi les quiz choisis, toutes différentes. */
 export function generateMixed(
@@ -462,9 +466,12 @@ export function generateMixed(
 ): QcmQuestion[] {
   const rng = createRng(seed);
   const pool = byDifficulty(data.characters, difficulty);
+  // Un salon ouvert avant la mise en pause d'un jeu peut encore le citer
+  const live = slugs.filter((slug) => MIX_SLUGS.includes(slug));
+  const sources = live.length > 0 ? live : MIX_SLUGS;
   const questions: QcmQuestion[] = [];
   for (let attempt = 0; questions.length < count && attempt < count * 8; attempt++) {
-    const slug = pick(rng, slugs);
+    const slug = pick(rng, sources);
     const [question] = BASE_GENERATORS[slug](rng, data, pool, 1);
     // L'identifiant est préfixé par le jeu : deux quiz peuvent porter sur le même personnage
     const id = `${slug}:${question?.id}`;

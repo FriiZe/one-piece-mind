@@ -62,8 +62,8 @@ export const GAME_CATEGORIES: GameCategory[] = [
   },
 ];
 
-/** Jeux jouables. Chacun a son composant (src/games/ui/GameRunner.tsx) et sa page (src/games/content.ts). */
-export const LIVE_SLUGS = [
+/** Jeux construits. Chacun a son composant (src/games/ui/GameRunner.tsx) et sa page (src/games/content.ts). */
+const BUILT_SLUGS = [
   "onepiecedle",
   "revelation",
   "zoom-extreme",
@@ -104,7 +104,17 @@ export const LIVE_SLUGS = [
   "la-route-de-grand-line",
   "den-den-devin",
 ] as const;
-export type LiveSlug = (typeof LIVE_SLUGS)[number];
+export type LiveSlug = (typeof BUILT_SLUGS)[number];
+
+/**
+ * Jeux construits mais retirés du site pour l'instant : ni page, ni sélection
+ * du jour, ni récompense, ni questions dans le mode aléatoire et le multijoueur.
+ * Rires attend ses extraits audio.
+ */
+export const PAUSED_SLUGS: readonly LiveSlug[] = ["rires"];
+
+/** Jeux jouables. */
+export const LIVE_SLUGS = BUILT_SLUGS.filter((slug) => !PAUSED_SLUGS.includes(slug));
 
 /**
  * Jeux sans récompense : rien ne permet au serveur de vérifier la partie
@@ -116,6 +126,11 @@ export const isRewardless = (slug: string) => (REWARDLESS_SLUGS as readonly stri
 
 export function isLiveSlug(slug: string): slug is LiveSlug {
   return (LIVE_SLUGS as readonly string[]).includes(slug);
+}
+
+/** Vrai aussi pour un jeu en pause : le parcours qu'un joueur y a déjà fait reste le sien. */
+export function isBuiltSlug(slug: string): slug is LiveSlug {
+  return (BUILT_SLUGS as readonly string[]).includes(slug);
 }
 
 const game = (slug: string, category: GameCategoryId, batch: Game["batch"], title: Localized, pitch: Localized): Game => ({

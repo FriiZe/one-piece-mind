@@ -16,7 +16,7 @@ import {
   type PlayerState,
   type PostId,
 } from "@/lib/economy";
-import { isLiveSlug } from "@/lib/games/catalog";
+import { isBuiltSlug } from "@/lib/games/catalog";
 import { DEFAULT_LOCALE, type Locale } from "@/lib/i18n";
 import type { BoosterResult, CrewResult, GameResult, RecruitResult, SellResult } from "@/lib/player/types";
 import type { SpoilerMode } from "@/lib/spoilers";
@@ -275,7 +275,7 @@ export function sanitizeGuestState(input: unknown) {
     lifetimeBerrys,
     games: guest.games,
     // Le parcours par jeu est repris pour que les objectifs déjà atteints ne soient pas payés deux fois
-    stats: Object.fromEntries(Object.entries(guest.stats ?? {}).filter(([slug]) => isLiveSlug(slug))),
+    stats: Object.fromEntries(Object.entries(guest.stats ?? {}).filter(([slug]) => isBuiltSlug(slug))),
     collection,
     crew: crew.map(([post, characterId]) => ({ post, characterId })),
   };

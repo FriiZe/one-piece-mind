@@ -692,7 +692,7 @@ export const GAME_CONTENT_FR: Record<LiveSlug, GameContent> = {
       {
         question: "Dans quels jeux les questions sont-elles tirées ?",
         answer:
-          "Équipage, Navires, Origine et race, Dans quel arc ?, Vrai ou faux, Techniques, Armes et sabres, Surnoms, Rires, Orthographe, Grand ou vieux et Haki.",
+          "Équipage, Navires, Origine et race, Dans quel arc ?, Vrai ou faux, Techniques, Armes et sabres, Surnoms, Orthographe, Grand ou vieux et Haki.",
       },
       {
         question: "Peut-on tomber deux fois sur la même question ?",
