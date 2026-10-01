@@ -12,5 +12,6 @@ export function generateStaticParams() {
 export async function GET(_request: Request, { params }: RouteContext<"/[lang]/data/jeux.json">) {
   const { lang } = await params;
   if (!isLocale(lang)) return new Response(null, { status: 404 });
-  return Response.json(buildGameData(lang));
+  // Un fichier de données, pas une page : il n'a rien à faire dans les résultats de recherche
+  return Response.json(buildGameData(lang), { headers: { "X-Robots-Tag": "noindex" } });
 }
