@@ -1,0 +1,201 @@
+# OnePieceMind — Plan
+
+Site de mini-jeux One Piece, gratuit, jouable dans le navigateur, dans l'esprit de [PokeMind](https://pokemind.fr/) : un gros catalogue de jeux courts, une méta-progression (monnaie, collection, équipage), du multijoueur et du classé.
+
+## 1. Décisions prises
+
+| Sujet | Décision |
+|---|---|
+| Périmètre | Complet façon PokeMind : comptes, économie, collection, multi, classé, marché |
+| Spoilers | Choix au lancement de chaque jeu : « à jour sur l'anime » ou « à jour sur le manga » (mémorisé ensuite) |
+| Jeux incertains retenus | Rires et voix, GeoPiece |
+| Jeux écartés | Blindtest openings, jeux sur le TCG |
+| Hébergement | Tout sur Vercel, multijoueur compris |
+| Référencement | Prioritaire : une page indexable par jeu |
+
+## 2. Architecture
+
+**Stack** : Next.js (App Router) + TypeScript + Tailwind, déployé sur Vercel. Next.js plutôt que React + Vite parce qu'il donne le rendu statique par page (référencement) et les routes serveur dans le même projet.
+
+| Brique | Choix | Remarque |
+|---|---|---|
+| Pages | Génération statique pour l'accueil, le catalogue, `/jeux/[slug]`, le wiki | Le jeu lui-même est un composant client chargé dans la page |
+| Base de données | Postgres Neon (Marketplace Vercel) + Prisma | Même duo que `one-piece-league` |
+| Auth | Auth.js : Discord + Google, et mode invité | Progression invitée en local, fusionnée à l'inscription |
+| Temps réel | WebSockets natifs des Vercel Functions + Redis Upstash | Voir risque n°2 |
+| Fichiers | Vercel Blob (images, audio) | |
+| Tâches planifiées | Vercel Cron | Tirage quotidien, boss hebdo, fin de saison classée |
+| Tests | Vitest (générateurs de manches), Playwright (parcours clés) | |
+
+**Moteur de jeu commun.** Chaque mini-jeu est un module qui déclare :
+
+- `meta` : slug, titre, catégorie, description, texte de référencement, difficultés ;
+- `generateRound(seed, pool, options)` : fonction pure qui fabrique une manche à partir du jeu de données filtré ;
+- `checkAnswer(round, answer)` ;
+- un composant React d'affichage.
+
+Le cadre autour (chrono, score, combo, écran de résultat, partage, gain de Berrys) est écrit une seule fois. Ajouter un jeu revient à écrire un générateur et un composant.
+
+**Triche.** Dès qu'une partie rapporte des Berrys, des avis de recherche ou des points classés, la manche est générée et corrigée côté serveur (la réponse n'est jamais envoyée au client). Les parties « pour le plaisir » en invité restent 100 % client.
+
+## 3. Données
+
+Il n'existe pas d'équivalent de PokéAPI aussi complet pour One Piece. Le jeu de données est donc un actif du projet, versionné dans le dépôt (`data/*.json`, validé par Zod).
+
+- **Sources** : [api-onepiece.com](https://api-onepiece.com/) pour la liste et les noms français (personnages, fruits, équipages, arcs), complétée par les infobox du [One Piece Wiki](https://onepiece.fandom.com/) (CC BY-SA) pour les premières apparitions, l'historique des primes, les surnoms, les origines et les affiliations. Curation manuelle par-dessus (`data/overrides/`).
+- **Entités** : personnages, fruits du démon, équipages et organisations, îles, arcs et sagas, techniques, armes, navires, citations.
+- **Champs personnage** : nom (FR / EN / romaji), surnom, genre, race, origine, taille, âge, affiliations, rôle, fruit, haki, prime, statut, première apparition (chapitre et épisode).
+- **Volume visé** : environ 300 personnages bien renseignés pour démarrer, puis élargissement.
+
+**Gestion des spoilers.** Chaque entité porte sa première apparition (chapitre + épisode). Les faits qui évoluent (prime, fruit révélé, affiliation, statut) sont stockés en versions datées par chapitre. Une constante `ANIME_CUTOFF_CHAPTER` indique jusqu'où l'anime a adapté le manga ; le mode « anime » ne voit que ce qui précède. Elle se met à jour à la main quand l'anime avance.
+
+**Images et sons.** À constituer : portraits, silhouettes (générées par script à partir des portraits détourés), Jolly Rogers, dessins de fruits, carte du monde, extraits de rires et de voix.
+
+## 4. Catalogue : 44 mini-jeux
+
+Lots : **A** = 10 jeux phares pour la mise en ligne, **B** = le gros du catalogue, **C** = jeux lourds (ressources ou logique spécifiques).
+
+### À l'œil (9)
+
+| # | Jeu | Principe | Lot |
+|---|---|---|---|
+| 1 | Silhouette | Reconnaître un personnage à son ombre, réponse libre | A |
+| 2 | Silhouette QCM | Même chose avec 4 propositions | B |
+| 3 | Zoom extrême | Un détail très agrandi qui dézoome peu à peu | B |
+| 4 | Révélation | Image pixelisée qui se précise avec le temps | A |
+| 5 | Avis de recherche | L'affiche sans le nom ni la photo : deviner à partir de la prime et du surnom | A |
+| 6 | Jolly Roger | Retrouver l'équipage à partir de son pavillon | A |
+| 7 | Avant / après l'ellipse | Associer un personnage à sa version d'avant ou d'après | B |
+| 8 | Fruit du démon | Reconnaître un fruit à son dessin | B |
+| 9 | Mémo | Paires à retrouver : personnage ↔ fruit, personnage ↔ pavillon | B |
+
+### À l'oreille (2)
+
+| # | Jeu | Principe | Lot |
+|---|---|---|---|
+| 10 | Rires | Reconnaître un personnage à son rire. Version écrite d'abord (« Zehahaha »), version audio ensuite | C |
+| 11 | Voix et répliques | Extrait audio court, deviner qui parle | C |
+
+### Mots et indices (8)
+
+| # | Jeu | Principe | Lot |
+|---|---|---|---|
+| 12 | OnePiecedle | Personnage mystère du jour ; chaque essai indique ce qui est juste (genre, affiliation, type de fruit, haki, prime, taille, origine, premier arc) | A |
+| 13 | Wordle | Trouver un nom en 6 essais | B |
+| 14 | Anagramme | Remettre les lettres d'un nom dans l'ordre | B |
+| 15 | Les indices | Indices du plus vague au plus précis ; moins on en utilise, plus on gagne | B |
+| 16 | Qui a dit ça ? | Attribuer une citation | B |
+| 17 | Surnoms | « Le Chirurgien de la mort » → Law | B |
+| 18 | Orthographe | Écrire sans faute les noms difficiles | B |
+| 19 | Emojis | Deviner un personnage ou un arc à partir d'emojis | B |
+
+### Primes et mesures (6)
+
+| # | Jeu | Principe | Lot |
+|---|---|---|---|
+| 20 | Plus ou moins | La prime de B est-elle plus haute ou plus basse que celle de A ? En série | A |
+| 21 | Le classement | Trier 5 personnages par prime, taille ou âge | A |
+| 22 | Devine la prime | Estimer une prime, points selon la proximité | B |
+| 23 | Grand ou vieux | Qui est le plus grand, le plus âgé | B |
+| 24 | Première apparition | Deviner le chapitre ou l'épisode d'entrée d'un personnage | B |
+| 25 | Prime d'équipage | Estimer la prime totale d'un équipage | B |
+
+### Savoir (11)
+
+| # | Jeu | Principe | Lot |
+|---|---|---|---|
+| 26 | Type de fruit | Paramecia, Zoan ou Logia | A |
+| 27 | Qui a mangé ce fruit ? | Du fruit vers son utilisateur, et l'inverse | A |
+| 28 | Équipage | À quelle organisation appartient ce personnage | B |
+| 29 | Haki | Quels hakis maîtrise ce personnage | B |
+| 30 | Techniques | À qui appartient cette attaque | B |
+| 31 | Armes et sabres | Du sabre à son porteur | B |
+| 32 | Navires | Du navire à son équipage | B |
+| 33 | Origine et race | Mer d'origine, race | B |
+| 34 | Chronologie | Remettre des arcs ou des événements dans l'ordre | B |
+| 35 | Dans quel arc ? | Situer un personnage ou un événement | B |
+| 36 | Vrai ou faux | Affirmations générées à partir des données | B |
+
+### Défis (8)
+
+| # | Jeu | Principe | Lot |
+|---|---|---|---|
+| 37 | Mode aléatoire | Enchaînement de manches tirées dans tous les jeux | B |
+| 38 | Trouve-les tous | Citer tous les membres d'un groupe en temps limité (Mugiwara, Corsaires, Supernovas, Amiraux...) | A |
+| 39 | La Route de Grand Line | Parcours d'île en île, difficulté croissante, un boss par arc, vies limitées | C |
+| 40 | Den Den Devin | Le jeu devine le personnage auquel tu penses en posant des questions | C |
+| 41 | GeoPiece | Placer une île sur la carte, ou retrouver l'ordre de la route | C |
+| 42 | Grille 3×3 | Remplir une grille en croisant deux critères (« Sabreur » × « East Blue ») | C |
+| 43 | Connexions | Regrouper 16 personnages en 4 familles cachées | C |
+| 44 | Recrute ton équipage | Tirage de personnages au hasard, composer l'équipage le plus fort poste par poste | C |
+
+## 5. Méta-jeu
+
+Transposition des systèmes de PokeMind.
+
+| PokeMind | OnePieceMind |
+|---|---|
+| PokéDollars | **Berrys**, gagnés à chaque partie selon le score et la difficulté |
+| Capture + Pokédex | **Recrutement** : après une partie, chance d'obtenir l'avis de recherche d'un personnage. La collection se remplit |
+| Chromatiques | **Avis dorés**, variantes rares d'un même personnage |
+| Équipe de 6 avec bonus | **Équipage** : 10 postes (capitaine, sabreur, navigateur, tireur, cuisinier, médecin, archéologue, charpentier, musicien, timonier), chaque poste donne un bonus (combo, chrono, joker...) |
+| Rang du joueur | **Ta propre prime**, qui monte avec tes résultats |
+| 5 rangs classés | Mousse → Rookie → Supernova → Corsaire → Empereur |
+| Boss mondial hebdo | **Raid** : toute la communauté contre un Empereur ou un Amiral, une fois par semaine |
+| Marché | Échange de doublons entre joueurs, avec taxe |
+| Boutique | Cosmétiques payés en Berrys uniquement (pavillon, navire, cadre de profil) |
+| Quiz créés par les joueurs | Idem, avec file de modération |
+| Amis, chat | Amis d'abord ; le chat en dernier, il impose de la modération |
+
+## 6. Multijoueur
+
+Mode salon façon Kahoot : un hôte crée une partie, partage un code, choisit les jeux et le mode spoiler ; tout le monde répond aux mêmes manches, classement en direct.
+
+- Connexion par WebSocket sur une Vercel Function, état du salon et diffusion entre instances par Redis.
+- Le serveur fait foi : il envoie la manche, reçoit les réponses, calcule les scores.
+- Ensuite : duel classé 1 contre 1 (« Davy Back Fight ») avec file d'attente.
+
+## 7. Référencement
+
+- Une page statique par jeu (`/jeux/onepiecedle`...) avec un vrai texte : règles, astuces, questions fréquentes.
+- Pages de catégories et wiki des mécaniques. Pas de page « réponse du jour » : elle attire du trafic mais tue l'intérêt du défi quotidien.
+- Métadonnées, images de partage générées, plan du site, données structurées (`VideoGame`, `FAQPage`).
+- Français d'abord, structure prête pour l'anglais (`/en/...`).
+- Partage des résultats en grille d'emojis, comme Wordle : c'est le principal canal d'acquisition de ce type de site.
+- Mettre en ligne dès la fin de la phase 1 : l'indexation prend des semaines, autant la démarrer tôt.
+
+## 8. Feuille de route
+
+| Phase | Contenu | Résultat |
+|---|---|---|
+| 0. Fondations | Projet Next.js, charte graphique, import et validation du jeu de données, marquage spoilers, génération des silhouettes | Données fiables, site vide déployé |
+| 1. Moteur + lot A | Moteur de jeu commun, choix anime / manga, 10 jeux phares, défi quotidien, pages de référencement | **Mise en ligne publique** |
+| 2. Comptes et économie | Auth, Berrys, recrutement et collection, équipage et bonus, profil, correction côté serveur | La boucle « jouer → gagner → collectionner » |
+| 3. Lot B | Les 26 jeux du lot B, objectifs par jeu, défis hebdo | Catalogue de 36 jeux |
+| 4. Multijoueur | Salons à code, amis, classement en direct | Parties entre amis |
+| 5. Compétitif et communauté | Classé, raid hebdo, marché, boutique, quiz des joueurs + modération | Parité avec PokeMind |
+| 6. Lot C | Route de Grand Line, GeoPiece, Den Den Devin, grille, connexions, rires et voix | 44 jeux |
+
+Le lot C peut s'intercaler plus tôt, jeu par jeu, selon l'envie.
+
+### Avancement
+
+**Phase 0 : faite, sauf deux points.**
+
+- Fait : projet Next.js, charte graphique, accueil et page « À propos », pipeline de données validé, marquage spoilers, script de silhouettes, tests.
+- Reste : le déploiement sur Vercel, et les portraits (aucune image n'est encore dans le projet, voir section 10).
+- À reprendre en phase 1 : libellés français des surnoms et des affiliations (ils viennent du wiki, en anglais), et rattachement fiable des personnages aux équipages (celui de l'API contient des erreurs).
+
+## 9. Risques
+
+1. **Droits d'auteur.** One Piece appartient à Shueisha et Toei. Un site de fans gratuit est en général toléré, mais les images officielles et surtout les extraits audio (rires, voix) sont les éléments les plus exposés. Mesures : aucun revenu tiré de la licence, mention de non-affiliation, retrait rapide sur demande, version écrite des rires en premier.
+2. **WebSockets sur Vercel.** Le support natif date de juin 2026 et est encore en bêta publique : connexion limitée à 30 minutes, liée à une seule instance, sans diffusion ni présence intégrées. D'où Redis pour relier les instances. Solution de repli si la bêta pose problème : Ably ou Pusher, sans changer d'hébergeur.
+3. **Qualité des données.** C'est le plus gros chantier caché : primes par époque, premières apparitions, marquage spoilers. Une erreur de marquage spoile un joueur. Prévoir des tests automatiques sur le jeu de données.
+4. **Économie et triche.** Un marché entre joueurs attire les abus ; d'où la correction serveur et des plafonds de gains journaliers.
+
+## 10. Points à trancher plus tard
+
+- Nom et domaine définitifs.
+- Défi quotidien : un seul tirage « sans spoiler anime » pour tout le monde (recommandé, les résultats restent comparables), ou deux tirages distincts.
+- Origine des images : officielles, ou illustrations refaites pour réduire le risque n°1.
+- Anglais dès la phase 1 ou plus tard.

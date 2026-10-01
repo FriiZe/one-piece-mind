@@ -1,0 +1,1410 @@
+[
+  {
+    "id": "goat-island",
+    "apiId": 1,
+    "name": {
+      "fr": "ïle de Goat",
+      "en": "Goat Island"
+    },
+    "romaji": "Gōto-jima",
+    "sea": "East Blue",
+    "region": null
+  },
+  {
+    "id": "shell-town",
+    "apiId": 2,
+    "name": {
+      "fr": "Shell Town",
+      "en": "Shell Town"
+    },
+    "romaji": "Sheruzu Taun",
+    "sea": "East Blue",
+    "region": "Île Yotsuba"
+  },
+  {
+    "id": "shimotsuki",
+    "apiId": 3,
+    "name": {
+      "fr": "Shimotsuki",
+      "en": "Shimotsuki"
+    },
+    "romaji": "Shimotsuki Mura",
+    "sea": "East Blue",
+    "region": null
+  },
+  {
+    "id": "argao-archipelago",
+    "apiId": 4,
+    "name": {
+      "fr": "Archipel des Argao",
+      "en": "Argao Archipelago"
+    },
+    "romaji": "Orugan Shotō",
+    "sea": "East Blue",
+    "region": null
+  },
+  {
+    "id": "rare-animal-island",
+    "apiId": 5,
+    "name": {
+      "fr": "Île des Animaux Rares",
+      "en": "Rare Animal Island"
+    },
+    "romaji": "Chinjū no Shima",
+    "sea": "East Blue",
+    "region": null
+  },
+  {
+    "id": "baratie",
+    "apiId": 6,
+    "name": {
+      "fr": "Baratie",
+      "en": "Baratie"
+    },
+    "romaji": "Baratie",
+    "sea": "East Blue",
+    "region": null
+  },
+  {
+    "id": "logue-town",
+    "apiId": 7,
+    "name": {
+      "fr": "Logue Town",
+      "en": "Logue Town"
+    },
+    "romaji": "Rōgutaun",
+    "sea": "East Blue",
+    "region": null
+  },
+  {
+    "id": "mirrorball-island",
+    "apiId": 8,
+    "name": {
+      "fr": "Île Mirrorball",
+      "en": "Mirrorball Island"
+    },
+    "romaji": "Mirābōru Airando",
+    "sea": "East Blue",
+    "region": null
+  },
+  {
+    "id": "tequila-wolf",
+    "apiId": 9,
+    "name": {
+      "fr": "Tequila Wolf",
+      "en": "Tequila Wolf"
+    },
+    "romaji": "Tekīra Urufu",
+    "sea": "East Blue",
+    "region": null
+  },
+  {
+    "id": "kingdom-of-oykot",
+    "apiId": 10,
+    "name": {
+      "fr": "Royaume d'Oykot",
+      "en": "Kingdom of Oykot"
+    },
+    "romaji": "Oikotto-Ōkoku",
+    "sea": "East Blue",
+    "region": null
+  },
+  {
+    "id": "kingdom-of-goa",
+    "apiId": 11,
+    "name": {
+      "fr": "Royaume de Goa",
+      "en": "Kingdom of Goa"
+    },
+    "romaji": "Goa Ōkoku",
+    "sea": "East Blue",
+    "region": "Île de Dawn"
+  },
+  {
+    "id": "grey-terminal",
+    "apiId": 12,
+    "name": {
+      "fr": "Grey Terminal",
+      "en": "Grey Terminal"
+    },
+    "romaji": "Gurē Tāminaru",
+    "sea": "East Blue",
+    "region": "Île de Dawn"
+  },
+  {
+    "id": "middle-forest",
+    "apiId": 13,
+    "name": {
+      "fr": "Forêt du Milieu",
+      "en": "Middle Forest"
+    },
+    "romaji": "Chūkan no Mori",
+    "sea": "East Blue",
+    "region": "Île de Dawn"
+  },
+  {
+    "id": "fuchsia-village",
+    "apiId": 14,
+    "name": {
+      "fr": "Village de Fuchsia",
+      "en": "Fuchsia Village"
+    },
+    "romaji": "Fūsha-mura",
+    "sea": "East Blue",
+    "region": "Île de Dawn"
+  },
+  {
+    "id": "mount-corvo",
+    "apiId": 15,
+    "name": {
+      "fr": "Mont Corvo",
+      "en": "Mount Corvo"
+    },
+    "romaji": "Korubo-yama",
+    "sea": "East Blue",
+    "region": "Île de Dawn"
+  },
+  {
+    "id": "village-of-sirop",
+    "apiId": 16,
+    "name": {
+      "fr": "Village de Sirop",
+      "en": "Village of Sirop"
+    },
+    "romaji": "Shiroppu-mura",
+    "sea": "East Blue",
+    "region": "Archipel des Gekko"
+  },
+  {
+    "id": "arlong-park",
+    "apiId": 17,
+    "name": {
+      "fr": "Arlong Park",
+      "en": "Arlong Park"
+    },
+    "romaji": "Āron Pāku",
+    "sea": "East Blue",
+    "region": "Archipel de Konomi"
+  },
+  {
+    "id": "kokoyashi-village",
+    "apiId": 18,
+    "name": {
+      "fr": "Village de Kokoyashi",
+      "en": "Kokoyashi Village"
+    },
+    "romaji": "Kokoyashi-mura",
+    "sea": "East Blue",
+    "region": "Archipel de Konomi"
+  },
+  {
+    "id": "village-of-gsa",
+    "apiId": 19,
+    "name": {
+      "fr": "Village de Gsa",
+      "en": "Village of Gsa"
+    },
+    "romaji": "Gosa no Machi",
+    "sea": "East Blue",
+    "region": "Archipel de Konomi"
+  },
+  {
+    "id": "kingdom-of-ilisia",
+    "apiId": 20,
+    "name": {
+      "fr": "Royaume d'Ilisia",
+      "en": "Kingdom of Ilisia"
+    },
+    "romaji": "Irishia Ōkoku",
+    "sea": "West Blue",
+    "region": null
+  },
+  {
+    "id": "ohara",
+    "apiId": 21,
+    "name": {
+      "fr": "Ohara",
+      "en": "Ohara"
+    },
+    "romaji": "Ohara",
+    "sea": "West Blue",
+    "region": null
+  },
+  {
+    "id": "toroa-island",
+    "apiId": 22,
+    "name": {
+      "fr": "Île de Toroa",
+      "en": "Toroa Island"
+    },
+    "romaji": "Toroa",
+    "sea": "West Blue",
+    "region": null
+  },
+  {
+    "id": "las-camp",
+    "apiId": 23,
+    "name": {
+      "fr": "Las Camp",
+      "en": "Las Camp"
+    },
+    "romaji": "Rasu Kyanpu",
+    "sea": "West Blue",
+    "region": null
+  },
+  {
+    "id": "thriller-bark",
+    "apiId": 24,
+    "name": {
+      "fr": "Thriller Bark",
+      "en": "Thriller Bark"
+    },
+    "romaji": "Surirā Bāku",
+    "sea": "West Blue",
+    "region": null
+  },
+  {
+    "id": "kingdom-of-luvneel",
+    "apiId": 25,
+    "name": {
+      "fr": "Royaume de Luvneel",
+      "en": "Kingdom of Luvneel"
+    },
+    "romaji": "Rubunīru Ōkoku",
+    "sea": "North Blue",
+    "region": null
+  },
+  {
+    "id": "micqueot-island",
+    "apiId": 26,
+    "name": {
+      "fr": "Île de Micqueot",
+      "en": "Micqueot Island"
+    },
+    "romaji": "Kita no Daichi Mikkyu",
+    "sea": "North Blue",
+    "region": null
+  },
+  {
+    "id": "spider-miles",
+    "apiId": 27,
+    "name": {
+      "fr": "Spider Miles",
+      "en": "Spider Miles"
+    },
+    "romaji": "Supaidā Mairuzu",
+    "sea": "North Blue",
+    "region": null
+  },
+  {
+    "id": "flevance",
+    "apiId": 28,
+    "name": {
+      "fr": "Flevance",
+      "en": "Flevance"
+    },
+    "romaji": "Furebansu",
+    "sea": "North Blue",
+    "region": null
+  },
+  {
+    "id": "rubeck-island",
+    "apiId": 29,
+    "name": {
+      "fr": "Île de Rubeck",
+      "en": "Rubeck Island"
+    },
+    "romaji": "Rūbekku-tō",
+    "sea": "North Blue",
+    "region": null
+  },
+  {
+    "id": "notice",
+    "apiId": 30,
+    "name": {
+      "fr": "Notice",
+      "en": "Notice"
+    },
+    "romaji": "Nōtisu",
+    "sea": "North Blue",
+    "region": null
+  },
+  {
+    "id": "swallow-island",
+    "apiId": 31,
+    "name": {
+      "fr": "Île de Swallow",
+      "en": "Swallow Island"
+    },
+    "romaji": "Suwarō-tō",
+    "sea": "North Blue",
+    "region": null
+  },
+  {
+    "id": "minion-island",
+    "apiId": 32,
+    "name": {
+      "fr": "Île de Minion",
+      "en": "Minion Island"
+    },
+    "romaji": "Minion-tō",
+    "sea": "North Blue",
+    "region": null
+  },
+  {
+    "id": "kingdom-of-briss",
+    "apiId": 33,
+    "name": {
+      "fr": "Royaume de Briss",
+      "en": "Kingdom of Briss"
+    },
+    "romaji": "Burisu Ōkoku",
+    "sea": "South Blue",
+    "region": null
+  },
+  {
+    "id": "karate-island",
+    "apiId": 34,
+    "name": {
+      "fr": "Île Karaté",
+      "en": "Karate Island"
+    },
+    "romaji": "Karate no Shima",
+    "sea": "South Blue",
+    "region": null
+  },
+  {
+    "id": "saint-reia",
+    "apiId": 35,
+    "name": {
+      "fr": "Saint Reia",
+      "en": "Saint Reia"
+    },
+    "romaji": "Sentourea",
+    "sea": "South Blue",
+    "region": null
+  },
+  {
+    "id": "kingdom-dezoizo",
+    "apiId": 36,
+    "name": {
+      "fr": "Royaume Dézoizo",
+      "en": "Kingdom Dézoizo"
+    },
+    "romaji": "Torino Ōkoku",
+    "sea": "South Blue",
+    "region": null
+  },
+  {
+    "id": "baterilla",
+    "apiId": 37,
+    "name": {
+      "fr": "Baterilla",
+      "en": "Baterilla"
+    },
+    "romaji": "Baterira",
+    "sea": "South Blue",
+    "region": null
+  },
+  {
+    "id": "kingdom-of-solbay",
+    "apiId": 38,
+    "name": {
+      "fr": "Royaume de Solbay",
+      "en": "Kingdom of Solbay"
+    },
+    "romaji": "Sorube Ōkoku",
+    "sea": "South Blue",
+    "region": null
+  },
+  {
+    "id": "reverse-mountain",
+    "apiId": 39,
+    "name": {
+      "fr": "Reverse Mountain",
+      "en": "Reverse Mountain"
+    },
+    "romaji": "Rivāsu Maunten",
+    "sea": "Red Line",
+    "region": "Grand Line"
+  },
+  {
+    "id": "cap-des-jumeaux",
+    "apiId": 40,
+    "name": {
+      "fr": "Cap des Jumeaux",
+      "en": "Cap des Jumeaux"
+    },
+    "romaji": "Futago Misaki",
+    "sea": "Red Line",
+    "region": "Grand Line"
+  },
+  {
+    "id": "mary-geoise",
+    "apiId": 41,
+    "name": {
+      "fr": "Mary Geoise",
+      "en": "Mary Geoise"
+    },
+    "romaji": "Seichi Marījoa",
+    "sea": "Red Line",
+    "region": null
+  },
+  {
+    "id": "ile-des-hommes-poissons",
+    "apiId": 42,
+    "name": {
+      "fr": "Île des Hommes-Poissons",
+      "en": "Île des Hommes-Poissons"
+    },
+    "romaji": "Gyojin-tō",
+    "sea": "Red Line",
+    "region": "Grand Line"
+  },
+  {
+    "id": "amazon-lily",
+    "apiId": 43,
+    "name": {
+      "fr": "Amazon Lily",
+      "en": "Amazon Lily"
+    },
+    "romaji": "Amazon Rirī",
+    "sea": "Calm Belt",
+    "region": null
+  },
+  {
+    "id": "impel-down",
+    "apiId": 44,
+    "name": {
+      "fr": "Impel Down",
+      "en": "Impel Down"
+    },
+    "romaji": "Inperu Daun",
+    "sea": "Calm Belt",
+    "region": null
+  },
+  {
+    "id": "ruskaina",
+    "apiId": 45,
+    "name": {
+      "fr": "Ruskaina",
+      "en": "Ruskaina"
+    },
+    "romaji": "Rusukaina",
+    "sea": "Calm Belt",
+    "region": null
+  },
+  {
+    "id": "whiskey-peak",
+    "apiId": 46,
+    "name": {
+      "fr": "Whiskey Peak",
+      "en": "Whiskey Peak"
+    },
+    "romaji": "Uisukī Pīku",
+    "sea": "Paradis",
+    "region": "Grand Line / Cactus Island"
+  },
+  {
+    "id": "little-garden",
+    "apiId": 47,
+    "name": {
+      "fr": "Little Garden",
+      "en": "Little Garden"
+    },
+    "romaji": "Ritoru Gāden",
+    "sea": "Paradis",
+    "region": "Grand Line"
+  },
+  {
+    "id": "kyuja-island",
+    "apiId": 48,
+    "name": {
+      "fr": "Kyuja Island",
+      "en": "Kyuja Island"
+    },
+    "romaji": "Kyūka-jima",
+    "sea": "Paradis",
+    "region": "Grand Line"
+  },
+  {
+    "id": "kingdom-of-the-cherry-trees-kingdom-of-drum",
+    "apiId": 49,
+    "name": {
+      "fr": "Royaume des Cerisiers / Royaume de Drum",
+      "en": "Kingdom of the Cherry Trees / Kingdom of Drum"
+    },
+    "romaji": "Sakura Ōkoku",
+    "sea": "Paradis",
+    "region": "Grand Line"
+  },
+  {
+    "id": "kingdom-of-alabasta",
+    "apiId": 50,
+    "name": {
+      "fr": "Royaume d'Alabasta",
+      "en": "Kingdom of Alabasta"
+    },
+    "romaji": "Arabasuta-Ōkoku",
+    "sea": "Paradis",
+    "region": "Grand Line"
+  },
+  {
+    "id": "jaya",
+    "apiId": 51,
+    "name": {
+      "fr": "Jaya",
+      "en": "Jaya"
+    },
+    "romaji": "Jaya",
+    "sea": "Paradis",
+    "region": "Grand Line"
+  },
+  {
+    "id": "long-ring-long-land",
+    "apiId": 52,
+    "name": {
+      "fr": "Long Ring Long Land",
+      "en": "Long Ring Long Land"
+    },
+    "romaji": "Ronguringu Rongurando",
+    "sea": "Paradis",
+    "region": "Grand Line"
+  },
+  {
+    "id": "shift-station",
+    "apiId": 53,
+    "name": {
+      "fr": "Gare de Shift",
+      "en": "Shift station"
+    },
+    "romaji": null,
+    "sea": "Paradis",
+    "region": "Grand Line"
+  },
+  {
+    "id": "water-seven",
+    "apiId": 54,
+    "name": {
+      "fr": "Water Seven",
+      "en": "Water Seven"
+    },
+    "romaji": "Mizu no Miyako Wōtā Sebun",
+    "sea": "Paradis",
+    "region": "Grand Line"
+  },
+  {
+    "id": "enies-lobby",
+    "apiId": 55,
+    "name": {
+      "fr": "Enies Lobby",
+      "en": "Enies Lobby"
+    },
+    "romaji": "Eniesu Robī",
+    "sea": "Paradis",
+    "region": "Grand Line"
+  },
+  {
+    "id": "baltigo",
+    "apiId": 56,
+    "name": {
+      "fr": "Baltigo",
+      "en": "Baltigo"
+    },
+    "romaji": "Barutigo",
+    "sea": "Paradis",
+    "region": "Grand Line"
+  },
+  {
+    "id": "banaro-island",
+    "apiId": 57,
+    "name": {
+      "fr": "Île de Banaro",
+      "en": "Banaro Island"
+    },
+    "romaji": "Banaro-tō",
+    "sea": "Paradis",
+    "region": "Grand Line"
+  },
+  {
+    "id": "thriller-bark-58",
+    "apiId": 58,
+    "name": {
+      "fr": "Thriller Bark",
+      "en": "Thriller Bark"
+    },
+    "romaji": "Surirā Bāku",
+    "sea": "Paradis",
+    "region": "Grand Line"
+  },
+  {
+    "id": "rosy-life-riders",
+    "apiId": 59,
+    "name": {
+      "fr": "Rosy Life RIders",
+      "en": "Rosy Life RIders"
+    },
+    "romaji": "Jinsei Bara-iro Raidāzu",
+    "sea": "Paradis",
+    "region": "Grand Line"
+  },
+  {
+    "id": "sabaody-archipelago",
+    "apiId": 60,
+    "name": {
+      "fr": "Archipel des Sabaody",
+      "en": "Sabaody Archipelago"
+    },
+    "romaji": "Shabondi Shotō",
+    "sea": "Paradis",
+    "region": "Grand Line"
+  },
+  {
+    "id": "balgimoa",
+    "apiId": 61,
+    "name": {
+      "fr": "Balgimoa",
+      "en": "Balgimoa"
+    },
+    "romaji": "Karakuri-jima",
+    "sea": "Paradis",
+    "region": "Grand Line"
+  },
+  {
+    "id": "kedetrav",
+    "apiId": 62,
+    "name": {
+      "fr": "Kedétrav",
+      "en": "Kedetrav"
+    },
+    "romaji": "Momoiro Airando",
+    "sea": "Paradis",
+    "region": "Grand Line"
+  },
+  {
+    "id": "boing-archipelago",
+    "apiId": 63,
+    "name": {
+      "fr": "Archipel de Boing",
+      "en": "Boing Archipelago"
+    },
+    "romaji": "Bōin Rettō",
+    "sea": "Paradis",
+    "region": "Grand Line"
+  },
+  {
+    "id": "harahettania",
+    "apiId": 64,
+    "name": {
+      "fr": "Harahettania",
+      "en": "Harahettania"
+    },
+    "romaji": "Harahettānya",
+    "sea": "Paradis",
+    "region": "Grand Line"
+  },
+  {
+    "id": "kuraigna-island",
+    "apiId": 65,
+    "name": {
+      "fr": "Île de Kuraigna",
+      "en": "Kuraigna Island"
+    },
+    "romaji": "Kuraigana-tō",
+    "sea": "Paradis",
+    "region": "Grand Line"
+  },
+  {
+    "id": "kenzan-island",
+    "apiId": 66,
+    "name": {
+      "fr": "Île de kenzan",
+      "en": "Kenzan Island"
+    },
+    "romaji": "Kenzan-tō",
+    "sea": "Paradis",
+    "region": "Grand Line"
+  },
+  {
+    "id": "marine-ford",
+    "apiId": 67,
+    "name": {
+      "fr": "Marine Ford",
+      "en": "Marine Ford"
+    },
+    "romaji": "Marinfōdo",
+    "sea": "Paradis",
+    "region": "La Route de tous les Périls"
+  },
+  {
+    "id": "yukiryu-island",
+    "apiId": 68,
+    "name": {
+      "fr": "Île de Yukiryu",
+      "en": "Yukiryu Island"
+    },
+    "romaji": "Yukiryū-tō",
+    "sea": "Nouveau Monde",
+    "region": "Grand Line"
+  },
+  {
+    "id": "wa-country",
+    "apiId": 69,
+    "name": {
+      "fr": "Pays des Wa",
+      "en": "Wa country"
+    },
+    "romaji": "Wa no Kuni",
+    "sea": "Nouveau Monde",
+    "region": "Grand Line"
+  },
+  {
+    "id": "foodvalten",
+    "apiId": 70,
+    "name": {
+      "fr": "Foodvalten",
+      "en": "Foodvalten"
+    },
+    "romaji": "Fūdovaruten",
+    "sea": "Nouveau Monde",
+    "region": "Grand Line"
+  },
+  {
+    "id": "whole-cake-island",
+    "apiId": 71,
+    "name": {
+      "fr": "Whole Cake Island",
+      "en": "Whole Cake Island"
+    },
+    "romaji": "Hōru Kēki Airando",
+    "sea": "Nouveau Monde",
+    "region": "Grand Line"
+  },
+  {
+    "id": "punk-hazard",
+    "apiId": 72,
+    "name": {
+      "fr": "Punk Hazard",
+      "en": "Punk Hazard"
+    },
+    "romaji": "Panku Hazādo-tō",
+    "sea": "Nouveau Monde",
+    "region": "Grand Line"
+  },
+  {
+    "id": "raijin-island",
+    "apiId": 73,
+    "name": {
+      "fr": "Raijin Island",
+      "en": "Raijin Island"
+    },
+    "romaji": "Raijin-tō",
+    "sea": "Nouveau Monde",
+    "region": "Grand Line"
+  },
+  {
+    "id": "risky-red",
+    "apiId": 74,
+    "name": {
+      "fr": "Risky Red",
+      "en": "Risky Red"
+    },
+    "romaji": "Risukī Reddo-tō",
+    "sea": "Nouveau Monde",
+    "region": "Grand Line"
+  },
+  {
+    "id": "mystoria-island",
+    "apiId": 75,
+    "name": {
+      "fr": "Île de Mystoria",
+      "en": "Mystoria Island"
+    },
+    "romaji": "Misutoria-tō",
+    "sea": "Nouveau Monde",
+    "region": "Grand Line"
+  },
+  {
+    "id": "flower-country",
+    "apiId": 76,
+    "name": {
+      "fr": "Pays des Fleurs",
+      "en": "Flower Country"
+    },
+    "romaji": "Ka no Kuni",
+    "sea": "West Blue",
+    "region": null
+  },
+  {
+    "id": "green-bit",
+    "apiId": 77,
+    "name": {
+      "fr": "Green Bit",
+      "en": "Green Bit"
+    },
+    "romaji": "Gurīn Bitto",
+    "sea": "Nouveau Monde",
+    "region": "Grand Line"
+  },
+  {
+    "id": "zo",
+    "apiId": 78,
+    "name": {
+      "fr": "Zo",
+      "en": "Zo"
+    },
+    "romaji": "Zō",
+    "sea": "Nouveau Monde",
+    "region": "Grand Line"
+  },
+  {
+    "id": "kingdom-of-prodence",
+    "apiId": 79,
+    "name": {
+      "fr": "Royaume de Prodence",
+      "en": "Kingdom of Prodence"
+    },
+    "romaji": "Purodensu Ōkoku",
+    "sea": "Nouveau Monde",
+    "region": "Grand Line"
+  },
+  {
+    "id": "kingdom-of-majiatsuka",
+    "apiId": 80,
+    "name": {
+      "fr": "Royaume de Majiatsuka",
+      "en": "Kingdom of Majiatsuka"
+    },
+    "romaji": "Majiatsuka Ōkoku",
+    "sea": "Nouveau Monde",
+    "region": "Grand Line"
+  },
+  {
+    "id": "kingdom-of-rommel",
+    "apiId": 81,
+    "name": {
+      "fr": "Royaume de Rommel",
+      "en": "Kingdom of Rommel"
+    },
+    "romaji": "Ronmeru Ōkoku",
+    "sea": "Nouveau Monde",
+    "region": "Grand Line"
+  },
+  {
+    "id": "kingdom-of-tontatta",
+    "apiId": 82,
+    "name": {
+      "fr": "Royaume de Tontatta",
+      "en": "Kingdom of Tontatta"
+    },
+    "romaji": "Tontatta Ōkoku",
+    "sea": "Nouveau Monde",
+    "region": "Grand Line"
+  },
+  {
+    "id": "dressrosa",
+    "apiId": 83,
+    "name": {
+      "fr": "Dressrosa",
+      "en": "Dressrosa"
+    },
+    "romaji": "Doresurōza",
+    "sea": "Nouveau Monde",
+    "region": "Grand Line"
+  },
+  {
+    "id": "kingdom-of-mogalo",
+    "apiId": 84,
+    "name": {
+      "fr": "Royaume de Mogalo",
+      "en": "Kingdom of Mogalo"
+    },
+    "romaji": "Mogaro Ōkoku",
+    "sea": "Nouveau Monde",
+    "region": "Grand Line"
+  },
+  {
+    "id": "kingdom-of-doerena",
+    "apiId": 85,
+    "name": {
+      "fr": "Royaume de Doerena",
+      "en": "Kingdom of Doerena"
+    },
+    "romaji": "Doerēna Ōkoku",
+    "sea": "Nouveau Monde",
+    "region": "Grand Line"
+  },
+  {
+    "id": "erbaf",
+    "apiId": 86,
+    "name": {
+      "fr": "Erbaf",
+      "en": "Erbaf"
+    },
+    "romaji": "Erubafu",
+    "sea": "Nouveau Monde",
+    "region": "Grand Line"
+  },
+  {
+    "id": "lodestar-island",
+    "apiId": 87,
+    "name": {
+      "fr": "Île de Lodestar",
+      "en": "Lodestar Island"
+    },
+    "romaji": "Rōdosutā-tō",
+    "sea": "Nouveau Monde",
+    "region": "Grand Line"
+  },
+  {
+    "id": "laugh-tale",
+    "apiId": 88,
+    "name": {
+      "fr": "Laugh Tale",
+      "en": "Laugh Tale"
+    },
+    "romaji": "Rafuteru",
+    "sea": "Nouveau Monde",
+    "region": "Grand Line"
+  },
+  {
+    "id": "skypiea",
+    "apiId": 89,
+    "name": {
+      "fr": "Skypiéa",
+      "en": "Skypiéa"
+    },
+    "romaji": "Sukaipia",
+    "sea": "Mer Blanche",
+    "region": "Ciel"
+  },
+  {
+    "id": "bilca",
+    "apiId": 90,
+    "name": {
+      "fr": "Bilca",
+      "en": "Bilca"
+    },
+    "romaji": "Biruka",
+    "sea": "Mer Blanche",
+    "region": "Ciel"
+  },
+  {
+    "id": "weatheria",
+    "apiId": 91,
+    "name": {
+      "fr": "Weatheria",
+      "en": "Weatheria"
+    },
+    "romaji": "Wezaria",
+    "sea": "Mer Blanche",
+    "region": "Ciel"
+  },
+  {
+    "id": "milky-road-la-route-de-nuages",
+    "apiId": 92,
+    "name": {
+      "fr": "Milky Road / La Route de Nuages",
+      "en": "Milky Road / La Route de Nuages"
+    },
+    "romaji": "Mirukī Rōdo",
+    "sea": "Mer Blanche",
+    "region": "Skypiéa"
+  },
+  {
+    "id": "upper-yard",
+    "apiId": 93,
+    "name": {
+      "fr": "Upper Yard",
+      "en": "Upper Yard"
+    },
+    "romaji": "Kami no Shima (Appā Yādo)",
+    "sea": "Mer Blanche",
+    "region": "Skypiéa"
+  },
+  {
+    "id": "angel-beach",
+    "apiId": 94,
+    "name": {
+      "fr": "Angel Beach",
+      "en": "Angel Beach"
+    },
+    "romaji": "Enjeru Bīchi",
+    "sea": "Mer Blanche",
+    "region": "Skypiéa"
+  },
+  {
+    "id": "sea-of-clouds",
+    "apiId": 95,
+    "name": {
+      "fr": "Mer de Nuages",
+      "en": "Sea of Clouds"
+    },
+    "romaji": "Umigumo",
+    "sea": "Mer Blanche",
+    "region": "Skypiéa"
+  },
+  {
+    "id": "shandora",
+    "apiId": 96,
+    "name": {
+      "fr": "Shandora",
+      "en": "Shandora"
+    },
+    "romaji": "Shandora",
+    "sea": "Mer Blanche",
+    "region": "Skypiéa"
+  },
+  {
+    "id": "old-kingdom",
+    "apiId": 97,
+    "name": {
+      "fr": "Ancien Royaume",
+      "en": "Old Kingdom"
+    },
+    "romaji": "Kyodai na Ōkoku",
+    "sea": null,
+    "region": null
+  },
+  {
+    "id": "ile-des-pirates-la-ruche",
+    "apiId": 98,
+    "name": {
+      "fr": "Île des Pirates / La Ruche",
+      "en": "Île des Pirates / La Ruche"
+    },
+    "romaji": "Kaizoku Shima",
+    "sea": "Nouveau Monde",
+    "region": "Grand Line"
+  },
+  {
+    "id": "nakrowa",
+    "apiId": 99,
+    "name": {
+      "fr": "Nakrowa",
+      "en": "Nakrowa"
+    },
+    "romaji": "Mugenkyō",
+    "sea": null,
+    "region": null
+  },
+  {
+    "id": "land-of-ice",
+    "apiId": 100,
+    "name": {
+      "fr": "Pays des Glaces",
+      "en": "Land of ice"
+    },
+    "romaji": "Kōri no Kuni",
+    "sea": "Nouveau Monde",
+    "region": "Grand Line"
+  },
+  {
+    "id": "kilauea-tierra-del-fuego",
+    "apiId": 101,
+    "name": {
+      "fr": "Kilauea / Terre de Feu",
+      "en": "Kilauea / Tierra del Fuego"
+    },
+    "romaji": "Kirauea",
+    "sea": null,
+    "region": null
+  },
+  {
+    "id": "warship-island",
+    "apiId": 102,
+    "name": {
+      "fr": "Île du Navire de Guerre",
+      "en": "Warship Island"
+    },
+    "romaji": "Gunkan-jima",
+    "sea": "East Blue",
+    "region": null
+  },
+  {
+    "id": "lost-island",
+    "apiId": 103,
+    "name": {
+      "fr": "Île Perdu",
+      "en": "Lost Island"
+    },
+    "romaji": "Rosuto Airando",
+    "sea": "East Blue",
+    "region": null
+  },
+  {
+    "id": "papanapple",
+    "apiId": 104,
+    "name": {
+      "fr": "Papanapple",
+      "en": "Papanapple"
+    },
+    "romaji": "Papanappuru-tō",
+    "sea": "Paradis",
+    "region": "Grand Line"
+  },
+  {
+    "id": "fireworks-island",
+    "apiId": 105,
+    "name": {
+      "fr": "Île des Feux d'Artifice",
+      "en": "Fireworks Island"
+    },
+    "romaji": "Faiā Wākusu",
+    "sea": null,
+    "region": null
+  },
+  {
+    "id": "goat-island-106",
+    "apiId": 106,
+    "name": {
+      "fr": "Île de Goat",
+      "en": "Goat Island"
+    },
+    "romaji": "Gōto-jima",
+    "sea": "East Blue",
+    "region": null
+  },
+  {
+    "id": "ruruka-island",
+    "apiId": 107,
+    "name": {
+      "fr": "Île de Ruruka",
+      "en": "Ruruka Island"
+    },
+    "romaji": "Ruruka-tō",
+    "sea": "Paradis",
+    "region": "Grand Line"
+  },
+  {
+    "id": "navarone-base-g-8",
+    "apiId": 108,
+    "name": {
+      "fr": "Navarone / Base G-8",
+      "en": "Navarone / Base G-8"
+    },
+    "romaji": "Nabaron",
+    "sea": "Paradis",
+    "region": "Grand Line"
+  },
+  {
+    "id": "hyokaido",
+    "apiId": 109,
+    "name": {
+      "fr": "Hyokaido",
+      "en": "Hyokaido"
+    },
+    "romaji": "Hyōkaidō",
+    "sea": "Paradis",
+    "region": "Grand Line"
+  },
+  {
+    "id": "spa-island",
+    "apiId": 110,
+    "name": {
+      "fr": "Île de Spa",
+      "en": "Spa Island"
+    },
+    "romaji": "Supa Airando-gō",
+    "sea": "Paradis",
+    "region": "Grand Line"
+  },
+  {
+    "id": "rainbow-mist",
+    "apiId": 111,
+    "name": {
+      "fr": "Brume Arc-En-Ciel",
+      "en": "Rainbow Mist"
+    },
+    "romaji": "Niji-iro no Kiri",
+    "sea": "Paradis",
+    "region": "Grand Line"
+  },
+  {
+    "id": "little-east-blue-kansorn-island",
+    "apiId": 112,
+    "name": {
+      "fr": "Little East Blue / Kansorn Island",
+      "en": "Little East Blue / Kansorn Island"
+    },
+    "romaji": "Ritoru Īsuto Burū",
+    "sea": "Paradis",
+    "region": "Grand Line"
+  },
+  {
+    "id": "ile-huit-neuf",
+    "apiId": 113,
+    "name": {
+      "fr": "Île Huit Neuf",
+      "en": "Île Huit Neuf"
+    },
+    "romaji": "Eito Nain Tō",
+    "sea": null,
+    "region": null
+  },
+  {
+    "id": "hand-island",
+    "apiId": 114,
+    "name": {
+      "fr": "Hand Island",
+      "en": "Hand Island"
+    },
+    "romaji": "Hando Airando",
+    "sea": "Nouveau Monde",
+    "region": "Grand Line"
+  },
+  {
+    "id": "sea-maubeugemour",
+    "apiId": 115,
+    "name": {
+      "fr": "Mer Maubeugemour",
+      "en": "Sea Maubeugemour"
+    },
+    "romaji": "Mobejumūru Kaiiki",
+    "sea": "Nouveau Monde",
+    "region": "Grand Line"
+  },
+  {
+    "id": "clock-island",
+    "apiId": 116,
+    "name": {
+      "fr": "Île de l'Horloge",
+      "en": "Clock Island"
+    },
+    "romaji": "Nejimaki-jima",
+    "sea": "East Blue",
+    "region": null
+  },
+  {
+    "id": "crown-island",
+    "apiId": 117,
+    "name": {
+      "fr": "Île de la Couronne",
+      "en": "Crown Island"
+    },
+    "romaji": "Ōkan Jima",
+    "sea": null,
+    "region": "Grand Line"
+  },
+  {
+    "id": "hannabal",
+    "apiId": 118,
+    "name": {
+      "fr": "Hannabal",
+      "en": "Hannabal"
+    },
+    "romaji": "Han'nabaru",
+    "sea": null,
+    "region": "Grand Line"
+  },
+  {
+    "id": "elena",
+    "apiId": 119,
+    "name": {
+      "fr": "Elena",
+      "en": "Elena"
+    },
+    "romaji": "Erena",
+    "sea": null,
+    "region": "Grand Line"
+  },
+  {
+    "id": "partia",
+    "apiId": 120,
+    "name": {
+      "fr": "Partia",
+      "en": "Partia"
+    },
+    "romaji": "Parutia",
+    "sea": null,
+    "region": "Grand Line"
+  },
+  {
+    "id": "asuka-island",
+    "apiId": 121,
+    "name": {
+      "fr": "Île d'Asuka",
+      "en": "Asuka Island"
+    },
+    "romaji": "Asuka-tō",
+    "sea": null,
+    "region": "Grand Line"
+  },
+  {
+    "id": "omatsuri-island",
+    "apiId": 122,
+    "name": {
+      "fr": "Omatsuri Island",
+      "en": "Omatsuri Island"
+    },
+    "romaji": "Omatsuri-jima",
+    "sea": null,
+    "region": "Grand Line"
+  },
+  {
+    "id": "mecha-island",
+    "apiId": 123,
+    "name": {
+      "fr": "Mecha Island",
+      "en": "Mecha Island"
+    },
+    "romaji": "Meka-jima",
+    "sea": null,
+    "region": "Grand Line"
+  },
+  {
+    "id": "dock-island",
+    "apiId": 124,
+    "name": {
+      "fr": "Île de Dock",
+      "en": "Dock Island"
+    },
+    "romaji": "Dokku-tō",
+    "sea": "Nouveau Monde",
+    "region": null
+  },
+  {
+    "id": "endpoint",
+    "apiId": 125,
+    "name": {
+      "fr": "Endpoint",
+      "en": "Endpoint"
+    },
+    "romaji": "Endopointo",
+    "sea": null,
+    "region": null
+  },
+  {
+    "id": "egghead",
+    "apiId": 126,
+    "name": {
+      "fr": "Egghead",
+      "en": "Egghead"
+    },
+    "romaji": "Egghead",
+    "sea": "Nouveau Monde",
+    "region": null
+  },
+  {
+    "id": "hachinosu",
+    "apiId": 127,
+    "name": {
+      "fr": "Hachinosu",
+      "en": "Hachinosu"
+    },
+    "romaji": "Hachinosu",
+    "sea": "Nouveau Monde",
+    "region": null
+  },
+  {
+    "id": "elbaf",
+    "apiId": 128,
+    "name": {
+      "fr": "Elbaf",
+      "en": "Elbaf"
+    },
+    "romaji": "Elbaf",
+    "sea": "Nouveau Monde",
+    "region": null
+  }
+]

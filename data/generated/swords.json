@@ -1,0 +1,233 @@
+[
+  {
+    "id": "yoru",
+    "name": {
+      "fr": "Yoru",
+      "en": "Yoru"
+    },
+    "romaji": "Yoru",
+    "category": "Saijo Ô Wazamono",
+    "type": "Lame noire",
+    "destroyed": false
+  },
+  {
+    "id": "murakumogiri",
+    "name": {
+      "fr": "Murakumogiri",
+      "en": "Murakumogiri"
+    },
+    "romaji": "Murakumogiri",
+    "category": "Saijo Ô Wazamono",
+    "type": "Naginata",
+    "destroyed": false
+  },
+  {
+    "id": "ace",
+    "name": {
+      "fr": "Ace",
+      "en": "Ace"
+    },
+    "romaji": "Ēsu",
+    "category": "Saijo Ô Wazamono",
+    "type": "Coutelas",
+    "destroyed": false
+  },
+  {
+    "id": "shodai-kitetsu",
+    "name": {
+      "fr": "Shodai Kitetsu",
+      "en": "Shodai Kitetsu"
+    },
+    "romaji": "Shodai Kitetsu",
+    "category": "Saijo Ô Wazamono",
+    "type": null,
+    "destroyed": false
+  },
+  {
+    "id": "wado-ichimonji",
+    "name": {
+      "fr": "Wadô Ichimonji",
+      "en": "Wadô Ichimonji"
+    },
+    "romaji": "Wadô Ichimonji",
+    "category": "Ô Wazamono",
+    "type": null,
+    "destroyed": false
+  },
+  {
+    "id": "nidai-kitetsu",
+    "name": {
+      "fr": "Nidai Kitetsu",
+      "en": "Nidai Kitetsu"
+    },
+    "romaji": "Nidai Kitetsu",
+    "category": "Ô Wazamono",
+    "type": null,
+    "destroyed": false
+  },
+  {
+    "id": "shusui",
+    "name": {
+      "fr": "Shusui",
+      "en": "Shusui"
+    },
+    "romaji": "Shusui",
+    "category": "Ô Wazamono",
+    "type": "Lame noire",
+    "destroyed": false
+  },
+  {
+    "id": "enma",
+    "name": {
+      "fr": "Enma",
+      "en": "Enma"
+    },
+    "romaji": "Enma",
+    "category": "Ô Wazamono",
+    "type": "Katana",
+    "destroyed": false
+  },
+  {
+    "id": "ame-no-habakiri",
+    "name": {
+      "fr": "Ame no Habakiri",
+      "en": "Ame no Habakiri"
+    },
+    "romaji": "Ame no Habakiri",
+    "category": "Ô Wazamono",
+    "type": "Katana",
+    "destroyed": false
+  },
+  {
+    "id": "yamaoroshi",
+    "name": {
+      "fr": "Yamaoroshi",
+      "en": "Yamaoroshi"
+    },
+    "romaji": "Yamaoroshi",
+    "category": "Ryo Wazamono",
+    "type": null,
+    "destroyed": false
+  },
+  {
+    "id": "shigure",
+    "name": {
+      "fr": "Shigure",
+      "en": "Shigure"
+    },
+    "romaji": "Shigure",
+    "category": "Ryo Wazamono",
+    "type": null,
+    "destroyed": false
+  },
+  {
+    "id": "sandai-kitetsu",
+    "name": {
+      "fr": "Sandai Kitetsu",
+      "en": "Sandai Kitetsu"
+    },
+    "romaji": "Sandai Kitetsu",
+    "category": "Ryo Wazamono",
+    "type": null,
+    "destroyed": false
+  },
+  {
+    "id": "yubashiri",
+    "name": {
+      "fr": "Yubashiri",
+      "en": "Yubashiri"
+    },
+    "romaji": "Yubashiri",
+    "category": "Ryo Wazamono",
+    "type": null,
+    "destroyed": true
+  },
+  {
+    "id": "kashu",
+    "name": {
+      "fr": "Kashu",
+      "en": "Kashu"
+    },
+    "romaji": "Kashū",
+    "category": "Ryo Wazamono",
+    "type": null,
+    "destroyed": false
+  },
+  {
+    "id": "oto",
+    "name": {
+      "fr": "Oto",
+      "en": "Oto"
+    },
+    "romaji": "Oto",
+    "category": null,
+    "type": null,
+    "destroyed": false
+  },
+  {
+    "id": "kogarashi",
+    "name": {
+      "fr": "kogarashi",
+      "en": "kogarashi"
+    },
+    "romaji": "kogarashi",
+    "category": null,
+    "type": null,
+    "destroyed": false
+  },
+  {
+    "id": "raiu",
+    "name": {
+      "fr": "Raiu",
+      "en": "Raiu"
+    },
+    "romaji": "Raiu",
+    "category": null,
+    "type": "Nodachi",
+    "destroyed": false
+  },
+  {
+    "id": "durandal",
+    "name": {
+      "fr": "Durandal",
+      "en": "Durandal"
+    },
+    "romaji": "Durandal",
+    "category": null,
+    "type": null,
+    "destroyed": false
+  },
+  {
+    "id": "shirauo",
+    "name": {
+      "fr": "Shirauo",
+      "en": "Shirauo"
+    },
+    "romaji": "Shirauo",
+    "category": null,
+    "type": "Nodachi",
+    "destroyed": false
+  },
+  {
+    "id": "pretzel",
+    "name": {
+      "fr": "Bretzel",
+      "en": "Pretzel"
+    },
+    "romaji": "Purettseru",
+    "category": null,
+    "type": null,
+    "destroyed": false
+  },
+  {
+    "id": "konpira",
+    "name": {
+      "fr": "Konpira",
+      "en": "Konpira"
+    },
+    "romaji": "Konpira",
+    "category": null,
+    "type": null,
+    "destroyed": false
+  }
+]

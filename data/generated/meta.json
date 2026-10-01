@@ -1,0 +1,28 @@
+{
+  "latestChapter": 1185,
+  "latestEpisode": 1162,
+  "animeCutoffChapter": 1132,
+  "counts": {
+    "characters": 777,
+    "canonCharacters": 681,
+    "fruits": 204,
+    "crews": 149,
+    "sagas": 10,
+    "arcs": 50,
+    "islands": 128,
+    "ships": 99,
+    "swords": 21
+  },
+  "sources": [
+    {
+      "name": "One Piece API",
+      "url": "https://api-onepiece.com/",
+      "license": "Données ouvertes"
+    },
+    {
+      "name": "One Piece Wiki",
+      "url": "https://onepiece.fandom.com/",
+      "license": "CC BY-SA 3.0"
+    }
+  ]
+}

@@ -1,0 +1,82 @@
+[
+  {
+    "id": "east-blue",
+    "number": 1,
+    "title": {
+      "fr": "East Blue",
+      "en": "East Blue"
+    }
+  },
+  {
+    "id": "alabasta",
+    "number": 2,
+    "title": {
+      "fr": "Alabasta",
+      "en": "Alabasta"
+    }
+  },
+  {
+    "id": "celestial-island",
+    "number": 3,
+    "title": {
+      "fr": "Île Céleste",
+      "en": "Celestial Island"
+    }
+  },
+  {
+    "id": "water-seven-cp9",
+    "number": 4,
+    "title": {
+      "fr": "Water Seven / CP9",
+      "en": "Water Seven / CP9"
+    }
+  },
+  {
+    "id": "thriller-bark",
+    "number": 5,
+    "title": {
+      "fr": "Thriller Bark",
+      "en": "Thriller Bark"
+    }
+  },
+  {
+    "id": "war-at-the-top",
+    "number": 6,
+    "title": {
+      "fr": "Guerre au Sommet",
+      "en": "War at the top"
+    }
+  },
+  {
+    "id": "ile-des-hommes-poissons",
+    "number": 7,
+    "title": {
+      "fr": "Île des Hommes-Poissons",
+      "en": "Île des Hommes-Poissons"
+    }
+  },
+  {
+    "id": "dressrosa-pirate-alliance",
+    "number": 8,
+    "title": {
+      "fr": "Dressrosa / Alliance Pirate",
+      "en": "Dressrosa / Pirate Alliance"
+    }
+  },
+  {
+    "id": "four-emperors",
+    "number": 9,
+    "title": {
+      "fr": "Quatres Empereurs",
+      "en": "Four Emperors"
+    }
+  },
+  {
+    "id": "final-saga",
+    "number": 10,
+    "title": {
+      "fr": "Saga Finale",
+      "en": "Final Saga"
+    }
+  }
+]

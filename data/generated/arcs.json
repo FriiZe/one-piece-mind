@@ -1,0 +1,851 @@
+[
+  {
+    "id": "romance-dawn",
+    "number": 1,
+    "title": {
+      "fr": "Arc Romance Dawn",
+      "en": "Arc Romance Dawn"
+    },
+    "sagaId": "east-blue",
+    "kind": "manga",
+    "chapters": {
+      "first": 1,
+      "last": 7
+    },
+    "episodes": {
+      "first": 1,
+      "last": 3
+    }
+  },
+  {
+    "id": "village-d-orange",
+    "number": 2,
+    "title": {
+      "fr": "Arc Village d'Orange",
+      "en": "Arc Village d'Orange"
+    },
+    "sagaId": "east-blue",
+    "kind": "manga",
+    "chapters": {
+      "first": 8,
+      "last": 21
+    },
+    "episodes": {
+      "first": 4,
+      "last": 8
+    }
+  },
+  {
+    "id": "village-de-sirop",
+    "number": 3,
+    "title": {
+      "fr": "Arc Village de Sirop",
+      "en": "Arc Village de Sirop"
+    },
+    "sagaId": "east-blue",
+    "kind": "manga",
+    "chapters": {
+      "first": 22,
+      "last": 41
+    },
+    "episodes": {
+      "first": 9,
+      "last": 17
+    }
+  },
+  {
+    "id": "baratie",
+    "number": 4,
+    "title": {
+      "fr": "Arc Baratie",
+      "en": "Arc Baratie"
+    },
+    "sagaId": "east-blue",
+    "kind": "manga",
+    "chapters": {
+      "first": 42,
+      "last": 68
+    },
+    "episodes": {
+      "first": 18,
+      "last": 30
+    }
+  },
+  {
+    "id": "arlong-park",
+    "number": 5,
+    "title": {
+      "fr": "Arc Arlong Park",
+      "en": "Arc Arlong Park"
+    },
+    "sagaId": "east-blue",
+    "kind": "manga",
+    "chapters": {
+      "first": 69,
+      "last": 95
+    },
+    "episodes": {
+      "first": 31,
+      "last": 44
+    }
+  },
+  {
+    "id": "the-adventures-of-baggy",
+    "number": 6,
+    "title": {
+      "fr": "Arc Les aventures de Baggy",
+      "en": "Arc The adventures of Baggy"
+    },
+    "sagaId": "east-blue",
+    "kind": "cover",
+    "chapters": null,
+    "episodes": {
+      "first": 46,
+      "last": 47
+    }
+  },
+  {
+    "id": "loguetown",
+    "number": 7,
+    "title": {
+      "fr": "Arc Loguetown",
+      "en": "Arc Loguetown"
+    },
+    "sagaId": "east-blue",
+    "kind": "manga",
+    "chapters": {
+      "first": 96,
+      "last": 100
+    },
+    "episodes": {
+      "first": 45,
+      "last": 53
+    }
+  },
+  {
+    "id": "ile-du-navire-de-guerre",
+    "number": 8,
+    "title": {
+      "fr": "Arc île du navire de guerre",
+      "en": "Arc île du navire de guerre"
+    },
+    "sagaId": "east-blue",
+    "kind": "filler",
+    "chapters": null,
+    "episodes": {
+      "first": 54,
+      "last": 61
+    }
+  },
+  {
+    "id": "reverse-mountain",
+    "number": 9,
+    "title": {
+      "fr": "Arc Reverse Mountain",
+      "en": "Arc Reverse Mountain"
+    },
+    "sagaId": "alabasta",
+    "kind": "manga",
+    "chapters": {
+      "first": 101,
+      "last": 105
+    },
+    "episodes": {
+      "first": 55,
+      "last": 63
+    }
+  },
+  {
+    "id": "whiskey-peak",
+    "number": 10,
+    "title": {
+      "fr": "Arc Whiskey Peak",
+      "en": "Arc Whiskey Peak"
+    },
+    "sagaId": "alabasta",
+    "kind": "manga",
+    "chapters": {
+      "first": 106,
+      "last": 114
+    },
+    "episodes": {
+      "first": 64,
+      "last": 67
+    }
+  },
+  {
+    "id": "kobby-and-hermep",
+    "number": 11,
+    "title": {
+      "fr": "Arc Kobby et Hermep",
+      "en": "Arc Kobby and Hermep"
+    },
+    "sagaId": "alabasta",
+    "kind": "cover",
+    "chapters": null,
+    "episodes": {
+      "first": 68,
+      "last": 69
+    }
+  },
+  {
+    "id": "little-garden",
+    "number": 12,
+    "title": {
+      "fr": "Arc Little Garden",
+      "en": "Arc Little Garden"
+    },
+    "sagaId": "alabasta",
+    "kind": "manga",
+    "chapters": {
+      "first": 115,
+      "last": 129
+    },
+    "episodes": {
+      "first": 70,
+      "last": 77
+    }
+  },
+  {
+    "id": "ile-de-drum",
+    "number": 13,
+    "title": {
+      "fr": "Arc Île de Drum",
+      "en": "Arc Île de Drum"
+    },
+    "sagaId": "alabasta",
+    "kind": "manga",
+    "chapters": {
+      "first": 130,
+      "last": 154
+    },
+    "episodes": {
+      "first": 78,
+      "last": 91
+    }
+  },
+  {
+    "id": "alabasta",
+    "number": 14,
+    "title": {
+      "fr": "Arc Alabasta",
+      "en": "Arc Alabasta"
+    },
+    "sagaId": "alabasta",
+    "kind": "manga",
+    "chapters": {
+      "first": 155,
+      "last": 217
+    },
+    "episodes": {
+      "first": 92,
+      "last": 129
+    }
+  },
+  {
+    "id": "post-alabasta",
+    "number": 15,
+    "title": {
+      "fr": "Arc Post Alabasta",
+      "en": "Arc Post Alabasta"
+    },
+    "sagaId": "alabasta",
+    "kind": "filler",
+    "chapters": null,
+    "episodes": {
+      "first": 131,
+      "last": 135
+    }
+  },
+  {
+    "id": "ile-de-chevre",
+    "number": 16,
+    "title": {
+      "fr": "Arc Île de Chèvre",
+      "en": "Arc Île de Chèvre"
+    },
+    "sagaId": "alabasta",
+    "kind": "filler",
+    "chapters": null,
+    "episodes": {
+      "first": 136,
+      "last": 138
+    }
+  },
+  {
+    "id": "brume-en-ciel",
+    "number": 17,
+    "title": {
+      "fr": "Arc Brume Arc-en-Ciel",
+      "en": "Arc Brume Arc-en-Ciel"
+    },
+    "sagaId": "alabasta",
+    "kind": "filler",
+    "chapters": null,
+    "episodes": {
+      "first": 139,
+      "last": 143
+    }
+  },
+  {
+    "id": "jaya",
+    "number": 18,
+    "title": {
+      "fr": "Arc Jaya",
+      "en": "Arc Jaya"
+    },
+    "sagaId": "celestial-island",
+    "kind": "manga",
+    "chapters": {
+      "first": 218,
+      "last": 236
+    },
+    "episodes": {
+      "first": 130,
+      "last": 152
+    }
+  },
+  {
+    "id": "skypiea-arch",
+    "number": 19,
+    "title": {
+      "fr": "Arc Skypiea",
+      "en": "Skypiea Arch"
+    },
+    "sagaId": "celestial-island",
+    "kind": "manga",
+    "chapters": {
+      "first": 237,
+      "last": 302
+    },
+    "episodes": {
+      "first": 153,
+      "last": 194
+    }
+  },
+  {
+    "id": "g8",
+    "number": 20,
+    "title": {
+      "fr": "Arc G8",
+      "en": "Arc G8"
+    },
+    "sagaId": "celestial-island",
+    "kind": "filler",
+    "chapters": null,
+    "episodes": {
+      "first": 196,
+      "last": 206
+    }
+  },
+  {
+    "id": "long-ring-long-land-davy-back-fight",
+    "number": 21,
+    "title": {
+      "fr": "Arc Long Ring Long Land / Davy Back Fight",
+      "en": "Arc Long Ring Long Land / Davy Back Fight"
+    },
+    "sagaId": "water-seven-cp9",
+    "kind": "manga",
+    "chapters": {
+      "first": 303,
+      "last": 321
+    },
+    "episodes": {
+      "first": 195,
+      "last": 228
+    }
+  },
+  {
+    "id": "le-voleur-de-memoire",
+    "number": 22,
+    "title": {
+      "fr": "Arc Le voleur de Mémoire",
+      "en": "Arc Le voleur de Mémoire"
+    },
+    "sagaId": "water-seven-cp9",
+    "kind": "filler",
+    "chapters": null,
+    "episodes": {
+      "first": 220,
+      "last": 224
+    }
+  },
+  {
+    "id": "le-retour-de-foxy",
+    "number": 23,
+    "title": {
+      "fr": "Arc Le Retour de Foxy",
+      "en": "Arc Le Retour de Foxy"
+    },
+    "sagaId": "water-seven-cp9",
+    "kind": "filler",
+    "chapters": null,
+    "episodes": {
+      "first": 225,
+      "last": 228
+    }
+  },
+  {
+    "id": "water-seven",
+    "number": 24,
+    "title": {
+      "fr": "Arc Water Seven",
+      "en": "Arc Water Seven"
+    },
+    "sagaId": "water-seven-cp9",
+    "kind": "manga",
+    "chapters": {
+      "first": 322,
+      "last": 374
+    },
+    "episodes": {
+      "first": 229,
+      "last": 262
+    }
+  },
+  {
+    "id": "enies-lobby",
+    "number": 25,
+    "title": {
+      "fr": "Arc Enies Lobby",
+      "en": "Arc Enies Lobby"
+    },
+    "sagaId": "water-seven-cp9",
+    "kind": "manga",
+    "chapters": {
+      "first": 375,
+      "last": 430
+    },
+    "episodes": {
+      "first": 263,
+      "last": 312
+    }
+  },
+  {
+    "id": "post-enies-lobby",
+    "number": 26,
+    "title": {
+      "fr": "Arc Post-Enies Lobby",
+      "en": "Arc Post-Enies Lobby"
+    },
+    "sagaId": "water-seven-cp9",
+    "kind": "manga",
+    "chapters": {
+      "first": 431,
+      "last": 441
+    },
+    "episodes": {
+      "first": 313,
+      "last": 325
+    }
+  },
+  {
+    "id": "ice-hunter-bow",
+    "number": 27,
+    "title": {
+      "fr": "Arc Chasseur de Glace",
+      "en": "Ice Hunter Bow"
+    },
+    "sagaId": "thriller-bark",
+    "kind": "filler",
+    "chapters": null,
+    "episodes": {
+      "first": 326,
+      "last": 336
+    }
+  },
+  {
+    "id": "thriller-bark",
+    "number": 28,
+    "title": {
+      "fr": "Arc Thriller Bark",
+      "en": "Arc Thriller Bark"
+    },
+    "sagaId": "thriller-bark",
+    "kind": "manga",
+    "chapters": {
+      "first": 442,
+      "last": 489
+    },
+    "episodes": {
+      "first": 326,
+      "last": 380
+    }
+  },
+  {
+    "id": "ile-spa",
+    "number": 29,
+    "title": {
+      "fr": "Arc Île Spa",
+      "en": "Arc Île Spa"
+    },
+    "sagaId": "thriller-bark",
+    "kind": "filler",
+    "chapters": null,
+    "episodes": {
+      "first": 382,
+      "last": 384
+    }
+  },
+  {
+    "id": "sabaody-archipelago",
+    "number": 30,
+    "title": {
+      "fr": "Arc Archipel des Sabaody",
+      "en": "Sabaody Archipelago Arc"
+    },
+    "sagaId": "war-at-the-top",
+    "kind": "manga",
+    "chapters": {
+      "first": 490,
+      "last": 513
+    },
+    "episodes": {
+      "first": 381,
+      "last": 405
+    }
+  },
+  {
+    "id": "amazon-lily-bow",
+    "number": 31,
+    "title": {
+      "fr": "Arc Amazon Lily",
+      "en": "Amazon Lily bow"
+    },
+    "sagaId": "war-at-the-top",
+    "kind": "manga",
+    "chapters": {
+      "first": 514,
+      "last": 524
+    },
+    "episodes": {
+      "first": 408,
+      "last": 421
+    }
+  },
+  {
+    "id": "impel-down-bow",
+    "number": 32,
+    "title": {
+      "fr": "Arc Impel Down",
+      "en": "Impel Down Bow"
+    },
+    "sagaId": "war-at-the-top",
+    "kind": "manga",
+    "chapters": {
+      "first": 525,
+      "last": 549
+    },
+    "episodes": {
+      "first": 422,
+      "last": 452
+    }
+  },
+  {
+    "id": "little-east-blue-bow",
+    "number": 33,
+    "title": {
+      "fr": "Arc Little East Blue",
+      "en": "Little East Blue bow"
+    },
+    "sagaId": "war-at-the-top",
+    "kind": "filler",
+    "chapters": null,
+    "episodes": {
+      "first": 426,
+      "last": 429
+    }
+  },
+  {
+    "id": "marine-ford",
+    "number": 34,
+    "title": {
+      "fr": "Arc Marine Ford",
+      "en": "Arc Marine Ford"
+    },
+    "sagaId": "war-at-the-top",
+    "kind": "manga",
+    "chapters": {
+      "first": 550,
+      "last": 580
+    },
+    "episodes": {
+      "first": 453,
+      "last": 489
+    }
+  },
+  {
+    "id": "post-marine-ford",
+    "number": 35,
+    "title": {
+      "fr": "Arc Post Marine Ford",
+      "en": "Arc Post Marine Ford"
+    },
+    "sagaId": "war-at-the-top",
+    "kind": "manga",
+    "chapters": {
+      "first": 581,
+      "last": 597
+    },
+    "episodes": {
+      "first": 490,
+      "last": 516
+    }
+  },
+  {
+    "id": "return-to-sabaody",
+    "number": 36,
+    "title": {
+      "fr": "Arc Retour à Sabaody",
+      "en": "Arc Return to Sabaody"
+    },
+    "sagaId": "ile-des-hommes-poissons",
+    "kind": "manga",
+    "chapters": {
+      "first": 598,
+      "last": 602
+    },
+    "episodes": {
+      "first": 517,
+      "last": 522
+    }
+  },
+  {
+    "id": "ile-des-hommes-poissons",
+    "number": 37,
+    "title": {
+      "fr": "Arc Île des Hommes-Poissons",
+      "en": "Arc Île des Hommes-Poissons"
+    },
+    "sagaId": "ile-des-hommes-poissons",
+    "kind": "manga",
+    "chapters": {
+      "first": 603,
+      "last": 653
+    },
+    "episodes": {
+      "first": 523,
+      "last": 573
+    }
+  },
+  {
+    "id": "l-ambition-de-z",
+    "number": 38,
+    "title": {
+      "fr": "Arc l'Ambition de Z",
+      "en": "Arc l'Ambition de Z"
+    },
+    "sagaId": "ile-des-hommes-poissons",
+    "kind": "filler",
+    "chapters": null,
+    "episodes": {
+      "first": 575,
+      "last": 578
+    }
+  },
+  {
+    "id": "punk-hazard",
+    "number": 39,
+    "title": {
+      "fr": "Arc Punk Hazard",
+      "en": "Arc Punk Hazard"
+    },
+    "sagaId": "dressrosa-pirate-alliance",
+    "kind": "manga",
+    "chapters": {
+      "first": 654,
+      "last": 699
+    },
+    "episodes": {
+      "first": 574,
+      "last": 626
+    }
+  },
+  {
+    "id": "recuperation-de-cesar",
+    "number": 40,
+    "title": {
+      "fr": "Arc Récupération de César",
+      "en": "Arc Récupération de César"
+    },
+    "sagaId": "dressrosa-pirate-alliance",
+    "kind": "filler",
+    "chapters": null,
+    "episodes": {
+      "first": 626,
+      "last": 628
+    }
+  },
+  {
+    "id": "dressrosa",
+    "number": 41,
+    "title": {
+      "fr": "Arc Dressrosa",
+      "en": "Arc Dressrosa"
+    },
+    "sagaId": "dressrosa-pirate-alliance",
+    "kind": "manga",
+    "chapters": {
+      "first": 700,
+      "last": 801
+    },
+    "episodes": {
+      "first": 628,
+      "last": 746
+    }
+  },
+  {
+    "id": "silver-mine-bow",
+    "number": 42,
+    "title": {
+      "fr": "Arc Mine Argentée",
+      "en": "Silver Mine Bow"
+    },
+    "sagaId": "four-emperors",
+    "kind": "filler",
+    "chapters": null,
+    "episodes": {
+      "first": 747,
+      "last": 750
+    }
+  },
+  {
+    "id": "zo",
+    "number": 43,
+    "title": {
+      "fr": "Arc Zo",
+      "en": "Arc Zo"
+    },
+    "sagaId": "four-emperors",
+    "kind": "manga",
+    "chapters": {
+      "first": 802,
+      "last": 824
+    },
+    "episodes": {
+      "first": 747,
+      "last": 779
+    }
+  },
+  {
+    "id": "rookies-de-la-marine",
+    "number": 44,
+    "title": {
+      "fr": "Arc Rookies de la Marine",
+      "en": "Arc Rookies de la Marine"
+    },
+    "sagaId": "four-emperors",
+    "kind": "filler",
+    "chapters": null,
+    "episodes": {
+      "first": 780,
+      "last": 782
+    }
+  },
+  {
+    "id": "whole-cake-island",
+    "number": 45,
+    "title": {
+      "fr": "Arc Whole Cake Island",
+      "en": "Arc Whole Cake Island"
+    },
+    "sagaId": "four-emperors",
+    "kind": "manga",
+    "chapters": {
+      "first": 825,
+      "last": 902
+    },
+    "episodes": {
+      "first": 783,
+      "last": 885
+    }
+  },
+  {
+    "id": "reverie",
+    "number": 46,
+    "title": {
+      "fr": "Arc Rêverie",
+      "en": "Arc Rêverie"
+    },
+    "sagaId": "four-emperors",
+    "kind": "manga",
+    "chapters": {
+      "first": 903,
+      "last": 908
+    },
+    "episodes": {
+      "first": 878,
+      "last": 889
+    }
+  },
+  {
+    "id": "pays-des-wa",
+    "number": 47,
+    "title": {
+      "fr": "Arc Pays des Wa",
+      "en": "Arc Pays des Wa"
+    },
+    "sagaId": "four-emperors",
+    "kind": "manga",
+    "chapters": {
+      "first": 909,
+      "last": 1057
+    },
+    "episodes": {
+      "first": 890,
+      "last": 1085
+    }
+  },
+  {
+    "id": "carbonic-acid-king-bow",
+    "number": 48,
+    "title": {
+      "fr": "Arc Roi acide carbonique",
+      "en": "Carbonic acid King Bow"
+    },
+    "sagaId": "four-emperors",
+    "kind": "filler",
+    "chapters": null,
+    "episodes": {
+      "first": 895,
+      "last": 896
+    }
+  },
+  {
+    "id": "egg-head",
+    "number": 49,
+    "title": {
+      "fr": "Arc Egg Head",
+      "en": "Egg Head Arc"
+    },
+    "sagaId": "final-saga",
+    "kind": "manga",
+    "chapters": {
+      "first": 1058,
+      "last": 1125
+    },
+    "episodes": {
+      "first": 1086,
+      "last": 1155
+    }
+  },
+  {
+    "id": "elbaph",
+    "number": 50,
+    "title": {
+      "fr": "Arc Elbaph",
+      "en": "Elbaph Arc"
+    },
+    "sagaId": "final-saga",
+    "kind": "manga",
+    "chapters": {
+      "first": 1126,
+      "last": 1185
+    },
+    "episodes": {
+      "first": 1156,
+      "last": 1162
+    }
+  }
+]

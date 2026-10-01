@@ -1,0 +1,1091 @@
+[
+  {
+    "id": "vogue-merry",
+    "apiId": 1,
+    "name": {
+      "fr": "Vogue Merry",
+      "en": "Vogue Merry"
+    },
+    "romaji": "Gōingu Merī-gō",
+    "type": "Navire Pirate",
+    "crewId": "mugiwara-no-ichimi"
+  },
+  {
+    "id": "thousand-sunny",
+    "apiId": 2,
+    "name": {
+      "fr": "Thousand Sunny",
+      "en": "Thousand Sunny"
+    },
+    "romaji": "Sauzando Sanī-gō",
+    "type": "Navire Pirate",
+    "crewId": "mugiwara-no-ichimi"
+  },
+  {
+    "id": "shiro-mokuba-i",
+    "apiId": 3,
+    "name": {
+      "fr": "Shiro Mokuba I",
+      "en": "Shiro Mokuba I"
+    },
+    "romaji": "Shiro Mokuba Ichi-gō",
+    "type": "Navire Pirate",
+    "crewId": "mugiwara-no-ichimi"
+  },
+  {
+    "id": "mini-merry-ii",
+    "apiId": 4,
+    "name": {
+      "fr": "Mini Merry II",
+      "en": "Mini Merry II"
+    },
+    "romaji": "Mini Merī Ni-gō",
+    "type": "Navire Pirate",
+    "crewId": "mugiwara-no-ichimi"
+  },
+  {
+    "id": "shimashima-shopping",
+    "apiId": 5,
+    "name": {
+      "fr": "Shimashima Shopping",
+      "en": "Shimashima Shopping"
+    },
+    "romaji": "Shimashima Shoppingu-gō",
+    "type": "Navire Pirate",
+    "crewId": "mugiwara-no-ichimi"
+  },
+  {
+    "id": "peace-of-spadil",
+    "apiId": 6,
+    "name": {
+      "fr": "Peace of Spadil",
+      "en": "Peace of Spadil"
+    },
+    "romaji": "Pīsu Obu Supadiru-gō",
+    "type": "Navire Pirate",
+    "crewId": "chahige-kaizokudan"
+  },
+  {
+    "id": "oro-jackson",
+    "apiId": 7,
+    "name": {
+      "fr": "Oro Jackson",
+      "en": "Oro Jackson"
+    },
+    "romaji": "Ōro Jakuson-gō",
+    "type": "Navire Pirate",
+    "crewId": "roja-kaizoku-dan"
+  },
+  {
+    "id": "moby-dick",
+    "apiId": 8,
+    "name": {
+      "fr": "Moby Dick",
+      "en": "Moby Dick"
+    },
+    "romaji": "Mobī Dikku-gō",
+    "type": "Navire Pirate",
+    "crewId": "shirohige-kaizokudan"
+  },
+  {
+    "id": "whitey-bay-icebreaker",
+    "apiId": 9,
+    "name": {
+      "fr": "Navire Brise Glace de Whitey Bay",
+      "en": "Whitey Bay icebreaker"
+    },
+    "romaji": null,
+    "type": "Navire Pirate",
+    "crewId": "shirohige-kaizokudan"
+  },
+  {
+    "id": "thriller-bark",
+    "apiId": 10,
+    "name": {
+      "fr": "Thriller Bark",
+      "en": "Thriller Bark"
+    },
+    "romaji": "Surirā Bāku",
+    "type": "Navire Pirate",
+    "crewId": "roringu-kaizokudan"
+  },
+  {
+    "id": "blackbeard-s-raft",
+    "apiId": 11,
+    "name": {
+      "fr": "Radeau de Barbe Noire",
+      "en": "Blackbeard's raft"
+    },
+    "romaji": "Marutabune",
+    "type": "Navire Pirate",
+    "crewId": "kiba-gaeru-kaizokudan"
+  },
+  {
+    "id": "big-top",
+    "apiId": 12,
+    "name": {
+      "fr": "Big Top",
+      "en": "Big Top"
+    },
+    "romaji": "Biggu Toppu-gō",
+    "type": "Navire Pirate",
+    "crewId": "bagi-kaizokudan"
+  },
+  {
+    "id": "red-force",
+    "apiId": 13,
+    "name": {
+      "fr": "Red Force",
+      "en": "Red Force"
+    },
+    "romaji": "Reddo Fōsu-gō",
+    "type": "Navire Pirate",
+    "crewId": "akagami-kaizokudan"
+  },
+  {
+    "id": "miss-love-duck",
+    "apiId": 14,
+    "name": {
+      "fr": "Miss Love Duck",
+      "en": "Miss Love Duck"
+    },
+    "romaji": "Misu Rabu Dakku-gō",
+    "type": "Navire Pirate",
+    "crewId": "arubida-kaizokudan"
+  },
+  {
+    "id": "bezan-black",
+    "apiId": 15,
+    "name": {
+      "fr": "Bezan Black",
+      "en": "Bezan Black"
+    },
+    "romaji": "Bezan Burakku-gō",
+    "type": "Navire Pirate",
+    "crewId": "kuroneko-kaizoku-dan"
+  },
+  {
+    "id": "dreadnaught-sabre",
+    "apiId": 16,
+    "name": {
+      "fr": "Dreadnaught Sabre",
+      "en": "Dreadnaught Sabre"
+    },
+    "romaji": "Doreddonōto Sāberu-gō",
+    "type": "Navire Pirate",
+    "crewId": "kuriiku-kaizoku-kantai"
+  },
+  {
+    "id": "cooking-george",
+    "apiId": 18,
+    "name": {
+      "fr": "Cooking George",
+      "en": "Cooking George"
+    },
+    "romaji": "Kukkingu Jōji-gō",
+    "type": "Navire Pirate",
+    "crewId": "kukku-kaizokudan"
+  },
+  {
+    "id": "shark-superb",
+    "apiId": 19,
+    "name": {
+      "fr": "Shark Superb",
+      "en": "Shark Superb"
+    },
+    "romaji": "Shāku Supābu-gō",
+    "type": "Navire Pirate",
+    "crewId": "aron-ichimi"
+  },
+  {
+    "id": "great-erik",
+    "apiId": 20,
+    "name": {
+      "fr": "Great Erik",
+      "en": "Great Erik"
+    },
+    "romaji": "Gurēto Eirīku-gō",
+    "type": "Navire Pirate",
+    "crewId": "kyo-he-kaizoku-dan"
+  },
+  {
+    "id": "biking",
+    "apiId": 21,
+    "name": {
+      "fr": "Biking",
+      "en": "Biking"
+    },
+    "romaji": "Burikingu-gō",
+    "type": "Navire Pirate",
+    "crewId": "burikingu-kaizokudan"
+  },
+  {
+    "id": "striker",
+    "apiId": 22,
+    "name": {
+      "fr": "Striker",
+      "en": "Striker"
+    },
+    "romaji": "Sutoraikā",
+    "type": "Navire Pirate",
+    "crewId": "shirohige-kaizokudan"
+  },
+  {
+    "id": "victory-hunter",
+    "apiId": 23,
+    "name": {
+      "fr": "Victory Hunter",
+      "en": "Victory Hunter"
+    },
+    "romaji": "Bikutorī Hantā-gō",
+    "type": "Navire Pirate",
+    "crewId": "hokahoka-kaizokudan"
+  },
+  {
+    "id": "outgang-sonar",
+    "apiId": 24,
+    "name": {
+      "fr": "Outgang Sonar",
+      "en": "Outgang Sonar"
+    },
+    "romaji": "Outgang Sonar",
+    "type": "Navire Pirate",
+    "crewId": "hokahoka-kaizokudan"
+  },
+  {
+    "id": "new-witch-s-tongue",
+    "apiId": 25,
+    "name": {
+      "fr": "New Witch’s Tongue",
+      "en": "New Witch's Tongue"
+    },
+    "romaji": "Nyū Wicchi Bero-gō",
+    "type": "Navire Pirate",
+    "crewId": "roshio-kaizokudan"
+  },
+  {
+    "id": "sexy-foxy",
+    "apiId": 26,
+    "name": {
+      "fr": "Sexy Foxy",
+      "en": "Sexy Foxy"
+    },
+    "romaji": "Sekushī Fokushī-gō",
+    "type": "Navire Pirate",
+    "crewId": "o-kabuto-kaizokudan"
+  },
+  {
+    "id": "polar-tang",
+    "apiId": 27,
+    "name": {
+      "fr": "Polar Tang",
+      "en": "Polar Tang"
+    },
+    "romaji": "Pōrā Tangu-gō",
+    "type": "Navire Pirate",
+    "crewId": "kiddo-kaizokudan"
+  },
+  {
+    "id": "flying-dutchman",
+    "apiId": 28,
+    "name": {
+      "fr": "Hollandais Volant",
+      "en": "Flying Dutchman"
+    },
+    "romaji": "Furaingu Datchiman-gō",
+    "type": "Navire Pirate",
+    "crewId": "jairo-kaizokudan"
+  },
+  {
+    "id": "fool",
+    "apiId": 29,
+    "name": {
+      "fr": "Fool",
+      "en": "Fool"
+    },
+    "romaji": "Fūru-gō",
+    "type": "Navire Pirate",
+    "crewId": "rubuniru-okoku"
+  },
+  {
+    "id": "swanda-express",
+    "apiId": 30,
+    "name": {
+      "fr": "Swanda Express",
+      "en": "Swanda Express"
+    },
+    "romaji": "Kaisoku Suwanda-gō",
+    "type": "Navire Pirate",
+    "crewId": "rubuniru-okoku"
+  },
+  {
+    "id": "galdino-ship",
+    "apiId": 31,
+    "name": {
+      "fr": "Navire de Galdino",
+      "en": "Galdino ship"
+    },
+    "romaji": null,
+    "type": "Navire Pirate",
+    "crewId": "rubuniru-okoku"
+  },
+  {
+    "id": "pop-rock-candy",
+    "apiId": 32,
+    "name": {
+      "fr": "Pop Rock Candy",
+      "en": "Pop Rock Candy"
+    },
+    "romaji": "Poppu Rokku Kyandi-gō",
+    "type": "Navire Pirate",
+    "crewId": "rubuniru-okoku"
+  },
+  {
+    "id": "perfume-yuda",
+    "apiId": 33,
+    "name": {
+      "fr": "Perfume Yuda",
+      "en": "Perfume Yuda"
+    },
+    "romaji": "Pafyūmu Yuda-gō",
+    "type": "Navire Pirate",
+    "crewId": "supedo-kaizokudan"
+  },
+  {
+    "id": "northheim",
+    "apiId": 34,
+    "name": {
+      "fr": "Northheim",
+      "en": "Northheim"
+    },
+    "romaji": "Nōsuhaimu-gō",
+    "type": "Navire Pirate",
+    "crewId": "happo-suigun"
+  },
+  {
+    "id": "going-luffy-senpai",
+    "apiId": 35,
+    "name": {
+      "fr": "Going Luffy-senpai",
+      "en": "Going Luffy-senpai"
+    },
+    "romaji": "Gōingu Rufi-senpai-gō",
+    "type": "Navire Pirate",
+    "crewId": "yonta-maria-dai-senda"
+  },
+  {
+    "id": "yonta-maria",
+    "apiId": 36,
+    "name": {
+      "fr": "Yonta Maria",
+      "en": "Yonta Maria"
+    },
+    "romaji": "Yonta Maria-gō",
+    "type": "Navire Pirate",
+    "crewId": "mikadzuki-no-norikumiin"
+  },
+  {
+    "id": "santa-maria",
+    "apiId": 37,
+    "name": {
+      "fr": "Santa Maria",
+      "en": "Santa Maria"
+    },
+    "romaji": "Santa Maria-gō",
+    "type": "Navire Pirate",
+    "crewId": "mikadzuki-no-norikumiin"
+  },
+  {
+    "id": "nita-maria",
+    "apiId": 38,
+    "name": {
+      "fr": "Nita Maria",
+      "en": "Nita Maria"
+    },
+    "romaji": null,
+    "type": "Navire Pirate",
+    "crewId": "mikadzuki-no-norikumiin"
+  },
+  {
+    "id": "cheval-blanc-des-bois-dormants",
+    "apiId": 39,
+    "name": {
+      "fr": "Cheval Blanc des Bois Dormants",
+      "en": "Cheval Blanc des Bois Dormants"
+    },
+    "romaji": "Nemureru Mori no Hakuba-gō",
+    "type": "Navire Pirate",
+    "crewId": "baruto-kurabu"
+  },
+  {
+    "id": "happou-sai",
+    "apiId": 40,
+    "name": {
+      "fr": "Happou-Sai",
+      "en": "Happou-Sai"
+    },
+    "romaji": "Happōsai",
+    "type": "Navire Pirate",
+    "crewId": "makuro-ichimi-81"
+  },
+  {
+    "id": "ippou-say",
+    "apiId": 41,
+    "name": {
+      "fr": "Ippou-Say",
+      "en": "Ippou-Say"
+    },
+    "romaji": "Ippōsai",
+    "type": "Navire Pirate",
+    "crewId": "makuro-ichimi-81"
+  },
+  {
+    "id": "mammoth",
+    "apiId": 42,
+    "name": {
+      "fr": "Mammouth",
+      "en": "Mammoth"
+    },
+    "romaji": "Manmosu-gō",
+    "type": "Navire Pirate",
+    "crewId": "kinjishi-kaizokudan"
+  },
+  {
+    "id": "coffin-ship",
+    "apiId": 43,
+    "name": {
+      "fr": "Navire-Cercueil",
+      "en": "Coffin Ship"
+    },
+    "romaji": "Hitsugi-bune",
+    "type": "Navire Pirate",
+    "crewId": null
+  },
+  {
+    "id": "sad-tanker",
+    "apiId": 44,
+    "name": {
+      "fr": "SAD Tanker",
+      "en": "SAD Tanker"
+    },
+    "romaji": "Esu-e-di no Tanka",
+    "type": "Navire Pirate",
+    "crewId": "kurohige-kaizokudan"
+  },
+  {
+    "id": "st-briss",
+    "apiId": 45,
+    "name": {
+      "fr": "St. Briss",
+      "en": "St. Briss"
+    },
+    "romaji": "Sento Burisu-gō",
+    "type": "Navire Pirate",
+    "crewId": null
+  },
+  {
+    "id": "snapper-head",
+    "apiId": 46,
+    "name": {
+      "fr": "Snapper Head",
+      "en": "Snapper Head"
+    },
+    "romaji": "Sunappā Heddo-gō",
+    "type": "Navire Pirate",
+    "crewId": "uchu-kaizoku"
+  },
+  {
+    "id": "naglfar",
+    "apiId": 47,
+    "name": {
+      "fr": "Naglfar",
+      "en": "Naglfar"
+    },
+    "romaji": "Nagurufaru",
+    "type": "Navire Pirate",
+    "crewId": "rokkusu-kaizokudan"
+  },
+  {
+    "id": "ship-des-maquereaux",
+    "apiId": 48,
+    "name": {
+      "fr": "Navire des Maquereaux",
+      "en": "Ship des Maquereaux"
+    },
+    "romaji": null,
+    "type": "Navire Pirate",
+    "crewId": "kaigun"
+  },
+  {
+    "id": "queen-mama-chanter",
+    "apiId": 49,
+    "name": {
+      "fr": "Queen Mama Chanter",
+      "en": "Queen Mama Chanter"
+    },
+    "romaji": "Kuīn Mama Shante-gō",
+    "type": "Navire Pirate",
+    "crewId": "bagizu-deribari"
+  },
+  {
+    "id": "monkey-d-garp-s-boat",
+    "apiId": 50,
+    "name": {
+      "fr": "Bateau de Monkey D. Garp",
+      "en": "Monkey D. Garp's boat"
+    },
+    "romaji": "Monkī D. Gāpu no shipu",
+    "type": "Navire du Gouvernement",
+    "crewId": "sekai-kizoku"
+  },
+  {
+    "id": "naval-ship",
+    "apiId": 51,
+    "name": {
+      "fr": "Navire de la Marine",
+      "en": "Naval ship"
+    },
+    "romaji": "Kaigun-sen",
+    "type": "Navire du Gouvernement",
+    "crewId": "sekai-kizoku"
+  },
+  {
+    "id": "g-5-ship",
+    "apiId": 52,
+    "name": {
+      "fr": "Navire du G-5",
+      "en": "G-5 ship"
+    },
+    "romaji": "Jī-Faibu",
+    "type": "Navire du Gouvernement",
+    "crewId": "sekai-kizoku"
+  },
+  {
+    "id": "nezumi-s-boat",
+    "apiId": 53,
+    "name": {
+      "fr": "Bateau de Nezumi",
+      "en": "Nezumi's boat"
+    },
+    "romaji": "Nezumi no shipu",
+    "type": "Navire du Gouvernement",
+    "crewId": "sekai-kizoku"
+  },
+  {
+    "id": "pudding-pudding-ship",
+    "apiId": 54,
+    "name": {
+      "fr": "Navire de Pudding Pudding",
+      "en": "Pudding Pudding ship"
+    },
+    "romaji": "Pudding Pudding no shipu",
+    "type": "Navire du Gouvernement",
+    "crewId": "sekai-kizoku"
+  },
+  {
+    "id": "hina-s-ship",
+    "apiId": 55,
+    "name": {
+      "fr": "Navire d’Hina",
+      "en": "Hina's ship"
+    },
+    "romaji": null,
+    "type": "Navire du Gouvernement",
+    "crewId": "sekai-kizoku"
+  },
+  {
+    "id": "judicial-ship",
+    "apiId": 56,
+    "name": {
+      "fr": "Navire Judiciaire",
+      "en": "Judicial ship"
+    },
+    "romaji": "Shihō-sen",
+    "type": "Navire du Gouvernement",
+    "crewId": "sekai-kizoku"
+  },
+  {
+    "id": "celestial-dragon-ship",
+    "apiId": 57,
+    "name": {
+      "fr": "Navire des dragons Célestes",
+      "en": "Celestial Dragon Ship"
+    },
+    "romaji": null,
+    "type": "Navire du Gouvernement",
+    "crewId": "shibarikubi-no-bigaro"
+  },
+  {
+    "id": "raven",
+    "apiId": 58,
+    "name": {
+      "fr": "Corbeau",
+      "en": "Raven"
+    },
+    "romaji": "Karasumaru",
+    "type": "Navire Pirate",
+    "crewId": "mugiwara-no-ichimi"
+  },
+  {
+    "id": "baratie",
+    "apiId": 59,
+    "name": {
+      "fr": "Baratie",
+      "en": "Baratie"
+    },
+    "romaji": "Baratie",
+    "type": "Navire Restaurant",
+    "crewId": null
+  },
+  {
+    "id": "tokoyaki-8",
+    "apiId": 60,
+    "name": {
+      "fr": "Tokoyaki 8",
+      "en": "Tokoyaki 8"
+    },
+    "romaji": "Takoyaki Eito",
+    "type": "Navire de Commerce",
+    "crewId": null
+  },
+  {
+    "id": "battle-franky",
+    "apiId": 61,
+    "name": {
+      "fr": "Battle Franky",
+      "en": "Battle Franky"
+    },
+    "romaji": "Batorufurankī",
+    "type": "Navire Pirate",
+    "crewId": null
+  },
+  {
+    "id": "arche-maxime",
+    "apiId": 62,
+    "name": {
+      "fr": "Arche Maxime",
+      "en": "Arche Maxime"
+    },
+    "romaji": "Makushimu",
+    "type": "Arche Volante",
+    "crewId": null
+  },
+  {
+    "id": "hobbit",
+    "apiId": 63,
+    "name": {
+      "fr": "Hobbit",
+      "en": "Hobbit"
+    },
+    "romaji": "Kyakusen Ōbitto Gō",
+    "type": "Navire Pirate",
+    "crewId": null
+  },
+  {
+    "id": "pandaman-boat",
+    "apiId": 64,
+    "name": {
+      "fr": "Bateau de Pandaman",
+      "en": "Pandaman boat"
+    },
+    "romaji": null,
+    "type": "Navire Pirate",
+    "crewId": null
+  },
+  {
+    "id": "tete-de-maquereau",
+    "apiId": 65,
+    "name": {
+      "fr": "Tête-de-Maquereau",
+      "en": "Tête-de-Maquereau"
+    },
+    "romaji": "Sabagashira Ichi-gō",
+    "type": "Navire Restaurant",
+    "crewId": null
+  },
+  {
+    "id": "noah",
+    "apiId": 66,
+    "name": {
+      "fr": "Noah",
+      "en": "Noah"
+    },
+    "romaji": "Noa",
+    "type": "Arche",
+    "crewId": null
+  },
+  {
+    "id": "ile-navire",
+    "apiId": 67,
+    "name": {
+      "fr": "Île Navire",
+      "en": "Île Navire"
+    },
+    "romaji": "Shima-bune",
+    "type": "Navire Pirate",
+    "crewId": "burujamu-kaizoku-dan"
+  },
+  {
+    "id": "white-tiger",
+    "apiId": 68,
+    "name": {
+      "fr": "White Tiger",
+      "en": "White Tiger"
+    },
+    "romaji": "Howaito Taigā-gō",
+    "type": "Navire Pirate",
+    "crewId": null
+  },
+  {
+    "id": "zenny",
+    "apiId": 69,
+    "name": {
+      "fr": "Zenny",
+      "en": "Zenny"
+    },
+    "romaji": "Zenī-gō",
+    "type": "Navire Pirate",
+    "crewId": "barubaru-dan"
+  },
+  {
+    "id": "it-s-okay",
+    "apiId": 70,
+    "name": {
+      "fr": "It’s Okay",
+      "en": "It's Okay"
+    },
+    "romaji": "Ma Ikkāda-gō",
+    "type": "Navire de Course",
+    "crewId": "mugiwara-no-ichimi"
+  },
+  {
+    "id": "tarumanma",
+    "apiId": 71,
+    "name": {
+      "fr": "Tarumanma",
+      "en": "Tarumanma"
+    },
+    "romaji": "Tarumanma-gō",
+    "type": "Navire de Course",
+    "crewId": "mugiwara-no-ichimi"
+  },
+  {
+    "id": "harem-no-tango",
+    "apiId": 72,
+    "name": {
+      "fr": "Harem no Tango",
+      "en": "Harem no Tango"
+    },
+    "romaji": "Hāremu no Tango",
+    "type": "Navire de Course",
+    "crewId": "o-kabuto-kaizokudan"
+  },
+  {
+    "id": "proud-barrel",
+    "apiId": 73,
+    "name": {
+      "fr": "Fier Baril",
+      "en": "Proud Barrel"
+    },
+    "romaji": "Tarutaigā-gō",
+    "type": "Navire de Course",
+    "crewId": "mugiwara-no-ichimi"
+  },
+  {
+    "id": "mother-ship",
+    "apiId": 74,
+    "name": {
+      "fr": "Mother Ship",
+      "en": "Mother Ship"
+    },
+    "romaji": "Mazā Shippu Kōsutā-gō",
+    "type": "Navire de Course",
+    "crewId": "o-kabuto-kaizokudan"
+  },
+  {
+    "id": "oyakata-bune",
+    "apiId": 75,
+    "name": {
+      "fr": "Oyakata Bune",
+      "en": "Oyakata Bune"
+    },
+    "romaji": "Oyakata Bune-gō",
+    "type": "Navire de Course",
+    "crewId": "o-kabuto-kaizokudan"
+  },
+  {
+    "id": "cutie-wagon",
+    "apiId": 76,
+    "name": {
+      "fr": "Cutie Wagon",
+      "en": "Cutie Wagon"
+    },
+    "romaji": "Kyūti Wagon-gō",
+    "type": "Navire de Course",
+    "crewId": "o-kabuto-kaizokudan"
+  },
+  {
+    "id": "kaji-king-i-ii",
+    "apiId": 77,
+    "name": {
+      "fr": "Kaji King I & II",
+      "en": "Kaji King I & II"
+    },
+    "romaji": "Kaji King Ichi-gō Ni-gō",
+    "type": "Navire de Course",
+    "crewId": "o-kabuto-kaizokudan"
+  },
+  {
+    "id": "kani-crane",
+    "apiId": 78,
+    "name": {
+      "fr": "Kani Crane",
+      "en": "Kani Crane"
+    },
+    "romaji": "Kani kuren-gō",
+    "type": "Navire de Course",
+    "crewId": "o-kabuto-kaizokudan"
+  },
+  {
+    "id": "salamander",
+    "apiId": 79,
+    "name": {
+      "fr": "Salamandre",
+      "en": "Salamander"
+    },
+    "romaji": "Saramandā-go",
+    "type": "Navire du Gouvernement",
+    "crewId": "sekai-kizoku"
+  },
+  {
+    "id": "marchen",
+    "apiId": 80,
+    "name": {
+      "fr": "Märchen",
+      "en": "Märchen"
+    },
+    "romaji": "Meruhen-gō",
+    "type": "Navire Pirate",
+    "crewId": "mugiwara-no-ichimi"
+  },
+  {
+    "id": "lady-mary",
+    "apiId": 81,
+    "name": {
+      "fr": "Lady Mary",
+      "en": "Lady Mary"
+    },
+    "romaji": "Redi Merri",
+    "type": "Navire Pirate",
+    "crewId": null
+  },
+  {
+    "id": "bateau-epicerie-de-la-marine",
+    "apiId": 82,
+    "name": {
+      "fr": "Bateau épicerie de la Marine",
+      "en": "Bateau épicerie de la Marine"
+    },
+    "romaji": null,
+    "type": "Navire du Gouvernement",
+    "crewId": "sekai-kizoku"
+  },
+  {
+    "id": "boat-in-dials",
+    "apiId": 83,
+    "name": {
+      "fr": "Bateau à Dials",
+      "en": "Boat in Dials"
+    },
+    "romaji": "Daiaru Sen",
+    "type": "Bateau",
+    "crewId": null
+  },
+  {
+    "id": "g-2-top-secret-intelligence-vessels",
+    "apiId": 84,
+    "name": {
+      "fr": "Navires Top Secret de Renseignement G-2",
+      "en": "G-2 Top Secret Intelligence Vessels"
+    },
+    "romaji": null,
+    "type": "Navire du Gouvernement",
+    "crewId": "sekai-kizoku"
+  },
+  {
+    "id": "nelson-s-ship",
+    "apiId": 85,
+    "name": {
+      "fr": "Navire de Nelson",
+      "en": "Nelson's ship"
+    },
+    "romaji": null,
+    "type": "Navire du Gouvernement",
+    "crewId": "sekai-kizoku"
+  },
+  {
+    "id": "pine-peak",
+    "apiId": 86,
+    "name": {
+      "fr": "Pine Peak",
+      "en": "Pine Peak"
+    },
+    "romaji": "Pain Pīku",
+    "type": "Navire du Gouvernement",
+    "crewId": "sekai-kizoku"
+  },
+  {
+    "id": "stan-maley",
+    "apiId": 87,
+    "name": {
+      "fr": "Stan Maley",
+      "en": "Stan Maley"
+    },
+    "romaji": "Sutan Marē-gō",
+    "type": "Navire du Gouvernement",
+    "crewId": "sekai-kizoku"
+  },
+  {
+    "id": "tarielishin",
+    "apiId": 88,
+    "name": {
+      "fr": "Tarielishin",
+      "en": "Tarielishin"
+    },
+    "romaji": "Tarierishin Gou",
+    "type": "Navire Pirate",
+    "crewId": "panpukin-kaizokudan"
+  },
+  {
+    "id": "web-panic",
+    "apiId": 89,
+    "name": {
+      "fr": "Web Panic",
+      "en": "Web Panic"
+    },
+    "romaji": "Webu Panikku-gō",
+    "type": "Navire Pirate",
+    "crewId": null
+  },
+  {
+    "id": "big-runner",
+    "apiId": 90,
+    "name": {
+      "fr": "Big Runner",
+      "en": "Big Runner"
+    },
+    "romaji": "Biggu Ran'nā-gō",
+    "type": "Navire Pirate",
+    "crewId": null
+  },
+  {
+    "id": "special-look",
+    "apiId": 91,
+    "name": {
+      "fr": "Look Spécial",
+      "en": "Special Look"
+    },
+    "romaji": null,
+    "type": "Navire de Course",
+    "crewId": "o-kabuto-kaizokudan"
+  },
+  {
+    "id": "alexandra",
+    "apiId": 92,
+    "name": {
+      "fr": "Alexandra",
+      "en": "Alexandra"
+    },
+    "romaji": "Arekusandora-gō",
+    "type": "Navire du Gouvernement",
+    "crewId": "sekai-kizoku"
+  },
+  {
+    "id": "bounty-maru",
+    "apiId": 93,
+    "name": {
+      "fr": "Bounty Maru",
+      "en": "Bounty Maru"
+    },
+    "romaji": "Baunti Maru",
+    "type": "Navire Pirate",
+    "crewId": null
+  },
+  {
+    "id": "rokuron-dokuron",
+    "apiId": 94,
+    "name": {
+      "fr": "Rokuron Dokuron",
+      "en": "Rokuron Dokuron"
+    },
+    "romaji": "Rokuron Dokuron-gō",
+    "type": "Navire Pirate",
+    "crewId": "maddo-toreja-kaizokudan-85"
+  },
+  {
+    "id": "sister-anko",
+    "apiId": 95,
+    "name": {
+      "fr": "Sister Anko",
+      "en": "Sister Anko"
+    },
+    "romaji": "Shisutā Ankō",
+    "type": "Navire de Dessert",
+    "crewId": null
+  },
+  {
+    "id": "nasugasira",
+    "apiId": 96,
+    "name": {
+      "fr": "Nasugasira",
+      "en": "Nasugasira"
+    },
+    "romaji": "Nasugashira-gō",
+    "type": "agrandissement du Baratie.",
+    "crewId": null
+  },
+  {
+    "id": "h-1",
+    "apiId": 97,
+    "name": {
+      "fr": "H-1",
+      "en": "H-1"
+    },
+    "romaji": "H-1",
+    "type": "Bateau",
+    "crewId": null
+  },
+  {
+    "id": "sand-sled",
+    "apiId": 98,
+    "name": {
+      "fr": "Sand Sled",
+      "en": "Sand Sled"
+    },
+    "romaji": "Barubaru Dan",
+    "type": "Navire Pirate",
+    "crewId": "ochanoma-kaizokudan"
+  },
+  {
+    "id": "shark-emeralda",
+    "apiId": 99,
+    "name": {
+      "fr": "Shark Emeralda",
+      "en": "Shark Emeralda"
+    },
+    "romaji": "Shāku Emeraruda-gō",
+    "type": "Navire Pirate",
+    "crewId": "tontatta-okoku"
+  },
+  {
+    "id": "gran-tesoro",
+    "apiId": 100,
+    "name": {
+      "fr": "Gran Tesoro",
+      "en": "Gran Tesoro"
+    },
+    "romaji": "Gurantesoro",
+    "type": "Navire Pirate",
+    "crewId": null
+  }
+]

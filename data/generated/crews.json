@@ -1,0 +1,1790 @@
+[
+  {
+    "id": "mugiwara-no-ichimi",
+    "apiId": 1,
+    "name": {
+      "fr": "L’équipage du Chapeau de Paille",
+      "en": "The Chapeau de Paille crew"
+    },
+    "romaji": "Mugiwara no Ichimi",
+    "isYonko": true,
+    "totalBounty": 3161000100,
+    "status": "actif"
+  },
+  {
+    "id": "akagami-kaizokudan",
+    "apiId": 2,
+    "name": {
+      "fr": "L’équipage du Roux",
+      "en": "Le Roux crew"
+    },
+    "romaji": "Akagami Kaizokudan",
+    "isYonko": true,
+    "totalBounty": 4142900000,
+    "status": "actif"
+  },
+  {
+    "id": "arubida-kaizokudan",
+    "apiId": 3,
+    "name": {
+      "fr": "L’équipage d’Alvida",
+      "en": "The Alvida crew"
+    },
+    "romaji": "Arubida Kaizokudan",
+    "isYonko": false,
+    "totalBounty": 5000000,
+    "status": "actif"
+  },
+  {
+    "id": "bagi-kaizokudan",
+    "apiId": 4,
+    "name": {
+      "fr": "L’équipage du Clown",
+      "en": "The Clown Crew"
+    },
+    "romaji": "Bagī Kaizokudan",
+    "isYonko": false,
+    "totalBounty": 20000000,
+    "status": "actif"
+  },
+  {
+    "id": "roja-kaizoku-dan",
+    "apiId": 5,
+    "name": {
+      "fr": "L’équipage des Pirates Roger",
+      "en": "The Pirates Roger crew"
+    },
+    "romaji": "Rojā Kaizoku Dan",
+    "isYonko": true,
+    "totalBounty": 5564800000,
+    "status": "dissous"
+  },
+  {
+    "id": "usoppu-kaizokudan",
+    "apiId": 6,
+    "name": {
+      "fr": "L’équipage du Capitaine Usopp",
+      "en": "Captain Usopp's crew"
+    },
+    "romaji": "Usoppu Kaizokudan",
+    "isYonko": false,
+    "totalBounty": 200000000,
+    "status": "dissous"
+  },
+  {
+    "id": "kuroneko-kaizoku-dan",
+    "apiId": 7,
+    "name": {
+      "fr": "L’équipage du Chat Noir",
+      "en": "The Black Cat crew"
+    },
+    "romaji": "Kuroneko Kaizoku Dan",
+    "isYonko": false,
+    "totalBounty": 32000000,
+    "status": null
+  },
+  {
+    "id": "kuriiku-kaizoku-kantai",
+    "apiId": 8,
+    "name": {
+      "fr": "L’armada Pirate de Don Krieg",
+      "en": "Don Krieg's Pirate Armada"
+    },
+    "romaji": "Kuriiku Kaizoku Kantai",
+    "isYonko": false,
+    "totalBounty": 29000000,
+    "status": null
+  },
+  {
+    "id": "kukku-kaizokudan",
+    "apiId": 9,
+    "name": {
+      "fr": "L’équipage des Cuisiniers",
+      "en": "Les Cuisiniers crew"
+    },
+    "romaji": "Kukku Kaizokudan",
+    "isYonko": false,
+    "totalBounty": null,
+    "status": "dissous"
+  },
+  {
+    "id": "aron-ichimi",
+    "apiId": 10,
+    "name": {
+      "fr": "L’équipage d’Arlong",
+      "en": "The Arlong crew"
+    },
+    "romaji": "Āron Ichimi",
+    "isYonko": false,
+    "totalBounty": 425000000,
+    "status": null
+  },
+  {
+    "id": "iesu-kaizokudan",
+    "apiId": 11,
+    "name": {
+      "fr": "L’équipage des Pirates Yes",
+      "en": "The Pirates Yes crew"
+    },
+    "romaji": "Iesu Kaizokudan",
+    "isYonko": false,
+    "totalBounty": 3000000,
+    "status": "dissous"
+  },
+  {
+    "id": "runba-kaizoku-dan",
+    "apiId": 12,
+    "name": {
+      "fr": "L’équipage du Rumbar",
+      "en": "The Rumbar crew"
+    },
+    "romaji": "Runbā Kaizoku-dan",
+    "isYonko": false,
+    "totalBounty": 33000000,
+    "status": "dissous"
+  },
+  {
+    "id": "kyo-he-kaizoku-dan",
+    "apiId": 13,
+    "name": {
+      "fr": "L’équipage des Géants",
+      "en": "The Giant Crew"
+    },
+    "romaji": "Kyo Hē Kaizoku-dan",
+    "isYonko": false,
+    "totalBounty": 200000000,
+    "status": "dissous"
+  },
+  {
+    "id": "burikingu-kaizokudan",
+    "apiId": 14,
+    "name": {
+      "fr": "L’équipage du Bliking",
+      "en": "The Bliking crew"
+    },
+    "romaji": "Burikingu Kaizokudan",
+    "isYonko": false,
+    "totalBounty": null,
+    "status": null
+  },
+  {
+    "id": "churippu-kaizokudan",
+    "apiId": 15,
+    "name": {
+      "fr": "L’équipage des Tulipes",
+      "en": "The Tulip crew"
+    },
+    "romaji": "Chūrippu Kaizokudan",
+    "isYonko": false,
+    "totalBounty": null,
+    "status": null
+  },
+  {
+    "id": "shirohige-kaizokudan",
+    "apiId": 16,
+    "name": {
+      "fr": "L’équipage de Barbe Blanche",
+      "en": "Whitebeard's crew"
+    },
+    "romaji": "Shirohige Kaizokudan",
+    "isYonko": true,
+    "totalBounty": 7480000000,
+    "status": null
+  },
+  {
+    "id": "saruyama-rengo",
+    "apiId": 17,
+    "name": {
+      "fr": "Ligue des Primates",
+      "en": "Primate League"
+    },
+    "romaji": "Saruyama Rengō",
+    "isYonko": false,
+    "totalBounty": 84000000,
+    "status": null
+  },
+  {
+    "id": "hokahoka-kaizokudan",
+    "apiId": 18,
+    "name": {
+      "fr": "L’équipage de Hakahoka",
+      "en": "The Hakahoka crew"
+    },
+    "romaji": "Hokahoka Kaizokudan",
+    "isYonko": false,
+    "totalBounty": null,
+    "status": null
+  },
+  {
+    "id": "berami-kaizokudan",
+    "apiId": 19,
+    "name": {
+      "fr": "l’équipage du New Age",
+      "en": "the New Age crew"
+    },
+    "romaji": "Beramī Kaizokudan",
+    "isYonko": false,
+    "totalBounty": 93000000,
+    "status": "dissous"
+  },
+  {
+    "id": "roshio-kaizokudan",
+    "apiId": 20,
+    "name": {
+      "fr": "L’équipage de Roshio",
+      "en": "The Roshio crew"
+    },
+    "romaji": "Roshio Kaizokudan",
+    "isYonko": false,
+    "totalBounty": 42000000,
+    "status": null
+  },
+  {
+    "id": "donkihote-kaizokudan",
+    "apiId": 21,
+    "name": {
+      "fr": "L’équipage de Don Quichotte",
+      "en": "Don Quixote's crew"
+    },
+    "romaji": "Donkihōte Kaizokudan",
+    "isYonko": false,
+    "totalBounty": 1113000000,
+    "status": "inactif"
+  },
+  {
+    "id": "kurohige-kaizokudan",
+    "apiId": 22,
+    "name": {
+      "fr": "L’équipage de Barbe Noire",
+      "en": "Blackbeard's crew"
+    },
+    "romaji": "Kurohige Kaizokudan",
+    "isYonko": true,
+    "totalBounty": 2445800000,
+    "status": "actif"
+  },
+  {
+    "id": "kiba-gaeru-kaizokudan",
+    "apiId": 23,
+    "name": {
+      "fr": "L’équipage des Fanged Toad",
+      "en": "The Fanged Toad crew"
+    },
+    "romaji": "Kiba Gaeru Kaizokudan",
+    "isYonko": false,
+    "totalBounty": null,
+    "status": null
+  },
+  {
+    "id": "fokushi-kaizokudan",
+    "apiId": 24,
+    "name": {
+      "fr": "L’équipage de Foxy",
+      "en": "The Foxy crew"
+    },
+    "romaji": "Fokushī Kaizokudan",
+    "isYonko": false,
+    "totalBounty": 24000000,
+    "status": "actif"
+  },
+  {
+    "id": "o-kabuto-kaizokudan",
+    "apiId": 25,
+    "name": {
+      "fr": "L’équipage des Gros Casques",
+      "en": "The Gros Casques crew"
+    },
+    "romaji": "Ō Kabuto Kaizokudan",
+    "isYonko": false,
+    "totalBounty": 36000000,
+    "status": null
+  },
+  {
+    "id": "taiyo-no-kaizokudan",
+    "apiId": 26,
+    "name": {
+      "fr": "L’équipage des Pirates du Soleil",
+      "en": "The Sun Pirates crew"
+    },
+    "romaji": "Taiyō no Kaizokudan",
+    "isYonko": false,
+    "totalBounty": null,
+    "status": "actif"
+  },
+  {
+    "id": "uchu-kaizoku",
+    "apiId": 27,
+    "name": {
+      "fr": "Pirate de l’Espace",
+      "en": "Space Pirate"
+    },
+    "romaji": "Uchū Kaizoku",
+    "isYonko": false,
+    "totalBounty": null,
+    "status": null
+  },
+  {
+    "id": "surira-baku",
+    "apiId": 28,
+    "name": {
+      "fr": "Thriller Bark",
+      "en": "Thriller Bark"
+    },
+    "romaji": "Surirā Bāku",
+    "isYonko": false,
+    "totalBounty": null,
+    "status": null
+  },
+  {
+    "id": "roringu-kaizokudan",
+    "apiId": 29,
+    "name": {
+      "fr": "L’équipage du Rolling",
+      "en": "The crew of the Rolling"
+    },
+    "romaji": "Rōringu Kaizokudan",
+    "isYonko": false,
+    "totalBounty": null,
+    "status": null
+  },
+  {
+    "id": "makuro-ichimi",
+    "apiId": 30,
+    "name": {
+      "fr": "L’équipage des Marquereaux",
+      "en": "The Marquereaux crew"
+    },
+    "romaji": "Makuro Ichimi",
+    "isYonko": false,
+    "totalBounty": null,
+    "status": null
+  },
+  {
+    "id": "kyandi-kaizokudan",
+    "apiId": 31,
+    "name": {
+      "fr": "L’équipage des Candys",
+      "en": "The Candys crew"
+    },
+    "romaji": "Kyandi Kaizokudan",
+    "isYonko": false,
+    "totalBounty": null,
+    "status": "dissous"
+  },
+  {
+    "id": "hato-no-kaizokudan",
+    "apiId": 32,
+    "name": {
+      "fr": "L’équipage du Hearth",
+      "en": "The Hearth crew"
+    },
+    "romaji": "Hāto no Kaizokudan",
+    "isYonko": false,
+    "totalBounty": 500000000,
+    "status": "actif"
+  },
+  {
+    "id": "kiddo-kaizokudan",
+    "apiId": 33,
+    "name": {
+      "fr": "L’équipage de Kid",
+      "en": "The Kid crew"
+    },
+    "romaji": "Kiddo Kaizokudan",
+    "isYonko": false,
+    "totalBounty": 670000000,
+    "status": "actif"
+  },
+  {
+    "id": "hokinsu-kaizokudan",
+    "apiId": 34,
+    "name": {
+      "fr": "L’équipage de Hawkins",
+      "en": "The Hawkins crew"
+    },
+    "romaji": "Hōkinsu Kaizokudan",
+    "isYonko": false,
+    "totalBounty": 320000000,
+    "status": "actif"
+  },
+  {
+    "id": "doreku-kaizokudan",
+    "apiId": 35,
+    "name": {
+      "fr": "L’équipage de Drake",
+      "en": "Drake's crew"
+    },
+    "romaji": "Dorēku Kaizokudan",
+    "isYonko": false,
+    "totalBounty": 222000000,
+    "status": null
+  },
+  {
+    "id": "on-ea-kaizokudan",
+    "apiId": 36,
+    "name": {
+      "fr": "L’équipage du On-Air",
+      "en": "The On-Air crew"
+    },
+    "romaji": "On Ea Kaizokudan",
+    "isYonko": false,
+    "totalBounty": 350000000,
+    "status": "actif"
+  },
+  {
+    "id": "boni-kaizokudan",
+    "apiId": 37,
+    "name": {
+      "fr": "L’équipage de Bonney",
+      "en": "Bonney's crew"
+    },
+    "romaji": "Bonī Kaizokudan",
+    "isYonko": false,
+    "totalBounty": 140000000,
+    "status": null
+  },
+  {
+    "id": "faia-tanku-kaizokudan",
+    "apiId": 38,
+    "name": {
+      "fr": "L’équipage du Fire Tank",
+      "en": "The Fire Tank crew"
+    },
+    "romaji": "Faia Tanku Kaizokudan",
+    "isYonko": false,
+    "totalBounty": 485000000,
+    "status": "actif"
+  },
+  {
+    "id": "hakaiso-kaizokudan",
+    "apiId": 39,
+    "name": {
+      "fr": "L’équipage des Moines Dépravés",
+      "en": "The crew of Les Moines Dépravés"
+    },
+    "romaji": "Hakaisō Kaizokudan",
+    "isYonko": false,
+    "totalBounty": 108000000,
+    "status": "actif"
+  },
+  {
+    "id": "akumeito-kaizokudan",
+    "apiId": 40,
+    "name": {
+      "fr": "L’équipage des Acumates",
+      "en": "The Acumates crew"
+    },
+    "romaji": "Akumeito Kaizokudan",
+    "isYonko": false,
+    "totalBounty": 60000000,
+    "status": "inactif"
+  },
+  {
+    "id": "kuja-kaizokudan",
+    "apiId": 41,
+    "name": {
+      "fr": "L’équipage des Pirates Kuja",
+      "en": "The Kuja Pirates crew"
+    },
+    "romaji": "Kuja Kaizokudan",
+    "isYonko": false,
+    "totalBounty": 160000000,
+    "status": "actif"
+  },
+  {
+    "id": "supedo-kaizokudan",
+    "apiId": 42,
+    "name": {
+      "fr": "L’équipage des Spade",
+      "en": "The Spade crew"
+    },
+    "romaji": "Supēdo Kaizokudan",
+    "isYonko": false,
+    "totalBounty": 550000000,
+    "status": null
+  },
+  {
+    "id": "chahige-kaizokudan",
+    "apiId": 43,
+    "name": {
+      "fr": "L’équipage de Barbe Brune",
+      "en": "The crew of Barbe Brune"
+    },
+    "romaji": "Chahige Kaizokudan",
+    "isYonko": false,
+    "totalBounty": 80060000,
+    "status": null
+  },
+  {
+    "id": "hyakuju-kaizokudan",
+    "apiId": 44,
+    "name": {
+      "fr": "L’équipage aux Cent Bêtes",
+      "en": "The Hundred Beasts crew"
+    },
+    "romaji": "Hyakujū Kaizokudan",
+    "isYonko": true,
+    "totalBounty": 11179100000,
+    "status": "actif"
+  },
+  {
+    "id": "kinjishi-kaizokudan",
+    "apiId": 45,
+    "name": {
+      "fr": "L’équipage du Lion d’Or",
+      "en": "The crew of the Lion d'Or"
+    },
+    "romaji": "Kinjishi Kaizokudan",
+    "isYonko": false,
+    "totalBounty": null,
+    "status": null
+  },
+  {
+    "id": "burujamu-kaizoku-dan",
+    "apiId": 46,
+    "name": {
+      "fr": "L’équipage du Bluejam",
+      "en": "The Bluejam crew"
+    },
+    "romaji": "Burūjamu Kaizoku-dan",
+    "isYonko": false,
+    "totalBounty": 17700000,
+    "status": null
+  },
+  {
+    "id": "l-equipage-asl",
+    "apiId": 47,
+    "name": {
+      "fr": "L’équipage ASL",
+      "en": "The ASL crew"
+    },
+    "romaji": null,
+    "isYonko": false,
+    "totalBounty": null,
+    "status": "inactif"
+  },
+  {
+    "id": "nise-mugiwara-no-ichimi",
+    "apiId": 48,
+    "name": {
+      "fr": "Faux Equipage du Chapeau de Paille",
+      "en": "Faux Equipage du Chapeau de Paille"
+    },
+    "romaji": "Nise Mugiwara no Ichimi",
+    "isYonko": false,
+    "totalBounty": 26000000,
+    "status": null
+  },
+  {
+    "id": "karibu-kaizokudan",
+    "apiId": 49,
+    "name": {
+      "fr": "L’équipage de Caribou",
+      "en": "The Caribou crew"
+    },
+    "romaji": "Karibū Kaizokudan",
+    "isYonko": false,
+    "totalBounty": 400000000,
+    "status": null
+  },
+  {
+    "id": "shin-gyojin-kaizokudan",
+    "apiId": 50,
+    "name": {
+      "fr": "L’équipage des Nouveaux Hommes-Poissons",
+      "en": "The New Fishmen crew"
+    },
+    "romaji": "Shin Gyojin Kaizokudan",
+    "isYonko": false,
+    "totalBounty": null,
+    "status": null
+  },
+  {
+    "id": "furaingu-kaizokudan",
+    "apiId": 51,
+    "name": {
+      "fr": "L’équipage des Pirates Volants",
+      "en": "The Flying Pirates crew"
+    },
+    "romaji": "Furaingu Kaizokudan",
+    "isYonko": false,
+    "totalBounty": null,
+    "status": null
+  },
+  {
+    "id": "jairo-kaizokudan",
+    "apiId": 52,
+    "name": {
+      "fr": "L’équipage de Gyro",
+      "en": "Gyro's crew"
+    },
+    "romaji": "Jairo Kaizokudan",
+    "isYonko": false,
+    "totalBounty": 73000000,
+    "status": "arr�t�"
+  },
+  {
+    "id": "biggu-mamu-kaizokudan",
+    "apiId": 53,
+    "name": {
+      "fr": "L’équipage de Big Mom",
+      "en": "Big Mom's crew"
+    },
+    "romaji": "Biggu Mamu Kaizokudan",
+    "isYonko": true,
+    "totalBounty": 11121500000,
+    "status": "actif"
+  },
+  {
+    "id": "bagizu-deribari",
+    "apiId": 54,
+    "name": {
+      "fr": "L’équipage d’Expédition",
+      "en": "The Expedition crew"
+    },
+    "romaji": "Bagīzu Deribarī",
+    "isYonko": false,
+    "totalBounty": null,
+    "status": "actif"
+  },
+  {
+    "id": "utsukushiki-kaizoku-dan",
+    "apiId": 55,
+    "name": {
+      "fr": "L’équipage des Magnifiques Pirates",
+      "en": "The Magnificent Pirates crew"
+    },
+    "romaji": "Utsukushiki Kaizoku-dan",
+    "isYonko": false,
+    "totalBounty": 397000000,
+    "status": "actif"
+  },
+  {
+    "id": "baruto-kurabu",
+    "apiId": 56,
+    "name": {
+      "fr": "L’équipage de Bartolomeo",
+      "en": "Bartolomeo's crew"
+    },
+    "romaji": "Baruto Kurabu",
+    "isYonko": false,
+    "totalBounty": 267000000,
+    "status": "actif"
+  },
+  {
+    "id": "yonta-maria-dai-senda",
+    "apiId": 57,
+    "name": {
+      "fr": "Flotte Yonta Maria",
+      "en": "Fleet Yonta Maria"
+    },
+    "romaji": "Yonta Maria Dai-senda",
+    "isYonko": false,
+    "totalBounty": 50000000,
+    "status": "actif"
+  },
+  {
+    "id": "mikadzuki-no-norikumiin",
+    "apiId": 58,
+    "name": {
+      "fr": "L’équipage du Croissant de Lune",
+      "en": "The crew of the Moon Crescent"
+    },
+    "romaji": "Mikadzuki no norikumiin",
+    "isYonko": false,
+    "totalBounty": null,
+    "status": null
+  },
+  {
+    "id": "bareruzu-kaizokudan",
+    "apiId": 59,
+    "name": {
+      "fr": "L’équipage de Diez Barrels",
+      "en": "The Diez Barrels crew"
+    },
+    "romaji": "Bareruzu Kaizokudan",
+    "isYonko": false,
+    "totalBounty": null,
+    "status": null
+  },
+  {
+    "id": "toripuru-ekkusu-jimu-kakuto-rengo",
+    "apiId": 60,
+    "name": {
+      "fr": "XXX Gym Martial Arts Alliances",
+      "en": "XXX Gym Martial Arts Alliances"
+    },
+    "romaji": "Toripuru-Ekkusu Jimu Kakutō Rengō",
+    "isYonko": false,
+    "totalBounty": null,
+    "status": "actif"
+  },
+  {
+    "id": "shin-kyo-he-kaizoku-dan",
+    "apiId": 61,
+    "name": {
+      "fr": "Nouvel Equipage des Géants",
+      "en": "New Giant Crew"
+    },
+    "romaji": "Shin Kyo Hē Kaizoku-dan",
+    "isYonko": false,
+    "totalBounty": null,
+    "status": "actif"
+  },
+  {
+    "id": "rokkusu-kaizokudan",
+    "apiId": 62,
+    "name": {
+      "fr": "L’équipage de Rocks",
+      "en": "The Rocks crew"
+    },
+    "romaji": "Rokkusu Kaizokudan",
+    "isYonko": false,
+    "totalBounty": 500000000,
+    "status": "inactif"
+  },
+  {
+    "id": "gyanzakku-kaizokudan",
+    "apiId": 63,
+    "name": {
+      "fr": "l’équipage de Ganzack",
+      "en": "the Ganzack crew"
+    },
+    "romaji": "Gyanzakku Kaizokudan",
+    "isYonko": false,
+    "totalBounty": null,
+    "status": null
+  },
+  {
+    "id": "amigo-kaizokudan",
+    "apiId": 64,
+    "name": {
+      "fr": "L’équipage Amigo",
+      "en": "The Amigo crew"
+    },
+    "romaji": "Amīgo Kaizokudan",
+    "isYonko": false,
+    "totalBounty": null,
+    "status": null
+  },
+  {
+    "id": "fenikkusu-kaizokudan",
+    "apiId": 65,
+    "name": {
+      "fr": "L’équipage du Phoenix",
+      "en": "The Phoenix crew"
+    },
+    "romaji": "Fenikkusu Kaizokudan",
+    "isYonko": false,
+    "totalBounty": 100000000,
+    "status": null
+  },
+  {
+    "id": "baian-kaizoku-dan",
+    "apiId": 66,
+    "name": {
+      "fr": "L’équipage de Bayan",
+      "en": "Bayan's crew"
+    },
+    "romaji": "Baian Kaizoku-dan",
+    "isYonko": false,
+    "totalBounty": null,
+    "status": null
+  },
+  {
+    "id": "shunaida-kaizokudan",
+    "apiId": 67,
+    "name": {
+      "fr": "L’équipage des Pirates Schneider",
+      "en": "The Schneider Pirates crew"
+    },
+    "romaji": "Shunaidā Kaizokudan",
+    "isYonko": false,
+    "totalBounty": null,
+    "status": null
+  },
+  {
+    "id": "wetton-kaizoku-dan",
+    "apiId": 68,
+    "name": {
+      "fr": "L’équipage de Wetton",
+      "en": "The Wetton crew"
+    },
+    "romaji": "Wetton Kaizoku-dan",
+    "isYonko": false,
+    "totalBounty": 14800000,
+    "status": null
+  },
+  {
+    "id": "panpukin-kaizokudan",
+    "apiId": 69,
+    "name": {
+      "fr": "Les Pirates à la citrouille",
+      "en": "Pumpkin Pirates"
+    },
+    "romaji": "Panpukin Kaizokudan",
+    "isYonko": false,
+    "totalBounty": null,
+    "status": "dissous"
+  },
+  {
+    "id": "reddo-arozu-kaizokudan",
+    "apiId": 70,
+    "name": {
+      "fr": "L’équipage des Flèches Rouges",
+      "en": "The Red Arrows crew"
+    },
+    "romaji": "Reddo Arōzu Kaizokudan",
+    "isYonko": false,
+    "totalBounty": 1000000,
+    "status": null
+  },
+  {
+    "id": "chobihige-kaizokudan",
+    "apiId": 71,
+    "name": {
+      "fr": "L’équipage des Pirates à la Moustache",
+      "en": "The Pirates with Moustaches crew"
+    },
+    "romaji": "Chobihige Kaizokudan",
+    "isYonko": false,
+    "totalBounty": null,
+    "status": null
+  },
+  {
+    "id": "toranpu-kyodai",
+    "apiId": 72,
+    "name": {
+      "fr": "L’équipage des Pirates Trump",
+      "en": "The Trump Pirates crew"
+    },
+    "romaji": "Toranpu Kyōdai",
+    "isYonko": false,
+    "totalBounty": 38500000,
+    "status": null
+  },
+  {
+    "id": "gasupade-kaizokudan",
+    "apiId": 73,
+    "name": {
+      "fr": "L’équipage de Gasparde",
+      "en": "Gasparde's crew"
+    },
+    "romaji": "Gasupāde Kaizokudan",
+    "isYonko": false,
+    "totalBounty": 152000000,
+    "status": null
+  },
+  {
+    "id": "zeni-kaizoku-dan",
+    "apiId": 74,
+    "name": {
+      "fr": "L’équipage de Zenny",
+      "en": "Zenny's crew"
+    },
+    "romaji": "Zenī Kaizoku-dan",
+    "isYonko": false,
+    "totalBounty": null,
+    "status": null
+  },
+  {
+    "id": "barubaru-dan",
+    "apiId": 75,
+    "name": {
+      "fr": "L’équipage des Pirates du Sables",
+      "en": "The Pirates du Sables crew"
+    },
+    "romaji": "Barubaru Dan",
+    "isYonko": false,
+    "totalBounty": null,
+    "status": null
+  },
+  {
+    "id": "ochanoma-kaizokudan",
+    "apiId": 76,
+    "name": {
+      "fr": "L’équipage Tearoom",
+      "en": "The Tearoom crew"
+    },
+    "romaji": "Ochanoma Kaizokudan",
+    "isYonko": false,
+    "totalBounty": null,
+    "status": null
+  },
+  {
+    "id": "maddo-toreja-kaizokudan",
+    "apiId": 77,
+    "name": {
+      "fr": "L’équipage des Pirates Treasure",
+      "en": "The Pirates Treasure crew"
+    },
+    "romaji": "Maddo Torejā Kaizokudan",
+    "isYonko": false,
+    "totalBounty": null,
+    "status": "inactif"
+  },
+  {
+    "id": "barokku-wakusu",
+    "apiId": 78,
+    "name": {
+      "fr": "Baroque Works",
+      "en": "Baroque Works"
+    },
+    "romaji": "Barokku Wākusu",
+    "isYonko": false,
+    "totalBounty": 39970000,
+    "status": "dissous"
+  },
+  {
+    "id": "rubuniru-okoku",
+    "apiId": 79,
+    "name": {
+      "fr": "Royaume de Luvneel",
+      "en": "Royaume de Luvneel"
+    },
+    "romaji": "Rubunīru Ōkoku",
+    "isYonko": false,
+    "totalBounty": null,
+    "status": null
+  },
+  {
+    "id": "happo-suigun",
+    "apiId": 80,
+    "name": {
+      "fr": "La Flotte de Happou",
+      "en": "La Flotte de Happou"
+    },
+    "romaji": "Happō Suigun",
+    "isYonko": false,
+    "totalBounty": 500000000,
+    "status": "actif"
+  },
+  {
+    "id": "makuro-ichimi-81",
+    "apiId": 81,
+    "name": {
+      "fr": "L'Équipage des Maquereaux",
+      "en": "L'Équipage des Maquereaux"
+    },
+    "romaji": "Makuro Ichimi",
+    "isYonko": false,
+    "totalBounty": null,
+    "status": null
+  },
+  {
+    "id": "kaigun",
+    "apiId": 82,
+    "name": {
+      "fr": "Marine",
+      "en": "Marine"
+    },
+    "romaji": "Kaigun",
+    "isYonko": false,
+    "totalBounty": null,
+    "status": "actif"
+  },
+  {
+    "id": "sekai-kizoku",
+    "apiId": 83,
+    "name": {
+      "fr": "Dragon Célestes",
+      "en": "Dragon Célestes"
+    },
+    "romaji": "Sekai Kizoku",
+    "isYonko": false,
+    "totalBounty": null,
+    "status": "actif"
+  },
+  {
+    "id": "shibarikubi-no-bigaro",
+    "apiId": 84,
+    "name": {
+      "fr": "Bigaro",
+      "en": "Bigaro"
+    },
+    "romaji": "Shibarikubi no Bigaro",
+    "isYonko": false,
+    "totalBounty": 14900000,
+    "status": "inactif"
+  },
+  {
+    "id": "maddo-toreja-kaizokudan-85",
+    "apiId": 85,
+    "name": {
+      "fr": "L'Équipage de Mad Treasure",
+      "en": "L'Équipage de Mad Treasure"
+    },
+    "romaji": "Maddo Torejā Kaizokudan",
+    "isYonko": false,
+    "totalBounty": null,
+    "status": "inactif"
+  },
+  {
+    "id": "tontatta-okoku",
+    "apiId": 86,
+    "name": {
+      "fr": "Royaume de Tontatta",
+      "en": "Royaume de Tontatta"
+    },
+    "romaji": "Tontatta Ōkoku",
+    "isYonko": false,
+    "totalBounty": null,
+    "status": "actif"
+  },
+  {
+    "id": "mugiwara-dai-sendan",
+    "apiId": 87,
+    "name": {
+      "fr": "Armarda du Chapeau de Paille",
+      "en": "Armarda du Chapeau de Paille"
+    },
+    "romaji": "Mugiwara Dai-sendan",
+    "isYonko": false,
+    "totalBounty": 1022000,
+    "status": "actif"
+  },
+  {
+    "id": "bagizu-deribari-88",
+    "apiId": 88,
+    "name": {
+      "fr": "Baggy's Delivery",
+      "en": "Baggy's Delivery"
+    },
+    "romaji": "Bagīzu Deribarī",
+    "isYonko": false,
+    "totalBounty": 344000000,
+    "status": "actif"
+  },
+  {
+    "id": "buggy-s-delivery",
+    "apiId": 89,
+    "name": {
+      "fr": "Buggy's Delivery",
+      "en": "Buggy's Delivery"
+    },
+    "romaji": null,
+    "isYonko": false,
+    "totalBounty": null,
+    "status": "actif"
+  },
+  {
+    "id": "cipher-pol",
+    "apiId": 90,
+    "name": {
+      "fr": "Cipher Pol",
+      "en": "Cipher Pol"
+    },
+    "romaji": null,
+    "isYonko": false,
+    "totalBounty": null,
+    "status": "actif"
+  },
+  {
+    "id": "enies-lobby",
+    "apiId": 91,
+    "name": {
+      "fr": "Enies Lobby",
+      "en": "Enies Lobby"
+    },
+    "romaji": null,
+    "isYonko": false,
+    "totalBounty": null,
+    "status": null
+  },
+  {
+    "id": "impel-down",
+    "apiId": 92,
+    "name": {
+      "fr": "Impel Down",
+      "en": "Impel Down"
+    },
+    "romaji": null,
+    "isYonko": false,
+    "totalBounty": null,
+    "status": "actif"
+  },
+  {
+    "id": "royaume-de-goa",
+    "apiId": 93,
+    "name": {
+      "fr": "Royaume de Goa",
+      "en": "Royaume de Goa"
+    },
+    "romaji": null,
+    "isYonko": false,
+    "totalBounty": null,
+    "status": "actif"
+  },
+  {
+    "id": "village-de-shimotsuki",
+    "apiId": 94,
+    "name": {
+      "fr": "Village de Shimotsuki",
+      "en": "Village de Shimotsuki"
+    },
+    "romaji": null,
+    "isYonko": false,
+    "totalBounty": null,
+    "status": "actif"
+  },
+  {
+    "id": "archipel-des-argao",
+    "apiId": 95,
+    "name": {
+      "fr": "Archipel des Argao",
+      "en": "Archipel des Argao"
+    },
+    "romaji": null,
+    "isYonko": false,
+    "totalBounty": null,
+    "status": "actif"
+  },
+  {
+    "id": "ile-des-animaux-etranges",
+    "apiId": 96,
+    "name": {
+      "fr": "Île des animaux étranges",
+      "en": "Île des animaux étranges"
+    },
+    "romaji": null,
+    "isYonko": false,
+    "totalBounty": null,
+    "status": "actif"
+  },
+  {
+    "id": "archipel-des-gecko",
+    "apiId": 97,
+    "name": {
+      "fr": "Archipel des Gecko",
+      "en": "Archipel des Gecko"
+    },
+    "romaji": null,
+    "isYonko": false,
+    "totalBounty": null,
+    "status": "actif"
+  },
+  {
+    "id": "baratie",
+    "apiId": 98,
+    "name": {
+      "fr": "Baratie",
+      "en": "Baratie"
+    },
+    "romaji": null,
+    "isYonko": false,
+    "totalBounty": null,
+    "status": "actif"
+  },
+  {
+    "id": "archipel-conomi",
+    "apiId": 99,
+    "name": {
+      "fr": "Archipel Conomi",
+      "en": "Archipel Conomi"
+    },
+    "romaji": null,
+    "isYonko": false,
+    "totalBounty": null,
+    "status": "actif"
+  },
+  {
+    "id": "loguetown",
+    "apiId": 100,
+    "name": {
+      "fr": "Loguetown",
+      "en": "Loguetown"
+    },
+    "romaji": null,
+    "isYonko": false,
+    "totalBounty": null,
+    "status": "actif"
+  },
+  {
+    "id": "royaume-de-lvneel",
+    "apiId": 101,
+    "name": {
+      "fr": "Royaume de Lvneel",
+      "en": "Royaume de Lvneel"
+    },
+    "romaji": null,
+    "isYonko": false,
+    "totalBounty": null,
+    "status": null
+  },
+  {
+    "id": "baterilla",
+    "apiId": 102,
+    "name": {
+      "fr": "Baterilla",
+      "en": "Baterilla"
+    },
+    "romaji": null,
+    "isYonko": false,
+    "totalBounty": null,
+    "status": "actif"
+  },
+  {
+    "id": "royaume-malefique-de-black-drum",
+    "apiId": 103,
+    "name": {
+      "fr": "Royaume maléfique de Black Drum",
+      "en": "Royaume maléfique de Black Drum"
+    },
+    "romaji": null,
+    "isYonko": false,
+    "totalBounty": null,
+    "status": "actif"
+  },
+  {
+    "id": "ohara",
+    "apiId": 104,
+    "name": {
+      "fr": "Ohara",
+      "en": "Ohara"
+    },
+    "romaji": null,
+    "isYonko": false,
+    "totalBounty": null,
+    "status": "inactif"
+  },
+  {
+    "id": "pays-des-fleurs",
+    "apiId": 105,
+    "name": {
+      "fr": "Pays des fleurs",
+      "en": "Pays des fleurs"
+    },
+    "romaji": null,
+    "isYonko": false,
+    "totalBounty": null,
+    "status": "actif"
+  },
+  {
+    "id": "reverse-mountain",
+    "apiId": 106,
+    "name": {
+      "fr": "Reverse Mountain",
+      "en": "Reverse Mountain"
+    },
+    "romaji": null,
+    "isYonko": false,
+    "totalBounty": null,
+    "status": "actif"
+  },
+  {
+    "id": "ile-aux-cactus",
+    "apiId": 107,
+    "name": {
+      "fr": "Île aux cactus",
+      "en": "Île aux cactus"
+    },
+    "romaji": null,
+    "isYonko": false,
+    "totalBounty": null,
+    "status": "actif"
+  },
+  {
+    "id": "little-garden",
+    "apiId": 108,
+    "name": {
+      "fr": "Little Garden",
+      "en": "Little Garden"
+    },
+    "romaji": null,
+    "isYonko": false,
+    "totalBounty": null,
+    "status": "actif"
+  },
+  {
+    "id": "ile-de-drum",
+    "apiId": 109,
+    "name": {
+      "fr": "Île de Drum",
+      "en": "Île de Drum"
+    },
+    "romaji": null,
+    "isYonko": false,
+    "totalBounty": null,
+    "status": "actif"
+  },
+  {
+    "id": "alabasta",
+    "apiId": 110,
+    "name": {
+      "fr": "Alabasta",
+      "en": "Alabasta"
+    },
+    "romaji": null,
+    "isYonko": false,
+    "totalBounty": null,
+    "status": "actif"
+  },
+  {
+    "id": "long-ring-long-land",
+    "apiId": 111,
+    "name": {
+      "fr": "Long Ring Long Land",
+      "en": "Long Ring Long Land"
+    },
+    "romaji": null,
+    "isYonko": false,
+    "totalBounty": null,
+    "status": "actif"
+  },
+  {
+    "id": "source-de-l-insouciance",
+    "apiId": 112,
+    "name": {
+      "fr": "Source de l'insouciance",
+      "en": "Source de l'insouciance"
+    },
+    "romaji": null,
+    "isYonko": false,
+    "totalBounty": null,
+    "status": "actif"
+  },
+  {
+    "id": "water-seven",
+    "apiId": 113,
+    "name": {
+      "fr": "Water Seven",
+      "en": "Water Seven"
+    },
+    "romaji": null,
+    "isYonko": false,
+    "totalBounty": null,
+    "status": "actif"
+  },
+  {
+    "id": "archipel-des-sabaody",
+    "apiId": 114,
+    "name": {
+      "fr": "Archipel des Sabaody",
+      "en": "Archipel des Sabaody"
+    },
+    "romaji": null,
+    "isYonko": false,
+    "totalBounty": null,
+    "status": "actif"
+  },
+  {
+    "id": "archipel-de-boing",
+    "apiId": 115,
+    "name": {
+      "fr": "Archipel de Boing",
+      "en": "Archipel de Boing"
+    },
+    "romaji": null,
+    "isYonko": false,
+    "totalBounty": null,
+    "status": "actif"
+  },
+  {
+    "id": "erbaf",
+    "apiId": 116,
+    "name": {
+      "fr": "Erbaf",
+      "en": "Erbaf"
+    },
+    "romaji": null,
+    "isYonko": false,
+    "totalBounty": null,
+    "status": "actif"
+  },
+  {
+    "id": "pays-des-wa",
+    "apiId": 117,
+    "name": {
+      "fr": "Pays des Wa",
+      "en": "Pays des Wa"
+    },
+    "romaji": null,
+    "isYonko": false,
+    "totalBounty": null,
+    "status": "actif"
+  },
+  {
+    "id": "punk-hazard",
+    "apiId": 118,
+    "name": {
+      "fr": "Punk Hazard",
+      "en": "Punk Hazard"
+    },
+    "romaji": null,
+    "isYonko": false,
+    "totalBounty": null,
+    "status": "actif"
+  },
+  {
+    "id": "dressrosa",
+    "apiId": 119,
+    "name": {
+      "fr": "Dressrosa",
+      "en": "Dressrosa"
+    },
+    "romaji": null,
+    "isYonko": false,
+    "totalBounty": null,
+    "status": "actif"
+  },
+  {
+    "id": "green-bit",
+    "apiId": 120,
+    "name": {
+      "fr": "Green Bit",
+      "en": "Green Bit"
+    },
+    "romaji": null,
+    "isYonko": false,
+    "totalBounty": null,
+    "status": "actif"
+  },
+  {
+    "id": "zo",
+    "apiId": 121,
+    "name": {
+      "fr": "Zo",
+      "en": "Zo"
+    },
+    "romaji": null,
+    "isYonko": false,
+    "totalBounty": null,
+    "status": "actif"
+  },
+  {
+    "id": "royaume-de-prodence",
+    "apiId": 122,
+    "name": {
+      "fr": "Royaume de Prodence",
+      "en": "Royaume de Prodence"
+    },
+    "romaji": null,
+    "isYonko": false,
+    "totalBounty": null,
+    "status": "actif"
+  },
+  {
+    "id": "royaume-de-mogalo",
+    "apiId": 123,
+    "name": {
+      "fr": "Royaume de Mogalo",
+      "en": "Royaume de Mogalo"
+    },
+    "romaji": null,
+    "isYonko": false,
+    "totalBounty": null,
+    "status": "actif"
+  },
+  {
+    "id": "royaume-de-germa",
+    "apiId": 124,
+    "name": {
+      "fr": "Royaume de Germa",
+      "en": "Royaume de Germa"
+    },
+    "romaji": null,
+    "isYonko": false,
+    "totalBounty": null,
+    "status": "actif"
+  },
+  {
+    "id": "sphinx",
+    "apiId": 125,
+    "name": {
+      "fr": "Sphinx",
+      "en": "Sphinx"
+    },
+    "romaji": null,
+    "isYonko": false,
+    "totalBounty": null,
+    "status": "actif"
+  },
+  {
+    "id": "skypiea",
+    "apiId": 126,
+    "name": {
+      "fr": "Skypiea",
+      "en": "Skypiea"
+    },
+    "romaji": null,
+    "isYonko": false,
+    "totalBounty": null,
+    "status": "actif"
+  },
+  {
+    "id": "weatheria",
+    "apiId": 127,
+    "name": {
+      "fr": "Weatheria",
+      "en": "Weatheria"
+    },
+    "romaji": null,
+    "isYonko": false,
+    "totalBounty": null,
+    "status": "actif"
+  },
+  {
+    "id": "ile-des-hommes-poissons",
+    "apiId": 128,
+    "name": {
+      "fr": "Île des hommes-poissons",
+      "en": "Île des hommes-poissons"
+    },
+    "romaji": null,
+    "isYonko": false,
+    "totalBounty": null,
+    "status": "actif"
+  },
+  {
+    "id": "la-lune",
+    "apiId": 129,
+    "name": {
+      "fr": "La lune",
+      "en": "La lune"
+    },
+    "romaji": null,
+    "isYonko": false,
+    "totalBounty": null,
+    "status": "actif"
+  },
+  {
+    "id": "armee-revolutionnaire",
+    "apiId": 130,
+    "name": {
+      "fr": "Armée Révolutionnaire",
+      "en": "Armée Révolutionnaire"
+    },
+    "romaji": null,
+    "isYonko": false,
+    "totalBounty": null,
+    "status": "actif"
+  },
+  {
+    "id": "anciens-membres-du-baroque-works",
+    "apiId": 131,
+    "name": {
+      "fr": "Anciens membres du Baroque Works",
+      "en": "Anciens membres du Baroque Works"
+    },
+    "romaji": null,
+    "isYonko": false,
+    "totalBounty": null,
+    "status": "actif"
+  },
+  {
+    "id": "anciens-membres-du-cipher-pol",
+    "apiId": 132,
+    "name": {
+      "fr": "Anciens membres du Cipher Pol",
+      "en": "Anciens membres du Cipher Pol"
+    },
+    "romaji": null,
+    "isYonko": false,
+    "totalBounty": null,
+    "status": "actif"
+  },
+  {
+    "id": "anciens-membres-de-la-marine",
+    "apiId": 133,
+    "name": {
+      "fr": "Anciens membres de la Marine",
+      "en": "Anciens membres de la Marine"
+    },
+    "romaji": null,
+    "isYonko": false,
+    "totalBounty": null,
+    "status": "actif"
+  },
+  {
+    "id": "esclave",
+    "apiId": 134,
+    "name": {
+      "fr": "Esclave",
+      "en": "Esclave"
+    },
+    "romaji": null,
+    "isYonko": false,
+    "totalBounty": null,
+    "status": "actif"
+  },
+  {
+    "id": "freres-voleurs",
+    "apiId": 135,
+    "name": {
+      "fr": "Frères Voleurs",
+      "en": "Frères Voleurs"
+    },
+    "romaji": null,
+    "isYonko": false,
+    "totalBounty": null,
+    "status": "actif"
+  },
+  {
+    "id": "iile-de-la-couronne",
+    "apiId": 136,
+    "name": {
+      "fr": "IÎle de la couronne",
+      "en": "IÎle de la couronne"
+    },
+    "romaji": null,
+    "isYonko": false,
+    "totalBounty": null,
+    "status": "actif"
+  },
+  {
+    "id": "ile-d-asuka",
+    "apiId": 137,
+    "name": {
+      "fr": "Île d'Asuka",
+      "en": "Île d'Asuka"
+    },
+    "romaji": null,
+    "isYonko": false,
+    "totalBounty": null,
+    "status": "actif"
+  },
+  {
+    "id": "pirate-des-fleches-rouges",
+    "apiId": 138,
+    "name": {
+      "fr": "Pirate des flèches rouges",
+      "en": "Pirate des flèches rouges"
+    },
+    "romaji": null,
+    "isYonko": false,
+    "totalBounty": null,
+    "status": "actif"
+  },
+  {
+    "id": "pirate-au-foyer",
+    "apiId": 139,
+    "name": {
+      "fr": "Pirate au foyer",
+      "en": "Pirate au foyer"
+    },
+    "romaji": null,
+    "isYonko": false,
+    "totalBounty": null,
+    "status": "actif"
+  },
+  {
+    "id": "pirate-moustachus",
+    "apiId": 140,
+    "name": {
+      "fr": "Pirate Moustachus",
+      "en": "Pirate Moustachus"
+    },
+    "romaji": null,
+    "isYonko": false,
+    "totalBounty": null,
+    "status": "actif"
+  },
+  {
+    "id": "ile-de-mecha",
+    "apiId": 141,
+    "name": {
+      "fr": "Île de Mecha",
+      "en": "Île de Mecha"
+    },
+    "romaji": null,
+    "isYonko": false,
+    "totalBounty": null,
+    "status": "actif"
+  },
+  {
+    "id": "neo-marine",
+    "apiId": 142,
+    "name": {
+      "fr": "Néo Marine",
+      "en": "Néo Marine"
+    },
+    "romaji": null,
+    "isYonko": false,
+    "totalBounty": null,
+    "status": "actif"
+  },
+  {
+    "id": "gran-tesero",
+    "apiId": 143,
+    "name": {
+      "fr": "Gran Tesero",
+      "en": "Gran Tesero"
+    },
+    "romaji": null,
+    "isYonko": false,
+    "totalBounty": null,
+    "status": "actif"
+  },
+  {
+    "id": "elegia",
+    "apiId": 144,
+    "name": {
+      "fr": "Elegia",
+      "en": "Elegia"
+    },
+    "romaji": null,
+    "isYonko": false,
+    "totalBounty": null,
+    "status": "actif"
+  },
+  {
+    "id": "world-economic-journal",
+    "apiId": 145,
+    "name": {
+      "fr": "World Economic Journal",
+      "en": "World Economic Journal"
+    },
+    "romaji": null,
+    "isYonko": false,
+    "totalBounty": null,
+    "status": "actif"
+  },
+  {
+    "id": "cap-des-jumeaux",
+    "apiId": 146,
+    "name": {
+      "fr": "Cap des Jumeaux",
+      "en": "Cap des Jumeaux"
+    },
+    "romaji": null,
+    "isYonko": false,
+    "totalBounty": null,
+    "status": "actif"
+  },
+  {
+    "id": "equipage-de-bellamy",
+    "apiId": 147,
+    "name": {
+      "fr": "Equipage de Bellamy",
+      "en": "Equipage de Bellamy"
+    },
+    "romaji": null,
+    "isYonko": false,
+    "totalBounty": null,
+    "status": "actif"
+  },
+  {
+    "id": "equipage-de-pandaman",
+    "apiId": 148,
+    "name": {
+      "fr": "Equipage de Pandaman",
+      "en": "Equipage de Pandaman"
+    },
+    "romaji": null,
+    "isYonko": false,
+    "totalBounty": null,
+    "status": null
+  },
+  {
+    "id": "equipage-de-bigalo",
+    "apiId": 149,
+    "name": {
+      "fr": "Equipage de Bigalo",
+      "en": "Equipage de Bigalo"
+    },
+    "romaji": null,
+    "isYonko": false,
+    "totalBounty": null,
+    "status": null
+  }
+]

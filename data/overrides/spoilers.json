@@ -1,0 +1,4 @@
+{
+  "_comment": "animeCutoffChapter : dernier chapitre adapté par l'anime. Laisser null pour le déduire du dernier épisode connu de l'API ; à renseigner à la main si l'API a du retard sur la diffusion.",
+  "animeCutoffChapter": null
+}

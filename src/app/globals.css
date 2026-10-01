@@ -1,0 +1,45 @@
+@import "tailwindcss";
+
+/*
+ * Charte graphique : la mer de nuit en fond, le parchemin des avis de
+ * recherche pour les surfaces, le jaune paille et le rouge du gilet de Luffy
+ * en accents.
+ */
+@theme inline {
+  --font-sans: var(--font-body);
+  --font-display: var(--font-display);
+
+  --color-sea-950: #07121f;
+  --color-sea-900: #0b1a2b;
+  --color-sea-800: #12283f;
+  --color-sea-700: #1b3a5a;
+  --color-sea-600: #2a5380;
+  --color-foam: #e8f1fa;
+  --color-mist: #9db2c8;
+
+  --color-parchment: #f6ecd6;
+  --color-parchment-dark: #e3d2a9;
+  --color-ink: #2b2118;
+
+  --color-straw: #f2c14e;
+  --color-straw-dark: #c9972a;
+  --color-vest: #d7263d;
+  --color-vest-dark: #a81b2e;
+}
+
+html {
+  background: var(--color-sea-900);
+  color-scheme: dark;
+}
+
+body {
+  background:
+    radial-gradient(1200px 600px at 80% -10%, rgb(42 83 128 / 0.35), transparent 60%),
+    var(--color-sea-900);
+  color: var(--color-foam);
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-straw);
+  outline-offset: 2px;
+}

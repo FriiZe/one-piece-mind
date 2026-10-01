@@ -1,0 +1,3701 @@
+[
+  {
+    "id": "gomu-gomu-no-mi",
+    "apiId": 1,
+    "wikiTitle": "Gomu Gomu no Mi",
+    "name": {
+      "fr": "Fruit du Gum-Gum",
+      "en": "Gomu Gomu no Mi"
+    },
+    "romaji": "Gomu Gomu no Mi",
+    "type": "paramecia",
+    "description": "Le Gomu Gomu no Mi, aussi connu sous le nom du Fruit du Gum-Gum en français, est un Fruit du Démon de type Paramecia qui confère au corps de son utilisateur les mêmes propriétés que le caoutchouc, ce qui fait du mangeur un Homme Élastique (ゴム人間, Gomu Ningen). Ce fut autrefois un trésor que Shanks et son équipage avaient pris à un convoi du Gouvernement Mondial, protégé par le CP9, mais qui fut accidentellement mangé par Monkey D. Luffy",
+    "debut": {
+      "chapter": 1,
+      "episode": 1
+    },
+    "userIds": [
+      "monkey-d-luffy"
+    ]
+  },
+  {
+    "id": "bara-bara-no-mi",
+    "apiId": 2,
+    "wikiTitle": "Bara Bara no Mi",
+    "name": {
+      "fr": "Fruit de la Fragmentation",
+      "en": "Bara Bara no Mi"
+    },
+    "romaji": "Bara Bara no Mi",
+    "type": "paramecia",
+    "description": "Permet de séparer son corps en plusieurs parties et de faire léviter ces dernières. Les parties peuvent voler dans un secteur de 200 mètres de diamètre autour des pieds. Ces derniers, quant à eux, ne peuvent pas léviter (ils peuvent cependant marcher). Ce pouvoir rend l'utilisateur insensible aux armes tranchantes. N'importe quelle partie de l'utilisateur restera tout de même sensible à la douleur qu'éprouvent les autres parties détachées du corps.",
+    "debut": {
+      "chapter": 9,
+      "episode": 5
+    },
+    "userIds": [
+      "buggy"
+    ]
+  },
+  {
+    "id": "sube-sube-no-mi",
+    "apiId": 3,
+    "wikiTitle": "Sube Sube no Mi",
+    "name": {
+      "fr": "Fruit Glisse-Glisse",
+      "en": "Sube Sube no Mi"
+    },
+    "romaji": "Sube Sube no Mi",
+    "type": "paramecia",
+    "description": "Lisse la peau de l'utilisateur et le rend, par conséquent, plus beau. De plus, sa peau devient ultra-glissante et de ce fait, dévie les objets touchant son corps.",
+    "debut": {
+      "chapter": 51,
+      "episode": 46
+    },
+    "userIds": [
+      "alvida"
+    ]
+  },
+  {
+    "id": "kiro-kiro-no-mi",
+    "apiId": 4,
+    "wikiTitle": "Kiro Kiro no Mi",
+    "name": {
+      "fr": "Fruit du Kilo-Kilo",
+      "en": "Kiro Kiro no Mi"
+    },
+    "romaji": "Kilo Kilo no Mi",
+    "type": "paramecia",
+    "description": "Permet de faire varier la masse de l'utilisateur entre un poids plume et 10 tonnes. Il est à noter que l'utilisateur ne change pas de volume lorsqu'il change sa masse.",
+    "debut": {
+      "chapter": 112,
+      "episode": 66
+    },
+    "userIds": [
+      "mikita"
+    ]
+  },
+  {
+    "id": "bomu-bomu-no-mi",
+    "apiId": 5,
+    "wikiTitle": "Bomu Bomu no Mi",
+    "name": {
+      "fr": "Fruit Boum-Boum",
+      "en": "Bomu Bomu no Mi"
+    },
+    "romaji": "Bomu Bomu no Mi",
+    "type": "paramecia",
+    "description": "L'utilisateur peut faire exploser n'importe quelle partie de son corps y compris ses crottes de nez et son haleine, le rendant insensible aux explosions. Son utilisateur peut combiner son pouvoir avec un pistolet qu'il recharge en soufflant à l'intérieur.",
+    "debut": {
+      "chapter": 110,
+      "episode": 65
+    },
+    "userIds": [
+      "gem"
+    ]
+  },
+  {
+    "id": "hana-hana-no-mi",
+    "apiId": 6,
+    "wikiTitle": "Hana Hana no Mi",
+    "name": {
+      "fr": "Fruit Des Éclosions",
+      "en": "Hana Hana no Mi"
+    },
+    "romaji": "Hana Hana no Mi",
+    "type": "paramecia",
+    "description": "Permet de faire pousser des parties de son corps (ou même de créer des clones) partout où son utilisateur le désire, même sur une autre personne. Il peut assembler plusieurs exemplaires du même membre afin de créer, par exemple, des mains géantes ou de créer des clones de lui-même pour tromper ses adversaires.",
+    "debut": {
+      "chapter": 114,
+      "episode": 67
+    },
+    "userIds": [
+      "nico-robin"
+    ]
+  },
+  {
+    "id": "doru-doru-no-mi",
+    "apiId": 7,
+    "wikiTitle": "Doru Doru no Mi",
+    "name": {
+      "fr": "Ciro-Fruit",
+      "en": "Doru Doru no Mi"
+    },
+    "romaji": "Doru Doru no Mi",
+    "type": "paramecia",
+    "description": "Permet de produire une cire durcissant rapidement et qui peut se modeler en n'importe quelle forme. Cette cire devient très résistante lorsqu'elle est durcie mais reste toujours aussi vulnérable à la chaleur que de la cire normale. Il est à noter qu'elle peut bloquer la plupart des poisons.",
+    "debut": {
+      "chapter": 118,
+      "episode": 71
+    },
+    "userIds": [
+      "galdino"
+    ]
+  },
+  {
+    "id": "baku-baku-no-mi",
+    "apiId": 8,
+    "wikiTitle": "Baku Baku no Mi",
+    "name": {
+      "fr": "Fruit du Glouton",
+      "en": "Baku Baku no Mi"
+    },
+    "romaji": "Baku Baku no Mi",
+    "type": "paramecia",
+    "description": "Permet à son utilisateur de manger n'importe quoi et d'intégrer ces aliments à son propre corps. Par exemple, s'il mange un canon, sa langue peut se transformer en un vrai canon. Il peut également faire fusionner des êtres qu'il a mangés et s'auto-ingérer afin de mincir.",
+    "debut": {
+      "chapter": 131,
+      "episode": 79
+    },
+    "userIds": [
+      "wapol"
+    ]
+  },
+  {
+    "id": "mane-mane-no-mi",
+    "apiId": 9,
+    "wikiTitle": "Mane Mane no Mi",
+    "name": {
+      "fr": "Travesti-Fruit",
+      "en": "Mane Mane no Mi"
+    },
+    "romaji": "Mane Mane no Mi",
+    "type": "paramecia",
+    "description": "Permet de modifier son apparence en se touchant le visage de la main droite et de reprendre son apparence normale en se touchant son visage de la main gauche. Il suffit de toucher une personne une seule fois pour que son apparence soit mémorisée pour toujours. Son utilisateur peut aussi faire des assemblages de parties de personnes différentes mais il est incapable d'attaquer s'il ne possède pas son visage et son propre corps.",
+    "debut": {
+      "chapter": 156,
+      "episode": 92
+    },
+    "userIds": [
+      "kurozumi-higurashi",
+      "bentham"
+    ]
+  },
+  {
+    "id": "toge-toge-no-mi",
+    "apiId": 10,
+    "wikiTitle": "Toge Toge no Mi",
+    "name": {
+      "fr": "Fruit de l'Oursin",
+      "en": "Toge Toge no Mi"
+    },
+    "romaji": "Toge Toge no Mi",
+    "type": "paramecia",
+    "description": "Permet de transformer toutes les parties de son corps (même ses cheveux) en piques qui sont assez solides pour transpercer des murs de pierre. Ces piques sont aussi utiles pour réaliser des techniques d'acupuncture qui servent à augmenter la masse musculaire de son propre utilisateur.",
+    "debut": {
+      "chapter": 190,
+      "episode": 117
+    },
+    "userIds": [
+      "zala"
+    ]
+  },
+  {
+    "id": "supa-supa-no-mi",
+    "apiId": 11,
+    "wikiTitle": "Supa Supa no Mi",
+    "name": {
+      "fr": "Fruit Tailladant",
+      "en": "Supa Supa no Mi"
+    },
+    "romaji": "Supa Supa no Mi",
+    "type": "paramecia",
+    "description": "Permet de transformer des parties de son corps en acier tranchant. Son possesseur peut, par exemple, transformer son corps en lames tranchantes pour qu'elle le protège ou ses bras pour qu'ils deviennent des lames acérées.",
+    "debut": {
+      "chapter": 160,
+      "episode": 103
+    },
+    "userIds": [
+      "s-hawk"
+    ]
+  },
+  {
+    "id": "ori-ori-no-mi",
+    "apiId": 12,
+    "wikiTitle": "Ori Ori no Mi",
+    "name": {
+      "fr": "Fruit du Séquestre",
+      "en": "Ori Ori no Mi"
+    },
+    "romaji": "Ori Ori no Mi",
+    "type": "paramecia",
+    "description": "Permet à son utilisateur d'emprisonner ses adversaires en entrant en contact avec ceux-ci. Ces liens de constriction sont constitués d'une substance durcissant rapidement.",
+    "debut": {
+      "chapter": 217,
+      "episode": 130
+    },
+    "userIds": [
+      "hina"
+    ]
+  },
+  {
+    "id": "bane-bane-no-mi",
+    "apiId": 13,
+    "wikiTitle": "Bane Bane no Mi",
+    "name": {
+      "fr": "Fruit du Ressort",
+      "en": "Bane Bane no Mi"
+    },
+    "romaji": "Bane Bane no Mi",
+    "type": "paramecia",
+    "description": "Permet de transformer des parties de son corps en ressorts qui servent à faire rebondir l'utilisateur à une vitesse impressionnante et à augmenter la puissance de ses coups.",
+    "debut": {
+      "chapter": 231,
+      "episode": 150
+    },
+    "userIds": [
+      "bellamy"
+    ]
+  },
+  {
+    "id": "ito-ito-no-mi",
+    "apiId": 14,
+    "wikiTitle": "Ito Ito no Mi",
+    "name": {
+      "fr": "Fruit du Fil",
+      "en": "Ito Ito no Mi"
+    },
+    "romaji": "Ito Ito no Mi",
+    "type": "paramecia",
+    "description": "Permet de prendre le contrôle de quelqu'un et de s'en servir comme d'une marionnette ainsi que de découper aisément personnes et objets de diverses tailles dans un grand périmètre. Il permet également à son utilisateur de s'accrocher aux nuages pour 'voler', de relier plusieurs fils entre eux pour créer un fouet tranchant et en version 'combinée' sous forme de boule pour 'tirer' des balles de fils à la manière d'un tir de pistolet. Et pour finir, il peut créer un clone à partir de ficelles qui a les mêmes capacités que son propriétaire et ce clone est insensible aux armes blanches. Grâce à son fruit, son utilisateur peut s'administrer les premiers soins en recousant ses organes et ses plaies ouvertes.",
+    "debut": {
+      "chapter": 234,
+      "episode": 151
+    },
+    "userIds": [
+      "donquixote-doflamingo"
+    ]
+  },
+  {
+    "id": "noro-noro-no-mi",
+    "apiId": 15,
+    "wikiTitle": "Noro Noro no Mi",
+    "name": {
+      "fr": "Fruit Ramollo",
+      "en": "Noro Noro no Mi"
+    },
+    "romaji": "Noro Noro no Mi",
+    "type": "paramecia",
+    "description": "Permet d'émettre un rayon qui ralentit le mouvement de toute masse pendant 30 secondes. Ce rayon peut être réfléchi à l'aide d'un miroir et son utilisateur n'est pas immunisé contre les effets de ses rayons.",
+    "debut": {
+      "chapter": 308,
+      "episode": 210
+    },
+    "userIds": [
+      "foxy"
+    ]
+  },
+  {
+    "id": "doa-doa-no-mi",
+    "apiId": 16,
+    "wikiTitle": "Doa Doa no Mi",
+    "name": {
+      "fr": "Fruit du Portier",
+      "en": "Doa Doa no Mi"
+    },
+    "romaji": "Doa Doa no Mi",
+    "type": "paramecia",
+    "description": "Permet à son utilisateur de transformer en porte tout ce qu'il touche : que ce soit un mur, une partie d'un corps humain ou le vide. Dans ce dernier cas, l'utilisateur 'disparait' dans une autre dimension et peut se rendre n'importe où il le désire en ouvrant une porte à un endroit déterminé.",
+    "debut": {
+      "chapter": 326,
+      "episode": 231
+    },
+    "userIds": [
+      "blueno"
+    ]
+  },
+  {
+    "id": "awa-awa-no-mi",
+    "apiId": 17,
+    "wikiTitle": "Awa Awa no Mi",
+    "name": {
+      "fr": "Fruit des Bulles",
+      "en": "Awa Awa no Mi"
+    },
+    "romaji": "Awa Awa no Mi",
+    "type": "paramecia",
+    "description": "Permet à son possesseur de produire des bulles de savon qui nettoient tout jusqu'à retirer la force elle-même. Permet aussi de savonner la peau et de rendre l'ennemi tellement glissant qu'il ne peut presque plus se mouvoir ou tenir quoi que ce soit dans ses mains.",
+    "debut": {
+      "chapter": 408,
+      "episode": 293
+    },
+    "userIds": [
+      "kalifa"
+    ]
+  },
+  {
+    "id": "beri-beri-no-mi",
+    "apiId": 18,
+    "wikiTitle": "Beri Beri no Mi",
+    "name": {
+      "fr": "Fruit des Baies",
+      "en": "Beri Beri no Mi"
+    },
+    "romaji": "Beri Beri no Mi",
+    "type": "paramecia",
+    "description": "Permet à son utilisateur de diviser son corps en parties qui ressemblent à des baies et donc de rebondir sur toutes surfaces. Il est donc immunisé contre les coups de poing et les armes contondantes.",
+    "debut": {
+      "chapter": 426,
+      "episode": 309
+    },
+    "userIds": [
+      "very-good"
+    ]
+  },
+  {
+    "id": "sabi-sabi-no-mi",
+    "apiId": 19,
+    "wikiTitle": "Sabi Sabi no Mi",
+    "name": {
+      "fr": "Fruit de la rouille",
+      "en": "Sabi Sabi no Mi"
+    },
+    "romaji": "Sabi Sabi no Mi",
+    "type": "paramecia",
+    "description": "Permet à son possesseur de faire rouiller tout ce qu'il touche. Il peut donc rouiller toutes armes blanches ou membres d'êtres vivants.",
+    "debut": {
+      "chapter": 426,
+      "episode": 309
+    },
+    "userIds": [
+      "shu"
+    ]
+  },
+  {
+    "id": "shari-shari-no-mi",
+    "apiId": 20,
+    "wikiTitle": "Shari Shari no Mi",
+    "name": {
+      "fr": "Fruit des Roues",
+      "en": "Shari Shari no Mi"
+    },
+    "romaji": "Shari Shari no Mi",
+    "type": "paramecia",
+    "description": "Permet à son propriétaire de transformer des parties de son corps en roues et de les faire tourner à grande vitesse.",
+    "debut": {
+      "chapter": 428,
+      "episode": null
+    },
+    "userIds": [
+      "sharinguru"
+    ]
+  },
+  {
+    "id": "yomi-yomi-no-mi",
+    "apiId": 21,
+    "wikiTitle": "Yomi Yomi no Mi",
+    "name": {
+      "fr": "Fruit de la Résurrection",
+      "en": "Yomi Yomi no Mi"
+    },
+    "romaji": "Yomi Yomi no Mi",
+    "type": "paramecia",
+    "description": "Permet au propriétaire de revenir à la vie une fois mort (ce pouvoir ne marche qu'une seule fois). Son possesseur peut faire sortir son âme de son corps pour lui faire traverser les murs et la faire revenir dans son corps comme il le souhaite. De même, si on lui coupe la tête, son fruit lui permet de ramener celle-ci sur ses épaules par la seule force de sa volonté (l'âme est toujours reliée à son corps). Si son pouvoir est combiné à une épée, il peut blesser en gelant tout ennemi qu'il touche grâce au froid glacial des tréfonds que son âme apporte à son épée.",
+    "debut": {
+      "chapter": 442,
+      "episode": 337
+    },
+    "userIds": [
+      "brook"
+    ]
+  },
+  {
+    "id": "kage-kage-no-mi",
+    "apiId": 22,
+    "wikiTitle": "Kage Kage no Mi",
+    "name": {
+      "fr": "Fruit de l'Ombre",
+      "en": "Kage Kage no Mi"
+    },
+    "romaji": "Kage Kage no Mi",
+    "type": "paramecia",
+    "description": "Permet à son utilisateur de contrôler les ombres. Il peut couper les ombres de n'importe qui à l'aide d'une paire de ciseaux et les ombres ainsi retirées peuvent être enfermées dans des corps inertes, ce qui donne naissance à des zombies possédant les techniques de combat de la personne à qui appartenait l'ombre. Si les ombres sont enfermées dans le corps d'un être vivant, elles ne peuvent rester que peu de temps et ceci, en fonction de la force mentale de celui-ci. Pour exemple, son utilisateur en a consommé jusqu'à 1000. Il est à noter aussi que son utilisateur peut utiliser sa propre ombre et la rendre tangible. Il peut donc utilisé son ombre afin de se téléporter ou se protéger des attaques physiques.",
+    "debut": {
+      "chapter": 443,
+      "episode": 338
+    },
+    "userIds": [
+      "gecko-moria"
+    ]
+  },
+  {
+    "id": "horo-horo-no-mi",
+    "apiId": 23,
+    "wikiTitle": "Horo Horo no Mi",
+    "name": {
+      "fr": "Fruit de l'Ectoplasme",
+      "en": "Horo Horo no Mi"
+    },
+    "romaji": "Horo Horo no Mi",
+    "type": "paramecia",
+    "description": "Permet à son utilisateur de créer des fantômes ayant diverses capacités comme saper le moral ou exploser. Il permet également à son utilisateur de se rendre intangible : son utilisateur peut donc flotter dans l'air et traverser les murs mais a le gros désavantage de laisser son corps inerte sans défense.",
+    "debut": {
+      "chapter": 442,
+      "episode": 337
+    },
+    "userIds": [
+      "perona"
+    ]
+  },
+  {
+    "id": "suke-suke-no-mi",
+    "apiId": 24,
+    "wikiTitle": "Suke Suke no Mi",
+    "name": {
+      "fr": "Fruit de l'Invisibilité",
+      "en": "Suke Suke no Mi"
+    },
+    "romaji": "Suke Suke no Mi",
+    "type": "paramecia",
+    "description": "Permet à son utilisateur de se rendre invisible ainsi que tout ce qu'il touche (êtres vivants, armes à feu, etc.)",
+    "debut": {
+      "chapter": 444,
+      "episode": 339
+    },
+    "userIds": [
+      "absalom",
+      "shiryu"
+    ]
+  },
+  {
+    "id": "nikyu-nikyu-no-mi",
+    "apiId": 25,
+    "wikiTitle": "Nikyu Nikyu no Mi",
+    "name": {
+      "fr": "Fruit des Coussinets",
+      "en": "Nikyu Nikyu no Mi"
+    },
+    "romaji": "Nikyu Nikyu no Mi",
+    "type": "paramecia",
+    "description": "Permet à l'utilisateur, grâce à des coussinets qu'il détient aux mains, de projeter de puissantes ondes de chocs, de se téléporter ou bien de repousser tout et n'importe quoi tels que la douleur et les attaques physiques. Son utilisateur peut 'expédier' ses adversaires n'importe où il le désire.",
+    "debut": {
+      "chapter": 473,
+      "episode": 368
+    },
+    "userIds": [
+      "bartholomew-kuma",
+      "s-bear"
+    ]
+  },
+  {
+    "id": "jiki-jiki-no-mi",
+    "apiId": 26,
+    "wikiTitle": "Jiki Jiki no Mi",
+    "name": {
+      "fr": "Magnéto-Fruit",
+      "en": "Jiki Jiki no Mi"
+    },
+    "romaji": "Jiki Jiki no Mi",
+    "type": "paramecia",
+    "description": "Permet à l'utilisateur de manipuler les forces magnétiques, pouvant ainsi attirer les métaux à lui mais également les repousser. Il peut également créer un golem de métaux lorsqu'une grande quantité est réunie.",
+    "debut": {
+      "chapter": 504,
+      "episode": 398
+    },
+    "userIds": [
+      "eustass-kid"
+    ]
+  },
+  {
+    "id": "ope-ope-no-mi",
+    "apiId": 27,
+    "wikiTitle": "Ope Ope no Mi",
+    "name": {
+      "fr": "Fruit du Bistouri",
+      "en": "Ope Ope no Mi"
+    },
+    "romaji": "Ope Ope no Mi",
+    "type": "paramecia",
+    "description": "Ce fruit permet à celui qui le mange de créer une sphère dans laquelle il peut tout faire comme inter-changer quelque chose avec une autre ou allonger les portées de ses coups de sabre. Il peut également découper ses victimes sans les tuer ou annuler la gravité de tout ce qui est dans la sphère. Son utilisateur peut même aller jusqu'à ôter le cœur d'une personne en la laissant en vie ou échanger les personnalités de plusieurs personnes. Ce fruit est considéré comme le « fruit du démon ultime » en raison de sa capacité unique d'accorder à une autre personne une jeunesse éternelle en échange de la vie de l'utilisateur.",
+    "debut": {
+      "chapter": 504,
+      "episode": 398
+    },
+    "userIds": [
+      "trafalgar-d-water-law"
+    ]
+  },
+  {
+    "id": "shiro-shiro-no-mi",
+    "apiId": 28,
+    "wikiTitle": "Shiro Shiro no Mi",
+    "name": {
+      "fr": "Fruit du Château",
+      "en": "Shiro Shiro no Mi"
+    },
+    "romaji": "Shiro Shiro no Mi",
+    "type": "paramecia",
+    "description": "Permet à son utilisateur de devenir un homme-château dont les quelques particularités sont les suivantes : toute personne qui se trouve à une certaine portée de lui (délimité par une zone rouge) est miniaturisée et celle qui en sort retrouve sa taille normale, le détenteur peut créer des meurtrières dans son corps afin de permettre aux assiégés de « défendre la forteresse ». L'intérieur de l'utilisateur est composé de différentes pièces où les membres peuvent y vivre. L'utilisateur peut également se miniaturiser pour y rejoindre ses invités mais celui-ci laisse son corps physique inerte. Il peut remplacer ses jambes par un système de chenilles afin de se déplacer plus aisément ou bien se transformer en une sorte de golem fortifié armé pouvant servir de refuge à ses alliés.",
+    "debut": {
+      "chapter": 508,
+      "episode": 401
+    },
+    "userIds": [
+      "capone-bege"
+    ]
+  },
+  {
+    "id": "wara-wara-no-mi",
+    "apiId": 29,
+    "wikiTitle": "Wara Wara no Mi",
+    "name": {
+      "fr": "Fruit de la Paille",
+      "en": "Wara Wara no Mi"
+    },
+    "romaji": "Wara Wara no Mi",
+    "type": "paramecia",
+    "description": "Permet à son utilisateur de produire et de manipuler la paille à sa guise. Il peut aussi utiliser la paille afin de rediriger les dégâts.",
+    "debut": {
+      "chapter": 508,
+      "episode": 401
+    },
+    "userIds": [
+      "basil-hawkins"
+    ]
+  },
+  {
+    "id": "oto-oto-no-mi",
+    "apiId": 30,
+    "wikiTitle": "Oto Oto no Mi",
+    "name": {
+      "fr": "Fruit du Son",
+      "en": "Oto Oto no Mi"
+    },
+    "romaji": "Oto Oto no Mi",
+    "type": "paramecia",
+    "description": "Permet à l'utilisateur de transformer les parties de son corps en instruments et de s'en servir comme arme.",
+    "debut": {
+      "chapter": 509,
+      "episode": 402
+    },
+    "userIds": [
+      "scratchmen-apoo"
+    ]
+  },
+  {
+    "id": "mero-mero-no-mi",
+    "apiId": 31,
+    "wikiTitle": "Mero Mero no Mi",
+    "name": {
+      "fr": "Fruit de la passion",
+      "en": "Mero Mero no Mi"
+    },
+    "romaji": "Mero Mero no Mi",
+    "type": "paramecia",
+    "description": "Permet à son possesseur d'utiliser l'amour comme une arme fatale à l'aide de divers moyens. Ces techniques ont pour but de pétrifier les personnes ou objets et ont toutes une forme de cœur (rayons, baisers perçants, coups de pieds, etc.). Ce pouvoir ne fonctionne que sur les personnes ayant une attirance (même infime) pour l'utilisateur. Lorsque l'utilisateur inverse le processus, la victime n'a aucun souvenir du temps passé pendant sa pétrification.",
+    "debut": {
+      "chapter": 516,
+      "episode": 410
+    },
+    "userIds": [
+      "boa-hancock",
+      "s-snake"
+    ]
+  },
+  {
+    "id": "doku-doku-no-mi",
+    "apiId": 32,
+    "wikiTitle": "Doku Doku no Mi",
+    "name": {
+      "fr": "Fruit du Poison",
+      "en": "Doku Doku no Mi"
+    },
+    "romaji": "Doku Doku no Mi",
+    "type": "paramecia",
+    "description": "Permet à son utilisateur de sécréter une panoplie de poisons et de gaz toxiques. Les effets de ces venins changent selon les besoins de l'utilisateur. Ce dernier peut donner n'importe quelle forme à ses créations et il peut aussi se recouvrir entièrement le corps avec du poison pour se protéger.",
+    "debut": {
+      "chapter": 528,
+      "episode": 425
+    },
+    "userIds": [
+      "magellan"
+    ]
+  },
+  {
+    "id": "horu-horu-no-mi",
+    "apiId": 33,
+    "wikiTitle": "Horu Horu no Mi",
+    "name": {
+      "fr": "Fruit des Hormones",
+      "en": "Horu Horu no Mi"
+    },
+    "romaji": "Horu Horu no Mi",
+    "type": "paramecia",
+    "description": "Permet à son utilisateur de sécréter des hormones et de les injecter à lui-même ou à quelqu'un d'autre. Ces hormones peuvent modifier le corps de la personne à qui on les a injectés : on peut par exemple modifier son sexe. Ces hormones peuvent aussi soigner, revitaliser (adrénaline) ou grossir une partie du corps.",
+    "debut": {
+      "chapter": 537,
+      "episode": 439
+    },
+    "userIds": [
+      "emporio-ivankov"
+    ]
+  },
+  {
+    "id": "choki-choki-no-mi",
+    "apiId": 34,
+    "wikiTitle": "Choki Choki no Mi",
+    "name": {
+      "fr": "Fruit des Ciseaux",
+      "en": "Choki Choki no Mi"
+    },
+    "romaji": "Choki Choki no Mi",
+    "type": "paramecia",
+    "description": "Permet à son utilisateur de transformer ses mains en ciseaux qui coupent absolument n'importe quoi, des feuilles de papier jusqu'aux murs de briques. Toute matière découpée peut être maniée très facilement.",
+    "debut": {
+      "chapter": 540,
+      "episode": 442
+    },
+    "userIds": [
+      "inazuma"
+    ]
+  },
+  {
+    "id": "gura-gura-no-mi",
+    "apiId": 35,
+    "wikiTitle": "Gura Gura no Mi",
+    "name": {
+      "fr": "Fruit du Tremblement",
+      "en": "Gura Gura no Mi"
+    },
+    "romaji": "Gura Gura no Mi",
+    "type": "paramecia",
+    "description": "Permet à son utilisateur de créer des ondes sismiques pour ainsi provoquer des tremblements de terre ou fissures (même dans l'air ambiant) qui détruisent tout ce qui se trouve dans leurs zones d'effet. La force de ces ondes varie selon le désir de l'utilisateur et ces ondes peuvent être démesurément grandes. Le pouvoir de ce fruit est tellement puissant qu'il peut aussi provoquer des tsunamis ou des abîmes. Les ondes sismiques peuvent recouvrir les armes pour décupler la puissance de leurs coups.",
+    "debut": {
+      "chapter": 552,
+      "episode": 461
+    },
+    "userIds": [
+      "edward-newgate"
+    ]
+  },
+  {
+    "id": "kira-kira-no-mi",
+    "apiId": 36,
+    "wikiTitle": "Kira Kira no Mi",
+    "name": {
+      "fr": "Fruit Étincelant",
+      "en": "Kira Kira no Mi"
+    },
+    "romaji": "Kira Kira no Mi",
+    "type": "paramecia",
+    "description": "Permet à son utilisateur de transformer son corps en diamant. Il possède alors une résistance hors du commun.",
+    "debut": {
+      "chapter": 553,
+      "episode": 463
+    },
+    "userIds": [
+      "jozu"
+    ]
+  },
+  {
+    "id": "poke-poke-no-mi",
+    "apiId": 37,
+    "wikiTitle": "Poke Poke no Mi",
+    "name": {
+      "fr": "Fruit de la Poche",
+      "en": "Poke Poke no Mi"
+    },
+    "romaji": "Poke Poke no Mi",
+    "type": "paramecia",
+    "description": "Permet à l'utilisateur de créer des poches sur son corps pour y stocker des objets.",
+    "debut": {
+      "chapter": 553,
+      "episode": 461
+    },
+    "userIds": [
+      "blamenco"
+    ]
+  },
+  {
+    "id": "woshu-woshu-no-mi",
+    "apiId": 38,
+    "wikiTitle": "Woshu Woshu no Mi",
+    "name": {
+      "fr": "Fruit de la Lessive",
+      "en": "Woshu Woshu no Mi"
+    },
+    "romaji": "Woshu Woshu no Mi",
+    "type": "paramecia",
+    "description": "Permet à son utilisateur de laver les gens de leurs cœurs impurs et de les étendre sur un fil. Ces personnes ne peuvent ensuite plus se mouvoir.",
+    "debut": {
+      "chapter": 556,
+      "episode": 465
+    },
+    "userIds": [
+      "tsuru"
+    ]
+  },
+  {
+    "id": "fuwa-fuwa-no-mi",
+    "apiId": 39,
+    "wikiTitle": "Fuwa Fuwa no Mi",
+    "name": {
+      "fr": "Fruit Flottant",
+      "en": "Fuwa Fuwa no Mi"
+    },
+    "romaji": "Fuwa Fuwa no Mi",
+    "type": "paramecia",
+    "description": "Il permet à son utilisateur de soulever des objets en contrôlant la gravité. Vu que son utilisateur a des épées à la place de ses jambes, il peut également s'envoler. (Même si ce fruit est apparu dans un film, son utilisation a été démontrée dans le chapitre 0 de One Piece expliquant l'évasion de Shiki de la prison d'Impel Down).",
+    "debut": {
+      "chapter": 0,
+      "episode": 426
+    },
+    "userIds": [
+      "shiki"
+    ]
+  },
+  {
+    "id": "mato-mato-no-mi",
+    "apiId": 40,
+    "wikiTitle": "Mato Mato no Mi",
+    "name": {
+      "fr": "Fruit du Dans-le-mille",
+      "en": "Mato Mato no Mi"
+    },
+    "romaji": "Mato Mato no Mi",
+    "type": "paramecia",
+    "description": "Permet à son utilisateur de viser une « cible » à n'importe quel moment et à n'importe quel endroit avec n'importe quel objet, qu'il soit animé ou pas. Son utilisateur est limité à une cible par main en la touchant simplement : celles-ci sont mémorisées jusqu'à ce qu'il décide d'en toucher une autre.",
+    "debut": {
+      "chapter": 613,
+      "episode": 532
+    },
+    "userIds": []
+  },
+  {
+    "id": "fuku-fuku-no-mi",
+    "apiId": 41,
+    "wikiTitle": "Fuku Fuku no Mi",
+    "name": {
+      "fr": "Fruit du Vêtement",
+      "en": "Fuku Fuku no Mi"
+    },
+    "romaji": "Fuku Fuku no Mi",
+    "type": "paramecia",
+    "description": "Permet à son utilisateur de créer des vêtements à partir de feuilles ou de pierres.",
+    "debut": {
+      "chapter": 663,
+      "episode": 588
+    },
+    "userIds": [
+      "kin-emon"
+    ]
+  },
+  {
+    "id": "buki-buki-no-mi",
+    "apiId": 42,
+    "wikiTitle": "Buki Buki no Mi",
+    "name": {
+      "fr": "Armo-Fruit",
+      "en": "Buki Buki no Mi"
+    },
+    "romaji": "Buki Buki no Mi",
+    "type": "paramecia",
+    "description": "Permet à son utilisateur de transformer des parties de son corps en armes de tout genre (revolver, canon, sabre, missile…).",
+    "debut": {
+      "chapter": 682,
+      "episode": 608
+    },
+    "userIds": [
+      "baby-5"
+    ]
+  },
+  {
+    "id": "guru-guru-no-mi",
+    "apiId": 43,
+    "wikiTitle": "Guru Guru no Mi",
+    "name": {
+      "fr": "Fruit du tournis",
+      "en": "Guru Guru no Mi"
+    },
+    "romaji": "Guru Guru no Mi",
+    "type": "paramecia",
+    "description": "Permet à son utilisateur de rendre toutes les parties de son corps rotatives lui permettant donc de voler dans les airs et de produire des ouragans en faisant tourner à pleine vitesse une partie précise de son corps.",
+    "debut": {
+      "chapter": 692,
+      "episode": 618
+    },
+    "userIds": [
+      "buffalo"
+    ]
+  },
+  {
+    "id": "beta-beta-no-mi",
+    "apiId": 44,
+    "wikiTitle": "Beta Beta no Mi",
+    "name": {
+      "fr": "Fruit du Poisse-Poisse",
+      "en": "Beta Beta no Mi"
+    },
+    "romaji": "Beta Beta no Mi",
+    "type": "paramecia",
+    "description": "le corps de celui qui le mange peut générer du mucus à volonté. Ce mucus a les caractéristiques suivantes : collant, adhérent et inflammable. Il peut donc utiliser son mucus pour agripper des objets, coller à toutes les surfaces ou bien l'enflammer.",
+    "debut": {
+      "chapter": 700,
+      "episode": 629
+    },
+    "userIds": [
+      "trebol"
+    ]
+  },
+  {
+    "id": "hobi-hobi-no-mi",
+    "apiId": 45,
+    "wikiTitle": "Hobi Hobi no Mi",
+    "name": {
+      "fr": "Fruit du Joujou",
+      "en": "Hobi Hobi no Mi"
+    },
+    "romaji": "Hobi Hobi no Mi",
+    "type": "paramecia",
+    "description": "Permet de transformer n'importe quelle personne en jouet en la touchant simplement. Les personnes transformées n'ont plus le contrôle de leur corps et obéissent aux ordres qu'on leur donne (du moins, si l'utilisateur leur en a donné). Les effets de ce fruit arrêtent la croissance de son utilisateur au moment où il le mange. Les personnes transformées en jouet tombent dans l'oubli, tous les souvenirs liés à elles disparaissent et elles sont préservées du vieillissement. Si l'utilisateur tombe inconscient, toutes les personnes redeviennent elles-mêmes et les souvenirs des personnes qui les avaient oubliées refont surface.",
+    "debut": {
+      "chapter": 701,
+      "episode": 630
+    },
+    "userIds": [
+      "sugar"
+    ]
+  },
+  {
+    "id": "zushi-zushi-no-mi",
+    "apiId": 46,
+    "wikiTitle": "Zushi Zushi no Mi",
+    "name": {
+      "fr": "Fruit de la Gravité",
+      "en": "Zushi Zushi no Mi"
+    },
+    "romaji": "Zushi Zushi no Mi",
+    "type": "paramecia",
+    "description": "Permet à l'utilisateur de manipuler la gravité autour d'un endroit précis en envoyant des forces gravitationnelles comme des blocs rocheux, des météorites ou en exerçant une force contre un adversaire au sol.",
+    "debut": {
+      "chapter": 701,
+      "episode": 631
+    },
+    "userIds": [
+      "issho"
+    ]
+  },
+  {
+    "id": "bari-bari-no-mi",
+    "apiId": 47,
+    "wikiTitle": "Bari Bari no Mi",
+    "name": {
+      "fr": "Fruit de la Barrière",
+      "en": "Bari Bari no Mi"
+    },
+    "romaji": "Bari Bari no Mi",
+    "type": "paramecia",
+    "description": "Permet à son utilisateur de générer des barrières presque invisibles lui permettant de renvoyer ou de bloquer toute attaque. Ses barrières peuvent prendre toute une série de formes diverses (raquette, escaliers, ...).",
+    "debut": {
+      "chapter": 708,
+      "episode": 637
+    },
+    "userIds": [
+      "bartolomeo",
+      "kurozumi-semimaru"
+    ]
+  },
+  {
+    "id": "nui-nui-no-mi",
+    "apiId": 48,
+    "wikiTitle": "Nui Nui no Mi",
+    "name": {
+      "fr": "Fruit de la Couture",
+      "en": "Nui Nui no Mi"
+    },
+    "romaji": "Nui Nui no Mi",
+    "type": "paramecia",
+    "description": "Permet à son utilisateur de tout coudre et découdre sur des surfaces planes. Ces coutures sont assez résistantes pour tenir des personnes 'accrochées' au sol.",
+    "debut": {
+      "chapter": 711,
+      "episode": 641
+    },
+    "userIds": [
+      "leo"
+    ]
+  },
+  {
+    "id": "giro-giro-no-mi",
+    "apiId": 49,
+    "wikiTitle": "Giro Giro no Mi",
+    "name": {
+      "fr": "Fruit du Regard",
+      "en": "Giro Giro no Mi"
+    },
+    "romaji": "Giro Giro no Mi",
+    "type": "paramecia",
+    "description": "Permet à son utilisateur de lire dans l'esprit des gens, de transmettre ses propres souvenirs à quelqu'un d'autre ainsi que de générer des larmes de formes variées (ex : des larmes en formes de baleines ayant suffisamment de puissance pour pulvériser des caisses en bois et assommer un groupe de personnes). Il permet également à son utilisateur d'observer des évènements qui ont lieu loin de lui en « transmutant » son regard en oiseau pour observer depuis les cieux tout ce qui se passe dans un périmètre donné.",
+    "debut": {
+      "chapter": 712,
+      "episode": 640
+    },
+    "userIds": [
+      "viola"
+    ]
+  },
+  {
+    "id": "ato-ato-no-mi",
+    "apiId": 50,
+    "wikiTitle": "Ato Ato no Mi",
+    "name": {
+      "fr": "Fruit de l'Art",
+      "en": "Ato Ato no Mi"
+    },
+    "romaji": "Ato Ato no Mi",
+    "type": "paramecia",
+    "description": "Permet à son utilisateur de créer une brume qui transforme tout ce qu'elle touche en œuvre-d'art. Tout être ou objet transformé en œuvre-d'art perdent leur fonctionnalité originelle.",
+    "debut": {
+      "chapter": 714,
+      "episode": 635
+    },
+    "userIds": [
+      "giolla"
+    ]
+  },
+  {
+    "id": "jake-jake-no-mi",
+    "apiId": 51,
+    "wikiTitle": "Jake Jake no Mi",
+    "name": {
+      "fr": "Fruit de la Pelisse",
+      "en": "Jake Jake no Mi"
+    },
+    "romaji": "Jake Jake no Mi",
+    "type": "paramecia",
+    "description": "Permet à son utilisateur de s'approprier les capacités physiques et mentales d'un être vivant (humain ou animal) en le portant à la même manière qu'une veste.",
+    "debut": {
+      "chapter": 715,
+      "episode": 645
+    },
+    "userIds": [
+      "kelly-funk"
+    ]
+  },
+  {
+    "id": "pamu-pamu-no-mi",
+    "apiId": 52,
+    "wikiTitle": "Pamu Pamu no Mi",
+    "name": {
+      "fr": "Fruit du Paf-Paf",
+      "en": "Pamu Pamu no Mi"
+    },
+    "romaji": "Pamu Pamu no Mi",
+    "type": "paramecia",
+    "description": "Permet de gonfler jusqu'au point de rupture un objet et de provoquer son explosion ainsi que de faire exploser son utilisateur par simple contact.",
+    "debut": {
+      "chapter": 723,
+      "episode": 653
+    },
+    "userIds": [
+      "gladius"
+    ]
+  },
+  {
+    "id": "sui-sui-no-mi",
+    "apiId": 53,
+    "wikiTitle": "Sui Sui no Mi",
+    "name": {
+      "fr": "Fruit du Barbotage",
+      "en": "Sui Sui no Mi"
+    },
+    "romaji": "Sui Sui no Mi",
+    "type": "paramecia",
+    "description": "Permet à l'utilisateur de liquéfier toutes surfaces autour de lui. Il peut donc nager dans des surfaces telles que les murs ou même le sol.",
+    "debut": {
+      "chapter": 732,
+      "episode": 664
+    },
+    "userIds": [
+      "senor-pink",
+      "s-shark"
+    ]
+  },
+  {
+    "id": "ton-ton-no-mi",
+    "apiId": 54,
+    "wikiTitle": "Ton Ton no Mi",
+    "name": {
+      "fr": "Fruit du Tonne-Tonne",
+      "en": "Ton Ton no Mi"
+    },
+    "romaji": "Ton Ton no Mi",
+    "type": "paramecia",
+    "description": "Son utilisateur peut flotter dans l'air et ensuite atterrir sur l'ennemi afin de l'écraser au sol, très rapidement.",
+    "debut": {
+      "chapter": 735,
+      "episode": 667
+    },
+    "userIds": [
+      "machvise"
+    ]
+  },
+  {
+    "id": "hira-hira-no-mi",
+    "apiId": 55,
+    "wikiTitle": "Hira Hira no Mi",
+    "name": {
+      "fr": "Fruit du Vole-au-Vent",
+      "en": "Hira Hira no Mi"
+    },
+    "romaji": "Hira Hira no Mi",
+    "type": "paramecia",
+    "description": "Permet de transformer la consistance dure d'un objet comme une cape d'acier en celle d'un drapeau. Son utilisateur peut même rendre un sabre 'mou' et ensuite le re-solidifier une fois que celui-ci aura pris une forme différente. Il peut aussi devenir lui-même un drapeau capable de flotter.",
+    "debut": {
+      "chapter": 736,
+      "episode": 668
+    },
+    "userIds": [
+      "diamante"
+    ]
+  },
+  {
+    "id": "ishi-ishi-no-mi",
+    "apiId": 56,
+    "wikiTitle": "Ishi Ishi no Mi",
+    "name": {
+      "fr": "Fruit de la Caillasse",
+      "en": "Ishi Ishi no Mi"
+    },
+    "romaji": "Ishi Ishi no Mi",
+    "type": "paramecia",
+    "description": "Permet à son détenteur de se fondre dans la pierre et de créer toute forme qu'il désire comme un clone de lui-même exponentiellement plus grand. Il peut modifier et contrôler à volonté la forme de tout objet ou structure constitués de roches.",
+    "debut": {
+      "chapter": 736,
+      "episode": 669
+    },
+    "userIds": [
+      "pica"
+    ]
+  },
+  {
+    "id": "fude-fude-no-mi",
+    "apiId": 57,
+    "wikiTitle": "Fude Fude no Mi",
+    "name": {
+      "fr": "Fruit du Pinceau",
+      "en": "Fude Fude no Mi"
+    },
+    "romaji": "Fude Fude no Mi",
+    "type": "paramecia",
+    "description": "Permet à l'utilisateur de générer de l'encre à partir de son corps et de transformer les dessins créés avec cette encre en objets tridimensionnels et réalistes.",
+    "debut": {
+      "chapter": 754,
+      "episode": 691
+    },
+    "userIds": [
+      "kurozumi-kanjuro"
+    ]
+  },
+  {
+    "id": "nagi-nagi-no-mi",
+    "apiId": 58,
+    "wikiTitle": "Nagi Nagi no Mi",
+    "name": {
+      "fr": "Fruit de la Sourdine",
+      "en": "Nagi Nagi no Mi"
+    },
+    "romaji": "Nagi Nahi no Mi",
+    "type": "paramecia",
+    "description": "Permet de créer des barrières insonorisées permettant d'annuler totalement les sons qu'il produit (ou depuis une zone où il se trouve) et ceux venant de l'extérieur.",
+    "debut": {
+      "chapter": 764,
+      "episode": 703
+    },
+    "userIds": [
+      "donquixote-rosinante"
+    ]
+  },
+  {
+    "id": "chiyu-chiyu-no-mi",
+    "apiId": 59,
+    "wikiTitle": "Chiyu Chiyu no Mi",
+    "name": {
+      "fr": "Fruit de la Guérison",
+      "en": "Chiyu Chiyu no Mi"
+    },
+    "romaji": "Chiyu Chiyu no Mi",
+    "type": "paramecia",
+    "description": "Permet de soigner temporairement tout être vivant par l'intermédiaire des pleurs de son utilisateur. Il peut soigner de manière définitive des blessés en prenant un peu d'énergie vitale de personnes en bonne santé (cette énergie prend la forme d'une fleur de pissenlit). Par extension, son utilisateur peut réparer tout objet mais au détriment de son espérance de vie.",
+    "debut": {
+      "chapter": 774,
+      "episode": 714
+    },
+    "userIds": [
+      "mansherry"
+    ]
+  },
+  {
+    "id": "soru-soru-no-mi",
+    "apiId": 60,
+    "wikiTitle": "Soru Soru no Mi",
+    "name": {
+      "fr": "Fruit des Âmes",
+      "en": "Soru Soru no Mi"
+    },
+    "romaji": "Soru Soru no Mi",
+    "type": "paramecia",
+    "description": "Permet de manipuler l'âme des êtres humains au souhait de l'utilisateur. Ce dernier peut introduire une âme dans un objet ou un animal pour le rendre vivant afin de l'humaniser, c'est-à-dire de leur donner une conscience et le don de parole. Ces êtres sont appelés les 'Homies'. L'utilisateur peut aussi répartir sa propre âme en fragments qui vivent sous forme d'avatar du mangeur du fruit. Ces avatars ont pour rôle principal de récolter des fragments de vies d'êtres vivants afin de les redistribuer à son possesseur. Les personnes n'ayant aucune peur à l'idée de mourir ou possédant un pouvoir psychique sont plus résistantes à ce fruit.",
+    "debut": {
+      "chapter": 651,
+      "episode": 571
+    },
+    "userIds": [
+      "charlotte-linlin"
+    ]
+  },
+  {
+    "id": "mira-mira-no-mi",
+    "apiId": 61,
+    "wikiTitle": "Mira Mira no Mi",
+    "name": {
+      "fr": "Fruit du Miroir",
+      "en": "Mira Mira no Mi"
+    },
+    "romaji": "Mira Mira no Mi",
+    "type": "paramecia",
+    "description": "Permet à son utilisateur de pouvoir répéter les gestes de ses adversaires et de réfléchir les attaques de ces derniers. Il est également possible de refléter des personnes sur des animaux. Les êtres vivants peuvent être capturés dans les miroirs et se retrouver dans un monde où les miroirs sont uniquement les points d'accès à ce monde. Ces miroirs sont des sources d'informations pour son utilisateur et les personnes se trouvant actuellement dans le monde « miroir » à la suite de questions qui peuvent être posées par ceux-ci (par exemple, communication de la position d'une personne, etc.)",
+    "debut": {
+      "chapter": 831,
+      "episode": 790
+    },
+    "userIds": [
+      "charlotte-brulee"
+    ]
+  },
+  {
+    "id": "pero-pero-no-mi",
+    "apiId": 62,
+    "wikiTitle": "Pero Pero no Mi",
+    "name": {
+      "fr": "Fruit de la Léchouille",
+      "en": "Pero Pero no Mi"
+    },
+    "romaji": "Pero Pero no Mi",
+    "type": "paramecia",
+    "description": "Permet à l'utilisateur de transformer des objets en sucreries pour ensuite les lécher. Il peut aussi transformer en sucrerie des êtres vivants, ce qui aura pour effet de les tuer. De plus, son utilisateur peut créer des objets complexes telles que des escalators ayant les mêmes fonctions que leur versions 'réelles'. En contrepartie, les sucreries peuvent fondre après un certain laps de temps à cause de la chaleur ou du feu et également être mangées.",
+    "debut": {
+      "chapter": 834,
+      "episode": 795
+    },
+    "userIds": [
+      "charlotte-perospero"
+    ]
+  },
+  {
+    "id": "bisu-bisu-no-mi",
+    "apiId": 63,
+    "wikiTitle": "Bisu Bisu no Mi",
+    "name": {
+      "fr": "Fruit du Biscuit",
+      "en": "Bisu Bisu no Mi"
+    },
+    "romaji": "Bisu Bisu no Mi",
+    "type": "paramecia",
+    "description": "Permet à l'utilisateur de produire et de manipuler des biscuits à sa guise. Son utilisateur peut se couvrir de biscuits afin de se créer un alter-ego différent de lui-même et créer une multitude de copie de ce même alter-ego. Le biscuit peut être rendu inefficace via l'utilisation d'eau et il est donc plus facile pour un ennemi de les manger.",
+    "debut": {
+      "chapter": 835,
+      "episode": 796
+    },
+    "userIds": [
+      "charlotte-cracker"
+    ]
+  },
+  {
+    "id": "kuri-kuri-no-mi",
+    "apiId": 64,
+    "wikiTitle": "Kuri Kuri no Mi",
+    "name": {
+      "fr": "Fruit de la Crème",
+      "en": "Kuri Kuri no Mi"
+    },
+    "romaji": "Kuri Kuri no Mi",
+    "type": "paramecia",
+    "description": "Permet à l'utilisateur de produire et de manipuler de la crème à sa guise.",
+    "debut": {
+      "chapter": 846,
+      "episode": 810
+    },
+    "userIds": [
+      "charlotte-opera"
+    ]
+  },
+  {
+    "id": "bata-bata-no-mi",
+    "apiId": 65,
+    "wikiTitle": "Bata Bata no Mi",
+    "name": {
+      "fr": "Fruit du Beurre",
+      "en": "Bata Bata no Mi"
+    },
+    "romaji": "Bata Bata no Mi",
+    "type": "paramecia",
+    "description": "Permet à l'utilisateur de produire et de manipuler du beurre à sa guise.",
+    "debut": {
+      "chapter": 846,
+      "episode": 811
+    },
+    "userIds": [
+      "charlotte-galette"
+    ]
+  },
+  {
+    "id": "buku-buku-no-mi",
+    "apiId": 66,
+    "wikiTitle": "Buku Buku no Mi",
+    "name": {
+      "fr": "Fruit du Livre",
+      "en": "Buku Buku no Mi"
+    },
+    "romaji": "Buku Buku no Mi",
+    "type": "paramecia",
+    "description": "Permet à l'utilisateur de manipuler des livres à sa guise et de créer des dimensions à l'intérieur des pages du livre pour y piéger des objets ou des êtres vivants. Toutefois, brûler les livres libérera ceux confinés à l'intérieur.",
+    "debut": {
+      "chapter": 846,
+      "episode": 810
+    },
+    "userIds": [
+      "charlotte-mont-d-or"
+    ]
+  },
+  {
+    "id": "shibo-shibo-no-mi",
+    "apiId": 67,
+    "wikiTitle": "Shibo Shibo no Mi",
+    "name": {
+      "fr": "Fruit du Presse-Presse",
+      "en": "Shibo Shibo no Mi"
+    },
+    "romaji": "Shibo Shibo no Mi",
+    "type": "paramecia",
+    "description": "Permet à l'utilisateur de transmettre et de retirer du liquide aux objets et aux êtres vivants.",
+    "debut": {
+      "chapter": 846,
+      "episode": 812
+    },
+    "userIds": [
+      "charlotte-smoothie",
+      "pierre"
+    ]
+  },
+  {
+    "id": "memo-memo-no-mi",
+    "apiId": 68,
+    "wikiTitle": "Memo Memo no Mi",
+    "name": {
+      "fr": "Fruit des Souvenirs",
+      "en": "Memo Memo no Mi"
+    },
+    "romaji": "Memo Memo no Mi",
+    "type": "paramecia",
+    "description": "Permet à l'utilisateur d'extraire la mémoire d'une personne sous le format d'une pellicule. Par ce biais, il peut manipuler la mémoire de la personne en soustrayant des souvenirs indésirables et/ou en insérant des souvenirs pris précédemment à d'autres victimes. Lorsque certaines personnes deviennent amnésiques, son utilisateur peut leur faire récupérer momentanément leurs mémoires.",
+    "debut": {
+      "chapter": 851,
+      "episode": 818
+    },
+    "userIds": [
+      "charlotte-pudding"
+    ]
+  },
+  {
+    "id": "mochi-mochi-no-mi",
+    "apiId": 69,
+    "wikiTitle": "Mochi Mochi no Mi",
+    "name": {
+      "fr": "Fruit du Riz Gluant",
+      "en": "Mochi Mochi no Mi"
+    },
+    "romaji": "Mochi Mochi no Mi",
+    "type": "paramecia",
+    "description": "Permet à l'utilisateur de générer du riz gluant à volonté. Il peut ainsi bloquer les attaques de n'importe qui et également les piéger dans une grande quantité de riz gluant. De plus, il possède plusieurs similarités avec le fruit du Gum Gum, comme l'élongation des membres ou le blocage de tous tirs d'armes à feu. Néanmoins, la substance se dissout après avoir reçu une grande quantité d'eau. C'est un Paramecia spécial.",
+    "debut": {
+      "chapter": 863,
+      "episode": 833
+    },
+    "userIds": [
+      "charlotte-katakuri"
+    ]
+  },
+  {
+    "id": "hoya-hoya-no-mi",
+    "apiId": 70,
+    "wikiTitle": "Hoya Hoya no Mi",
+    "name": {
+      "fr": "Fruit de la Lampe",
+      "en": "Hoya Hoya no Mi"
+    },
+    "romaji": "Hoya Hoya no Mi",
+    "type": "paramecia",
+    "description": "Permet à l'utilisateur de faire sortir un puissant génie de son corps et d'attaquer ses adversaires avec lui. Ce génie est armé d'une hallebarde.",
+    "debut": {
+      "chapter": 864,
+      "episode": 826
+    },
+    "userIds": [
+      "charlotte-daifuku"
+    ]
+  },
+  {
+    "id": "netsu-netsu-no-mi",
+    "apiId": 71,
+    "wikiTitle": "Netsu Netsu no Mi",
+    "name": {
+      "fr": "Fruit de la Chaleur",
+      "en": "Netsu Netsu no Mi"
+    },
+    "romaji": "Netsu Netsu no Mi",
+    "type": "paramecia",
+    "description": "Permet à l'utilisateur de chauffer les parties de son corps et de transférer la chaleur sur des objets. La chaleur générée par son utilisateur le rend plus résistant aux armes blanches.",
+    "debut": {
+      "chapter": 864,
+      "episode": 827
+    },
+    "userIds": [
+      "charlotte-oven"
+    ]
+  },
+  {
+    "id": "kuku-kuku-no-mi",
+    "apiId": 72,
+    "wikiTitle": "Kuku Kuku no Mi",
+    "name": {
+      "fr": "Fruit du Cuistot",
+      "en": "Kuku Kuku no Mi"
+    },
+    "romaji": "Kuku Kuku no Mi",
+    "type": "paramecia",
+    "description": "Permet à l'utilisateur de transformer les objets naturels en ingrédients pour être, par la suite, mangés.",
+    "debut": {
+      "chapter": 868,
+      "episode": 832
+    },
+    "userIds": [
+      "streusen"
+    ]
+  },
+  {
+    "id": "gocha-gocha-no-mi",
+    "apiId": 73,
+    "wikiTitle": "Gocha Gocha no Mi",
+    "name": {
+      "fr": "Fruit de la Mixité",
+      "en": "Gocha Gocha no Mi"
+    },
+    "romaji": "Gocha Gocha no Mi",
+    "type": "paramecia",
+    "description": "Permet à l'utilisateur de fusionner avec d'autres personnes.",
+    "debut": {
+      "chapter": 900,
+      "episode": 875
+    },
+    "userIds": [
+      "charlotte-newshi"
+    ]
+  },
+  {
+    "id": "kobu-kobu-no-mi",
+    "apiId": 74,
+    "wikiTitle": "Kobu Kobu no Mi",
+    "name": {
+      "fr": "Fruit de l'Exaltation",
+      "en": "Kobu Kobu no Mi"
+    },
+    "romaji": "Kubu Kobu no Mi",
+    "type": "paramecia",
+    "description": "Permet à l'utilisateur de motiver les personnes dans un combat et d'éveiller leur pouvoir latent pour se battre.",
+    "debut": {
+      "chapter": 904,
+      "episode": 880
+    },
+    "userIds": [
+      "belo-betty"
+    ]
+  },
+  {
+    "id": "oshi-oshi-no-mi",
+    "apiId": 75,
+    "wikiTitle": "Oshi Oshi no Mi",
+    "name": {
+      "fr": "Fruit du Pousse-Pousse",
+      "en": "Oshi Oshi no Mi"
+    },
+    "romaji": "Oshi Oshi no Mi",
+    "type": "paramecia",
+    "description": "Permet à l'utilisateur de manipuler et de se déplacer dans la roche comme de l'argile. Il permet ainsi de créer des tunnels.",
+    "debut": {
+      "chapter": 904,
+      "episode": 880
+    },
+    "userIds": [
+      "morley"
+    ]
+  },
+  {
+    "id": "kibi-kibi-no-mi",
+    "apiId": 76,
+    "wikiTitle": "Kibi Kibi no Mi",
+    "name": {
+      "fr": "Fruit du Millet",
+      "en": "Kibi Kibi no Mi"
+    },
+    "romaji": "Kibi Kibi no Mi",
+    "type": "paramecia",
+    "description": "Permet à l'utilisateur de générer des dangos puis de rendre servile tout animal qui en consomme. Cela fonctionne sur les utilisateurs des SMILES, mais pas sur les utilisateurs de fruit du démon de type Zoan.",
+    "debut": {
+      "chapter": 911,
+      "episode": 893
+    },
+    "userIds": [
+      "kurozumi-tama"
+    ]
+  },
+  {
+    "id": "toki-toki-no-mi",
+    "apiId": 77,
+    "wikiTitle": "Toki Toki no Mi",
+    "name": {
+      "fr": "Fruit du Temps",
+      "en": "Toki Toki no Mi"
+    },
+    "romaji": "Toki Toki no Mi",
+    "type": "paramecia",
+    "description": "Permet à l'utilisateur de pouvoir voyager dans le futur.",
+    "debut": {
+      "chapter": 920,
+      "episode": 910
+    },
+    "userIds": [
+      "kouzuki-toki"
+    ]
+  },
+  {
+    "id": "juku-juku-no-mi",
+    "apiId": 78,
+    "wikiTitle": "Juku Juku no Mi",
+    "name": {
+      "fr": "Fruit de la Maturation",
+      "en": "Juku Juku no Mi"
+    },
+    "romaji": "Juku Juku no Mi",
+    "type": "paramecia",
+    "description": "Permet à l'utilisateur de mûrir et de décomposer des objets inanimés. Il peut également faire vieillir des êtres vivants.",
+    "debut": {
+      "chapter": 924,
+      "episode": 916
+    },
+    "userIds": [
+      "shinobu"
+    ]
+  },
+  {
+    "id": "maki-maki-no-mi",
+    "apiId": 79,
+    "wikiTitle": "Maki Maki no Mi",
+    "name": {
+      "fr": "Fruit du Parchemin",
+      "en": "Maki Maki no Mi"
+    },
+    "romaji": "Maki Maki no Mi",
+    "type": "paramecia",
+    "description": "Permet à l'utilisateur de créer et de manipuler des parchemins à volonté. Les parchemins ont des propriétés spéciales, comme le pouvoir de stocker des objets ou des attaques à l'intérieur.",
+    "debut": {
+      "chapter": 817,
+      "episode": 768
+    },
+    "userIds": []
+  },
+  {
+    "id": "moku-moku-no-mi",
+    "apiId": 80,
+    "wikiTitle": "Moku Moku no Mi",
+    "name": {
+      "fr": "Fruit Fumigène",
+      "en": "Moku Moku no Mi"
+    },
+    "romaji": "Moku Moku no Mi",
+    "type": "logia",
+    "description": "le corps de celui qui le mange se transforme en fumée. Il peut alors créer de la fumée pour attraper ses adversaires et peut se propulser avec sa fumée pour se déplacer plus vite et ainsi voler.",
+    "debut": {
+      "chapter": 100,
+      "episode": 48
+    },
+    "userIds": [
+      "smoker"
+    ]
+  },
+  {
+    "id": "suna-suna-no-mi",
+    "apiId": 81,
+    "wikiTitle": "Suna Suna no Mi",
+    "name": {
+      "fr": "Fruit des Sables",
+      "en": "Suna Suna no Mi"
+    },
+    "romaji": "Suna Suna no Mi",
+    "type": "logia",
+    "description": "le corps de celui qui le mange se transforme en sable. Il peut contrôler le sable à sa guise et peut assécher l'humidité avec ses mains pouvant ainsi par exemple assécher l'eau présente dans le corps de son adversaire et par conséquent le tuer, envoyer des vagues de sables, des lames de sables et des tempêtes de sable balayant tout sur son passage. Toutefois, son corps redevient solide s'il entre en contact avec un liquide (sang, eau...).",
+    "debut": {
+      "chapter": 127,
+      "episode": 77
+    },
+    "userIds": []
+  },
+  {
+    "id": "mera-mera-no-mi",
+    "apiId": 82,
+    "wikiTitle": "Mera Mera no Mi",
+    "name": {
+      "fr": "Pyro-Fruit",
+      "en": "Mera Mera no Mi"
+    },
+    "romaji": "Mera Mera no Mi",
+    "type": "logia",
+    "description": "le corps de celui qui le mange se transforme en feu. Il peut donc créer des déflagrations surpuissantes et contrôler les températures ambiantes. Il peut aussi utiliser son feu pour se propulser et aller beaucoup plus vite. Cependant, le feu ne résiste pas au magma.",
+    "debut": {
+      "chapter": 158,
+      "episode": 94
+    },
+    "userIds": [
+      "portgas-d-ace",
+      "sabo"
+    ]
+  },
+  {
+    "id": "goro-goro-no-mi",
+    "apiId": 83,
+    "wikiTitle": "Goro Goro no Mi",
+    "name": {
+      "fr": "Fulguro-Fruit",
+      "en": "Goro Goro no Mi"
+    },
+    "romaji": "Goro Goro no Mi",
+    "type": "logia",
+    "description": "le corps de celui qui le mange se transforme en foudre. Il peut donc se déplacer à la vitesse de la foudre et foudroyer n'importe quoi mis à part les éléments non-conducteurs tels que le caoutchouc. Il peut créer de puissants orages ou des sphères de foudre très puissantes. En combinant le Haki à sa foudre, son utilisateur peut entendre des choses à plus de 1 kilomètre à la ronde. Il peut également s'auto-réanimer s'il tombe inconscient.",
+    "debut": {
+      "chapter": 241,
+      "episode": 155
+    },
+    "userIds": [
+      "enel"
+    ]
+  },
+  {
+    "id": "hie-hie-no-mi",
+    "apiId": 84,
+    "wikiTitle": "Hie Hie no Mi",
+    "name": {
+      "fr": "Fruit du Givre",
+      "en": "Hie Hie no Mi"
+    },
+    "romaji": "Hie Hie no Mi",
+    "type": "logia",
+    "description": "le corps de celui qui le mange se transforme en glace. Il est capable de geler n'importe quoi et quasiment n'importe qui, lancer des vagues surpuissantes d'air glacé qui peuvent tout geler sur leurs passages et est immunisé aux différentiels de température quand celui-ci intensifie le froid ambiant. Son utilisateur peut neutraliser ses opposants en un tour de main ou même geler une vaste étendue d'eau pendant 1 semaine.",
+    "debut": {
+      "chapter": 303,
+      "episode": 225
+    },
+    "userIds": [
+      "kuzan"
+    ]
+  },
+  {
+    "id": "yami-yami-no-mi",
+    "apiId": 85,
+    "wikiTitle": "Yami Yami no Mi",
+    "name": {
+      "fr": "Fruit des Ténèbres",
+      "en": "Yami Yami no Mi"
+    },
+    "romaji": "Yami Yami no Mi",
+    "type": "logia",
+    "description": "le corps de celui qui le mange se transforme en ténèbres. Il devient capable de modifier la gravité afin d'attirer à lui et d'absorber à peu près n'importe quoi dans un 'trou noir' et de les relâcher par la suite. Il permet aussi d'annuler les pouvoirs des autres utilisateurs de fruit du démon lorsqu'il les touche. Par ailleurs, il s'agit du seul Logia qui ne puisse pas éviter les coups physiques, son utilisateur acquiert dès lors une forte sensibilité à la douleur. À noter qu'il peut absorber le pouvoir du fruit du démon de son possesseur comme Marshall D. Teach le fera avec Barbe Blanche.",
+    "debut": {
+      "chapter": 440,
+      "episode": 325
+    },
+    "userIds": [
+      "marshall-d-teach"
+    ]
+  },
+  {
+    "id": "pika-pika-no-mi",
+    "apiId": 86,
+    "wikiTitle": "Pika Pika no Mi",
+    "name": {
+      "fr": "Fruit Luminescent",
+      "en": "Pika Pika no Mi"
+    },
+    "romaji": "Pika Pika no Mi",
+    "type": "logia",
+    "description": "le corps de celui qui le mange se transforme en lumière. Il est alors capable de se déplacer et de frapper quasiment n'importe qui rapidement. Il peut également se déplacer à la vitesse de la lumière, émettre des rayons explosifs et lumineux, aveugler ses ennemis et créer des armes constituées de lumière (épée, lance...).",
+    "debut": {
+      "chapter": 506,
+      "episode": 400
+    },
+    "userIds": [
+      "borsalino"
+    ]
+  },
+  {
+    "id": "magu-magu-no-mi",
+    "apiId": 87,
+    "wikiTitle": "Magu Magu no Mi",
+    "name": {
+      "fr": "Fruit du Magma",
+      "en": "Magu Magu no Mi"
+    },
+    "romaji": "Magu Magu no Mi",
+    "type": "logia",
+    "description": "le corps de celui qui le mange se transforme en lave. Il peut alors faire fondre tout ce qu'il veut et quasiment n'importe qui. Il peut aussi créer des mains géantes de lave qui, après avoir été lancées dans l'atmosphère, font redescendre les particules volcaniques sur la terre ferme qui peuvent causer de gros dégâts. Le feu est impuissant contre le magma.",
+    "debut": {
+      "chapter": 554,
+      "episode": 463
+    },
+    "userIds": [
+      "sakazuki"
+    ]
+  },
+  {
+    "id": "numa-numa-no-mi",
+    "apiId": 88,
+    "wikiTitle": "Numa Numa no Mi",
+    "name": {
+      "fr": "Fruit du Marais",
+      "en": "Numa Numa no Mi"
+    },
+    "romaji": "Numa Numa no Mi",
+    "type": "logia",
+    "description": "le corps de celui qui le mange se transforme en boue et devient un marais vivant. Il peut créer des marécages sans fond pour empêcher ses victimes de s'enfuir : plus ses victimes se débattent, plus elles s'enfoncent. Il peut grâce à ce principe les enfermer dans son corps tout en gardant sa taille initiale. Cela permet également de conserver des armes dans son propre corps, comme une mitrailleuse ou une faux, et de les faire sortir pour s'en servir le moment voulu.",
+    "debut": {
+      "chapter": 603,
+      "episode": 521
+    },
+    "userIds": [
+      "caribou"
+    ]
+  },
+  {
+    "id": "gasu-gasu-no-mi",
+    "apiId": 89,
+    "wikiTitle": "Gasu Gasu no Mi",
+    "name": {
+      "fr": "Fruit du Gaz",
+      "en": "Gasu Gasu no Mi"
+    },
+    "romaji": "Gasu Gasu no Mi",
+    "type": "logia",
+    "description": "le corps de celui qui le mange se transforme en gaz. Ainsi, son corps peut changer de forme à sa guise. Il peut flotter très haut et se faufiler par n'importe quel passage étroit ou impossible d'accès en temps normal. Il semble être immunisé contre certains poisons, peut en créer d'autres comme des gaz hallucinogènes et peut même purifier l'air intoxiqué. Il peut étouffer ses victimes en les privant d'oxygène. Il est également capable de créer un gaz explosif ainsi que de cracher un rayon capable de faire fondre le métal.",
+    "debut": {
+      "chapter": 658,
+      "episode": 581
+    },
+    "userIds": [
+      "caesar-clown"
+    ]
+  },
+  {
+    "id": "yuki-yuki-no-mi",
+    "apiId": 90,
+    "wikiTitle": "Yuki Yuki no Mi",
+    "name": {
+      "fr": "Fruit du Flocon",
+      "en": "Yuki Yuki no Mi"
+    },
+    "romaji": "Yuki Yuki no Mi",
+    "type": "logia",
+    "description": "le corps de celui qui le mange se transforme en neige. Il peut créer un violent blizzard, des barrières solides de neige ou même des igloos. Il peut aussi refroidir ses adversaires par le biais de son corps afin de, par exemple, les mettre en état de stase. Il peut aussi se transformer en 'monstre' de neige, se doter d'une paire d'ailes de neige et transformer ces parties en glace aussi tranchantes et solides que l'acier. Il permet également de donner forme à des créatures de neige (ex : lapins de neige) et de s'en servir comme projectile. Enfin, son utilisateur peut se servir de son pouvoir pour manipuler des pics de neige lui servant de sabres.",
+    "debut": {
+      "chapter": 681,
+      "episode": 607
+    },
+    "userIds": [
+      "monet"
+    ]
+  },
+  {
+    "id": "ushi-ushi-no-mi",
+    "apiId": 91,
+    "wikiTitle": null,
+    "name": {
+      "fr": "Fruit du Bovin, version Bison",
+      "en": "Fruit du Bovin, Bison version"
+    },
+    "romaji": "Ushi Ushi no Mi",
+    "type": "zoan",
+    "description": "Celui qui le mange devient à moitié bison. Sa vitesse, ses réflexes et sa force sont nettement accrus.",
+    "debut": null,
+    "userIds": []
+  },
+  {
+    "id": "hito-hito-no-mi",
+    "apiId": 92,
+    "wikiTitle": "Hito Hito no Mi",
+    "name": {
+      "fr": "Fruit de l'Humain",
+      "en": "Hito Hito no Mi"
+    },
+    "romaji": "Hito Hito no Mi",
+    "type": "zoan",
+    "description": "celui qui le mange devient à moitié humain. Son utilisateur étant à la base un renne, celui-ci a attrapé donc une intelligence lui permettant d'acquérir une grande quantité de connaissance. Avant l'ellipse, Chopper devait prendre une Rumble-Ball pour avoir plus de transformation pendant 3 minutes1 (si au bout des 3 minutes il reprenait une Rumble-Ball, il ne contrôlait plus ses transformations et s'il prenait une 3e Rumble-Ball, il devenait un monstre gigantesque mais inconscient, détruisant ennemis comme alliés). Après l'ellipse, il maîtrise parfaitement toutes les transformations et lorsqu'il prend une Rumble-Ball il devient le monstre gigantesque mais en se contrôlant.",
+    "debut": {
+      "chapter": 138,
+      "episode": 83
+    },
+    "userIds": [
+      "tony-tony-chopper"
+    ]
+  },
+  {
+    "id": "tori-tori-no-mi-model-falcon",
+    "apiId": 93,
+    "wikiTitle": "Tori Tori no Mi, Model: Falcon",
+    "name": {
+      "fr": "Fruit du Volatile, version Faucon",
+      "en": "Tori Tori no Mi, Model: Falcon"
+    },
+    "romaji": "Tori Tori no Mi",
+    "type": "zoan",
+    "description": "celui qui le mange devient à moitié faucon. Ce pouvoir lui offre une vue perçante, une rapidité surprenante et donne la capacité de voler.",
+    "debut": {
+      "chapter": 169,
+      "episode": 106
+    },
+    "userIds": [
+      "pell"
+    ]
+  },
+  {
+    "id": "mogu-mogu-no-mi",
+    "apiId": 94,
+    "wikiTitle": "Mogu Mogu no Mi",
+    "name": {
+      "fr": "Fruit Fouisseur",
+      "en": "Mogu Mogu no Mi"
+    },
+    "romaji": "Mogu Mogu no Mi",
+    "type": "zoan",
+    "description": "celui qui le mange devient à moitié taupe. Il peut ainsi creuser de gigantesques galeries dans presque tous les matériaux.",
+    "debut": {
+      "chapter": 184,
+      "episode": 113
+    },
+    "userIds": [
+      "drophy"
+    ]
+  },
+  {
+    "id": "inu-inu-no-mi-model-dachshund",
+    "apiId": 95,
+    "wikiTitle": "Inu Inu no Mi, Model: Dachshund",
+    "name": {
+      "fr": "Fruit du Canidé, version Basset",
+      "en": "Inu Inu no Mi, Model: Dachshund"
+    },
+    "romaji": "Inu Inu no Mi moderu Dakkusufunto",
+    "type": "zoan",
+    "description": "celui qui le mange devient à moitié basset. Étant donné que son utilisateur est une arme à feu, cela en a fait un être mi-fusil mi-chien.",
+    "debut": {
+      "chapter": 184,
+      "episode": 113
+    },
+    "userIds": [
+      "lassoo"
+    ]
+  },
+  {
+    "id": "inu-inu-no-mi-model-jackal",
+    "apiId": 96,
+    "wikiTitle": "Inu Inu no Mi, Model: Jackal",
+    "name": {
+      "fr": "Fruit du Canidé, version Chacal",
+      "en": "Inu Inu no Mi, Model: Jackal"
+    },
+    "romaji": "Inu Inu no Mi moderu Jakkaru",
+    "type": "zoan",
+    "description": "celui qui le mange devient à moitié chacal. Son agilité en forme hybride est alors nettement supérieure à la moyenne.",
+    "debut": {
+      "chapter": 196,
+      "episode": 120
+    },
+    "userIds": [
+      "chaka"
+    ]
+  },
+  {
+    "id": "neko-neko-no-mi-moderu-hyo",
+    "apiId": 98,
+    "wikiTitle": null,
+    "name": {
+      "fr": "Fruit du Félin, version Léopard",
+      "en": "Fruit of the Feline, Leopard version"
+    },
+    "romaji": "Neko Neko no Mi moderu: Hyō",
+    "type": "zoan",
+    "description": "celui qui le mange devient à moitié léopard. Sa force et sa vitesse sont ainsi décuplées de façon impressionnante et avec les techniques du Rokushiki, il peut accéder à une deuxième forme hybride plus petite et plus agile.",
+    "debut": null,
+    "userIds": []
+  },
+  {
+    "id": "neko-neko-no-mi-model-leopard",
+    "apiId": 99,
+    "wikiTitle": "Neko Neko no Mi, Model: Leopard",
+    "name": {
+      "fr": "Fruit du Pachyderme",
+      "en": "Neko Neko no Mi, Model: Leopard"
+    },
+    "romaji": "Zo Zo no Mi",
+    "type": "zoan",
+    "description": "celui qui le mange devient à moitié éléphant. Étant donné que son utilisateur est une épée, cela en a fait un être mi-épée mi-éléphant. Ayant acquis une conscience et donc une certaine intelligence, elle peut avoir une portée phénoménale.",
+    "debut": {
+      "chapter": 348,
+      "episode": 245
+    },
+    "userIds": [
+      "rob-lucci",
+      "funkfreed"
+    ]
+  },
+  {
+    "id": "inu-inu-no-mi-model-wolf",
+    "apiId": 100,
+    "wikiTitle": "Inu Inu no Mi, Model: Wolf",
+    "name": {
+      "fr": "Fruit du Canidé, version Loup",
+      "en": "Inu Inu no Mi, Model: Wolf"
+    },
+    "romaji": "Inu Inu no Mi moderu: Ōkami",
+    "type": "zoan",
+    "description": "celui qui le mange devient à moitié loup. Sa force et sa rapidité sont plus grandes en forme hybride.",
+    "debut": {
+      "chapter": 379,
+      "episode": 266
+    },
+    "userIds": [
+      "jabra"
+    ]
+  },
+  {
+    "id": "ushi-ushi-no-mi-model-giraffe",
+    "apiId": 101,
+    "wikiTitle": "Ushi Ushi no Mi, Model: Giraffe",
+    "name": {
+      "fr": "Fruit du Bovin, version Girafe",
+      "en": "Ushi Ushi no Mi, Model: Giraffe"
+    },
+    "romaji": "Ushi Ushi no Mi moderu Kirin",
+    "type": "zoan",
+    "description": "celui qui le mange devient à moitié girafe. Ses coups de pieds et de nez sont nettement plus puissants (surtout avec le Shigan du Rokushiki).",
+    "debut": {
+      "chapter": 401,
+      "episode": 286
+    },
+    "userIds": [
+      "kaku"
+    ]
+  },
+  {
+    "id": "hebi-hebi-no-mi-model-anaconda",
+    "apiId": 102,
+    "wikiTitle": "Hebi Hebi no Mi, Model: Anaconda",
+    "name": {
+      "fr": "Fruit du Reptile, version Anaconda",
+      "en": "Hebi Hebi no Mi, Model: Anaconda"
+    },
+    "romaji": "Hebi Hebi no Mi moderu: Anakonda",
+    "type": "zoan",
+    "description": "permet à son utilisateur de se transformer comme il lui plait en anaconda : l'utilisateur peut transformer ses cheveux en serpents durs comme l'acier.",
+    "debut": {
+      "chapter": 518,
+      "episode": 412
+    },
+    "userIds": [
+      "boa-sandersonia"
+    ]
+  },
+  {
+    "id": "hebi-hebi-no-mi-model-king-cobra",
+    "apiId": 103,
+    "wikiTitle": "Hebi Hebi no Mi, Model: King Cobra",
+    "name": {
+      "fr": "Fruit du Reptile, version Cobra Royal",
+      "en": "Hebi Hebi no Mi, Model: King Cobra"
+    },
+    "romaji": "Hebi Hebi no Mi moderu: Kingu Kobura",
+    "type": "zoan",
+    "description": "permet à l'utilisateur de se transformer comme il lui plait en cobra : il peut lancer des jets de poison mortel, peut transformer ses cheveux en serpent et est insensible au feu.",
+    "debut": {
+      "chapter": 518,
+      "episode": 412
+    },
+    "userIds": [
+      "boa-marigold"
+    ]
+  },
+  {
+    "id": "kame-kame-no-mi",
+    "apiId": 104,
+    "wikiTitle": "Kame Kame no Mi",
+    "name": {
+      "fr": "Fruit de la Tortue",
+      "en": "Kame Kame no Mi"
+    },
+    "romaji": "Kame Kame no Mi",
+    "type": "zoan",
+    "description": "celui qui le mange peut se transformer en tortue à la carapace indestructible. Étant aussi résistante que le diamant, elle protège son utilisateur contre, entre autres, les tirs d'armes à feu et les effondrements de bâtiments.",
+    "debut": {
+      "chapter": 652,
+      "episode": 572
+    },
+    "userIds": [
+      "pekoms"
+    ]
+  },
+  {
+    "id": "tama-tama-no-mi",
+    "apiId": 105,
+    "wikiTitle": "Tama Tama no Mi",
+    "name": {
+      "fr": "Fruit de l’Œuf",
+      "en": "Tama Tama no Mi"
+    },
+    "romaji": "Tama Tama no Mi",
+    "type": "zoan",
+    "description": "permet à l'utilisateur de transformer sa composition corporelle en œuf. À chaque fois qu'il est sérieusement blessé, son utilisateur se régénère dans une forme de plus en plus aboutie de poulet et augmente exponentiellement ses capacités physiques.",
+    "debut": {
+      "chapter": 651,
+      "episode": 570
+    },
+    "userIds": [
+      "tamago"
+    ]
+  },
+  {
+    "id": "sara-sara-no-mi-model-axolotl",
+    "apiId": 106,
+    "wikiTitle": "Sara Sara no Mi, Model: Axolotl",
+    "name": {
+      "fr": "Fruit de la Salamandre, version Axolotl",
+      "en": "Sara Sara no Mi, Model: Axolotl"
+    },
+    "romaji": "Sara Sara no Mi moderu: Ahorōtoru",
+    "type": "zoan",
+    "description": "celui qui le mange peut se transformer en axolotl, l'utilisateur étant une énorme masse gélatineuse vivante fait d'un produit inflammable, il peut se déplacer bien plus rapidement pour charger ses victimes et se subdiviser en une multitude de petites créatures comme la version originale.",
+    "debut": {
+      "chapter": 668,
+      "episode": 594
+    },
+    "userIds": [
+      "smiley"
+    ]
+  },
+  {
+    "id": "mushi-mushi-no-mi-model-kabutomushi",
+    "apiId": 107,
+    "wikiTitle": "Mushi Mushi no Mi, Model: Kabutomushi",
+    "name": {
+      "fr": "Fruit de l'Insecte, version Scarabée-Rhinocéros",
+      "en": "Mushi Mushi no Mi, Model: Kabutomushi"
+    },
+    "romaji": "Mushi Mushi no Mi, Moderu Kabutomushi",
+    "type": "zoan",
+    "description": "celui qui le mange peut se transformer en scarabée rhinocéros. Il permet à son utilisateur de voler.",
+    "debut": {
+      "chapter": 718,
+      "episode": 648
+    },
+    "userIds": [
+      "kabu"
+    ]
+  },
+  {
+    "id": "mushi-mushi-no-mi-model-suzumebachi",
+    "apiId": 108,
+    "wikiTitle": "Mushi Mushi no Mi, Model: Suzumebachi",
+    "name": {
+      "fr": "Fruit de l'Insecte, version Guêpe",
+      "en": "Mushi Mushi no Mi, Model: Suzumebachi"
+    },
+    "romaji": "Mushi Mushi no Mi, Moderu Suzumebachi",
+    "type": "zoan",
+    "description": "celui qui le mange peut se transformer en guêpe. Il permet à son utilisateur de voler.",
+    "debut": {
+      "chapter": 718,
+      "episode": 648
+    },
+    "userIds": [
+      "bian"
+    ]
+  },
+  {
+    "id": "tori-tori-no-mi-model-albatross",
+    "apiId": 109,
+    "wikiTitle": "Tori Tori no Mi, Model: Albatross",
+    "name": {
+      "fr": "Fruit du Volatile, version Albatros",
+      "en": "Tori Tori no Mi, Model: Albatross"
+    },
+    "romaji": "Tori Tori no Mi Moderu Arubatorosu",
+    "type": "zoan",
+    "description": "celui qui le mange peut se transformer en albatros.",
+    "debut": {
+      "chapter": 860,
+      "episode": 830
+    },
+    "userIds": [
+      "morgans"
+    ]
+  },
+  {
+    "id": "inu-inu-no-mi-model-tanuki",
+    "apiId": 110,
+    "wikiTitle": "Inu Inu no Mi, Model: Tanuki",
+    "name": {
+      "fr": "Fruit du Canidé, version Tanuki",
+      "en": "Inu Inu no Mi, Model: Tanuki"
+    },
+    "romaji": "Inu Inu no Mi Moderu Bake-danuki",
+    "type": "zoan",
+    "description": "celui qui le mange peut se transformer en tanuki.",
+    "debut": {
+      "chapter": 911,
+      "episode": 894
+    },
+    "userIds": [
+      "bunbuku"
+    ]
+  },
+  {
+    "id": "ryu-ryu-no-mi-model-allosaurus",
+    "apiId": 111,
+    "wikiTitle": "Ryu Ryu no Mi, Model: Allosaurus",
+    "name": {
+      "fr": "Fruit du Dinosaure, version Allosaurus",
+      "en": "Ryu Ryu no Mi, Model: Allosaurus"
+    },
+    "romaji": "Ryū Ryū no Mi Moderu Arosaurusu",
+    "type": "zoan-ancient",
+    "description": "celui qui le mange peut se transformer en allosaurus.",
+    "debut": {
+      "chapter": 509,
+      "episode": 402
+    },
+    "userIds": [
+      "x-drake"
+    ]
+  },
+  {
+    "id": "zou-zou-no-mi-model-mammoth",
+    "apiId": 112,
+    "wikiTitle": "Zou Zou no Mi, Model: Mammoth",
+    "name": {
+      "fr": "Fruit du Pachyderme, version Mammouth",
+      "en": "Zou Zou no Mi, Model: Mammoth"
+    },
+    "romaji": "Zō Zō no Mi, moderu Manmosu",
+    "type": "zoan-ancient",
+    "description": "celui qui le mange peut se transformer en mammouth. Il permet d'augmenter la force et l'allonge de son possesseur de manière exceptionnelle. Il a de plus une certaine résistance contre les attaques physiques vu la dureté de sa peau.",
+    "debut": {
+      "chapter": 807,
+      "episode": 757
+    },
+    "userIds": [
+      "jack"
+    ]
+  },
+  {
+    "id": "ryu-ryu-no-mi-model-spinosaurus",
+    "apiId": 113,
+    "wikiTitle": "Ryu Ryu no Mi, Model: Spinosaurus",
+    "name": {
+      "fr": "Fruit du Dinosaure, version Spinosaurus",
+      "en": "Ryu Ryu no Mi, Model: Spinosaurus"
+    },
+    "romaji": "Ryū Ryū no Mi Moderu Supinosaurusu",
+    "type": "zoan-ancient",
+    "description": "celui qui le mange peut se transformer en spinosaurus.",
+    "debut": {
+      "chapter": 929,
+      "episode": 923
+    },
+    "userIds": [
+      "page-one"
+    ]
+  },
+  {
+    "id": "ryu-ryu-no-mi-model-pteranodon",
+    "apiId": 114,
+    "wikiTitle": "Ryu Ryu no Mi, Model: Pteranodon",
+    "name": {
+      "fr": "Fruit du Dinosaure, version Ptéranodon",
+      "en": "Ryu Ryu no Mi, Model: Pteranodon"
+    },
+    "romaji": "Ryū Ryū no Mi Kodai-shu Moderu Puteranodon",
+    "type": "zoan-ancient",
+    "description": "celui qui le mange peut se transformer en ptéranodon.",
+    "debut": {
+      "chapter": 930,
+      "episode": 924
+    },
+    "userIds": [
+      "king"
+    ]
+  },
+  {
+    "id": "ryu-ryu-no-mi-model-brachiosaurus",
+    "apiId": 115,
+    "wikiTitle": "Ryu Ryu no Mi, Model: Brachiosaurus",
+    "name": {
+      "fr": "Fruit du Dinosaure, version Brachiosaure",
+      "en": "Ryu Ryu no Mi, Model: Brachiosaurus"
+    },
+    "romaji": "Ryū Ryū no Mi Moderu Burakiosaurusu",
+    "type": "zoan-ancient",
+    "description": "celui qui le mange peut se transformer en brachiosaure.",
+    "debut": {
+      "chapter": 945,
+      "episode": 944
+    },
+    "userIds": [
+      "queen"
+    ]
+  },
+  {
+    "id": "ryu-ryu-no-mi-model-pachycephalosaurus",
+    "apiId": 116,
+    "wikiTitle": "Ryu Ryu no Mi, Model: Pachycephalosaurus",
+    "name": {
+      "fr": "Fruit du Dinosaure, version Pachycephalosaurus",
+      "en": "Ryu Ryu no Mi, Model: Pachycephalosaurus"
+    },
+    "romaji": "Ryū Ryū no Mi Moderu Pakikefarosaurusu",
+    "type": "zoan-ancient",
+    "description": "celui qui le mange peut se transformer en pachycephalosaurus.",
+    "debut": {
+      "chapter": 983,
+      "episode": 990
+    },
+    "userIds": [
+      "ulti"
+    ]
+  },
+  {
+    "id": "ryu-ryu-no-mi-model-triceratops",
+    "apiId": 117,
+    "wikiTitle": "Ryu Ryu no Mi, Model: Triceratops",
+    "name": {
+      "fr": "Fruit du Dinosaure, version Tricératops",
+      "en": "Ryu Ryu no Mi, Model: Triceratops"
+    },
+    "romaji": "Ryū Ryū no Mi Moderu Torikeratopusu",
+    "type": "zoan-ancient",
+    "description": "celui qui le mange peut se transformer en tricératops.",
+    "debut": {
+      "chapter": 998,
+      "episode": 1012
+    },
+    "userIds": [
+      "sasaki"
+    ]
+  },
+  {
+    "id": "kumo-kumo-no-mi-model-rosamygale-grauvogeli",
+    "apiId": 118,
+    "wikiTitle": "Kumo Kumo no Mi, Model: Rosamygale Grauvogeli",
+    "name": {
+      "fr": "Fruit de l'Araignée, version Rosamygale grauvogeli",
+      "en": "Kumo Kumo no Mi, Model: Rosamygale Grauvogeli"
+    },
+    "romaji": "Kumo Kumo no Mi Moderu Rosamigare Guraubogerī",
+    "type": "zoan-ancient",
+    "description": "celui qui le mange peut se transformer en rosamygale grauvogeli.",
+    "debut": {
+      "chapter": 997,
+      "episode": 1011
+    },
+    "userIds": [
+      "black-maria"
+    ]
+  },
+  {
+    "id": "neko-neko-no-mi-moderu-saberutaiga",
+    "apiId": 119,
+    "wikiTitle": null,
+    "name": {
+      "fr": "Fruit du Félin, version Tigre à dents de sabre",
+      "en": "Fruit du Félin, saber-toothed tiger version"
+    },
+    "romaji": "Neko Neko no Mi Moderu Sāberutaigā",
+    "type": "zoan-ancient",
+    "description": "celui qui le mange peut se transformer en tigre à dents de sabre.",
+    "debut": null,
+    "userIds": []
+  },
+  {
+    "id": "neko-neko-no-mi-model-saber-tiger",
+    "apiId": 120,
+    "wikiTitle": "Neko Neko no Mi, Model: Saber Tiger",
+    "name": {
+      "fr": "Fruit du Félin, version Tigre à dents de sabre",
+      "en": "Neko Neko no Mi, Model: Saber Tiger"
+    },
+    "romaji": "Tori Tori no Mi, Moderu Fenikkusu",
+    "type": "zoan-mythical",
+    "description": "celui qui le mange peut se transformer en phénix. Il peut se régénérer et également soigner les blessures d'autres êtres vivants.",
+    "debut": {
+      "chapter": 998,
+      "episode": 1012
+    },
+    "userIds": [
+      "who-s-who"
+    ]
+  },
+  {
+    "id": "hito-hito-no-mi-model-daibutsu",
+    "apiId": 121,
+    "wikiTitle": "Hito Hito no Mi, Model: Daibutsu",
+    "name": {
+      "fr": "Fruit de l'Humain, version Bouddha",
+      "en": "Hito Hito no Mi, Model: Daibutsu"
+    },
+    "romaji": "Hito Hito no Mi moderu Daibutsu",
+    "type": "zoan-mythical",
+    "description": "celui qui le mange peut se transformer en un imposant Daibutsu qui augmente considérablement sa force physique. Il peut générer des ondes de choc.",
+    "debut": {
+      "chapter": 571,
+      "episode": 480
+    },
+    "userIds": [
+      "sengoku"
+    ]
+  },
+  {
+    "id": "uo-uo-no-mi-model-seiryu",
+    "apiId": 122,
+    "wikiTitle": "Uo Uo no Mi, Model: Seiryu",
+    "name": {
+      "fr": "Fruit du Poisson, version Dragon azur",
+      "en": "Uo Uo no Mi, Model: Seiryu"
+    },
+    "romaji": "Uo Uo no Mi, Moderu Seiryū",
+    "type": "zoan-mythical",
+    "description": "celui qui le mange peut se transformer en dragon azur.",
+    "debut": {
+      "chapter": 921,
+      "episode": 912
+    },
+    "userIds": [
+      "kaidou",
+      "kouzuki-momonosuke"
+    ]
+  },
+  {
+    "id": "inu-inu-no-mi-model-kyubi-no-kitsune",
+    "apiId": 123,
+    "wikiTitle": "Inu Inu no Mi, Model: Kyubi no Kitsune",
+    "name": {
+      "fr": "Fruit du Canidé, version Renard à neuf queues",
+      "en": "Inu Inu no Mi, Model: Kyubi no Kitsune"
+    },
+    "romaji": "Inu Inu no Mi, Moderu Kyūbi no Kitsune",
+    "type": "zoan-mythical",
+    "description": "celui qui le mange peut se transformer en renard à neuf queues.",
+    "debut": {
+      "chapter": 925,
+      "episode": 917
+    },
+    "userIds": [
+      "catarina-devon"
+    ]
+  },
+  {
+    "id": "hebi-hebi-no-mi-model-yamata-no-orochi",
+    "apiId": 124,
+    "wikiTitle": "Hebi Hebi no Mi, Model: Yamata no Orochi",
+    "name": {
+      "fr": "Fruit du Reptile, version Dragon à huit têtes",
+      "en": "Hebi Hebi no Mi, Model: Yamata no Orochi"
+    },
+    "romaji": "Hebi Hebi no Mi moderu Yamata no Orochi",
+    "type": "zoan-mythical",
+    "description": "celui qui le mange peut se transformer en dragon à huit têtes.",
+    "debut": {
+      "chapter": 927,
+      "episode": 921
+    },
+    "userIds": [
+      "kurozumi-orochi"
+    ]
+  },
+  {
+    "id": "hito-hito-no-mi-model-onyudo",
+    "apiId": 125,
+    "wikiTitle": "Hito Hito no Mi, Model: Onyudo",
+    "name": {
+      "fr": "Fruit de l'Humain, version Onyudo",
+      "en": "Hito Hito no Mi, Model: Onyudo"
+    },
+    "romaji": "Hito Hito no Mi, Moderu: Ōnyūdō",
+    "type": "zoan-mythical",
+    "description": "celui qui le mange peut se transformer en Onyudo",
+    "debut": {
+      "chapter": 936,
+      "episode": 932
+    },
+    "userIds": [
+      "onimaru"
+    ]
+  },
+  {
+    "id": "inu-inu-no-mi-model-okuchi-no-makami",
+    "apiId": 126,
+    "wikiTitle": "Inu Inu no Mi, Model: Okuchi no Makami",
+    "name": {
+      "fr": "Fruit du Canidé, version Loup divin",
+      "en": "Inu Inu no Mi, Model: Okuchi no Makami"
+    },
+    "romaji": "Inu Inu no Mi Moderu Ōkuchi no Makami",
+    "type": "zoan-mythical",
+    "description": "celui qui le mange peut se transformer en loup divin.",
+    "debut": {
+      "chapter": 996,
+      "episode": 1009
+    },
+    "userIds": [
+      "yamato"
+    ]
+  },
+  {
+    "id": "sheep-smile",
+    "apiId": 127,
+    "wikiTitle": null,
+    "name": {
+      "fr": "SMILE de mouton",
+      "en": "Sheep SMILE"
+    },
+    "romaji": null,
+    "type": "smile",
+    "description": "il permet de se transformer en mouton.",
+    "debut": {
+      "chapter": 795,
+      "episode": null
+    },
+    "userIds": [
+      "sheepshead"
+    ]
+  },
+  {
+    "id": "bat-smile",
+    "apiId": 128,
+    "wikiTitle": null,
+    "name": {
+      "fr": "SMILE de chauve-souris",
+      "en": "Bat SMILE"
+    },
+    "romaji": null,
+    "type": "smile",
+    "description": "il permet de se transformer en chauve-souris.",
+    "debut": {
+      "chapter": 914,
+      "episode": null
+    },
+    "userIds": [
+      "batman"
+    ]
+  },
+  {
+    "id": "smile-de-gazelle",
+    "apiId": 129,
+    "wikiTitle": null,
+    "name": {
+      "fr": "SMILE de gazelle",
+      "en": "SMILE de gazelle"
+    },
+    "romaji": null,
+    "type": "smile",
+    "description": "il permet de se transformer en gazelle.",
+    "debut": {
+      "chapter": 914,
+      "episode": null
+    },
+    "userIds": [
+      "gazelleman"
+    ]
+  },
+  {
+    "id": "mouse-smile",
+    "apiId": 130,
+    "wikiTitle": null,
+    "name": {
+      "fr": "SMILE de souris",
+      "en": "Mouse SMILE"
+    },
+    "romaji": null,
+    "type": "smile",
+    "description": "il permet de se transformer en souris.",
+    "debut": {
+      "chapter": 915,
+      "episode": null
+    },
+    "userIds": [
+      "mouseman"
+    ]
+  },
+  {
+    "id": "lion-smile",
+    "apiId": 131,
+    "wikiTitle": null,
+    "name": {
+      "fr": "SMILE de lion",
+      "en": "Lion SMILE"
+    },
+    "romaji": null,
+    "type": "smile",
+    "description": "il permet de se transformer en lion.",
+    "debut": {
+      "chapter": 915,
+      "episode": null
+    },
+    "userIds": [
+      "holed-em"
+    ]
+  },
+  {
+    "id": "horse-smile",
+    "apiId": 132,
+    "wikiTitle": null,
+    "name": {
+      "fr": "SMILE de cheval",
+      "en": "Horse SMILE"
+    },
+    "romaji": null,
+    "type": "smile",
+    "description": "il permet de se transformer en cheval.",
+    "debut": {
+      "chapter": 917,
+      "episode": null
+    },
+    "userIds": [
+      "speed"
+    ]
+  },
+  {
+    "id": "smile",
+    "apiId": 133,
+    "wikiTitle": "SMILE",
+    "name": {
+      "fr": "SMILE de serpent",
+      "en": "SMILE"
+    },
+    "romaji": null,
+    "type": "smile",
+    "description": "il permet de se transformer en serpent.",
+    "debut": {
+      "chapter": 689,
+      "episode": 615
+    },
+    "userIds": [
+      "snakeman",
+      "sarahebi"
+    ]
+  },
+  {
+    "id": "rabbit-smile",
+    "apiId": 134,
+    "wikiTitle": null,
+    "name": {
+      "fr": "SMILE de lapin",
+      "en": "Rabbit SMILE"
+    },
+    "romaji": null,
+    "type": "smile",
+    "description": "il permet de se transformer en lapin.",
+    "debut": {
+      "chapter": 916,
+      "episode": null
+    },
+    "userIds": [
+      "rabbitman"
+    ]
+  },
+  {
+    "id": "hippopotamus-smile",
+    "apiId": 135,
+    "wikiTitle": null,
+    "name": {
+      "fr": "SMILE d'hippopotame",
+      "en": "Hippopotamus SMILE"
+    },
+    "romaji": null,
+    "type": "smile",
+    "description": "il permet de se transformer en hippopotame.",
+    "debut": null,
+    "userIds": [
+      "plouf"
+    ]
+  },
+  {
+    "id": "smile-from-alpaca",
+    "apiId": 136,
+    "wikiTitle": null,
+    "name": {
+      "fr": "SMILE de l'alpaga",
+      "en": "SMILE from alpaca"
+    },
+    "romaji": null,
+    "type": "smile",
+    "description": "il permet de se transformer en alpaga.",
+    "debut": {
+      "chapter": 934,
+      "episode": null
+    },
+    "userIds": [
+      "alpacaman"
+    ]
+  },
+  {
+    "id": "smile-of-the-elephant",
+    "apiId": 137,
+    "wikiTitle": null,
+    "name": {
+      "fr": "SMILE de l'éléphant",
+      "en": "SMILE of the elephant"
+    },
+    "romaji": null,
+    "type": "smile",
+    "description": "il permet de se transformer en éléphant.",
+    "debut": null,
+    "userIds": [
+      "pouilleux"
+    ]
+  },
+  {
+    "id": "smile-of-the-scorpion",
+    "apiId": 138,
+    "wikiTitle": null,
+    "name": {
+      "fr": "SMILE du scorpion",
+      "en": "SMILE of the scorpion"
+    },
+    "romaji": null,
+    "type": "smile",
+    "description": "il permet de se transformer en scorpion.",
+    "debut": {
+      "chapter": 998,
+      "episode": null
+    },
+    "userIds": [
+      "trouduc",
+      "nure-onna"
+    ]
+  },
+  {
+    "id": "monkey-smile",
+    "apiId": 139,
+    "wikiTitle": null,
+    "name": {
+      "fr": "SMILE du singe",
+      "en": "Monkey SMILE"
+    },
+    "romaji": null,
+    "type": "smile",
+    "description": "il permet de se transformer en singe.",
+    "debut": {
+      "chapter": 935,
+      "episode": null
+    },
+    "userIds": [
+      "solitaire"
+    ]
+  },
+  {
+    "id": "armadillo-smile",
+    "apiId": 140,
+    "wikiTitle": null,
+    "name": {
+      "fr": "SMILE du tatou",
+      "en": "Armadillo SMILE"
+    },
+    "romaji": null,
+    "type": "smile",
+    "description": "il permet de se transformer en tatou.",
+    "debut": null,
+    "userIds": [
+      "tatouman"
+    ]
+  },
+  {
+    "id": "ostrich-smile",
+    "apiId": 141,
+    "wikiTitle": null,
+    "name": {
+      "fr": "SMILE de l'autruche",
+      "en": "Ostrich SMILE"
+    },
+    "romaji": null,
+    "type": "smile",
+    "description": "il permet de se transformer en autruche.",
+    "debut": {
+      "chapter": 940,
+      "episode": null
+    },
+    "userIds": [
+      "dachoman"
+    ]
+  },
+  {
+    "id": "flying-squirrel-smile",
+    "apiId": 142,
+    "wikiTitle": null,
+    "name": {
+      "fr": "SMILE de l'écureuil volant",
+      "en": "Flying Squirrel SMILE"
+    },
+    "romaji": null,
+    "type": "smile",
+    "description": "il permet de se transformer en écureuil volant.",
+    "debut": {
+      "chapter": 979,
+      "episode": null
+    },
+    "userIds": [
+      "bao-huang"
+    ]
+  },
+  {
+    "id": "smile-of-the-white-snake",
+    "apiId": 143,
+    "wikiTitle": null,
+    "name": {
+      "fr": "SMILE du serpent blanc",
+      "en": "SMILE of the white snake"
+    },
+    "romaji": null,
+    "type": "smile",
+    "description": "il permet de se transformer en serpent blanc.",
+    "debut": {
+      "chapter": 980,
+      "episode": null
+    },
+    "userIds": [
+      "tenjo-sagari"
+    ]
+  },
+  {
+    "id": "gorilla-smile",
+    "apiId": 144,
+    "wikiTitle": null,
+    "name": {
+      "fr": "SMILE du gorille",
+      "en": "Gorilla SMILE"
+    },
+    "romaji": null,
+    "type": "smile",
+    "description": "il permet de se transformer en gorille",
+    "debut": {
+      "chapter": 978,
+      "episode": null
+    },
+    "userIds": [
+      "briscola",
+      "mizerka"
+    ]
+  },
+  {
+    "id": "smile-du-coq",
+    "apiId": 145,
+    "wikiTitle": null,
+    "name": {
+      "fr": "SMILE du coq",
+      "en": "SMILE du coq"
+    },
+    "romaji": null,
+    "type": "smile",
+    "description": "il permet de se transformer en coq",
+    "debut": {
+      "chapter": 994,
+      "episode": null
+    },
+    "userIds": [
+      "fourtricks"
+    ]
+  },
+  {
+    "id": "giraffe-smile",
+    "apiId": 146,
+    "wikiTitle": null,
+    "name": {
+      "fr": "SMILE de la girafe",
+      "en": "Giraffe SMILE"
+    },
+    "romaji": null,
+    "type": "smile",
+    "description": "il permet de se transformer en girafe",
+    "debut": {
+      "chapter": 994,
+      "episode": null
+    },
+    "userIds": [
+      "hamlet"
+    ]
+  },
+  {
+    "id": "rattlesnake-smile",
+    "apiId": 147,
+    "wikiTitle": null,
+    "name": {
+      "fr": "SMILE de la crotale",
+      "en": "Rattlesnake SMILE"
+    },
+    "romaji": null,
+    "type": "smile",
+    "description": "il permet de se transformer en crotale",
+    "debut": {
+      "chapter": 997,
+      "episode": null
+    },
+    "userIds": [
+      "poker"
+    ]
+  },
+  {
+    "id": "heterodon-smile",
+    "apiId": 148,
+    "wikiTitle": null,
+    "name": {
+      "fr": "SMILE de l'hétérodon",
+      "en": "Heterodon SMILE"
+    },
+    "romaji": null,
+    "type": "smile",
+    "description": "il permet de se transformer en hétérodon",
+    "debut": null,
+    "userIds": []
+  },
+  {
+    "id": "caiman-smile",
+    "apiId": 149,
+    "wikiTitle": null,
+    "name": {
+      "fr": "SMILE de caïman",
+      "en": "Caiman SMILE"
+    },
+    "romaji": null,
+    "type": "smile",
+    "description": "il permet de se transformer en caïman",
+    "debut": {
+      "chapter": 1004,
+      "episode": null
+    },
+    "userIds": [
+      "caimanlady"
+    ]
+  },
+  {
+    "id": "pug-smile",
+    "apiId": 150,
+    "wikiTitle": null,
+    "name": {
+      "fr": "SMILE de carlin",
+      "en": "Pug SMILE"
+    },
+    "romaji": null,
+    "type": "smile",
+    "description": "il permet de se transformer en carlin",
+    "debut": {
+      "chapter": 1005,
+      "episode": null
+    },
+    "userIds": [
+      "wanyudo"
+    ]
+  },
+  {
+    "id": "goe-goe-no-mi",
+    "apiId": 151,
+    "wikiTitle": "Goe Goe no Mi",
+    "name": {
+      "fr": "Fruit de la Vocalise",
+      "en": "Goe Goe no Mi"
+    },
+    "romaji": "Goe Goe no Mi",
+    "type": "paramecia",
+    "description": "la personne ayant mangé ce fruit se sert de faisceaux sonores convertis en lasers pour tout détruire sur son passage.",
+    "debut": null,
+    "userIds": [
+      "eldoraggo"
+    ]
+  },
+  {
+    "id": "hiso-hiso-no-mi",
+    "apiId": 152,
+    "wikiTitle": "Hiso Hiso no Mi",
+    "name": {
+      "fr": "Fruit du Murmure",
+      "en": "Hiso Hiso no Mi"
+    },
+    "romaji": "Hiso Hiso no Mi",
+    "type": "paramecia",
+    "description": "Ce fruit permet à l'utilisateur de comprendre le cœur d'un animal ou, en d'autres mots, permet à l'utilisateur de parler aux animaux. Celui-ci ne peut pas contrôler la volonté des animaux.",
+    "debut": {
+      "chapter": null,
+      "episode": 54
+    },
+    "userIds": []
+  },
+  {
+    "id": "kama-kama-no-mi",
+    "apiId": 153,
+    "wikiTitle": "Kama Kama no Mi",
+    "name": {
+      "fr": "Fruit du Slash-Slash",
+      "en": "Kama Kama no Mi"
+    },
+    "romaji": "Kama Kama no Mi",
+    "type": "paramecia",
+    "description": "celui qui a mangé ce fruit peut créer des lames d'airs aussi tranchantes que la lame d'un sabre.",
+    "debut": {
+      "chapter": null,
+      "episode": 56
+    },
+    "userIds": []
+  },
+  {
+    "id": "kachi-kachi-no-mi",
+    "apiId": 154,
+    "wikiTitle": "Kachi Kachi no Mi",
+    "name": {
+      "fr": "Fruit Incassable",
+      "en": "Kachi Kachi no Mi"
+    },
+    "romaji": "Kachi Kachi no Mi",
+    "type": "paramecia",
+    "description": "celui qui le mange devient aussi dur que le roc et peut augmenter la chaleur de membres corporels déterminés pour que son adversaire se brûle en les touchant.",
+    "debut": null,
+    "userIds": [
+      "bear-king"
+    ]
+  },
+  {
+    "id": "nemu-nemu-no-mi",
+    "apiId": 155,
+    "wikiTitle": "Nemu Nemu no Mi",
+    "name": {
+      "fr": "Fruit du Sommeil",
+      "en": "Nemu Nemu no Mi"
+    },
+    "romaji": "Nemu Nemu no Mi",
+    "type": "paramecia",
+    "description": "Ce fruit permet d'endormir n'importe qui via hypnose. L'utilisateur peut ainsi pénétrer dans la mémoire de la personne endormie pour lui infliger des dégâts comme la perte de mémoire ou les cauchemars.",
+    "debut": null,
+    "userIds": []
+  },
+  {
+    "id": "mini-mini-no-mi",
+    "apiId": 156,
+    "wikiTitle": "Mini Mini no Mi",
+    "name": {
+      "fr": "Fruit du Nain",
+      "en": "Mini Mini no Mi"
+    },
+    "romaji": "Mini Mini no Mi",
+    "type": "paramecia",
+    "description": "permet à son utilisateur de rétrécir à volonté.",
+    "debut": {
+      "chapter": null,
+      "episode": 575
+    },
+    "userIds": []
+  },
+  {
+    "id": "atsu-atsu-no-mi",
+    "apiId": 157,
+    "wikiTitle": "Atsu Atsu no Mi",
+    "name": {
+      "fr": "Fruit de la Chaleur",
+      "en": "Atsu Atsu no Mi"
+    },
+    "romaji": "Atsu Atsu no Mi",
+    "type": "paramecia",
+    "description": "L'utilisateur peut contrôler sa chaleur corporelle et l'augmenter à plus de 10 000 degrés, ce qui lui permet de faire fondre n'importe quoi. Il devient donc insensible au froid.",
+    "debut": {
+      "chapter": null,
+      "episode": 326
+    },
+    "userIds": []
+  },
+  {
+    "id": "noko-noko-no-mi",
+    "apiId": 158,
+    "wikiTitle": "Noko Noko no Mi",
+    "name": {
+      "fr": "Fruit du Chamquipue",
+      "en": "Noko Noko no Mi"
+    },
+    "romaji": "Noko Noko no Mi",
+    "type": "paramecia",
+    "description": "la personne qui mange ce fruit peut créer des spores empoisonnés. Ces spores peuvent prendre diverses forme (rayons laser, clones, ...). Bien sûr, son utilisateur est immunisé au poison mais son pouvoir est vulnérable au feu.",
+    "debut": null,
+    "userIds": [
+      "musshul"
+    ]
+  },
+  {
+    "id": "ami-ami-no-mi",
+    "apiId": 159,
+    "wikiTitle": "Ami Ami no Mi",
+    "name": {
+      "fr": "Fruit du Filet",
+      "en": "Ami Ami no Mi"
+    },
+    "romaji": "Ami Ami no Mi",
+    "type": "paramecia",
+    "description": "Ce fruit permet à son utilisateur de manger des matériaux de n'importe quel type (feu, métal…) et de créer des filets avec les propriétés de la substance ingérée. Ce fruit est idéal pour capturer les ennemis.",
+    "debut": {
+      "chapter": null,
+      "episode": 427
+    },
+    "userIds": []
+  },
+  {
+    "id": "kopi-kopi-no-mi",
+    "apiId": 160,
+    "wikiTitle": "Kopi Kopi no Mi",
+    "name": {
+      "fr": "Fruit de la Copie",
+      "en": "Kopi Kopi no Mi"
+    },
+    "romaji": "Kopi Kopi no Mi",
+    "type": "paramecia",
+    "description": "Ce fruit permet à son utilisateur de copier les capacités d'autres personnes en touchant et prenant un coup d'un adversaire.",
+    "debut": null,
+    "userIds": []
+  },
+  {
+    "id": "mosa-mosa-no-mi",
+    "apiId": 161,
+    "wikiTitle": "Mosa Mosa no Mi",
+    "name": {
+      "fr": "Fruit Touffu-Touffu",
+      "en": "Mosa Mosa no Mi"
+    },
+    "romaji": "Mosa Mosa no Mi",
+    "type": "paramecia",
+    "description": "Ce fruit permet à son utilisateur d'accélérer le taux de croissance des plantes et de les contrôler à sa guise. Son utilisateur peut s'en servir principalement pour piéger ou attaquer ses ennemis à l'aide de lianes mais également pour se protéger des attaques ennemies. Il ne peut cependant faire pousser des plantes que dans des environnements où pousse de la végétation.",
+    "debut": {
+      "chapter": 691,
+      "episode": null
+    },
+    "userIds": [
+      "binz"
+    ]
+  },
+  {
+    "id": "modo-modo-no-mi",
+    "apiId": 162,
+    "wikiTitle": "Modo Modo no Mi",
+    "name": {
+      "fr": "Fruit Jeune-Jeune",
+      "en": "Modo Modo no Mi"
+    },
+    "romaji": "Modo Modo no Mi",
+    "type": "paramecia",
+    "description": "Ce fruit permet à son détenteur de rajeunir les gens et de retourner les objets à leur état 12 ans auparavant (par exemple : des roches volcaniques retourneront à l'état de lave). Ce pouvoir se manifeste par la création d'une aura rose avec laquelle son utilisateur doit toucher sa cible pour l'activer. Plus l'objet ou la personne est touché par ce pouvoir, plus celle-ci rajeunit. Si le nombre de 'toucher' est supérieur à l'âge de la personne ou de l'objet touché (moins 12 ans à chaque toucher), il/elle disparait définitivement",
+    "debut": {
+      "chapter": null,
+      "episode": 577
+    },
+    "userIds": [
+      "ain"
+    ]
+  },
+  {
+    "id": "gutsu-gutsu-no-mi",
+    "apiId": 163,
+    "wikiTitle": "Gutsu Gutsu no Mi",
+    "name": {
+      "fr": "Fruit du Fourneau",
+      "en": "Gutsu Gutsu no Mi"
+    },
+    "romaji": "Gutsu Gutsu no Mi",
+    "type": "paramecia",
+    "description": "Ce fruit permet à son utilisateur de produire et de faire fondre toute structure dans de l'argent. Il peut aussi créer des armes et transformer des êtres vivants en statues d'argent.",
+    "debut": {
+      "chapter": null,
+      "episode": 746
+    },
+    "userIds": []
+  },
+  {
+    "id": "peto-peto-no-mi",
+    "apiId": 164,
+    "wikiTitle": "Peto Peto no Mi",
+    "name": {
+      "fr": "Fruit du Dresseur",
+      "en": "Peto Peto no Mi"
+    },
+    "romaji": "Peto Peto no Mi",
+    "type": "paramecia",
+    "description": "Ce fruit permet de produire une matière verte gluante et de l'enrouler autour du cou de n'importe quel être vivant pour le contrôler par le son de la voix. Le 'collier' est indestructible. Toutefois, il est possible de se protéger de ses effets en se bouchant les oreilles. L'utilisateur a aussi la possibilité d'utiliser son pouvoir sur lui-même pour accroître ses capacités physiques et obéir à ses propres ordres de manière à les exécuter efficacement.",
+    "debut": {
+      "chapter": null,
+      "episode": 625
+    },
+    "userIds": []
+  },
+  {
+    "id": "kone-kone-no-mi",
+    "apiId": 165,
+    "wikiTitle": "Kone Kone no Mi",
+    "name": {
+      "fr": "Fruit du Lien",
+      "en": "Kone Kone no Mi"
+    },
+    "romaji": "Kone Kone no Mi",
+    "type": "paramecia",
+    "description": "Ce fruit permet à son utilisateur de transformer les personnes qu'il touche en d'autres individus, copiant ainsi l'apparence, les capacités et la force de ces derniers. Néanmoins, l'utilisateur ne peut pas se transformer lui-même.",
+    "debut": null,
+    "userIds": []
+  },
+  {
+    "id": "moa-moa-no-mi",
+    "apiId": 166,
+    "wikiTitle": "Moa Moa no Mi",
+    "name": {
+      "fr": "Fruit du Plus-Plus",
+      "en": "Moa Moa no Mi"
+    },
+    "romaji": "Moa Moa no Mi",
+    "type": "paramecia",
+    "description": "Il permet à son utilisateur d'augmenter diverses capacités d'objet (vitesse, taille, ...) qu'il touche jusqu'à 100 fois la capacité initiale. Son utilisateur peut par extension augmenter ses propres capacités.",
+    "debut": null,
+    "userIds": []
+  },
+  {
+    "id": "kyubu-kyubu-no-mi",
+    "apiId": 167,
+    "wikiTitle": "Kyubu Kyubu no Mi",
+    "name": {
+      "fr": "Fruit du Cube",
+      "en": "Kyubu Kyubu no Mi"
+    },
+    "romaji": "Kyubu Kyubu no Mi",
+    "type": "paramecia",
+    "description": "Il permet à son utilisateur de transformer tout ce qu'il touche en cubes (sol, navires, humains) et de les contrôler. Ces cubes assemblés peuvent former des structures plus complexes.",
+    "debut": null,
+    "userIds": []
+  },
+  {
+    "id": "maji-maji-no-mi",
+    "apiId": 168,
+    "wikiTitle": "Maji Maji no Mi",
+    "name": {
+      "fr": "Fruit de la Magie",
+      "en": "Maji Maji no Mi"
+    },
+    "romaji": "Maji Maji no Mi",
+    "type": "paramecia",
+    "description": "Ce fruit permet à son utilisateur d'utiliser des techniques magiques ressemblant aux tours effectués par des magiciens lors des spectacles.",
+    "debut": null,
+    "userIds": []
+  },
+  {
+    "id": "nito-nito-no-mi",
+    "apiId": 169,
+    "wikiTitle": "Nito Nito no Mi",
+    "name": {
+      "fr": "Nitro-Fruit",
+      "en": "Nito Nito no Mi"
+    },
+    "romaji": "Nito Nito no Mi",
+    "type": "paramecia",
+    "description": "Ce fruit confère à son utilisateur les propriétés de nitroglycérine : à chaque claquement des mains, une explosion se produit.",
+    "debut": null,
+    "userIds": []
+  },
+  {
+    "id": "hore-hore-no-mi",
+    "apiId": 170,
+    "wikiTitle": "Hore Hore no Mi",
+    "name": {
+      "fr": "Fruit de l'amour",
+      "en": "Hore Hore no Mi"
+    },
+    "romaji": "Hore Hore no Mi",
+    "type": "paramecia",
+    "description": "Ce fruit permet à son utilisateur de manipuler toutes personnes en les faisant tomber amoureuses. Il réalise cette manipulation en envoyant un rayon de lumière sur ses victimes via les ailes de sa tenue de paon.",
+    "debut": null,
+    "userIds": []
+  },
+  {
+    "id": "nuke-nuke-no-mi",
+    "apiId": 171,
+    "wikiTitle": "Nuke Nuke no Mi",
+    "name": {
+      "fr": "Fruit du Passe-Muraille",
+      "en": "Nuke Nuke no Mi"
+    },
+    "romaji": "Nuku Nuke no Mi",
+    "type": "paramecia",
+    "description": "Ce fruit permet à son utilisateur de passer dans des objets solides pour s'échapper ou pour traverser les murs.",
+    "debut": {
+      "chapter": null,
+      "episode": 747
+    },
+    "userIds": [
+      "tanaka"
+    ]
+  },
+  {
+    "id": "koro-koro-no-mi",
+    "apiId": 172,
+    "wikiTitle": "Koro Koro no Mi",
+    "name": {
+      "fr": "Fruit du Tchou-Tchou",
+      "en": "Koro Koro no Mi"
+    },
+    "romaji": "Koro Koro no Mi",
+    "type": "paramecia",
+    "description": "Ce fruit permet à son utilisateur de transformer ses mains et ses pieds en roues. L'utilisateur devient donc un 'homme-wagon'.",
+    "debut": {
+      "chapter": null,
+      "episode": 747
+    },
+    "userIds": []
+  },
+  {
+    "id": "jara-jara-no-mi",
+    "apiId": 173,
+    "wikiTitle": "Jara Jara no Mi",
+    "name": {
+      "fr": "Fruit des Chaines",
+      "en": "Jara Jara no Mi"
+    },
+    "romaji": "Jara Jara no Mi",
+    "type": "paramecia",
+    "description": "Ce fruit permet à son utilisateur de produire et de contrôler des chaines à volonté.",
+    "debut": null,
+    "userIds": []
+  },
+  {
+    "id": "iro-iro-no-mi",
+    "apiId": 174,
+    "wikiTitle": "Iro Iro no Mi",
+    "name": {
+      "fr": "Fruit du Camouflage",
+      "en": "Iro Iro no Mi"
+    },
+    "romaji": "Iro Iro no Mi",
+    "type": "paramecia",
+    "description": "Ce fruit permet à son utilisateur de produire et de créer de la peinture pour camoufler des gens ou des objets.",
+    "debut": null,
+    "userIds": []
+  },
+  {
+    "id": "goru-goru-no-mi",
+    "apiId": 175,
+    "wikiTitle": "Goru Goru no Mi",
+    "name": {
+      "fr": "Fruit de l'Or",
+      "en": "Goru Goru no Mi"
+    },
+    "romaji": "Gol Gol no Mi",
+    "type": "paramecia",
+    "description": "Ce fruit permet à son utilisateur de manipuler l'or à volonté. Il peut transformer des objets solides en or et aussi les faire fondre. Il peut recouvrir son corps d'or, jusqu'à se transformer en golem géant en or massif. Il peut aussi faire des bâtiments en or et les contrôler.",
+    "debut": {
+      "chapter": 817,
+      "episode": null
+    },
+    "userIds": [
+      "gild-tesoro"
+    ]
+  },
+  {
+    "id": "raki-raki-no-mi",
+    "apiId": 176,
+    "wikiTitle": "Raki Raki no Mi",
+    "name": {
+      "fr": "Fruit de la Chance",
+      "en": "Raki Raki no Mi"
+    },
+    "romaji": "Raki Raki no Mi",
+    "type": "paramecia",
+    "description": "Ce fruit permet à son utilisateur de voler la chance des personnes qu'il touche et de l'utiliser pour soi.",
+    "debut": {
+      "chapter": 829,
+      "episode": null
+    },
+    "userIds": [
+      "baccarat"
+    ]
+  },
+  {
+    "id": "nepa-nepa-no-mi",
+    "apiId": 177,
+    "wikiTitle": "Nepa Nepa no Mi",
+    "name": {
+      "fr": "Fruit des Vagues de Chaleur",
+      "en": "Nepa Nepa no Mi"
+    },
+    "romaji": "Nepa Nepa no Mi",
+    "type": "paramecia",
+    "description": "Ce fruit permet à son utilisateur de générer des vagues de chaleurs.",
+    "debut": null,
+    "userIds": []
+  },
+  {
+    "id": "mono-mono-no-mi",
+    "apiId": 178,
+    "wikiTitle": "Mono Mono no Mi",
+    "name": {
+      "fr": "Fruit des Choses",
+      "en": "Mono Mono no Mi"
+    },
+    "romaji": "Mono Mono no Mi",
+    "type": "paramecia",
+    "description": "Ce fruit permet à son utilisateur de cloner toute chose, tel que l'utilisateur lui-même, d'autres personnes ou encore des objets.",
+    "debut": null,
+    "userIds": []
+  },
+  {
+    "id": "bijo-bijo-no-mi",
+    "apiId": 179,
+    "wikiTitle": "Bijo Bijo no Mi",
+    "name": {
+      "fr": "Fruit de la Vision",
+      "en": "Bijo Bijo no Mi"
+    },
+    "romaji": "Bijo Bijo no Mi",
+    "type": "paramecia",
+    "description": "Ce fruit lui permet de créer des illusions temporaires ayant la forme de la personne souhaitée.",
+    "debut": null,
+    "userIds": [
+      "ann"
+    ]
+  },
+  {
+    "id": "ute-ute-no-mi",
+    "apiId": 180,
+    "wikiTitle": "Ute Ute no Mi",
+    "name": {
+      "fr": "Fruit du Tir",
+      "en": "Ute Ute no Mi"
+    },
+    "romaji": "Ute Ute no Mi",
+    "type": "paramecia",
+    "description": "Ce fruit permet à son utilisateur de transformer toute chose en arme à feu.",
+    "debut": null,
+    "userIds": []
+  },
+  {
+    "id": "pocha-pocha-no-mi",
+    "apiId": 181,
+    "wikiTitle": "Pocha Pocha no Mi",
+    "name": {
+      "fr": "Fruit du Potelé",
+      "en": "Pocha Pocha no Mi"
+    },
+    "romaji": "Pocha Pocha no Mi",
+    "type": "paramecia",
+    "description": "Ce fruit permet à son utilisateur d'ajouter de la graisse dans le corps de ses adversaires afin de les immobiliser.",
+    "debut": null,
+    "userIds": []
+  },
+  {
+    "id": "bana-bana-no-mi",
+    "apiId": 182,
+    "wikiTitle": "Bana Bana no Mi",
+    "name": {
+      "fr": "Fruit du Brûleur",
+      "en": "Bana Bana no Mi"
+    },
+    "romaji": "Bana Bana no Mi",
+    "type": "paramecia",
+    "description": "Ce fruit permet à son utilisateur de transformer sa jalousie en chaleur et en flammes.",
+    "debut": null,
+    "userIds": []
+  },
+  {
+    "id": "deri-deri-no-mi",
+    "apiId": 183,
+    "wikiTitle": "Deri Deri no Mi",
+    "name": {
+      "fr": "Fruit du Livreur",
+      "en": "Deri Deri no Mi"
+    },
+    "romaji": "Deri Deri no Mi",
+    "type": "paramecia",
+    "description": "Ce fruit permet à son utilisateur d'envoyer un objet sur n'importe quelle cible à portée de vue de l'utilisateur.",
+    "debut": null,
+    "userIds": []
+  },
+  {
+    "id": "toro-toro-no-mi",
+    "apiId": 184,
+    "wikiTitle": "Toro Toro no Mi",
+    "name": {
+      "fr": "Fruit de la Dissolution",
+      "en": "Toro Toro no Mi"
+    },
+    "romaji": "Dero Dero no Mi",
+    "type": "paramecia",
+    "description": "Ce fruit permet à son utilisateur de dissoudre toute chose en liquide, y compris lui-même, en tirant des rayons dans les yeux de ses adversaires.",
+    "debut": null,
+    "userIds": [
+      "honey-queen"
+    ]
+  },
+  {
+    "id": "basu-basu-no-mi",
+    "apiId": 185,
+    "wikiTitle": "Basu Basu no Mi",
+    "name": {
+      "fr": "Fruit de la Bombe",
+      "en": "Basu Basu no Mi"
+    },
+    "romaji": "Basu Basu no Mi",
+    "type": "paramecia",
+    "description": "Ce fruit permet à son utilisateur de transformer toute chose en bombe.",
+    "debut": null,
+    "userIds": []
+  },
+  {
+    "id": "gasha-gasha-no-mi",
+    "apiId": 186,
+    "wikiTitle": "Gasha Gasha no Mi",
+    "name": {
+      "fr": "Fruit de la Ferraille",
+      "en": "Gasha Gasha no Mi"
+    },
+    "romaji": "Gasha Gasha no Mi",
+    "type": "paramecia",
+    "description": "Ce fruit permet à son utilisateur de manipuler et de combiner des objets tels que le fer et les armes.",
+    "debut": null,
+    "userIds": [
+      "douglas-bullet"
+    ]
+  },
+  {
+    "id": "nibi-nibi-no-mi",
+    "apiId": 187,
+    "wikiTitle": "Nibi Nibi no Mi",
+    "name": {
+      "fr": "Fruit de la Nécromancie",
+      "en": "Nibi Nibi no Mi"
+    },
+    "romaji": "Nibi Nibi no Mi",
+    "type": "paramecia",
+    "description": "Ce fruit permet à son utilisateur de reproduire l'apparence des défunts.",
+    "debut": null,
+    "userIds": []
+  },
+  {
+    "id": "pasa-pasa-no-mi",
+    "apiId": 189,
+    "wikiTitle": "Pasa Pasa no Mi",
+    "name": {
+      "fr": "Fruit du Papier",
+      "en": "Pasa Pasa no Mi"
+    },
+    "romaji": "Pasa Pasa no Mi",
+    "type": "logia",
+    "description": "le corps de celui qui le mange se transforme en morceaux de papier. Il permet notamment d'esquiver facilement les attaques et même de produire des cartes, voire des livres. Très efficace face à l'électricité mais vulnérable au feu.",
+    "debut": null,
+    "userIds": []
+  },
+  {
+    "id": "ame-ame-no-mi",
+    "apiId": 190,
+    "wikiTitle": "Ame Ame no Mi",
+    "name": {
+      "fr": "Fruit du Bonbon",
+      "en": "Ame Ame no Mi"
+    },
+    "romaji": "Ame Ame no Mi",
+    "type": "logia",
+    "description": "le corps de celui qui le mange se transforme en sirop. Il peut aussi contenir dans son corps toute masse solide le traversant (épées, poings, pieds, ...). Seulement, il est vulnérable s'il est atteint par une matière farineuse.",
+    "debut": null,
+    "userIds": [
+      "gasparde"
+    ]
+  },
+  {
+    "id": "tori-tori-no-mi-model-eagle",
+    "apiId": 191,
+    "wikiTitle": "Tori Tori no Mi, Model: Eagle",
+    "name": {
+      "fr": "Fruit du Volatile, version Aigle",
+      "en": "Tori Tori no Mi, Model: Eagle"
+    },
+    "romaji": "Tori Tori no Mi moderu Washi",
+    "type": "zoan",
+    "description": "Très similaire au Fruit du Volatile version Faucon",
+    "debut": null,
+    "userIds": [
+      "buzz"
+    ]
+  },
+  {
+    "id": "ushi-ushi-no-mi-moderu-lama",
+    "apiId": 192,
+    "wikiTitle": null,
+    "name": {
+      "fr": "Fruit du Bovin, version Lama",
+      "en": "Fruit du Bovin, Lama version"
+    },
+    "romaji": "Ushi Ushi no Mi moderu Lama",
+    "type": "zoan",
+    "description": "Permet de se transformer en lama",
+    "debut": null,
+    "userIds": []
+  },
+  {
+    "id": "inu-inu-no-mi-moderu-bake-danuki",
+    "apiId": 193,
+    "wikiTitle": null,
+    "name": {
+      "fr": "Fruit du Canidé, version Raton Laveur",
+      "en": "Fruit du Canidé, Raccoon version"
+    },
+    "romaji": "Inu Inu no Mi Moderu Bake-danuki",
+    "type": "zoan-mythical",
+    "description": "Permet de se transformer en Tanuki, une créature mythologique japonaise.",
+    "debut": null,
+    "userIds": []
+  },
+  {
+    "id": "batto-batto-no-mi-moderu-banpaia",
+    "apiId": 194,
+    "wikiTitle": null,
+    "name": {
+      "fr": "Fruit de la Chauve-Souris, version Vampire",
+      "en": "Fruit of the Bat, Vampire version"
+    },
+    "romaji": "Batto Batto no Mi Moderu Banpaia",
+    "type": "zoan-mythical",
+    "description": "Permet à son utilisateur de se transformer en vampire, une créature horrifique légendaire. Ce fruit permet d'absorber la vitalité des gens en les faisant vieillir.",
+    "debut": null,
+    "userIds": []
+  },
+  {
+    "id": "tori-tori-no-mi-moderu-nue",
+    "apiId": 195,
+    "wikiTitle": null,
+    "name": {
+      "fr": "Fruit du Volatile, version Nue",
+      "en": "Fruit of the Volatile, Naked version"
+    },
+    "romaji": "Tori Tori no Mi, Moderu Nue",
+    "type": "zoan-mythical",
+    "description": "Permet à son utilisateur de se transformer en nue.",
+    "debut": null,
+    "userIds": []
+  },
+  {
+    "id": "nomi-nomi-no-mi",
+    "apiId": 198,
+    "wikiTitle": "Nomi Nomi no Mi",
+    "name": {
+      "fr": "Fruit du Ciboulot",
+      "en": "Nomi Nomi no Mi"
+    },
+    "romaji": "Nomi Nomi no Mi",
+    "type": "paramecia",
+    "description": "Le Nomi Nomi no Mi est un Fruit du Démon de type Paramecia qui permet au cerveau de celui qui l'a mangé de se développer indéfiniment au fur et à mesure qu'il ingère de nouvelles connaissances, transformant celui qui l'a mangé en Homme-Cerveau",
+    "debut": {
+      "chapter": 1066,
+      "episode": 1096
+    },
+    "userIds": [
+      "vegapunk"
+    ]
+  },
+  {
+    "id": "riki-riki-no-mi",
+    "apiId": 199,
+    "wikiTitle": "Riki Riki no Mi",
+    "name": {
+      "fr": "Fruit de la force",
+      "en": "Riki Riki no Mi"
+    },
+    "romaji": "Riki Riki no Mi",
+    "type": "paramecia",
+    "description": "C'est un fruit qui permet à celui qui l'a mangé de d'acquérir une force herculéenne.",
+    "debut": {
+      "chapter": 1063,
+      "episode": 1093
+    },
+    "userIds": [
+      "jesus-burgess"
+    ]
+  },
+  {
+    "id": "wapu-wapu-no-mi",
+    "apiId": 200,
+    "wikiTitle": "Wapu Wapu no Mi",
+    "name": {
+      "fr": "Fruit de la téléportation",
+      "en": "Wapu Wapu no Mi"
+    },
+    "romaji": "Wapu Wapu no mi",
+    "type": "paramecia",
+    "description": "C'est un fruit du démon qui permet à celui qui l'a mangé de se téléporter et de téléporter n'importe quoi d’un endroit à l’autre",
+    "debut": {
+      "chapter": 1063,
+      "episode": 1093
+    },
+    "userIds": [
+      "van-augur"
+    ]
+  },
+  {
+    "id": "shima-shima-no-mi",
+    "apiId": 201,
+    "wikiTitle": "Shima Shima no Mi",
+    "name": {
+      "fr": "Fruit de l'île",
+      "en": "Shima Shima no Mi"
+    },
+    "romaji": "Shima Shima no Mi",
+    "type": "paramecia",
+    "description": "C'est un fruit du démon qui lui permet à son utilisateur de ne faire plus qu'un avec une île entière, devenant ainsi un Homme Insulaire",
+    "debut": {
+      "chapter": 1080,
+      "episode": 1113
+    },
+    "userIds": [
+      "avalo-pizarro"
+    ]
+  },
+  {
+    "id": "deka-deka-no-mi",
+    "apiId": 202,
+    "wikiTitle": "Deka Deka no Mi",
+    "name": {
+      "fr": "Fruit du gigantisme",
+      "en": "Deka Deka no Mi"
+    },
+    "romaji": "Deka Deka no Mi",
+    "type": "paramecia",
+    "description": "C'est un fruit du démon qui permet à son utilisateur d'augmenter sa taille, faisant de lui un Homme Gigantifié",
+    "debut": {
+      "chapter": 575,
+      "episode": 484
+    },
+    "userIds": [
+      "sanjuan-wolf"
+    ]
+  },
+  {
+    "id": "gabu-gabu-no-mi",
+    "apiId": 203,
+    "wikiTitle": "Gabu Gabu no Mi",
+    "name": {
+      "fr": "Fruit du Glouglou",
+      "en": "Gabu Gabu no Mi"
+    },
+    "romaji": "Gabu Gabu no Mi",
+    "type": "paramecia",
+    "description": "C'est un fruit du démon qui permet à son utilisateur de contrôler l'alcool, faisant de lui un Homme-Alcool",
+    "debut": {
+      "chapter": 1087,
+      "episode": 1121
+    },
+    "userIds": [
+      "vasco-shot"
+    ]
+  },
+  {
+    "id": "shiku-shiku-no-mi",
+    "apiId": 204,
+    "wikiTitle": "Shiku Shiku no Mi",
+    "name": {
+      "fr": "Fruit de la maladie",
+      "en": "Shiku Shiku no Mi"
+    },
+    "romaji": "Shiku Shiku no Mi",
+    "type": "paramecia",
+    "description": "C'est un fruit du démon qui permet à celui qui l'a mangé de créer n'importe quelle forme de maladie contagieuse et virulante.",
+    "debut": {
+      "chapter": 1063,
+      "episode": 1093
+    },
+    "userIds": [
+      "doc-q"
+    ]
+  },
+  {
+    "id": "uma-uma-no-mi-model-pegasus",
+    "apiId": 205,
+    "wikiTitle": "Uma Uma no Mi, Model: Pegasus",
+    "name": {
+      "fr": "Fruit du cheval, modèle Pégase",
+      "en": "Uma Uma no Mi, Model: Pegasus"
+    },
+    "romaji": "Uma Uma no Mi, modèle Pégase",
+    "type": "zoan-mythical",
+    "description": "C'est un fruit du démon qui permet à l'utilisateur de se transformer en un cheval ailé volant ou en cheval ailé volant hybride",
+    "debut": {
+      "chapter": 1063,
+      "episode": 1092
+    },
+    "userIds": [
+      "stronger"
+    ]
+  },
+  {
+    "id": "tori-tori-no-mi-model-phoenix",
+    "apiId": 206,
+    "wikiTitle": "Tori Tori no Mi, Model: Phoenix",
+    "name": {
+      "fr": "Fruit du Phœnix",
+      "en": "Tori Tori no Mi, Model: Phoenix"
+    },
+    "romaji": "Tori Tori no Mi",
+    "type": "zoan-mythical",
+    "description": "Il permet de se transformer en Phénix ou en une forme hybride",
+    "debut": {
+      "chapter": 553,
+      "episode": 463
+    },
+    "userIds": [
+      "polo-marco"
+    ]
+  },
+  {
+    "id": "toshi-toshi-no-mi",
+    "apiId": 210,
+    "wikiTitle": "Toshi Toshi no Mi",
+    "name": {
+      "fr": "Fruit de l'âge",
+      "en": "Toshi Toshi no Mi"
+    },
+    "romaji": "Toshi Toshi no Mi",
+    "type": "paramecia",
+    "description": "manipulation de l’âge\r\nvieillissement / rajeunissement\r\naltération biologique temporaire",
+    "debut": {
+      "chapter": 499,
+      "episode": 393
+    },
+    "userIds": [
+      "jewelry-bonney"
+    ]
+  },
+  {
+    "id": "batto-batto-no-mi",
+    "apiId": 211,
+    "wikiTitle": "Batto Batto no Mi",
+    "name": {
+      "fr": "Fruit de la chauve-souris / vampire (modèle fruit-bat)",
+      "en": "Batto Batto no Mi"
+    },
+    "romaji": "Mori Mori no Mi",
+    "type": "logia",
+    "description": "Un fruit de type Zoan qui transforme son utilisateur en créature vampirique, spécialisé dans l’infiltration et l’attaque furtive plutôt que la force brute.",
+    "debut": {
+      "chapter": 1072,
+      "episode": 1104
+    },
+    "userIds": [
+      "stussy"
+    ]
+  }
+]
