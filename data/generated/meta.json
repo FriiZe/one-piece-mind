@@ -3,15 +3,16 @@
   "latestEpisode": 1162,
   "animeCutoffChapter": 1132,
   "counts": {
-    "characters": 777,
-    "canonCharacters": 681,
+    "characters": 772,
+    "canonCharacters": 676,
     "fruits": 204,
     "crews": 149,
     "sagas": 10,
     "arcs": 50,
     "islands": 128,
     "ships": 99,
-    "swords": 21
+    "swords": 21,
+    "groups": 15
   },
   "sources": [
     {
@@ -23,6 +24,11 @@
       "name": "One Piece Wiki",
       "url": "https://onepiece.fandom.com/",
       "license": "CC BY-SA 3.0"
+    },
+    {
+      "name": "AniList",
+      "url": "https://anilist.co/",
+      "license": "portraits des personnages"
     }
   ]
 }

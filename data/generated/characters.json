@@ -11,6 +11,7 @@
       "Monkey D Luffy"
     ],
     "canon": true,
+    "tier": 1,
     "debut": {
       "chapter": 1,
       "episode": 1
@@ -155,9 +156,11 @@
       "en": "Roronoa Zoro"
     },
     "aliases": [
-      "Roronoa Zoro (Uncut dub, Early VIZ manga);\nRoronoa Zolo (Edited dub, VIZ Media, 4Kids)"
+      "Roronoa Zoro ;",
+      "Roronoa Zolo"
     ],
     "canon": true,
+    "tier": 1,
     "debut": {
       "chapter": 3,
       "episode": 1
@@ -271,6 +274,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 1,
     "debut": {
       "chapter": 8,
       "episode": 1
@@ -373,8 +377,13 @@
       "fr": "Usopp",
       "en": "Usopp"
     },
-    "aliases": [],
+    "aliases": [
+      "Pipo",
+      "Sogeking",
+      "God Usopp"
+    ],
     "canon": true,
+    "tier": 1,
     "debut": {
       "chapter": 23,
       "episode": 8
@@ -473,6 +482,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 1,
     "debut": {
       "chapter": 43,
       "episode": 20
@@ -593,6 +603,7 @@
       "Tony Tony Chopper"
     ],
     "canon": true,
+    "tier": 1,
     "debut": {
       "chapter": 134,
       "episode": 81
@@ -682,6 +693,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 1,
     "debut": {
       "chapter": 114,
       "episode": 67
@@ -819,9 +831,11 @@
       "en": "Franky"
     },
     "aliases": [
-      "Franky;\nFrankie (originally)"
+      "Franky;",
+      "Frankie"
     ],
     "canon": true,
+    "tier": 1,
     "debut": {
       "chapter": 329,
       "episode": 233
@@ -936,6 +950,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 1,
     "debut": {
       "chapter": 442,
       "episode": 337
@@ -1058,9 +1073,11 @@
       "en": "Jinbe"
     },
     "aliases": [
-      "Jinbe (OPCG, Crunchyroll);\nJimbei (VIZ, Crunchyroll (former))"
+      "Jinbe ;",
+      "Jimbei )"
     ],
     "canon": true,
+    "tier": 1,
     "debut": {
       "chapter": 528,
       "episode": 430
@@ -1203,6 +1220,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 2,
     "debut": {
       "chapter": 827,
       "episode": 786
@@ -1279,6 +1297,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 2,
     "debut": {
       "chapter": 704,
       "episode": 632
@@ -1372,6 +1391,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 3,
     "debut": {
       "chapter": 704,
       "episode": 632
@@ -1453,6 +1473,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 1,
     "debut": {
       "chapter": 705,
       "episode": 633
@@ -1538,6 +1559,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 705,
       "episode": 634
@@ -1600,6 +1622,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 2,
     "debut": {
       "chapter": 704,
       "episode": 632
@@ -1681,6 +1704,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 3,
     "debut": {
       "chapter": 704,
       "episode": 632
@@ -1742,9 +1766,10 @@
       "en": "Baby 5"
     },
     "aliases": [
-      "Baby 5\nBaby Five (WT100)"
+      "Baby Five"
     ],
     "canon": true,
+    "tier": 2,
     "debut": {
       "chapter": 682,
       "episode": 608
@@ -1826,6 +1851,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 3,
     "debut": {
       "chapter": 706,
       "episode": 633
@@ -1894,9 +1920,11 @@
       "en": "Blue Gilly"
     },
     "aliases": [
-      "Blue Gilly (Viz);\nBluegilly (WT100)"
+      "Blue Gilly ;",
+      "Bluegilly"
     ],
     "canon": true,
+    "tier": 3,
     "debut": {
       "chapter": 706,
       "episode": 636
@@ -1951,6 +1979,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 3,
     "debut": {
       "chapter": 704,
       "episode": 633
@@ -2015,6 +2044,7 @@
       "Jet; Jeet"
     ],
     "canon": true,
+    "tier": 3,
     "debut": {
       "chapter": 704,
       "episode": 633
@@ -2079,6 +2109,7 @@
       "Leo"
     ],
     "canon": true,
+    "tier": 2,
     "debut": {
       "chapter": 710,
       "episode": 640
@@ -2144,9 +2175,10 @@
       "en": "Kabu"
     },
     "aliases": [
-      "Cub; Kabu (FUNimation (Ep 640-648))"
+      "Cub; Kabu )"
     ],
     "canon": true,
+    "tier": 3,
     "debut": {
       "chapter": 710,
       "episode": 640
@@ -2211,6 +2243,7 @@
       "Bian"
     ],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 717,
       "episode": 647
@@ -2273,6 +2306,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 1,
     "debut": {
       "chapter": 706,
       "episode": 639
@@ -2349,6 +2383,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 3,
     "debut": {
       "chapter": 500,
       "episode": 394
@@ -2427,6 +2462,7 @@
       "Rodo"
     ],
     "canon": true,
+    "tier": 2,
     "debut": {
       "chapter": 898,
       "episode": 836
@@ -2488,6 +2524,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 3,
     "debut": {
       "chapter": 899,
       "episode": 836
@@ -2559,6 +2596,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 3,
     "debut": {
       "chapter": 866,
       "episode": 836
@@ -2632,6 +2670,7 @@
       "Orlombus"
     ],
     "canon": true,
+    "tier": 3,
     "debut": {
       "chapter": 704,
       "episode": 632
@@ -2712,11 +2751,12 @@
       "en": "Buggy"
     },
     "aliases": [
+      "Le Clown",
       "Buggy",
-      "Baggy le Clown",
-      "Le Clown"
+      "Baggy le Clown"
     ],
     "canon": true,
+    "tier": 1,
     "debut": {
       "chapter": 9,
       "episode": 4
@@ -2851,6 +2891,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 2,
     "debut": {
       "chapter": 2,
       "episode": 1
@@ -2937,6 +2978,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 1,
     "debut": {
       "chapter": 117,
       "episode": 70
@@ -3028,9 +3070,11 @@
     },
     "aliases": [
       "Mohji",
-      "Mohji;\nMorji (Odex)"
+      "Mohji;",
+      "Morji"
     ],
     "canon": true,
+    "tier": 3,
     "debut": {
       "chapter": 9,
       "episode": 6
@@ -3111,6 +3155,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 3,
     "debut": {
       "chapter": 9,
       "episode": 7
@@ -3192,6 +3237,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 2,
     "debut": {
       "chapter": 23,
       "episode": 9
@@ -3257,9 +3303,10 @@
       "en": "Sham"
     },
     "aliases": [
-      "Siam\nSham (WT100)"
+      "Siam"
     ],
     "canon": true,
+    "tier": 3,
     "debut": {
       "chapter": 31,
       "episode": 13
@@ -3325,9 +3372,10 @@
       "en": "Buchi"
     },
     "aliases": [
-      "Butchie\nBuchi (WT100)"
+      "Butchie"
     ],
     "canon": true,
+    "tier": 3,
     "debut": {
       "chapter": 31,
       "episode": 13
@@ -3396,6 +3444,7 @@
       "Don Krieg"
     ],
     "canon": true,
+    "tier": 2,
     "debut": {
       "chapter": 45,
       "episode": 21
@@ -3469,9 +3518,11 @@
     },
     "aliases": [
       "Gin",
-      "Gin (VIZ, Odex);\nGhin (4Kids, Funimation)"
+      "Gin ;",
+      "Ghin"
     ],
     "canon": true,
+    "tier": 3,
     "debut": {
       "chapter": 44,
       "episode": 21
@@ -3542,6 +3593,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 3,
     "debut": {
       "chapter": 54,
       "episode": 25
@@ -3610,9 +3662,13 @@
     },
     "aliases": [
       "Mont Blanc Cricket",
-      "Mont Blanc Cricket (Viz),\nMontblanc Cricket (Uncut Funimation),\nMonbran Cricket (Edited Funimation),\nMombran Cricket (4Kids)"
+      "Mont Blanc Cricket ,",
+      "Montblanc Cricket ,",
+      "Monbran Cricket ,",
+      "Mombran Cricket"
     ],
     "canon": true,
+    "tier": 3,
     "debut": {
       "chapter": 227,
       "episode": 148
@@ -3684,6 +3740,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 219,
       "episode": 144
@@ -3750,9 +3807,11 @@
     },
     "aliases": [
       "Shoujou",
-      "Shojoe (4Kids);\nShoujou (Viz);\nShojo (Funimation)"
+      "Shojoe ;",
+      "Shoujou ;"
     ],
     "canon": true,
+    "tier": 3,
     "debut": {
       "chapter": 226,
       "episode": 147
@@ -3819,6 +3878,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 2,
     "debut": {
       "chapter": 305,
       "episode": 207
@@ -3882,6 +3942,7 @@
       "Porche"
     ],
     "canon": true,
+    "tier": 3,
     "debut": {
       "chapter": 305,
       "episode": 207
@@ -3939,6 +4000,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 3,
     "debut": {
       "chapter": 305,
       "episode": 207
@@ -4001,6 +4063,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 1,
     "debut": {
       "chapter": 449,
       "episode": 343
@@ -4072,6 +4135,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 2,
     "debut": {
       "chapter": 446,
       "episode": 340
@@ -4132,6 +4196,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 2,
     "debut": {
       "chapter": 444,
       "episode": 339
@@ -4198,6 +4263,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 2,
     "debut": {
       "chapter": 443,
       "episode": 338
@@ -4266,6 +4332,7 @@
       "Charlotte Lola"
     ],
     "canon": true,
+    "tier": 2,
     "debut": {
       "chapter": 476,
       "episode": 370
@@ -4342,6 +4409,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 1,
     "debut": {
       "chapter": 498,
       "episode": 392
@@ -4445,6 +4513,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 2,
     "debut": {
       "chapter": 498,
       "episode": 392
@@ -4520,6 +4589,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 3,
     "debut": {
       "chapter": 497,
       "episode": 391
@@ -4587,6 +4657,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 3,
     "debut": {
       "chapter": 498,
       "episode": 392
@@ -4645,6 +4716,7 @@
       "Penguin"
     ],
     "canon": true,
+    "tier": 3,
     "debut": {
       "chapter": 498,
       "episode": 392
@@ -4703,6 +4775,7 @@
       "Eustass Kid"
     ],
     "canon": true,
+    "tier": 1,
     "debut": {
       "chapter": 498,
       "episode": 392
@@ -4778,6 +4851,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 2,
     "debut": {
       "chapter": 498,
       "episode": 392
@@ -4863,6 +4937,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 500,
       "episode": 394
@@ -4919,6 +4994,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 500,
       "episode": 394
@@ -4975,6 +5051,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 1,
     "debut": {
       "chapter": 498,
       "episode": 392
@@ -5059,6 +5136,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 3,
     "debut": {
       "chapter": 812,
       "episode": 763
@@ -5125,6 +5203,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 3,
     "debut": {
       "chapter": 825,
       "episode": 783
@@ -5182,6 +5261,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 2,
     "debut": {
       "chapter": 825,
       "episode": 783
@@ -5243,6 +5323,7 @@
     },
     "aliases": [],
     "canon": false,
+    "tier": 4,
     "debut": null,
     "gender": null,
     "races": [],
@@ -5273,6 +5354,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 1,
     "debut": {
       "chapter": 498,
       "episode": 392
@@ -5343,6 +5425,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 3,
     "debut": {
       "chapter": 498,
       "episode": 392
@@ -5402,6 +5485,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 1,
     "debut": {
       "chapter": 516,
       "episode": 409
@@ -5489,6 +5573,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 2,
     "debut": {
       "chapter": 516,
       "episode": 409
@@ -5548,6 +5633,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 3,
     "debut": {
       "chapter": 516,
       "episode": 409
@@ -5607,9 +5693,10 @@
     },
     "aliases": [
       "Marguerite",
-      "Marguerite (VIZ),\nMargaret (Funimation)"
+      "Marguerite ,"
     ],
     "canon": true,
+    "tier": 3,
     "debut": {
       "chapter": 514,
       "episode": 408
@@ -5659,6 +5746,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 2,
     "debut": {
       "chapter": 0,
       "episode": 425
@@ -5735,6 +5823,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 3,
     "debut": {
       "chapter": 0,
       "episode": 429
@@ -5787,6 +5876,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 2,
     "debut": {
       "chapter": 600,
       "episode": 519
@@ -5863,6 +5953,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 3,
     "debut": {
       "chapter": 600,
       "episode": 519
@@ -5934,6 +6025,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 2,
     "debut": {
       "chapter": 521,
       "episode": 415
@@ -6022,6 +6114,7 @@
       "Aladine"
     ],
     "canon": true,
+    "tier": 3,
     "debut": {
       "chapter": 620,
       "episode": 540
@@ -6100,6 +6193,7 @@
       "Charlotte Praline"
     ],
     "canon": true,
+    "tier": 3,
     "debut": {
       "chapter": 830,
       "episode": 790
@@ -6166,9 +6260,10 @@
       "en": "Dracule Mihawk"
     },
     "aliases": [
-      "Dracule Mihawk\nDiego Mihawk (Odex)"
+      "Diego Mihawk"
     ],
     "canon": true,
+    "tier": 1,
     "debut": {
       "chapter": 49,
       "episode": 23
@@ -6249,6 +6344,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 1,
     "debut": {
       "chapter": 126,
       "episode": 76
@@ -6336,7 +6432,7 @@
     ],
     "crewId": null,
     "job": null,
-    "fruitId": null,
+    "fruitId": "suna-suna-no-mi",
     "haki": {
       "observation": true,
       "armament": true,
@@ -6355,6 +6451,7 @@
       "Daz Bonez"
     ],
     "canon": true,
+    "tier": 2,
     "debut": {
       "chapter": 160,
       "episode": 103
@@ -6419,7 +6516,7 @@
     ],
     "crewId": null,
     "job": null,
-    "fruitId": null,
+    "fruitId": "supa-supa-no-mi",
     "haki": {
       "observation": false,
       "armament": false,
@@ -6438,6 +6535,7 @@
       "Edward Weevil"
     ],
     "canon": true,
+    "tier": 3,
     "debut": {
       "chapter": 802,
       "episode": 751
@@ -6494,6 +6592,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 1,
     "debut": {
       "chapter": 1,
       "episode": 4
@@ -6590,9 +6689,11 @@
     },
     "aliases": [
       "Benn Beckman",
-      "Benn Beckman;\nBen Beckman (VIZ, formerly)"
+      "Benn Beckman;",
+      "Ben Beckman"
     ],
     "canon": true,
+    "tier": 3,
     "debut": {
       "chapter": 1,
       "episode": 4
@@ -6649,9 +6750,10 @@
     },
     "aliases": [
       "Lucky Roux",
-      "Lucky Roux;\nLucky Roo (WT100)"
+      "Lucky Roux;"
     ],
     "canon": true,
+    "tier": 3,
     "debut": {
       "chapter": 1,
       "episode": 4
@@ -6715,6 +6817,7 @@
       "Yasopp"
     ],
     "canon": true,
+    "tier": 3,
     "debut": {
       "chapter": 1,
       "episode": 4
@@ -6780,9 +6883,10 @@
       "en": "Limejuice"
     },
     "aliases": [
-      "Lime Juice;\nLimejuice (OPCG)"
+      "Lime Juice;"
     ],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 1,
       "episode": 4
@@ -6835,6 +6939,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 1,
       "episode": 4
@@ -6892,6 +6997,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 1,
       "episode": 489
@@ -6953,6 +7059,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 41,
       "episode": 4
@@ -7010,6 +7117,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 1,
       "episode": 489
@@ -7067,9 +7175,10 @@
     },
     "aliases": [
       "Gab",
-      "Gabu;\nGab (OPCG)"
+      "Gabu;"
     ],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 580,
       "episode": 489
@@ -7127,6 +7236,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 234,
       "episode": 151
@@ -7181,6 +7291,7 @@
       "Big Mom"
     ],
     "canon": true,
+    "tier": 1,
     "debut": {
       "chapter": 651,
       "episode": 571
@@ -7281,6 +7392,7 @@
       "Charlotte Katakuri"
     ],
     "canon": true,
+    "tier": 1,
     "debut": {
       "chapter": 860,
       "episode": 825
@@ -7347,6 +7459,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 2,
     "debut": {
       "chapter": 846,
       "episode": 812
@@ -7414,6 +7527,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 2,
     "debut": {
       "chapter": 835,
       "episode": 796
@@ -7489,9 +7603,10 @@
     },
     "aliases": [
       "Charlotte Perospero",
-      "Charlotte Perospero (Viz); Charlotte Perosperaw (WT100)"
+      "Charlotte Perospero ; Charlotte Perosperaw"
     ],
     "canon": true,
+    "tier": 1,
     "debut": {
       "chapter": 834,
       "episode": 795
@@ -7558,6 +7673,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 3,
     "debut": {
       "chapter": 861,
       "episode": 826
@@ -7624,6 +7740,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 2,
     "debut": {
       "chapter": 861,
       "episode": 827
@@ -7690,6 +7807,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 3,
     "debut": {
       "chapter": 827,
       "episode": 786
@@ -7755,6 +7873,7 @@
       "Charlotte Opera"
     ],
     "canon": true,
+    "tier": 3,
     "debut": {
       "chapter": 829,
       "episode": 789
@@ -7814,6 +7933,7 @@
       "Charlotte Brulee"
     ],
     "canon": true,
+    "tier": 2,
     "debut": {
       "chapter": 831,
       "episode": 791
@@ -7870,9 +7990,10 @@
     },
     "aliases": [
       "Charlotte Mont-d'Or",
-      "Charlotte Montd'Or (Viz)\nCharlotte Mont-d'Or (WT100)"
+      "Charlotte Montd'Or"
     ],
     "canon": true,
+    "tier": 2,
     "debut": {
       "chapter": 829,
       "episode": 789
@@ -7944,6 +8065,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 3,
     "debut": {
       "chapter": 829,
       "episode": 789
@@ -8001,6 +8123,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 894,
       "episode": 798
@@ -8070,6 +8193,7 @@
       "Pudding"
     ],
     "canon": true,
+    "tier": 1,
     "debut": {
       "chapter": 651,
       "episode": 571
@@ -8138,6 +8262,7 @@
       "Charlotte Flampe"
     ],
     "canon": true,
+    "tier": 3,
     "debut": {
       "chapter": 891,
       "episode": 865
@@ -8209,6 +8334,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 860,
       "episode": 830
@@ -8266,9 +8392,11 @@
     },
     "aliases": [
       "Charlotte Mondée",
-      "Charlotte Monder;\nCharlotte Mondee (WT100)"
+      "Charlotte Monder;",
+      "Charlotte Mondee"
     ],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 854,
       "episode": 822
@@ -8324,6 +8452,7 @@
       "Charlotte Hachee"
     ],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 871,
       "episode": null
@@ -8376,9 +8505,11 @@
       "en": "Charlotte Effilée"
     },
     "aliases": [
-      "Charlotte Effiler;\nCharlotte Effilee (WT100)"
+      "Charlotte Effiler;",
+      "Charlotte Effilee"
     ],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 864,
       "episode": 831
@@ -8432,6 +8563,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 845,
       "episode": 809
@@ -8484,6 +8616,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 845,
       "episode": 809
@@ -8536,6 +8669,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 845,
       "episode": 809
@@ -8588,6 +8722,7 @@
     },
     "aliases": [],
     "canon": false,
+    "tier": 4,
     "debut": null,
     "gender": "male",
     "races": [
@@ -8626,6 +8761,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 860,
       "episode": 830
@@ -8682,6 +8818,7 @@
     },
     "aliases": [],
     "canon": false,
+    "tier": 4,
     "debut": null,
     "gender": null,
     "races": [],
@@ -8711,10 +8848,10 @@
       "en": "Charlotte Zuccotto"
     },
     "aliases": [
-      "Charlotte Zuccotto",
-      "Charlotte Zuccotto (OPWT100)"
+      "Charlotte Zuccotto"
     ],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 862,
       "episode": 832
@@ -8775,6 +8912,7 @@
       "Charlotte Broye"
     ],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 864,
       "episode": 832
@@ -8836,6 +8974,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 3,
     "debut": {
       "chapter": 854,
       "episode": 822
@@ -8892,9 +9031,10 @@
       "en": "Charlotte Basskarte"
     },
     "aliases": [
-      "Charlotte Bassquarte (Viz);\nCharlotte Basskarte (WT100)"
+      "Charlotte Bassquarte ;"
     ],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 860,
       "episode": 830
@@ -8949,6 +9089,7 @@
       "Charlotte Dosmarche"
     ],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 861,
       "episode": 832
@@ -9006,6 +9147,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 862,
       "episode": 832
@@ -9063,6 +9205,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 829,
       "episode": 788
@@ -9118,10 +9261,9 @@
       "fr": "Charlotte Mash",
       "en": "Charlotte Mash"
     },
-    "aliases": [
-      "Charlotte Mash (WT100)"
-    ],
+    "aliases": [],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 865,
       "episode": 831
@@ -9176,6 +9318,7 @@
       "Charlotte Cornstarch"
     ],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 865,
       "episode": 841
@@ -9233,6 +9376,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 864,
       "episode": 834
@@ -9290,6 +9434,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 864,
       "episode": 834
@@ -9342,6 +9487,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 862,
       "episode": 831
@@ -9394,6 +9540,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 861,
       "episode": 834
@@ -9451,6 +9598,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 862,
       "episode": 832
@@ -9503,6 +9651,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 862,
       "episode": 832
@@ -9560,6 +9709,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 861,
       "episode": 833
@@ -9624,6 +9774,7 @@
       "Charlotte Cinnamon"
     ],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 860,
       "episode": 830
@@ -9680,9 +9831,10 @@
       "en": "Charlotte Saint-Marc"
     },
     "aliases": [
-      "Charlotte Saintmarc (VIZ);\nCharlotte Saint-Marc (WT100)"
+      "Charlotte Saintmarc ;"
     ],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 862,
       "episode": 832
@@ -9738,10 +9890,9 @@
       "fr": "Charlotte Basans",
       "en": "Charlotte Basans"
     },
-    "aliases": [
-      "Charlotte Basans (WT100)"
-    ],
+    "aliases": [],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 862,
       "episode": 832
@@ -9796,6 +9947,7 @@
       "Charlotte Melise"
     ],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 854,
       "episode": null
@@ -9848,6 +10000,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 854,
       "episode": 822
@@ -9903,6 +10056,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 860,
       "episode": 830
@@ -9955,6 +10109,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 888,
       "episode": 861
@@ -10007,6 +10162,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 896,
       "episode": 871
@@ -10064,6 +10220,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 862,
       "episode": 839
@@ -10120,9 +10277,11 @@
       "en": "Charlotte Kato"
     },
     "aliases": [
-      "Kato (Funimation subs);\nFructose (VIZ);\nCharlotte Kato (WT100)"
+      "Kato ;",
+      "Fructose ;"
     ],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 854,
       "episode": 822
@@ -10180,6 +10339,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 897,
       "episode": 873
@@ -10232,6 +10392,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 894,
       "episode": 869
@@ -10289,6 +10450,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 862,
       "episode": 832
@@ -10347,6 +10509,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 894,
       "episode": 869
@@ -10400,6 +10563,7 @@
     },
     "aliases": [],
     "canon": false,
+    "tier": 4,
     "debut": null,
     "gender": null,
     "races": [],
@@ -10432,6 +10596,7 @@
       "Charlotte Maple"
     ],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 897,
       "episode": null
@@ -10485,6 +10650,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 845,
       "episode": 809
@@ -10537,6 +10703,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 894,
       "episode": 869
@@ -10589,6 +10756,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 845,
       "episode": 809
@@ -10641,6 +10809,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 897,
       "episode": null
@@ -10693,6 +10862,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 845,
       "episode": 809
@@ -10751,6 +10921,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 845,
       "episode": 809
@@ -10806,6 +10977,7 @@
       "Charlotte Yuen"
     ],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 894,
       "episode": 869
@@ -10858,6 +11030,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 3,
     "debut": {
       "chapter": 845,
       "episode": 809
@@ -10917,6 +11090,7 @@
       "Charlotte Newgo"
     ],
     "canon": true,
+    "tier": 3,
     "debut": {
       "chapter": 845,
       "episode": 809
@@ -10974,6 +11148,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 3,
     "debut": {
       "chapter": 845,
       "episode": 809
@@ -11031,6 +11206,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 854,
       "episode": 822
@@ -11088,6 +11264,7 @@
     },
     "aliases": [],
     "canon": false,
+    "tier": 4,
     "debut": null,
     "gender": null,
     "races": [],
@@ -11118,6 +11295,7 @@
     },
     "aliases": [],
     "canon": false,
+    "tier": 4,
     "debut": null,
     "gender": null,
     "races": [],
@@ -11148,6 +11326,7 @@
     },
     "aliases": [],
     "canon": false,
+    "tier": 4,
     "debut": null,
     "gender": null,
     "races": [],
@@ -11178,6 +11357,7 @@
     },
     "aliases": [],
     "canon": false,
+    "tier": 4,
     "debut": null,
     "gender": null,
     "races": [],
@@ -11208,6 +11388,7 @@
     },
     "aliases": [],
     "canon": false,
+    "tier": 4,
     "debut": null,
     "gender": null,
     "races": [],
@@ -11238,6 +11419,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 894,
       "episode": 869
@@ -11292,6 +11474,7 @@
       "Charlotte Anglaise"
     ],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 845,
       "episode": 809
@@ -11338,6 +11521,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 845,
       "episode": 809
@@ -11381,6 +11565,7 @@
       "Charlotte Uiro"
     ],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 845,
       "episode": 809
@@ -11423,6 +11608,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 845,
       "episode": 809
@@ -11465,6 +11651,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 845,
       "episode": 809
@@ -11507,6 +11694,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 845,
       "episode": 809
@@ -11553,6 +11741,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 845,
       "episode": 809
@@ -11599,6 +11788,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 845,
       "episode": 809
@@ -11645,6 +11835,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 2,
     "debut": {
       "chapter": 651,
       "episode": 570
@@ -11714,6 +11905,7 @@
       "Tamago"
     ],
     "canon": true,
+    "tier": 2,
     "debut": {
       "chapter": 651,
       "episode": 570
@@ -11780,6 +11972,7 @@
       "Bobbin"
     ],
     "canon": true,
+    "tier": 3,
     "debut": {
       "chapter": 651,
       "episode": 571
@@ -11837,6 +12030,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 3,
     "debut": {
       "chapter": 858,
       "episode": 827
@@ -11905,6 +12099,7 @@
       "Prometheus"
     ],
     "canon": true,
+    "tier": 2,
     "debut": {
       "chapter": 827,
       "episode": 786
@@ -11962,6 +12157,7 @@
       "Napoleon"
     ],
     "canon": true,
+    "tier": 2,
     "debut": {
       "chapter": 651,
       "episode": 571
@@ -12019,6 +12215,7 @@
       "Hera"
     ],
     "canon": true,
+    "tier": 3,
     "debut": {
       "chapter": 1011,
       "episode": 1028
@@ -12080,6 +12277,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 3,
     "debut": {
       "chapter": 836,
       "episode": 797
@@ -12138,6 +12336,7 @@
       "Kaidou"
     ],
     "canon": true,
+    "tier": 1,
     "debut": {
       "chapter": 795,
       "episode": 736
@@ -12236,6 +12435,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 1,
     "debut": {
       "chapter": 920,
       "episode": 910
@@ -12297,6 +12497,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 1,
     "debut": {
       "chapter": 920,
       "episode": 910
@@ -12374,6 +12575,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 2,
     "debut": {
       "chapter": 801,
       "episode": 746
@@ -12445,6 +12647,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 2,
     "debut": {
       "chapter": 929,
       "episode": 923
@@ -12506,6 +12709,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 2,
     "debut": {
       "chapter": 977,
       "episode": 982
@@ -12569,6 +12773,7 @@
       "Who's-Who"
     ],
     "canon": true,
+    "tier": 2,
     "debut": {
       "chapter": 977,
       "episode": 954
@@ -12660,6 +12865,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 2,
     "debut": {
       "chapter": 977,
       "episode": 982
@@ -12721,6 +12927,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 2,
     "debut": {
       "chapter": 977,
       "episode": 954
@@ -12794,6 +13001,7 @@
       "Sheepshead"
     ],
     "canon": true,
+    "tier": 3,
     "debut": {
       "chapter": 795,
       "episode": 739
@@ -12828,7 +13036,7 @@
     ],
     "crewId": "hyakuju-kaizokudan",
     "job": "Vedette",
-    "fruitId": "sheep-smile",
+    "fruitId": null,
     "haki": {
       "observation": false,
       "armament": false,
@@ -12845,6 +13053,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 1,
     "debut": {
       "chapter": 498,
       "episode": 392
@@ -12927,6 +13136,7 @@
       "Holed'em"
     ],
     "canon": true,
+    "tier": 3,
     "debut": {
       "chapter": 915,
       "episode": 901
@@ -12961,7 +13171,7 @@
     ],
     "crewId": "hyakuju-kaizokudan",
     "job": "Vedette",
-    "fruitId": "lion-smile",
+    "fruitId": null,
     "haki": {
       "observation": false,
       "armament": false,
@@ -12978,6 +13188,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 3,
     "debut": {
       "chapter": 917,
       "episode": 904
@@ -13022,7 +13233,7 @@
     ],
     "crewId": "hyakuju-kaizokudan",
     "job": "Vedette",
-    "fruitId": "horse-smile",
+    "fruitId": null,
     "haki": {
       "observation": false,
       "armament": false,
@@ -13039,6 +13250,7 @@
     },
     "aliases": [],
     "canon": false,
+    "tier": 4,
     "debut": null,
     "gender": null,
     "races": [],
@@ -13069,6 +13281,7 @@
     },
     "aliases": [],
     "canon": false,
+    "tier": 4,
     "debut": null,
     "gender": null,
     "races": [],
@@ -13099,6 +13312,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 935,
       "episode": 930
@@ -13134,7 +13348,7 @@
     ],
     "crewId": "hyakuju-kaizokudan",
     "job": "Vedette",
-    "fruitId": "monkey-smile",
+    "fruitId": null,
     "haki": {
       "observation": false,
       "armament": false,
@@ -13151,6 +13365,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 979,
       "episode": 985
@@ -13191,7 +13406,7 @@
     ],
     "crewId": "hyakuju-kaizokudan",
     "job": "Vedette",
-    "fruitId": "flying-squirrel-smile",
+    "fruitId": null,
     "haki": {
       "observation": false,
       "armament": false,
@@ -13208,6 +13423,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 795,
       "episode": 739
@@ -13255,6 +13471,7 @@
     },
     "aliases": [],
     "canon": false,
+    "tier": 4,
     "debut": null,
     "gender": null,
     "races": [],
@@ -13285,6 +13502,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 993,
       "episode": 982
@@ -13325,7 +13543,7 @@
     ],
     "crewId": "hyakuju-kaizokudan",
     "job": "Vedette",
-    "fruitId": "gorilla-smile",
+    "fruitId": null,
     "haki": {
       "observation": false,
       "armament": false,
@@ -13342,6 +13560,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 994,
       "episode": 982
@@ -13372,7 +13591,7 @@
     ],
     "crewId": "hyakuju-kaizokudan",
     "job": "Vedette",
-    "fruitId": "smile-du-coq",
+    "fruitId": null,
     "haki": {
       "observation": false,
       "armament": false,
@@ -13389,6 +13608,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 994,
       "episode": 982
@@ -13429,7 +13649,7 @@
     ],
     "crewId": "hyakuju-kaizokudan",
     "job": "Vedette",
-    "fruitId": "giraffe-smile",
+    "fruitId": null,
     "haki": {
       "observation": false,
       "armament": false,
@@ -13446,6 +13666,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 978,
       "episode": 982
@@ -13486,7 +13707,7 @@
     ],
     "crewId": "hyakuju-kaizokudan",
     "job": "Vedette",
-    "fruitId": "gorilla-smile",
+    "fruitId": null,
     "haki": {
       "observation": false,
       "armament": false,
@@ -13503,6 +13724,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 997,
       "episode": 982
@@ -13538,7 +13760,7 @@
     ],
     "crewId": "hyakuju-kaizokudan",
     "job": "Vedette",
-    "fruitId": "rattlesnake-smile",
+    "fruitId": null,
     "haki": {
       "observation": false,
       "armament": false,
@@ -13554,9 +13776,10 @@
       "en": "Batman"
     },
     "aliases": [
-      "Bat-Man (Viz)\nBatman (Funimation)"
+      "Bat-Man"
     ],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 914,
       "episode": 900
@@ -13587,7 +13810,7 @@
     ],
     "crewId": "hyakuju-kaizokudan",
     "job": "Gifters",
-    "fruitId": "bat-smile",
+    "fruitId": null,
     "haki": {
       "observation": false,
       "armament": false,
@@ -13603,9 +13826,10 @@
       "en": "Gazelleman"
     },
     "aliases": [
-      "Gazelle-Man (Viz)\nGazelleman (Funimation)"
+      "Gazelle-Man"
     ],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 914,
       "episode": 900
@@ -13646,7 +13870,7 @@
     ],
     "crewId": "hyakuju-kaizokudan",
     "job": "Gifters",
-    "fruitId": "smile-de-gazelle",
+    "fruitId": null,
     "haki": {
       "observation": false,
       "armament": false,
@@ -13665,6 +13889,7 @@
       "Mouse-Man"
     ],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 915,
       "episode": 901
@@ -13695,7 +13920,7 @@
     ],
     "crewId": "hyakuju-kaizokudan",
     "job": "Gifters",
-    "fruitId": "mouse-smile",
+    "fruitId": null,
     "haki": {
       "observation": false,
       "armament": false,
@@ -13712,6 +13937,7 @@
     },
     "aliases": [],
     "canon": false,
+    "tier": 4,
     "debut": null,
     "gender": null,
     "races": [],
@@ -13745,6 +13971,7 @@
       "Rabbit-Man"
     ],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 916,
       "episode": 904
@@ -13775,7 +14002,7 @@
     ],
     "crewId": "hyakuju-kaizokudan",
     "job": "Gifters",
-    "fruitId": "rabbit-smile",
+    "fruitId": null,
     "haki": {
       "observation": false,
       "armament": false,
@@ -13794,6 +14021,7 @@
       "Sarahebi"
     ],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 919,
       "episode": 909
@@ -13849,6 +14077,7 @@
       "Alpaca-Man"
     ],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 934,
       "episode": 929
@@ -13879,7 +14108,7 @@
     ],
     "crewId": "hyakuju-kaizokudan",
     "job": "Gifters",
-    "fruitId": "smile-from-alpaca",
+    "fruitId": null,
     "haki": {
       "observation": false,
       "armament": false,
@@ -13896,6 +14125,7 @@
     },
     "aliases": [],
     "canon": false,
+    "tier": 4,
     "debut": null,
     "gender": null,
     "races": [],
@@ -13928,6 +14158,7 @@
       "N/A"
     ],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 940,
       "episode": 937
@@ -13958,7 +14189,7 @@
     ],
     "crewId": "hyakuju-kaizokudan",
     "job": "Gifters",
-    "fruitId": "ostrich-smile",
+    "fruitId": null,
     "haki": {
       "observation": false,
       "armament": false,
@@ -13975,6 +14206,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 980,
       "episode": 986
@@ -14005,7 +14237,7 @@
     ],
     "crewId": "hyakuju-kaizokudan",
     "job": "Gifters",
-    "fruitId": "smile-of-the-white-snake",
+    "fruitId": null,
     "haki": {
       "observation": false,
       "armament": false,
@@ -14021,9 +14253,11 @@
       "en": "Caimanlady"
     },
     "aliases": [
-      "Caiman Lady;\nCaiman-Lady (WT100 2nd)"
+      "Caiman Lady;",
+      "Caiman-Lady"
     ],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 1004,
       "episode": 1020
@@ -14059,7 +14293,7 @@
     ],
     "crewId": "hyakuju-kaizokudan",
     "job": "Gifters",
-    "fruitId": "caiman-smile",
+    "fruitId": null,
     "haki": {
       "observation": false,
       "armament": false,
@@ -14078,6 +14312,7 @@
       "Nure-Onna"
     ],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 998,
       "episode": 1013
@@ -14108,7 +14343,7 @@
     ],
     "crewId": "hyakuju-kaizokudan",
     "job": "Gifters",
-    "fruitId": "smile-of-the-scorpion",
+    "fruitId": null,
     "haki": {
       "observation": false,
       "armament": false,
@@ -14127,6 +14362,7 @@
       "Wanyudo"
     ],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 1005,
       "episode": 1021
@@ -14157,7 +14393,7 @@
     ],
     "crewId": "hyakuju-kaizokudan",
     "job": "Gifters",
-    "fruitId": "pug-smile",
+    "fruitId": null,
     "haki": {
       "observation": false,
       "armament": false,
@@ -14174,6 +14410,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 954,
       "episode": 955
@@ -14213,6 +14450,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 991,
       "episode": 1055
@@ -14256,6 +14494,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 991,
       "episode": 1055
@@ -14295,6 +14534,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 954,
       "episode": 955
@@ -14334,6 +14574,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 954,
       "episode": 955
@@ -14373,6 +14614,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 1036,
       "episode": 1063
@@ -14412,6 +14654,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 988,
       "episode": 997
@@ -14454,6 +14697,7 @@
       "Haccha"
     ],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 981,
       "episode": 987
@@ -14497,6 +14741,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 1020,
       "episode": 1042
@@ -14536,6 +14781,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 977,
       "episode": 982
@@ -14575,6 +14821,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 3,
     "debut": {
       "chapter": 931,
       "episode": 925
@@ -14646,6 +14893,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 931,
       "episode": 925
@@ -14712,6 +14960,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 931,
       "episode": 925
@@ -14773,6 +15022,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 931,
       "episode": 925
@@ -14834,6 +15084,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 931,
       "episode": 925
@@ -14897,6 +15148,7 @@
       "Jigoku-Benten"
     ],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 931,
       "episode": 925
@@ -14963,6 +15215,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 931,
       "episode": 925
@@ -15029,6 +15282,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 931,
       "episode": 925
@@ -15095,6 +15349,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 931,
       "episode": 925
@@ -15161,6 +15416,7 @@
     },
     "aliases": [],
     "canon": false,
+    "tier": 4,
     "debut": null,
     "gender": null,
     "races": [],
@@ -15193,6 +15449,7 @@
       "Yazaemon"
     ],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 931,
       "episode": 925
@@ -15254,6 +15511,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 951,
       "episode": 951
@@ -15316,6 +15574,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 2,
     "debut": {
       "chapter": 498,
       "episode": 392
@@ -15394,10 +15653,12 @@
     },
     "aliases": [
       "Barbe Noire",
+      "Marshall D. Teech ;",
       "Blackbeard",
       "Teach"
     ],
     "canon": true,
+    "tier": 1,
     "debut": {
       "chapter": 223,
       "episode": 146
@@ -15502,9 +15763,11 @@
       "en": "Jesus Burgess"
     },
     "aliases": [
-      "Jesus Burgess (VIZ, uncut dub);\nG. Zass Burgess (edited dub)"
+      "Jesus Burgess ;",
+      "G. Zass Burgess"
     ],
     "canon": true,
+    "tier": 2,
     "debut": {
       "chapter": 222,
       "episode": 146
@@ -15570,10 +15833,10 @@
       "en": "Shiryu"
     },
     "aliases": [
-      "Shiryu",
-      "Shiryu\nShiliew (WT100)"
+      "Shiryu"
     ],
     "canon": true,
+    "tier": 2,
     "debut": {
       "chapter": 538,
       "episode": 440
@@ -15645,9 +15908,10 @@
     },
     "aliases": [
       "Van Augur",
-      "Van Augur (VIZ)\nVan Ogre (Formerly VIZ, Edited Funimation)\nVan Auger (Uncut Funimation)"
+      "Van Ogre"
     ],
     "canon": true,
+    "tier": 2,
     "debut": {
       "chapter": 222,
       "episode": 146
@@ -15714,6 +15978,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 3,
     "debut": {
       "chapter": 575,
       "episode": 484
@@ -15785,9 +16050,11 @@
     },
     "aliases": [
       "Laffitte",
-      "Lafitte (VIZ, uncut dub);\nRaffit (edited dub);\nLaffitte (WT100)"
+      "Lafitte ;",
+      "Raffit ;"
     ],
     "canon": true,
+    "tier": 3,
     "debut": {
       "chapter": 234,
       "episode": 151
@@ -15858,9 +16125,11 @@
       "en": "Catarina Devon"
     },
     "aliases": [
-      "Catarina Devon;\nCatalina Devon"
+      "Catarina Devon;",
+      "Catalina Devon"
     ],
     "canon": true,
+    "tier": 3,
     "debut": {
       "chapter": 575,
       "episode": 484
@@ -15927,6 +16196,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 3,
     "debut": {
       "chapter": 575,
       "episode": 484
@@ -15988,6 +16258,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 3,
     "debut": {
       "chapter": 575,
       "episode": 484
@@ -16054,6 +16325,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 3,
     "debut": {
       "chapter": 223,
       "episode": 146
@@ -16122,6 +16394,7 @@
       "Peachbeard"
     ],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 904,
       "episode": 880
@@ -16189,6 +16462,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 1,
     "debut": {
       "chapter": 1,
       "episode": 48
@@ -16255,6 +16529,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 1,
     "debut": {
       "chapter": 19,
       "episode": 8
@@ -16312,6 +16587,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 1,
     "debut": {
       "chapter": 19,
       "episode": null
@@ -16375,6 +16651,7 @@
       "Seagull Ganz Nozudon"
     ],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 0,
       "episode": 0
@@ -16422,6 +16699,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 0,
       "episode": null
@@ -16471,6 +16749,7 @@
       "Doringo"
     ],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 0,
       "episode": null
@@ -16520,6 +16799,7 @@
       "Mille Pine"
     ],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 966,
       "episode": 959
@@ -16572,6 +16852,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 552,
       "episode": 461
@@ -16619,6 +16900,7 @@
       "CB Gallant"
     ],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 966,
       "episode": 959
@@ -16668,6 +16950,7 @@
       "Donkino"
     ],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 966,
       "episode": 959
@@ -16722,6 +17005,7 @@
       "Mr. Momora"
     ],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 966,
       "episode": 966
@@ -16769,6 +17053,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 966,
       "episode": 969
@@ -16823,6 +17108,7 @@
       "Yuey"
     ],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 966,
       "episode": 966
@@ -16872,6 +17158,7 @@
       "Langram"
     ],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 966,
       "episode": null
@@ -16919,6 +17206,7 @@
     },
     "aliases": [],
     "canon": false,
+    "tier": 4,
     "debut": null,
     "gender": null,
     "races": [],
@@ -16951,6 +17239,7 @@
       "MAX Marx"
     ],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 966,
       "episode": 967
@@ -17003,6 +17292,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 966,
       "episode": 959
@@ -17058,6 +17348,7 @@
       "Bancro"
     ],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 967,
       "episode": 959
@@ -17107,6 +17398,7 @@
       "Bluemarine"
     ],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 967,
       "episode": 959
@@ -17161,6 +17453,7 @@
       "Erio"
     ],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 967,
       "episode": 959
@@ -17215,6 +17508,7 @@
       "Lowwing"
     ],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 967,
       "episode": 959
@@ -17270,6 +17564,7 @@
       "Jackson Burner"
     ],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 967,
       "episode": 968
@@ -17322,6 +17617,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 1158,
       "episode": 966
@@ -17369,6 +17665,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 1,
     "debut": {
       "chapter": 69,
       "episode": 31
@@ -17445,6 +17742,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 3,
     "debut": {
       "chapter": 69,
       "episode": 31
@@ -17506,6 +17804,7 @@
     },
     "aliases": [],
     "canon": false,
+    "tier": 4,
     "debut": null,
     "gender": null,
     "races": [],
@@ -17540,9 +17839,10 @@
       "en": "Yorki"
     },
     "aliases": [
-      "Yorki\nCalico Yorki (live-action series)"
+      "Calico Yorki"
     ],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 103,
       "episode": 63
@@ -17603,6 +17903,7 @@
       "Mizuuta Madaisky"
     ],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 487,
       "episode": 379
@@ -17653,6 +17954,7 @@
       "Mizuuta Mawaritosky"
     ],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 488,
       "episode": 379
@@ -17700,6 +18002,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 3,
     "debut": {
       "chapter": 222,
       "episode": 146
@@ -17761,9 +18064,11 @@
     },
     "aliases": [
       "Barbe Blanche",
-      "Edward Newgate (VIZ, Funimation);\nWard Newgate (4Kids)"
+      "Edward Newgate ;",
+      "Ward Newgate"
     ],
     "canon": true,
+    "tier": 1,
     "debut": {
       "chapter": 159,
       "episode": 95
@@ -17847,9 +18152,12 @@
       "en": "Portgas D. Ace"
     },
     "aliases": [
-      "Portgas D. Ace (uncut dub);\nPortgaz D. Ace (VIZ, Funimation subs);\nPortgaz D. Trace (edited dub)"
+      "Portgas D. Ace ;",
+      "Portgaz D. Ace ;",
+      "Portgaz D. Trace"
     ],
     "canon": true,
+    "tier": 1,
     "debut": {
       "chapter": 154,
       "episode": 91
@@ -17958,6 +18266,7 @@
       "Jozu"
     ],
     "canon": true,
+    "tier": 3,
     "debut": {
       "chapter": 234,
       "episode": 151
@@ -18019,6 +18328,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 3,
     "debut": {
       "chapter": 440,
       "episode": 325
@@ -18070,6 +18380,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 3,
     "debut": {
       "chapter": 552,
       "episode": null
@@ -18131,6 +18442,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 553,
       "episode": 461
@@ -18187,6 +18499,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 553,
       "episode": 461
@@ -18243,6 +18556,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 553,
       "episode": 461
@@ -18299,6 +18613,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 552,
       "episode": 461
@@ -18360,6 +18675,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 562,
       "episode": 461
@@ -18416,6 +18732,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 553,
       "episode": 461
@@ -18472,6 +18789,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 3,
     "debut": {
       "chapter": 553,
       "episode": 461
@@ -18536,6 +18854,7 @@
       "Speed Jil"
     ],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 553,
       "episode": 461
@@ -18592,6 +18911,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 553,
       "episode": 461
@@ -18650,6 +18970,7 @@
       "Izo"
     ],
     "canon": true,
+    "tier": 2,
     "debut": {
       "chapter": 553,
       "episode": 461
@@ -18721,6 +19042,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 551,
       "episode": 460
@@ -18777,10 +19099,10 @@
       "en": "Decalvan Brothers"
     },
     "aliases": [
-      "Decalvan Brothers",
-      "Decalvan Brothers (Viz)\nDeCalvan Brothers (Funimation)"
+      "Decalvan Brothers"
     ],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 551,
       "episode": 460
@@ -18835,6 +19157,7 @@
       "Squard"
     ],
     "canon": true,
+    "tier": 3,
     "debut": {
       "chapter": 551,
       "episode": 460
@@ -18901,6 +19224,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 3,
     "debut": {
       "chapter": 556,
       "episode": 462
@@ -18960,6 +19284,7 @@
       "Little Oars Jr."
     ],
     "canon": true,
+    "tier": 3,
     "debut": {
       "chapter": 554,
       "episode": 463
@@ -19023,6 +19348,7 @@
       "McGuy"
     ],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 551,
       "episode": 460
@@ -19080,9 +19406,10 @@
     },
     "aliases": [
       "A O",
-      "A.O. (VIZ Media and FUNimation subs);\nA.O (FUNimation dub)"
+      "A.O. ;"
     ],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 551,
       "episode": 460
@@ -19140,6 +19467,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 553,
       "episode": 467
@@ -19192,6 +19520,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 551,
       "episode": 460
@@ -19244,6 +19573,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 551,
       "episode": 460
@@ -19296,6 +19626,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 551,
       "episode": 460
@@ -19348,6 +19679,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 553,
       "episode": 462
@@ -19400,6 +19732,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 553,
       "episode": 470
@@ -19457,6 +19790,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 553,
       "episode": 468
@@ -19509,6 +19843,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 553,
       "episode": 477
@@ -19561,6 +19896,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 553,
       "episode": null
@@ -19614,6 +19950,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 553,
       "episode": 462
@@ -19664,6 +20001,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 3,
     "debut": {
       "chapter": 553,
       "episode": 467
@@ -19716,6 +20054,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 553,
       "episode": null
@@ -19768,6 +20107,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 555,
       "episode": 464
@@ -19817,6 +20157,7 @@
       "Arthur"
     ],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 556,
       "episode": null
@@ -19869,6 +20210,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 556,
       "episode": 465
@@ -19921,6 +20263,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 556,
       "episode": 465
@@ -19973,6 +20316,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 558,
       "episode": 479
@@ -20025,6 +20369,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 558,
       "episode": null
@@ -20077,6 +20422,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 558,
       "episode": 468
@@ -20131,6 +20477,7 @@
       "N/A"
     ],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 579,
       "episode": null
@@ -20183,6 +20530,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 558,
       "episode": 467
@@ -20234,9 +20582,10 @@
       "en": "Baggaley"
     },
     "aliases": [
-      "Baggaly (WT100)"
+      "Baggaly"
     ],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 561,
       "episode": null
@@ -20284,6 +20633,7 @@
     },
     "aliases": [],
     "canon": false,
+    "tier": 4,
     "debut": null,
     "gender": null,
     "races": [],
@@ -20314,6 +20664,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 561,
       "episode": 470
@@ -20366,6 +20717,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 561,
       "episode": 470
@@ -20418,6 +20770,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 558,
       "episode": null
@@ -20467,6 +20820,7 @@
       "Great Michael"
     ],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 563,
       "episode": null
@@ -20521,6 +20875,7 @@
       "Zukka"
     ],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 564,
       "episode": 489
@@ -20575,6 +20930,7 @@
       "Cans"
     ],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 569,
       "episode": null
@@ -20627,6 +20983,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 570,
       "episode": 467
@@ -20674,6 +21031,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 574,
       "episode": null
@@ -20728,6 +21086,7 @@
       "Agushily"
     ],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 578,
       "episode": 487
@@ -20780,6 +21139,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 578,
       "episode": null
@@ -20829,6 +21189,7 @@
       "N/A"
     ],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 578,
       "episode": 487
@@ -20883,6 +21244,7 @@
       "N/A"
     ],
     "canon": false,
+    "tier": 4,
     "debut": null,
     "gender": "male",
     "races": [
@@ -20934,6 +21296,7 @@
       "N/A"
     ],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 566,
       "episode": null
@@ -20987,9 +21350,10 @@
     "aliases": [
       "Barbe Brune",
       "Chadros Higelyges",
-      "Browndros Beardriguez (WT100)\nChadros Higelyges (OPCG)"
+      "Browndros Beardriguez"
     ],
     "canon": true,
+    "tier": 3,
     "debut": {
       "chapter": 581,
       "episode": 490
@@ -21065,6 +21429,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 584,
       "episode": 494
@@ -21126,6 +21491,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 583,
       "episode": 494
@@ -21181,10 +21547,10 @@
       "en": "Demalo Black"
     },
     "aliases": [
-      "Demalo Black",
-      "Demalo Black\nDemaro Black (Funimation, former)"
+      "Demalo Black"
     ],
     "canon": true,
+    "tier": 3,
     "debut": {
       "chapter": 598,
       "episode": 517
@@ -21246,6 +21612,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 598,
       "episode": 518
@@ -21297,6 +21664,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 598,
       "episode": 517
@@ -21350,6 +21718,7 @@
       "Mounbleten"
     ],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 598,
       "episode": 517
@@ -21400,9 +21769,10 @@
       "en": "Drip"
     },
     "aliases": [
-      "Gack (VIZ);\nDrip (Funimation, WT100)"
+      "Gack ;"
     ],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 598,
       "episode": 518
@@ -21456,6 +21826,7 @@
       "Stray Fox"
     ],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 598,
       "episode": 518
@@ -21505,6 +21876,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 598,
       "episode": 518
@@ -21558,6 +21930,7 @@
       "Turk"
     ],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 598,
       "episode": 517
@@ -21608,9 +21981,11 @@
       "en": "Hody Jones"
     },
     "aliases": [
-      "Hordy Jones (Funimation)\nHody Jones (Viz, Special Edited Version);"
+      "Hordy Jones",
+      "Hody Jones ;"
     ],
     "canon": true,
+    "tier": 1,
     "debut": {
       "chapter": 608,
       "episode": 527
@@ -21682,6 +22057,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 3,
     "debut": {
       "chapter": 611,
       "episode": 530
@@ -21738,6 +22114,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 3,
     "debut": {
       "chapter": 611,
       "episode": 530
@@ -21799,6 +22176,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 3,
     "debut": {
       "chapter": 611,
       "episode": 530
@@ -21855,6 +22233,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 3,
     "debut": {
       "chapter": 611,
       "episode": 530
@@ -21913,6 +22292,7 @@
       "Hyouzou"
     ],
     "canon": true,
+    "tier": 3,
     "debut": {
       "chapter": 607,
       "episode": 527
@@ -21984,6 +22364,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 2,
     "debut": {
       "chapter": 606,
       "episode": 525
@@ -22023,7 +22404,7 @@
     ],
     "crewId": "furaingu-kaizokudan",
     "job": "Capitaine",
-    "fruitId": null,
+    "fruitId": "mato-mato-no-mi",
     "haki": {
       "observation": false,
       "armament": false,
@@ -22040,9 +22421,10 @@
     },
     "aliases": [
       "Donquixote Doflamingo",
-      "Don Quixote Doflamingo (VIZ);\nDonquixote Doflamingo (Funimation subs)"
+      "Don Quixote Doflamingo ;"
     ],
     "canon": true,
+    "tier": 1,
     "debut": {
       "chapter": 233,
       "episode": 151
@@ -22151,6 +22533,7 @@
       "Trebol"
     ],
     "canon": true,
+    "tier": 2,
     "debut": {
       "chapter": 700,
       "episode": 629
@@ -22217,6 +22600,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 2,
     "debut": {
       "chapter": 700,
       "episode": 629
@@ -22283,6 +22667,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 2,
     "debut": {
       "chapter": 700,
       "episode": 629
@@ -22339,6 +22724,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 2,
     "debut": {
       "chapter": 671,
       "episode": 597
@@ -22420,6 +22806,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 3,
     "debut": {
       "chapter": 682,
       "episode": 608
@@ -22473,6 +22860,7 @@
       "Giolla"
     ],
     "canon": true,
+    "tier": 3,
     "debut": {
       "chapter": 682,
       "episode": 608
@@ -22524,6 +22912,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 3,
     "debut": {
       "chapter": 682,
       "episode": 608
@@ -22582,6 +22971,7 @@
       "Senor Pink"
     ],
     "canon": true,
+    "tier": 2,
     "debut": {
       "chapter": 702,
       "episode": 632
@@ -22642,9 +23032,11 @@
       "en": "Machvise"
     },
     "aliases": [
-      "Machvise (FUNimation Simulcast, Formerly Viz);\nMach Vise (Viz)"
+      "Machvise ;",
+      "Mach Vise"
     ],
     "canon": true,
+    "tier": 3,
     "debut": {
       "chapter": 682,
       "episode": 608
@@ -22701,6 +23093,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 3,
     "debut": {
       "chapter": 702,
       "episode": 632
@@ -22758,6 +23151,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 3,
     "debut": {
       "chapter": 682,
       "episode": 608
@@ -22816,6 +23210,7 @@
       "Buffalo"
     ],
     "canon": true,
+    "tier": 3,
     "debut": {
       "chapter": 692,
       "episode": 618
@@ -22877,6 +23272,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 2,
     "debut": {
       "chapter": 657,
       "episode": 581
@@ -22943,6 +23339,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 1,
     "debut": {
       "chapter": 957,
       "episode": 958
@@ -22990,15 +23387,22 @@
     }
   },
   {
-    "id": "im-sama",
+    "id": "nerona-imu",
     "apiId": 380,
     "wikiTitle": "Nerona Imu",
     "name": {
-      "fr": "Im Sama",
-      "en": "Im Sama"
+      "fr": "Imu",
+      "en": "Nerona Imu"
     },
-    "aliases": [],
+    "aliases": [
+      "Nerona Imu",
+      "St. Nerona Imu",
+      "Im",
+      "Im-sama",
+      "Im Sama"
+    ],
     "canon": true,
+    "tier": 1,
     "debut": {
       "chapter": 906,
       "episode": 885
@@ -23049,6 +23453,7 @@
     },
     "aliases": [],
     "canon": false,
+    "tier": 4,
     "debut": null,
     "gender": null,
     "races": [],
@@ -23079,6 +23484,7 @@
     },
     "aliases": [],
     "canon": false,
+    "tier": 4,
     "debut": null,
     "gender": null,
     "races": [],
@@ -23109,6 +23515,7 @@
     },
     "aliases": [],
     "canon": false,
+    "tier": 4,
     "debut": null,
     "gender": null,
     "races": [],
@@ -23139,6 +23546,7 @@
     },
     "aliases": [],
     "canon": false,
+    "tier": 4,
     "debut": null,
     "gender": null,
     "races": [],
@@ -23169,6 +23577,7 @@
     },
     "aliases": [],
     "canon": false,
+    "tier": 4,
     "debut": null,
     "gender": null,
     "races": [],
@@ -23199,9 +23608,10 @@
     },
     "aliases": [
       "Rosward Rosward",
-      "Roswald;\nRosward Rosward (WT100 2nd)"
+      "Roswald;"
     ],
     "canon": true,
+    "tier": 3,
     "debut": {
       "chapter": 497,
       "episode": 391
@@ -23253,9 +23663,11 @@
     },
     "aliases": [
       "Rosward Charlos",
-      "Saint Charlos (VIZ);\nSaint Charloss (Funimation)"
+      "Saint Charlos ;",
+      "Saint Charloss"
     ],
     "canon": true,
+    "tier": 3,
     "debut": {
       "chapter": 499,
       "episode": 393
@@ -23310,6 +23722,7 @@
       "Saint Rosward Shalria"
     ],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 497,
       "episode": 391
@@ -23361,9 +23774,12 @@
     },
     "aliases": [
       "Donquixote Mjosgard",
-      "Don Quixote Myosgard (VIZ, Funimation dub (Ep 545), Funimation)\nDon Quixote Mjosgard (Funimation, former)\nDonquixote Myosgard (Crunchyroll)"
+      "Don Quixote Myosgard , Funimation)",
+      "Don Quixote Mjosgard",
+      "Donquixote Myosgard"
     ],
     "canon": true,
+    "tier": 3,
     "debut": {
       "chapter": 625,
       "episode": 545
@@ -23410,9 +23826,11 @@
       "en": "Jalmack"
     },
     "aliases": [
-      "Saint Jalmac (VIZ);\nSaint Jalmack (Funimation)"
+      "Saint Jalmac ;",
+      "Saint Jalmack"
     ],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 588,
       "episode": 502
@@ -23462,6 +23880,7 @@
       "Guernika"
     ],
     "canon": true,
+    "tier": 3,
     "debut": {
       "chapter": 705,
       "episode": 635
@@ -23513,6 +23932,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 1,
     "debut": {
       "chapter": 323,
       "episode": 230
@@ -23584,6 +24004,7 @@
     },
     "aliases": [],
     "canon": false,
+    "tier": 4,
     "debut": null,
     "gender": null,
     "races": [],
@@ -23614,6 +24035,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 2,
     "debut": {
       "chapter": 355,
       "episode": 249
@@ -23685,9 +24107,11 @@
     },
     "aliases": [
       "Funkfreed",
-      "Funkfreed (VIZ, Funimation);\nFunk Freed (Unlimited Adventure)"
+      "Funkfreed ;",
+      "Funk Freed"
     ],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 365,
       "episode": 254
@@ -23721,7 +24145,7 @@
     ],
     "crewId": "cipher-pol",
     "job": null,
-    "fruitId": "neko-neko-no-mi-model-leopard",
+    "fruitId": null,
     "haki": {
       "observation": false,
       "armament": false,
@@ -23738,6 +24162,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 1,
     "debut": {
       "chapter": 323,
       "episode": 230
@@ -23809,6 +24234,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 2,
     "debut": {
       "chapter": 860,
       "episode": 828
@@ -23887,6 +24313,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 929,
       "episode": 922
@@ -23934,6 +24361,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 362,
       "episode": 253
@@ -23987,6 +24415,7 @@
       "Wanze"
     ],
     "canon": true,
+    "tier": 3,
     "debut": {
       "chapter": 367,
       "episode": 257
@@ -24048,6 +24477,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 3,
     "debut": {
       "chapter": 379,
       "episode": 267
@@ -24099,6 +24529,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 3,
     "debut": {
       "chapter": 379,
       "episode": 267
@@ -24150,6 +24581,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 3,
     "debut": {
       "chapter": 379,
       "episode": 267
@@ -24201,6 +24633,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 2,
     "debut": {
       "chapter": 525,
       "episode": 422
@@ -24257,6 +24690,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 2,
     "debut": {
       "chapter": 528,
       "episode": 425
@@ -24313,6 +24747,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 526,
       "episode": 422
@@ -24369,6 +24804,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 530,
       "episode": 431
@@ -24420,6 +24856,7 @@
       "Sadie"
     ],
     "canon": true,
+    "tier": 3,
     "debut": {
       "chapter": 531,
       "episode": 432
@@ -24471,9 +24908,10 @@
     },
     "aliases": [
       "Minotaurus",
-      "Minotaur (Viz);\nMinotaurus (Funimation)"
+      "Minotaur ;"
     ],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 525,
       "episode": 422
@@ -24524,6 +24962,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 531,
       "episode": 432
@@ -24576,6 +25015,7 @@
       "Minorhinoceros"
     ],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 532,
       "episode": 433
@@ -24628,6 +25068,7 @@
       "Minozebra"
     ],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 533,
       "episode": 434
@@ -24680,6 +25121,7 @@
       "Minochihuahua"
     ],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 662,
       "episode": null
@@ -24727,6 +25169,7 @@
       "Akainu"
     ],
     "canon": true,
+    "tier": 1,
     "debut": {
       "chapter": 397,
       "episode": 278
@@ -24790,6 +25233,7 @@
       "Kizaru"
     ],
     "canon": true,
+    "tier": 1,
     "debut": {
       "chapter": 504,
       "episode": 398
@@ -24853,6 +25297,7 @@
       "Fujitora"
     ],
     "canon": true,
+    "tier": 1,
     "debut": {
       "chapter": 701,
       "episode": 630
@@ -24921,6 +25366,7 @@
       "Ryokugyu"
     ],
     "canon": true,
+    "tier": 2,
     "debut": {
       "chapter": 905,
       "episode": 882
@@ -24982,6 +25428,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 1,
     "debut": {
       "chapter": 92,
       "episode": 68
@@ -25057,6 +25504,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 3,
     "debut": {
       "chapter": 234,
       "episode": 151
@@ -25113,6 +25561,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 96,
       "episode": 45
@@ -25164,6 +25613,7 @@
     },
     "aliases": [],
     "canon": false,
+    "tier": 4,
     "debut": null,
     "gender": null,
     "races": [],
@@ -25194,6 +25644,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 3,
     "debut": {
       "chapter": 420,
       "episode": 302
@@ -25250,6 +25701,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 420,
       "episode": 302
@@ -25297,6 +25749,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 3,
     "debut": {
       "chapter": 420,
       "episode": 302
@@ -25344,6 +25797,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 420,
       "episode": 302
@@ -25396,6 +25850,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 420,
       "episode": 302
@@ -25443,9 +25898,10 @@
     },
     "aliases": [
       "Dalmatian",
-      "Dalmation (WT100)\nDalmatian (OPCG)"
+      "Dalmation"
     ],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 553,
       "episode": 462
@@ -25493,6 +25949,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 3,
     "debut": {
       "chapter": 553,
       "episode": 462
@@ -25548,9 +26005,11 @@
       "en": "Smoker"
     },
     "aliases": [
-      "Smoker (VIZ, Funimation),\nChaser (4Kids)"
+      "Smoker ,",
+      "Chaser"
     ],
     "canon": true,
+    "tier": 1,
     "debut": {
       "chapter": 97,
       "episode": 48
@@ -25645,6 +26104,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 705,
       "episode": 634
@@ -25697,6 +26157,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 907,
       "episode": 887
@@ -25744,6 +26205,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 3,
     "debut": {
       "chapter": 171,
       "episode": 127
@@ -25805,9 +26267,10 @@
     },
     "aliases": [
       "T Bone",
-      "T-Bone;\nT Bone (WT100)"
+      "T-Bone;"
     ],
     "canon": true,
+    "tier": 3,
     "debut": {
       "chapter": 365,
       "episode": 255
@@ -25879,6 +26342,7 @@
     },
     "aliases": [],
     "canon": false,
+    "tier": 4,
     "debut": null,
     "gender": null,
     "races": [],
@@ -25909,9 +26373,10 @@
     },
     "aliases": [
       "Brannew",
-      "Brannew;\nBrandnew (formerly)"
+      "Brannew;"
     ],
     "canon": true,
+    "tier": 3,
     "debut": {
       "chapter": 96,
       "episode": 45
@@ -25971,6 +26436,7 @@
       "Berry Good"
     ],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 426,
       "episode": 309
@@ -26018,6 +26484,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 426,
       "episode": 309
@@ -26067,6 +26534,7 @@
       "Sharingle"
     ],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 428,
       "episode": 310
@@ -26114,6 +26582,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 1,
     "debut": {
       "chapter": 96,
       "episode": 48
@@ -26185,9 +26654,11 @@
     },
     "aliases": [
       "Koby",
-      "Koby (VIZ, Crunchyroll, Odex),\nCoby (Funimation, 4Kids)"
+      "Koby ,",
+      "Coby"
     ],
     "canon": true,
+    "tier": 1,
     "debut": {
       "chapter": 2,
       "episode": 1
@@ -26263,9 +26734,11 @@
       "en": "Nezumi"
     },
     "aliases": [
-      "Nezumi;\nRat (Odex)"
+      "Nezumi;",
+      "Rat"
     ],
     "canon": true,
+    "tier": 3,
     "debut": {
       "chapter": 69,
       "episode": 31
@@ -26322,9 +26795,10 @@
     },
     "aliases": [
       "Donquixote Rosinante",
-      "Don Quixote Rocinante (Viz); Donquixote Rosinante (Funimation subs); Don Quixote Rosinante (Funimation dub)"
+      "Don Quixote Rocinante ; Donquixote Rosinante ; Don Quixote Rosinante"
     ],
     "canon": true,
+    "tier": 2,
     "debut": {
       "chapter": 761,
       "episode": 686
@@ -26398,6 +26872,7 @@
       "Helmeppo"
     ],
     "canon": true,
+    "tier": 2,
     "debut": {
       "chapter": 3,
       "episode": 2
@@ -26464,9 +26939,11 @@
       "en": "Fullbody"
     },
     "aliases": [
-      "Fullbody;\nFull Body (Odex, Live-Action)"
+      "Fullbody;",
+      "Full Body"
     ],
     "canon": true,
+    "tier": 2,
     "debut": {
       "chapter": 43,
       "episode": 20
@@ -26531,9 +27008,10 @@
       "en": "Jango"
     },
     "aliases": [
-      "Django (Viz, 4Kids, Funimation subs);\nJango (Funimation dub, WT100, live-action series)"
+      "Django ;"
     ],
     "canon": true,
+    "tier": 2,
     "debut": {
       "chapter": 25,
       "episode": 9
@@ -26619,6 +27097,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 1,
     "debut": {
       "chapter": 234,
       "episode": 151
@@ -26694,6 +27173,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 2,
     "debut": {
       "chapter": 497,
       "episode": 401
@@ -26763,6 +27243,7 @@
       "X. Drake"
     ],
     "canon": true,
+    "tier": 1,
     "debut": {
       "chapter": 498,
       "episode": 392
@@ -26866,6 +27347,7 @@
       "Stainless"
     ],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 96,
       "episode": 151
@@ -26913,6 +27395,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 96,
       "episode": 151
@@ -26960,6 +27443,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 234,
       "episode": 151
@@ -27007,6 +27491,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 550,
       "episode": 459
@@ -27056,6 +27541,7 @@
       "Lonz"
     ],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 550,
       "episode": 459
@@ -27103,6 +27589,7 @@
     },
     "aliases": [],
     "canon": false,
+    "tier": 4,
     "debut": null,
     "gender": null,
     "races": [],
@@ -27135,6 +27622,7 @@
       "Dorrow"
     ],
     "canon": false,
+    "tier": 4,
     "debut": null,
     "gender": "male",
     "races": [
@@ -27184,6 +27672,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 504,
       "episode": null
@@ -27237,6 +27726,7 @@
       "Uweshall Notpass"
     ],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 548,
       "episode": 451
@@ -27278,6 +27768,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 602,
       "episode": 522
@@ -27325,6 +27816,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 622,
       "episode": 541
@@ -27372,6 +27864,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 531,
       "episode": 432
@@ -27423,6 +27916,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 596,
       "episode": 514
@@ -27469,10 +27963,10 @@
       "en": "Sterry"
     },
     "aliases": [
-      "Sterry",
-      "Stelly\nSterry (WT100)"
+      "Sterry"
     ],
     "canon": true,
+    "tier": 3,
     "debut": {
       "chapter": 586,
       "episode": 500
@@ -27523,6 +28017,7 @@
     },
     "aliases": [],
     "canon": false,
+    "tier": 4,
     "debut": null,
     "gender": null,
     "races": [],
@@ -27553,6 +28048,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 585,
       "episode": 496
@@ -27594,6 +28090,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 585,
       "episode": 496
@@ -27641,6 +28138,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 3,
     "debut": {
       "chapter": 1,
       "episode": 4
@@ -27697,6 +28195,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 3,
     "debut": {
       "chapter": 1,
       "episode": 4
@@ -27748,6 +28247,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 3,
     "debut": {
       "chapter": 440,
       "episode": 324
@@ -27808,9 +28308,10 @@
       "en": "Dogra"
     },
     "aliases": [
-      "Dogura (VIZ);\nDogra (Funimation)"
+      "Dogura ;"
     ],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 582,
       "episode": 493
@@ -27857,9 +28358,10 @@
       "en": "Magra"
     },
     "aliases": [
-      "Magura (VIZ);\nMagra (Funimation)"
+      "Magura ;"
     ],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 582,
       "episode": 493
@@ -27907,6 +28409,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 3,
     "debut": {
       "chapter": 1,
       "episode": 4
@@ -27966,6 +28469,7 @@
       "Shimotsuki Kozaburo"
     ],
     "canon": true,
+    "tier": 3,
     "debut": {
       "chapter": 1033,
       "episode": 1060
@@ -28017,9 +28521,11 @@
     },
     "aliases": [
       "Shimotsuki Koushirou",
-      "Shimotsuki Koshiro;\nKoushirou (Live-Action, OPCG)"
+      "Shimotsuki Koshiro;",
+      "Koushirou"
     ],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 5,
       "episode": 19
@@ -28073,6 +28579,7 @@
       "Shimotsuki Kuina"
     ],
     "canon": true,
+    "tier": 3,
     "debut": {
       "chapter": 5,
       "episode": 2
@@ -28124,6 +28631,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 12,
       "episode": 6
@@ -28168,9 +28676,12 @@
       "en": "Chouchou"
     },
     "aliases": [
-      "Chouchou;\nShushu (WT100);\nChou-Chou (Live-Action)"
+      "Chouchou;",
+      "Shushu ;",
+      "Chou-Chou"
     ],
     "canon": true,
+    "tier": 3,
     "debut": {
       "chapter": 12,
       "episode": 6
@@ -28227,6 +28738,7 @@
       "Gaimon"
     ],
     "canon": true,
+    "tier": 3,
     "debut": {
       "chapter": 22,
       "episode": 18
@@ -28277,6 +28789,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 620,
       "episode": 1151
@@ -28318,6 +28831,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 3,
     "debut": {
       "chapter": 23,
       "episode": 9
@@ -28363,6 +28877,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 3,
     "debut": {
       "chapter": 24,
       "episode": 11
@@ -28414,9 +28929,10 @@
     },
     "aliases": [
       "Tamanegi",
-      "Onion\nTamanegi (Odex)"
+      "Onion"
     ],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 23,
       "episode": 9
@@ -28473,9 +28989,11 @@
     },
     "aliases": [
       "Piiman",
-      "Pepper\nPieman (Odex)"
+      "Pepper",
+      "Pieman"
     ],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 23,
       "episode": 9
@@ -28532,9 +29050,10 @@
     },
     "aliases": [
       "Ninjin",
-      "Carrot\nNinjin (Odex)"
+      "Carrot"
     ],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 23,
       "episode": 9
@@ -28590,9 +29109,10 @@
       "en": "Banchina"
     },
     "aliases": [
-      "Bankina (WT100);\nBanchina (Live-Action Series)"
+      "Bankina ;"
     ],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 41,
       "episode": 17
@@ -28631,9 +29151,11 @@
       "en": "Zeff"
     },
     "aliases": [
-      "Zeff;\nZef (Odex)"
+      "Zeff;",
+      "Zef"
     ],
     "canon": true,
+    "tier": 2,
     "debut": {
       "chapter": 43,
       "episode": 20
@@ -28695,6 +29217,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 3,
     "debut": {
       "chapter": 44,
       "episode": 21
@@ -28746,6 +29269,7 @@
     },
     "aliases": [],
     "canon": false,
+    "tier": 4,
     "debut": null,
     "gender": null,
     "races": [],
@@ -28776,9 +29300,11 @@
     },
     "aliases": [
       "Bell-mère",
-      "Belle-Mère (VIZ Media);\nBellemere (Funimation);\nBell-mère (OPCG)"
+      "Belle-Mère ;",
+      "Bellemere ;"
     ],
     "canon": true,
+    "tier": 3,
     "debut": {
       "chapter": 77,
       "episode": 32
@@ -28835,6 +29361,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 3,
     "debut": {
       "chapter": 70,
       "episode": 31
@@ -28886,6 +29413,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 3,
     "debut": {
       "chapter": 71,
       "episode": 32
@@ -28937,6 +29465,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 3,
     "debut": {
       "chapter": 77,
       "episode": 32
@@ -28981,9 +29510,12 @@
       "en": "Chabo"
     },
     "aliases": [
-      "Chabo;\nCabo (Funimation dub);\nBenson (Odex)"
+      "Chabo;",
+      "Cabo ;",
+      "Benson"
     ],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 69,
       "episode": 31
@@ -29037,6 +29569,7 @@
       "Johnny"
     ],
     "canon": true,
+    "tier": 3,
     "debut": {
       "chapter": 42,
       "episode": 19
@@ -29098,6 +29631,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 3,
     "debut": {
       "chapter": 42,
       "episode": 20
@@ -29158,9 +29692,10 @@
       "en": "Ipponmatsu"
     },
     "aliases": [
-      "Matsu (Viz)\nIpponmatsu (WT100)"
+      "Matsu"
     ],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 97,
       "episode": 49
@@ -29212,9 +29747,12 @@
     },
     "aliases": [
       "Mont Blanc Noland",
-      "Mont Blanc Noland\nMontblanc Noland\nMonbran Noland\nMombran Noland"
+      "Montblanc Noland",
+      "Monbran Noland",
+      "Mombran Noland"
     ],
     "canon": true,
+    "tier": 2,
     "debut": {
       "chapter": 286,
       "episode": 187
@@ -29289,6 +29827,7 @@
       "Don Quixote Homing"
     ],
     "canon": true,
+    "tier": 3,
     "debut": {
       "chapter": 760,
       "episode": 699
@@ -29338,6 +29877,7 @@
       "Portgaz D. Rouge"
     ],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 550,
       "episode": null
@@ -29389,6 +29929,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 1,
     "debut": {
       "chapter": 131,
       "episode": 79
@@ -29475,6 +30016,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 261,
       "episode": 778
@@ -29534,6 +30076,7 @@
       "Clou D. Clover"
     ],
     "canon": true,
+    "tier": 3,
     "debut": {
       "chapter": 391,
       "episode": 275
@@ -29595,6 +30138,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 3,
     "debut": {
       "chapter": 392,
       "episode": 275
@@ -29653,6 +30197,7 @@
       "Jaguar D. Saul"
     ],
     "canon": true,
+    "tier": 2,
     "debut": {
       "chapter": 392,
       "episode": 275
@@ -29719,6 +30264,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 823,
       "episode": 777
@@ -29768,6 +30314,7 @@
       "Qing Jiao; Chin Jao"
     ],
     "canon": true,
+    "tier": 2,
     "debut": {
       "chapter": 704,
       "episode": 632
@@ -29848,6 +30395,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 3,
     "debut": {
       "chapter": 102,
       "episode": 62
@@ -29908,9 +30456,11 @@
       "en": "Laboon"
     },
     "aliases": [
-      "Laboon;\nRaboon (Odex)"
+      "Laboon;",
+      "Raboon"
     ],
     "canon": true,
+    "tier": 3,
     "debut": {
       "chapter": 102,
       "episode": 62
@@ -29960,9 +30510,10 @@
       "en": "Miss Monday"
     },
     "aliases": [
-      "Ms. Monday\nMiss Monday (WT100)"
+      "Ms. Monday"
     ],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 107,
       "episode": 64
@@ -30021,6 +30572,7 @@
       "Mr. 9"
     ],
     "canon": true,
+    "tier": 3,
     "debut": {
       "chapter": 103,
       "episode": 62
@@ -30077,6 +30629,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 2,
     "debut": {
       "chapter": 116,
       "episode": 71
@@ -30142,9 +30695,10 @@
     },
     "aliases": [
       "Brogy",
-      "Brogy (VIZ, Odex);\nBroggy (Funimation, formerly VIZ)"
+      "Brogy ;"
     ],
     "canon": true,
+    "tier": 2,
     "debut": {
       "chapter": 115,
       "episode": 71
@@ -30209,10 +30763,10 @@
       "en": "Dalton"
     },
     "aliases": [
-      "Dalton",
-      "Dalton\nDolton (Odex)"
+      "Dalton"
     ],
     "canon": true,
+    "tier": 3,
     "debut": {
       "chapter": 132,
       "episode": 79
@@ -30274,6 +30828,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 2,
     "debut": {
       "chapter": 134,
       "episode": 80
@@ -30344,9 +30899,11 @@
     },
     "aliases": [
       "Hiriluk",
-      "Dr. Hiriluk\nDr. Hiruruku (Odex)"
+      "Dr. Hiriluk",
+      "Dr. Hiruruku"
     ],
     "canon": true,
+    "tier": 3,
     "debut": {
       "chapter": 141,
       "episode": 85
@@ -30397,6 +30954,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 131,
       "episode": 78
@@ -30452,9 +31010,10 @@
       "en": "Kuromarimo"
     },
     "aliases": [
-      "Kuromarimo\nK.M. (live-action series)"
+      "K.M."
     ],
     "canon": true,
+    "tier": 3,
     "debut": {
       "chapter": 131,
       "episode": 79
@@ -30510,9 +31069,12 @@
       "en": "Nefertari Cobra"
     },
     "aliases": [
-      "Nefeltari Cobra (VIZ, Movie 8);\nNefertari Cobra (Funimation, live-action series);\nNefeltari Nebra (4Kids)"
+      "Nefeltari Cobra ;",
+      "Nefertari Cobra ;",
+      "Nefeltari Nebra"
     ],
     "canon": true,
+    "tier": 3,
     "debut": {
       "chapter": 142,
       "episode": 91
@@ -30571,6 +31133,7 @@
       "Nefeltari Titi"
     ],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 215,
       "episode": 129
@@ -30617,9 +31180,11 @@
       "en": "Nefertari Vivi"
     },
     "aliases": [
-      "Nefeltari Vivi;\nVivi Nefertari;\nNefertari Vivi"
+      "Nefeltari Vivi;",
+      "Vivi Nefertari;"
     ],
     "canon": true,
+    "tier": 1,
     "debut": {
       "chapter": 103,
       "episode": 62
@@ -30711,6 +31276,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 2,
     "debut": {
       "chapter": 106,
       "episode": 64
@@ -30782,6 +31348,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 3,
     "debut": {
       "chapter": 155,
       "episode": 91
@@ -30837,9 +31404,11 @@
       "en": "Pell"
     },
     "aliases": [
-      "Pell;\nPelu (Odex subtitles)"
+      "Pell;",
+      "Pelu"
     ],
     "canon": true,
+    "tier": 3,
     "debut": {
       "chapter": 155,
       "episode": 91
@@ -30896,9 +31465,11 @@
     },
     "aliases": [
       "Karoo",
-      "Karoo (VIZ, 4Kids, Funimation);\nKalu (Odex)"
+      "Karoo ;",
+      "Kalu"
     ],
     "canon": true,
+    "tier": 2,
     "debut": {
       "chapter": 109,
       "episode": 65
@@ -30963,9 +31534,12 @@
     },
     "aliases": [
       "Matsuge",
-      "Eyelashes (VIZ),\nEyelash (4Kids, Funimation dub),\nLashes (Funimation subs),\nMatsuge (WT100)"
+      "Eyelashes ,",
+      "Eyelash ,",
+      "Lashes ,"
     ],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 162,
       "episode": 93
@@ -31020,6 +31594,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 180,
       "episode": 111
@@ -31074,6 +31649,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 180,
       "episode": 111
@@ -31128,6 +31704,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 180,
       "episode": 111
@@ -31182,6 +31759,7 @@
     },
     "aliases": [],
     "canon": false,
+    "tier": 4,
     "debut": null,
     "gender": null,
     "races": [],
@@ -31212,6 +31790,7 @@
     },
     "aliases": [],
     "canon": false,
+    "tier": 4,
     "debut": null,
     "gender": null,
     "races": [],
@@ -31242,6 +31821,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 180,
       "episode": 111
@@ -31296,6 +31876,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 3,
     "debut": {
       "chapter": 163,
       "episode": 93
@@ -31366,9 +31947,12 @@
       "en": "Toto"
     },
     "aliases": [
-      "Toto (FUNimation),\nToh-Toh (Viz),\nTu-tu (4Kids)"
+      "Toto ,",
+      "Toh-Toh ,",
+      "Tu-tu"
     ],
     "canon": true,
+    "tier": 3,
     "debut": {
       "chapter": 163,
       "episode": 100
@@ -31416,6 +32000,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 304,
       "episode": 207
@@ -31460,9 +32045,10 @@
       "en": "Shelly"
     },
     "aliases": [
-      "Sherry (VIZ); Shelly (Funimation)"
+      "Sherry ; Shelly"
     ],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 304,
       "episode": 207
@@ -31507,9 +32093,10 @@
       "en": "Gedatsu"
     },
     "aliases": [
-      "Gedatsu (Viz, Uncut dub); Gedatz (Edited dub)"
+      "Gedatsu ; Gedatz"
     ],
     "canon": true,
+    "tier": 3,
     "debut": {
       "chapter": 241,
       "episode": 155
@@ -31578,6 +32165,7 @@
       "Iceberg"
     ],
     "canon": true,
+    "tier": 2,
     "debut": {
       "chapter": 323,
       "episode": 230
@@ -31644,9 +32232,10 @@
     },
     "aliases": [
       "Paulie",
-      "Paulie (Funimation, Viz);\nPauly (Unlimited Adventure)"
+      "Paulie ;"
     ],
     "canon": true,
+    "tier": 3,
     "debut": {
       "chapter": 323,
       "episode": 230
@@ -31708,9 +32297,10 @@
     },
     "aliases": [
       "Peepley Lulu",
-      "Peepley Lulu (VIZ);\nPeeply Lulu (Funimation)"
+      "Peepley Lulu ;"
     ],
     "canon": true,
+    "tier": 3,
     "debut": {
       "chapter": 323,
       "episode": 230
@@ -31767,6 +32357,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 3,
     "debut": {
       "chapter": 323,
       "episode": 230
@@ -31825,6 +32416,7 @@
       "Zambai"
     ],
     "canon": true,
+    "tier": 3,
     "debut": {
       "chapter": 324,
       "episode": 230
@@ -31886,6 +32478,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 3,
     "debut": {
       "chapter": 329,
       "episode": 233
@@ -31942,6 +32535,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 3,
     "debut": {
       "chapter": 329,
       "episode": 233
@@ -31998,6 +32592,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 3,
     "debut": {
       "chapter": 352,
       "episode": 248
@@ -32049,6 +32644,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 3,
     "debut": {
       "chapter": 322,
       "episode": 229
@@ -32105,6 +32701,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 322,
       "episode": 229
@@ -32159,6 +32756,7 @@
       "Gonbe"
     ],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 322,
       "episode": 229
@@ -32208,6 +32806,7 @@
       "Yokozuna"
     ],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 322,
       "episode": 228
@@ -32249,6 +32848,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 2,
     "debut": {
       "chapter": 498,
       "episode": 392
@@ -32319,6 +32919,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 500,
       "episode": 394
@@ -32380,6 +32981,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 3,
     "debut": {
       "chapter": 491,
       "episode": 386
@@ -32448,6 +33050,7 @@
       "Heracles"
     ],
     "canon": true,
+    "tier": 3,
     "debut": {
       "chapter": 524,
       "episode": 420
@@ -32503,6 +33106,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 1,
     "debut": {
       "chapter": 1130,
       "episode": 1160
@@ -32574,6 +33178,7 @@
       "Jorul"
     ],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 866,
       "episode": 836
@@ -32637,6 +33242,7 @@
       "Jarul"
     ],
     "canon": true,
+    "tier": 2,
     "debut": {
       "chapter": 866,
       "episode": 836
@@ -32693,6 +33299,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 2,
     "debut": {
       "chapter": 377,
       "episode": 265
@@ -32756,6 +33363,7 @@
       "Kashii"
     ],
     "canon": true,
+    "tier": 2,
     "debut": {
       "chapter": 377,
       "episode": 265
@@ -32807,6 +33415,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 2,
     "debut": {
       "chapter": 911,
       "episode": 894
@@ -32868,9 +33477,10 @@
     },
     "aliases": [
       "Kouzuki Oden",
-      "Kozuki Oden;\nKouzuki Oden (OPCG)"
+      "Kozuki Oden;"
     ],
     "canon": true,
+    "tier": 1,
     "debut": {
       "chapter": 920,
       "episode": 910
@@ -32952,9 +33562,10 @@
     },
     "aliases": [
       "Kouzuki Toki",
-      "Kozuki Toki;\nKouzuki Toki (OPCG)"
+      "Kozuki Toki;"
     ],
     "canon": true,
+    "tier": 3,
     "debut": {
       "chapter": 919,
       "episode": 893
@@ -33010,10 +33621,13 @@
       "en": "Kouzuki Momonosuke"
     },
     "aliases": [
+      "Kouzuki Momonosuke",
+      "Kozuki Momonosuke ; Kouzuki Momonosuke",
       "Momonosuke",
       "Momo"
     ],
     "canon": true,
+    "tier": 1,
     "debut": {
       "chapter": 684,
       "episode": 609
@@ -33070,9 +33684,10 @@
     },
     "aliases": [
       "Kouzuki Hiyori",
-      "Kozuki Hiyori;\nKouzuki Hiyori (OPCG)"
+      "Kozuki Hiyori;"
     ],
     "canon": true,
+    "tier": 2,
     "debut": {
       "chapter": 909,
       "episode": 892
@@ -33131,6 +33746,7 @@
       "Kin'emon"
     ],
     "canon": true,
+    "tier": 1,
     "debut": {
       "chapter": 656,
       "episode": 580
@@ -33217,6 +33833,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 2,
     "debut": {
       "chapter": 919,
       "episode": 909
@@ -33318,6 +33935,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 1,
     "debut": {
       "chapter": 913,
       "episode": 899
@@ -33399,6 +34017,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 1,
     "debut": {
       "chapter": 817,
       "episode": 768
@@ -33473,7 +34092,7 @@
     ],
     "crewId": "pays-des-wa",
     "job": "Fourreaux Rouges",
-    "fruitId": null,
+    "fruitId": "maki-maki-no-mi",
     "haki": {
       "observation": true,
       "armament": true,
@@ -33490,6 +34109,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 2,
     "debut": {
       "chapter": 920,
       "episode": 910
@@ -33576,6 +34196,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 2,
     "debut": {
       "chapter": 920,
       "episode": 910
@@ -33666,6 +34287,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 2,
     "debut": {
       "chapter": 921,
       "episode": 911
@@ -33743,6 +34365,7 @@
       "Kurozumi Orochi"
     ],
     "canon": true,
+    "tier": 1,
     "debut": {
       "chapter": 927,
       "episode": 921
@@ -33801,6 +34424,7 @@
       "Kurozumi Kanjuro"
     ],
     "canon": true,
+    "tier": 1,
     "debut": {
       "chapter": 700,
       "episode": 629
@@ -33898,6 +34522,7 @@
       "Kurozumi Semimaru"
     ],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 965,
       "episode": 965
@@ -33951,6 +34576,7 @@
       "Kurozumi Higurashi"
     ],
     "canon": true,
+    "tier": 3,
     "debut": {
       "chapter": 965,
       "episode": 965
@@ -33998,6 +34624,7 @@
       "Shimotsuki Ryuma"
     ],
     "canon": true,
+    "tier": 3,
     "debut": {
       "chapter": 1023,
       "episode": 1046
@@ -34065,6 +34692,7 @@
       "Shimotsuki Yasuie"
     ],
     "canon": true,
+    "tier": 2,
     "debut": {
       "chapter": 929,
       "episode": 916
@@ -34120,6 +34748,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 3,
     "debut": {
       "chapter": 927,
       "episode": 920
@@ -34171,6 +34800,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 3,
     "debut": {
       "chapter": 936,
       "episode": 932
@@ -34244,6 +34874,7 @@
       "Hyougoro"
     ],
     "canon": true,
+    "tier": 2,
     "debut": {
       "chapter": 926,
       "episode": 919
@@ -34317,6 +34948,7 @@
       "Ohmasa"
     ],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 952,
       "episode": 946
@@ -34379,6 +35011,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 947,
       "episode": 946
@@ -34443,6 +35076,7 @@
       "Ocho"
     ],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 952,
       "episode": 946
@@ -34507,6 +35141,7 @@
       "Yatappe"
     ],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 952,
       "episode": 946
@@ -34571,6 +35206,7 @@
       "Kurozumi Tama"
     ],
     "canon": true,
+    "tier": 2,
     "debut": {
       "chapter": 911,
       "episode": 893
@@ -34634,6 +35270,7 @@
       "Tsuru"
     ],
     "canon": true,
+    "tier": 3,
     "debut": {
       "chapter": 912,
       "episode": 897
@@ -34684,6 +35321,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 910,
       "episode": 892
@@ -34732,6 +35370,7 @@
       "Hihimaru"
     ],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 910,
       "episode": 892
@@ -34783,6 +35422,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 911,
       "episode": 894
@@ -34824,6 +35464,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 1,
     "debut": {
       "chapter": 971,
       "episode": 972
@@ -34877,6 +35518,7 @@
       "Yeti Cool Brothers"
     ],
     "canon": true,
+    "tier": 3,
     "debut": {
       "chapter": 665,
       "episode": 591
@@ -34948,6 +35590,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 595,
       "episode": 513
@@ -35005,6 +35648,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 3,
     "debut": {
       "chapter": 668,
       "episode": 594
@@ -35052,6 +35696,7 @@
       "Riku Doldo III"
     ],
     "canon": true,
+    "tier": 2,
     "debut": {
       "chapter": 706,
       "episode": 636
@@ -35113,6 +35758,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 721,
       "episode": 650
@@ -35160,6 +35806,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 1,
     "debut": {
       "chapter": 702,
       "episode": 631
@@ -35221,6 +35868,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 2,
     "debut": {
       "chapter": 703,
       "episode": 632
@@ -35292,6 +35940,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 1,
     "debut": {
       "chapter": 704,
       "episode": 633
@@ -35359,6 +36008,7 @@
       "Gyats"
     ],
     "canon": true,
+    "tier": 3,
     "debut": {
       "chapter": 702,
       "episode": 631
@@ -35405,9 +36055,10 @@
       "en": "Tank Lepanto"
     },
     "aliases": [
-      "Tank Lepant (FUNimation)"
+      "Tank Lepant"
     ],
     "canon": true,
+    "tier": 3,
     "debut": {
       "chapter": 706,
       "episode": 636
@@ -35457,6 +36108,7 @@
       "Gancho"
     ],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 711,
       "episode": 641
@@ -35504,9 +36156,10 @@
     },
     "aliases": [
       "Mansherry",
-      "Mancherie; Mansherry;\nManshelly (WT100 2nd)"
+      "Mancherie; Mansherry;"
     ],
     "canon": true,
+    "tier": 3,
     "debut": {
       "chapter": 717,
       "episode": 647
@@ -35560,6 +36213,7 @@
       "Zunesha"
     ],
     "canon": true,
+    "tier": 3,
     "debut": {
       "chapter": 802,
       "episode": 751
@@ -35599,6 +36253,7 @@
     },
     "aliases": [],
     "canon": false,
+    "tier": 4,
     "debut": null,
     "gender": null,
     "races": [],
@@ -35629,6 +36284,7 @@
     },
     "aliases": [],
     "canon": false,
+    "tier": 4,
     "debut": null,
     "gender": null,
     "races": [],
@@ -35659,9 +36315,10 @@
     },
     "aliases": [
       "Nekomamushi",
-      "Cat Viper\nNekomamushi (WT100)"
+      "Cat Viper"
     ],
     "canon": true,
+    "tier": 1,
     "debut": {
       "chapter": 809,
       "episode": 756
@@ -35780,6 +36437,7 @@
       "Shishilian"
     ],
     "canon": true,
+    "tier": 3,
     "debut": {
       "chapter": 808,
       "episode": 758
@@ -35848,6 +36506,7 @@
       "Concelot"
     ],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 809,
       "episode": 758
@@ -35909,6 +36568,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 809,
       "episode": 758
@@ -35970,6 +36630,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 2,
     "debut": {
       "chapter": 804,
       "episode": 753
@@ -36036,6 +36697,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 1,
     "debut": {
       "chapter": 804,
       "episode": 753
@@ -36102,6 +36764,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 1,
     "debut": {
       "chapter": 805,
       "episode": 754
@@ -36190,6 +36853,7 @@
       "Elizabero II; Elizabello II"
     ],
     "canon": true,
+    "tier": 3,
     "debut": {
       "chapter": 704,
       "episode": 632
@@ -36246,6 +36910,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 3,
     "debut": {
       "chapter": 704,
       "episode": 632
@@ -36293,6 +36958,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 3,
     "debut": {
       "chapter": 704,
       "episode": 633
@@ -36349,6 +37015,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 3,
     "debut": {
       "chapter": 704,
       "episode": 632
@@ -36407,6 +37074,7 @@
       "Vinsmoke Judge"
     ],
     "canon": true,
+    "tier": 1,
     "debut": {
       "chapter": 832,
       "episode": 793
@@ -36500,6 +37168,7 @@
       "Vinsmoke Sora"
     ],
     "canon": true,
+    "tier": 3,
     "debut": {
       "chapter": 841,
       "episode": 803
@@ -36554,6 +37223,7 @@
       "Vinsmoke Reiju"
     ],
     "canon": true,
+    "tier": 1,
     "debut": {
       "chapter": 826,
       "episode": 784
@@ -36627,6 +37297,7 @@
       "Vinsmoke Ichiji"
     ],
     "canon": true,
+    "tier": 2,
     "debut": {
       "chapter": 828,
       "episode": 787
@@ -36700,6 +37371,7 @@
       "Vinsmoke Niji"
     ],
     "canon": true,
+    "tier": 2,
     "debut": {
       "chapter": 828,
       "episode": 787
@@ -36773,6 +37445,7 @@
       "Vinsmoke Yonji"
     ],
     "canon": true,
+    "tier": 2,
     "debut": {
       "chapter": 825,
       "episode": 783
@@ -36846,6 +37519,7 @@
       "Polo Marco"
     ],
     "canon": true,
+    "tier": 1,
     "debut": {
       "chapter": 234,
       "episode": 151
@@ -36922,9 +37596,12 @@
     },
     "aliases": [
       "Gan Fall",
-      "Ganfor (VIZ; Funimation simulcast);\nGan Fall (Funimation);\nGunfall (4Kids)"
+      "Ganfor ;",
+      "Gan Fall ;",
+      "Gunfall"
     ],
     "canon": true,
+    "tier": 3,
     "debut": {
       "chapter": 237,
       "episode": 153
@@ -36986,6 +37663,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 237,
       "episode": 153
@@ -37016,7 +37694,7 @@
     ],
     "crewId": "skypiea",
     "job": "Habitant",
-    "fruitId": "shibo-shibo-no-mi",
+    "fruitId": null,
     "haki": {
       "observation": false,
       "armament": false,
@@ -37033,6 +37711,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 3,
     "debut": {
       "chapter": 239,
       "episode": 154
@@ -37084,6 +37763,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 239,
       "episode": 154
@@ -37129,6 +37809,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 238,
       "episode": 153
@@ -37187,6 +37868,7 @@
       "Shandia Chief"
     ],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 275,
       "episode": 168
@@ -37238,9 +37920,11 @@
     },
     "aliases": [
       "Wyper",
-      "Wyper (4Kids, Viz, Funimation);\nWyler (4Kids; Funimation edited dub)"
+      "Wyper ;",
+      "Wyler"
     ],
     "canon": true,
+    "tier": 2,
     "debut": {
       "chapter": 237,
       "episode": 153
@@ -37307,6 +37991,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 249,
       "episode": 163
@@ -37368,6 +38053,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 249,
       "episode": 163
@@ -37428,9 +38114,10 @@
       "en": "Genbo"
     },
     "aliases": [
-      "Genbou\nGenbo (OPCG)"
+      "Genbou"
     ],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 249,
       "episode": 163
@@ -37492,9 +38179,10 @@
     },
     "aliases": [
       "Raki",
-      "Raki (Viz);\nLaki (FUNimation)"
+      "Raki ;"
     ],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 249,
       "episode": 163
@@ -37556,6 +38244,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 3,
     "debut": {
       "chapter": 249,
       "episode": 161
@@ -37608,6 +38297,7 @@
       "Nola"
     ],
     "canon": true,
+    "tier": 3,
     "debut": {
       "chapter": 255,
       "episode": 168
@@ -37659,9 +38349,10 @@
     },
     "aliases": [
       "Kalgara",
-      "Kalgara\nCalgara (Funimation subs, Unlimited games)\nKalgala (BStation)"
+      "Kalgala"
     ],
     "canon": true,
+    "tier": 3,
     "debut": {
       "chapter": 286,
       "episode": 187
@@ -37724,6 +38415,7 @@
       "Ohm"
     ],
     "canon": true,
+    "tier": 3,
     "debut": {
       "chapter": 241,
       "episode": 155
@@ -37780,6 +38472,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 3,
     "debut": {
       "chapter": 241,
       "episode": 155
@@ -37836,6 +38529,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 3,
     "debut": {
       "chapter": 241,
       "episode": 155
@@ -37892,6 +38586,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 254,
       "episode": 167
@@ -37945,6 +38640,7 @@
       "Kotori"
     ],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 260,
       "episode": 171
@@ -37996,6 +38692,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 523,
       "episode": 418
@@ -38041,6 +38738,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 2,
     "debut": {
       "chapter": 611,
       "episode": 530
@@ -38111,6 +38809,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 3,
     "debut": {
       "chapter": 621,
       "episode": 539
@@ -38172,6 +38871,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 2,
     "debut": {
       "chapter": 609,
       "episode": 528
@@ -38223,6 +38923,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 3,
     "debut": {
       "chapter": 609,
       "episode": 528
@@ -38274,9 +38975,10 @@
     },
     "aliases": [
       "Manboshi",
-      "Mamboshi;\nManboshi (Funimation simulcast, formerly)"
+      "Mamboshi;"
     ],
     "canon": true,
+    "tier": 3,
     "debut": {
       "chapter": 609,
       "episode": 528
@@ -38328,6 +39030,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 1,
     "debut": {
       "chapter": 612,
       "episode": 531
@@ -38391,6 +39094,7 @@
       "Hoe"
     ],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 611,
       "episode": 530
@@ -38445,6 +39149,7 @@
       "Megalo"
     ],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 605,
       "episode": 525
@@ -38494,6 +39199,7 @@
       "Minister of the Left"
     ],
     "canon": true,
+    "tier": 3,
     "debut": {
       "chapter": 612,
       "episode": 531
@@ -38547,6 +39253,7 @@
       "Minister of the Right"
     ],
     "canon": true,
+    "tier": 3,
     "debut": {
       "chapter": 612,
       "episode": 531
@@ -38597,9 +39304,11 @@
       "en": "Shyarly"
     },
     "aliases": [
-      "Sharley;\nShirley (WT100, OPCG)"
+      "Sharley;",
+      "Shirley"
     ],
     "canon": true,
+    "tier": 3,
     "debut": {
       "chapter": 610,
       "episode": 529
@@ -38663,6 +39372,7 @@
       "Camie"
     ],
     "canon": true,
+    "tier": 2,
     "debut": {
       "chapter": 195,
       "episode": 385
@@ -38728,9 +39438,10 @@
       "en": "Pappag"
     },
     "aliases": [
-      "Pappagu;\nPappag (WT100, OPCG)"
+      "Pappagu;"
     ],
     "canon": true,
+    "tier": 3,
     "debut": {
       "chapter": 195,
       "episode": 385
@@ -38799,6 +39510,7 @@
       "Hatchan"
     ],
     "canon": true,
+    "tier": 1,
     "debut": {
       "chapter": 69,
       "episode": 31
@@ -38871,6 +39583,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 616,
       "episode": 534
@@ -38926,9 +39639,11 @@
     },
     "aliases": [
       "Enel",
-      "Eneru (Crunchyroll, former);\nEnel (BStation, WT100, OPCG), Crunchyroll"
+      "Eneru ;",
+      "Enel , Crunchyroll"
     ],
     "canon": true,
+    "tier": 1,
     "debut": {
       "chapter": 254,
       "episode": 167
@@ -38990,6 +39705,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 1,
     "debut": {
       "chapter": 100,
       "episode": 52
@@ -39070,6 +39786,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 1,
     "debut": {
       "chapter": 583,
       "episode": 494
@@ -39161,6 +39878,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 1,
     "debut": {
       "chapter": 537,
       "episode": 438
@@ -39256,6 +39974,7 @@
     },
     "aliases": [],
     "canon": false,
+    "tier": 4,
     "debut": null,
     "gender": null,
     "races": [],
@@ -39291,6 +40010,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 3,
     "debut": {
       "chapter": 904,
       "episode": 880
@@ -39347,6 +40067,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 3,
     "debut": {
       "chapter": 904,
       "episode": 880
@@ -39418,6 +40139,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 904,
       "episode": 880
@@ -39470,6 +40192,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 3,
     "debut": {
       "chapter": 536,
       "episode": 438
@@ -39546,6 +40269,7 @@
     },
     "aliases": [],
     "canon": false,
+    "tier": 4,
     "debut": null,
     "gender": null,
     "races": [],
@@ -39576,6 +40300,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 2,
     "debut": {
       "chapter": 622,
       "episode": 541
@@ -39643,6 +40368,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 3,
     "debut": {
       "chapter": 706,
       "episode": 633
@@ -39709,6 +40435,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 2,
     "debut": {
       "chapter": 155,
       "episode": 103
@@ -39785,6 +40512,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 1,
     "debut": {
       "chapter": 129,
       "episode": 78
@@ -39859,10 +40587,9 @@
       "fr": "Marianne",
       "en": "Marianne"
     },
-    "aliases": [
-      "Marianne (WT100)"
-    ],
+    "aliases": [],
     "canon": true,
+    "tier": 3,
     "debut": {
       "chapter": 117,
       "episode": 70
@@ -39934,6 +40661,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 3,
     "debut": {
       "chapter": 160,
       "episode": 103
@@ -40007,6 +40735,7 @@
       "Lassoo"
     ],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 160,
       "episode": 103
@@ -40062,6 +40791,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 3,
     "debut": {
       "chapter": 160,
       "episode": 103
@@ -40135,6 +40865,7 @@
       "Gem"
     ],
     "canon": true,
+    "tier": 3,
     "debut": {
       "chapter": 110,
       "episode": 65
@@ -40211,6 +40942,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 3,
     "debut": {
       "chapter": 110,
       "episode": 65
@@ -40284,6 +41016,7 @@
       "Jabra"
     ],
     "canon": true,
+    "tier": 2,
     "debut": {
       "chapter": 375,
       "episode": 264
@@ -40340,6 +41073,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 2,
     "debut": {
       "chapter": 325,
       "episode": 230
@@ -40401,6 +41135,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 3,
     "debut": {
       "chapter": 375,
       "episode": 264
@@ -40457,9 +41192,10 @@
     },
     "aliases": [
       "Fukurou",
-      "Fukurô (VIZ); Fukurou (Funimation (former))"
+      "Fukurô ; Fukurou )"
     ],
     "canon": true,
+    "tier": 3,
     "debut": {
       "chapter": 375,
       "episode": 264
@@ -40521,6 +41257,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 2,
     "debut": {
       "chapter": 323,
       "episode": 230
@@ -40587,6 +41324,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 367,
       "episode": 257
@@ -40643,6 +41381,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 392,
       "episode": 275
@@ -40696,6 +41435,7 @@
       "Aokiji"
     ],
     "canon": true,
+    "tier": 1,
     "debut": {
       "chapter": 303,
       "episode": 225
@@ -40762,6 +41502,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 2,
     "debut": {
       "chapter": 4,
       "episode": 2
@@ -40824,6 +41565,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 1,
     "debut": {
       "chapter": 222,
       "episode": 146
@@ -40912,6 +41654,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 1,
     "debut": {
       "chapter": 233,
       "episode": 151
@@ -41023,6 +41766,7 @@
       "Caesar Clown"
     ],
     "canon": true,
+    "tier": 1,
     "debut": {
       "chapter": 658,
       "episode": 581
@@ -41099,6 +41843,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 3,
     "debut": {
       "chapter": 860,
       "episode": 828
@@ -41165,9 +41910,10 @@
     },
     "aliases": [
       "Eldoraggo",
-      "El Drago (Manga Entertainment, BStation)\nEldoraggo (OPCG)"
+      "El Drago"
     ],
     "canon": false,
+    "tier": 4,
     "debut": null,
     "gender": "male",
     "races": [
@@ -41217,6 +41963,7 @@
     },
     "aliases": [],
     "canon": false,
+    "tier": 4,
     "debut": null,
     "gender": "male",
     "races": [
@@ -41271,6 +42018,7 @@
     },
     "aliases": [],
     "canon": false,
+    "tier": 4,
     "debut": null,
     "gender": "male",
     "races": [
@@ -41302,9 +42050,10 @@
       "en": "Ganzo"
     },
     "aliases": [
-      "Ganzo (Manga Entertainment, Bandai)\nGanzou (BStation)"
+      "Ganzou"
     ],
     "canon": false,
+    "tier": 4,
     "debut": null,
     "gender": "male",
     "races": [
@@ -41343,6 +42092,7 @@
     },
     "aliases": [],
     "canon": false,
+    "tier": 4,
     "debut": null,
     "gender": "male",
     "races": [
@@ -41395,6 +42145,7 @@
     },
     "aliases": [],
     "canon": false,
+    "tier": 3,
     "debut": null,
     "gender": "male",
     "races": [
@@ -41444,6 +42195,7 @@
     },
     "aliases": [],
     "canon": false,
+    "tier": 4,
     "debut": null,
     "gender": "female",
     "races": [
@@ -41493,6 +42245,7 @@
     },
     "aliases": [],
     "canon": false,
+    "tier": 4,
     "debut": null,
     "gender": "male",
     "races": [
@@ -41541,9 +42294,10 @@
       "en": "Boo Jack"
     },
     "aliases": [
-      "Boojack (Manga Entertainment)\nBoo Jack (BStation)"
+      "Boojack"
     ],
     "canon": false,
+    "tier": 4,
     "debut": null,
     "gender": "male",
     "races": [
@@ -41593,6 +42347,7 @@
     },
     "aliases": [],
     "canon": false,
+    "tier": 4,
     "debut": null,
     "gender": "male",
     "races": [
@@ -41641,9 +42396,10 @@
       "en": "Borodo"
     },
     "aliases": [
-      "Borod (Manga Entertainment)\nBorodo (VIZ, BStation)"
+      "Borod"
     ],
     "canon": false,
+    "tier": 4,
     "debut": null,
     "gender": "male",
     "races": [
@@ -41693,9 +42449,10 @@
       "en": "Akisu"
     },
     "aliases": [
-      "Akees (Manga Entertainment)\nAkisu (BStation)"
+      "Akees"
     ],
     "canon": false,
+    "tier": 4,
     "debut": null,
     "gender": "male",
     "races": [
@@ -41745,6 +42502,7 @@
     },
     "aliases": [],
     "canon": false,
+    "tier": 4,
     "debut": null,
     "gender": null,
     "races": [],
@@ -41779,9 +42537,10 @@
       "en": "Hotdog"
     },
     "aliases": [
-      "Hot Dog (Manga Entertainment)\nHotdog (Treasure Cruise, BStation)"
+      "Hot Dog"
     ],
     "canon": false,
+    "tier": 4,
     "debut": null,
     "gender": "male",
     "races": [
@@ -41842,6 +42601,7 @@
       "Mobanby"
     ],
     "canon": false,
+    "tier": 4,
     "debut": null,
     "gender": "male",
     "races": [
@@ -41885,9 +42645,10 @@
       "en": "Heaby"
     },
     "aliases": [
-      "Snake (Manga Entertainment)\nHeaby (BStation, Movie 9)"
+      "Snake"
     ],
     "canon": false,
+    "tier": 4,
     "debut": null,
     "gender": "male",
     "races": [
@@ -41946,9 +42707,10 @@
     },
     "aliases": [
       "Gasparde",
-      "Gasparde\nGusparday (Manga Entertainment)"
+      "Gusparday"
     ],
     "canon": false,
+    "tier": 3,
     "debut": null,
     "gender": "male",
     "races": [
@@ -42012,9 +42774,10 @@
       "en": "Needless"
     },
     "aliases": [
-      "Needles (Manga Entertainment, BStation)\nNeedless (Treasure Cruise)"
+      "Needles"
     ],
     "canon": false,
+    "tier": 4,
     "debut": null,
     "gender": "male",
     "races": [
@@ -42069,6 +42832,7 @@
     },
     "aliases": [],
     "canon": false,
+    "tier": 4,
     "debut": null,
     "gender": "male",
     "races": [
@@ -42112,9 +42876,11 @@
       "en": "Shuraiya Bascùd"
     },
     "aliases": [
-      "Shryer Bascudo (Manga Entertainment)\nShuraiya Bascùd (BStation)\nShuraiya Bascud (Treasure Cruise)"
+      "Shryer Bascudo",
+      "Shuraiya Bascud"
     ],
     "canon": false,
+    "tier": 4,
     "debut": null,
     "gender": "male",
     "races": [
@@ -42163,9 +42929,11 @@
       "en": "Adelle Bascùd"
     },
     "aliases": [
-      "Adele Bascudo (Manga Entertainment)\nAdele Bascùd (BStation)"
+      "Adele Bascudo",
+      "Adele Bascùd"
     ],
     "canon": false,
+    "tier": 4,
     "debut": null,
     "gender": "female",
     "races": [
@@ -42210,6 +42978,7 @@
     },
     "aliases": [],
     "canon": false,
+    "tier": 3,
     "debut": null,
     "gender": "male",
     "races": [
@@ -42273,9 +43042,10 @@
       "en": "Toma"
     },
     "aliases": [
-      "Tohma (Manga Entertainment)\nToma (BStation)"
+      "Tohma"
     ],
     "canon": false,
+    "tier": 4,
     "debut": null,
     "gender": "male",
     "races": [
@@ -42327,6 +43097,7 @@
       "N/A"
     ],
     "canon": false,
+    "tier": 4,
     "debut": null,
     "gender": "male",
     "races": [
@@ -42373,6 +43144,7 @@
       "N/A"
     ],
     "canon": false,
+    "tier": 4,
     "debut": null,
     "gender": "male",
     "races": [
@@ -42417,6 +43189,7 @@
     },
     "aliases": [],
     "canon": false,
+    "tier": 3,
     "debut": null,
     "gender": "female",
     "races": [
@@ -42457,6 +43230,7 @@
       "Baba"
     ],
     "canon": false,
+    "tier": 3,
     "debut": null,
     "gender": "female",
     "races": [
@@ -42501,6 +43275,7 @@
     },
     "aliases": [],
     "canon": false,
+    "tier": 4,
     "debut": null,
     "gender": "male",
     "races": [
@@ -42545,6 +43320,7 @@
     },
     "aliases": [],
     "canon": false,
+    "tier": 4,
     "debut": null,
     "gender": "male",
     "races": [
@@ -42588,6 +43364,7 @@
     },
     "aliases": [],
     "canon": false,
+    "tier": 3,
     "debut": null,
     "gender": null,
     "races": [],
@@ -42624,9 +43401,10 @@
     },
     "aliases": [
       "Ochanoma Papa",
-      "Ochanoma Papa (Manga Entertainment)\nTearoom Papa (BStation)"
+      "Tearoom Papa"
     ],
     "canon": false,
+    "tier": 3,
     "debut": null,
     "gender": "male",
     "races": [
@@ -42671,6 +43449,7 @@
     },
     "aliases": [],
     "canon": false,
+    "tier": 4,
     "debut": null,
     "gender": "male",
     "races": [
@@ -42720,6 +43499,7 @@
     },
     "aliases": [],
     "canon": false,
+    "tier": 4,
     "debut": null,
     "gender": "male",
     "races": [
@@ -42764,6 +43544,7 @@
     },
     "aliases": [],
     "canon": false,
+    "tier": 4,
     "debut": null,
     "gender": "male",
     "races": [
@@ -42808,6 +43589,7 @@
     },
     "aliases": [],
     "canon": false,
+    "tier": 4,
     "debut": null,
     "gender": "male",
     "races": [
@@ -42854,6 +43636,7 @@
       "N/A"
     ],
     "canon": false,
+    "tier": 4,
     "debut": null,
     "gender": "female",
     "races": [
@@ -42888,6 +43671,7 @@
       "Musshuru"
     ],
     "canon": false,
+    "tier": 4,
     "debut": null,
     "gender": "male",
     "races": [
@@ -42937,6 +43721,7 @@
     },
     "aliases": [],
     "canon": false,
+    "tier": 4,
     "debut": null,
     "gender": "male",
     "races": [
@@ -42981,6 +43766,7 @@
     },
     "aliases": [],
     "canon": false,
+    "tier": 4,
     "debut": null,
     "gender": "female",
     "races": [
@@ -43013,6 +43799,7 @@
     },
     "aliases": [],
     "canon": false,
+    "tier": 4,
     "debut": null,
     "gender": "male",
     "races": [
@@ -43061,9 +43848,10 @@
       "en": "Buzz"
     },
     "aliases": [
-      "Wazu (BStation)"
+      "Wazu"
     ],
     "canon": false,
+    "tier": 4,
     "debut": null,
     "gender": "male",
     "races": [
@@ -43110,6 +43898,7 @@
       "Z"
     ],
     "canon": false,
+    "tier": 2,
     "debut": {
       "chapter": 691,
       "episode": 577
@@ -43183,6 +43972,7 @@
     },
     "aliases": [],
     "canon": false,
+    "tier": 3,
     "debut": {
       "chapter": 691,
       "episode": 575
@@ -43237,6 +44027,7 @@
       "Binz"
     ],
     "canon": false,
+    "tier": 4,
     "debut": {
       "chapter": 691,
       "episode": 575
@@ -43282,9 +44073,12 @@
       "en": "Gild Tesoro"
     },
     "aliases": [
-      "Gild Tesoro (Funimation),\nGuild Tesoro (Simulcast subs),\nGildo Tesoro (Burning Blood)"
+      "Gild Tesoro ,",
+      "Guild Tesoro ,",
+      "Gildo Tesoro"
     ],
     "canon": false,
+    "tier": 2,
     "debut": {
       "chapter": 817,
       "episode": 750
@@ -43351,6 +44145,7 @@
     },
     "aliases": [],
     "canon": false,
+    "tier": 4,
     "debut": {
       "chapter": 829,
       "episode": null
@@ -43398,6 +44193,7 @@
     },
     "aliases": [],
     "canon": false,
+    "tier": 4,
     "debut": {
       "chapter": 829,
       "episode": null
@@ -43445,6 +44241,7 @@
     },
     "aliases": [],
     "canon": false,
+    "tier": 4,
     "debut": {
       "chapter": 829,
       "episode": 747
@@ -43492,6 +44289,7 @@
     },
     "aliases": [],
     "canon": false,
+    "tier": 3,
     "debut": {
       "chapter": 829,
       "episode": null
@@ -43557,6 +44355,7 @@
     },
     "aliases": [],
     "canon": false,
+    "tier": 2,
     "debut": null,
     "gender": "male",
     "races": [
@@ -43616,6 +44415,7 @@
     },
     "aliases": [],
     "canon": false,
+    "tier": 4,
     "debut": {
       "chapter": null,
       "episode": 895
@@ -43672,6 +44472,7 @@
     },
     "aliases": [],
     "canon": false,
+    "tier": 3,
     "debut": null,
     "gender": "female",
     "races": [
@@ -43709,6 +44510,7 @@
     },
     "aliases": [],
     "canon": false,
+    "tier": 4,
     "debut": null,
     "gender": "male",
     "races": [
@@ -43754,6 +44556,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 2,
     "debut": {
       "chapter": 1055,
       "episode": 1029
@@ -43811,6 +44614,7 @@
     },
     "aliases": [],
     "canon": false,
+    "tier": 4,
     "debut": null,
     "gender": "male",
     "races": [
@@ -43849,6 +44653,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 2,
     "debut": {
       "chapter": 911,
       "episode": 894
@@ -43910,6 +44715,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 907,
       "episode": 887
@@ -43957,6 +44763,7 @@
     },
     "aliases": [],
     "canon": false,
+    "tier": 4,
     "debut": {
       "chapter": null,
       "episode": 54
@@ -43985,7 +44792,7 @@
     "occupations": [],
     "crewId": null,
     "job": null,
-    "fruitId": null,
+    "fruitId": "hiso-hiso-no-mi",
     "haki": {
       "observation": false,
       "armament": false,
@@ -44001,9 +44808,11 @@
       "en": "Bokuden"
     },
     "aliases": [
-      "Bokuden (Funimation);\nBokden (Odex)"
+      "Bokuden ;",
+      "Bokden"
     ],
     "canon": false,
+    "tier": 4,
     "debut": {
       "chapter": null,
       "episode": 55
@@ -44043,6 +44852,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 197,
       "episode": 386
@@ -44111,6 +44921,7 @@
       "Purinpurin"
     ],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 75,
       "episode": 34
@@ -44161,9 +44972,10 @@
       "en": "Pandaman"
     },
     "aliases": [
-      "Panda Man\nPandaman (WT100)"
+      "Panda Man"
     ],
     "canon": true,
+    "tier": 2,
     "debut": {
       "chapter": 44,
       "episode": 16
@@ -44203,6 +45015,7 @@
     },
     "aliases": [],
     "canon": false,
+    "tier": 4,
     "debut": {
       "chapter": null,
       "episode": 136
@@ -44255,6 +45068,7 @@
     },
     "aliases": [],
     "canon": false,
+    "tier": 4,
     "debut": {
       "chapter": null,
       "episode": 140
@@ -44322,6 +45136,7 @@
     },
     "aliases": [],
     "canon": false,
+    "tier": 4,
     "debut": null,
     "gender": "male",
     "races": [
@@ -44373,6 +45188,7 @@
       "Dr. Vegapunk"
     ],
     "canon": true,
+    "tier": 1,
     "debut": {
       "chapter": 684,
       "episode": 610
@@ -44434,9 +45250,11 @@
       "en": "Stronger"
     },
     "aliases": [
-      "Stronger (Funimation, VIZ);\nStrongheart (Formerly VIZ)"
+      "Stronger ;",
+      "Strongheart"
     ],
     "canon": true,
+    "tier": 3,
     "debut": {
       "chapter": 223,
       "episode": 146
@@ -44480,282 +45298,6 @@
     }
   },
   {
-    "id": "punk-01-shaka",
-    "apiId": 763,
-    "wikiTitle": "Vegapunk/Shaka",
-    "name": {
-      "fr": "Punk 01 - Shaka",
-      "en": "Punk 01 - Shaka"
-    },
-    "aliases": [],
-    "canon": true,
-    "debut": {
-      "chapter": 1062,
-      "episode": 1091
-    },
-    "gender": "male",
-    "races": [],
-    "origin": {
-      "sea": "grand-line",
-      "place": "Egghead",
-      "since": null
-    },
-    "age": null,
-    "height": null,
-    "status": "unknown",
-    "bounties": [],
-    "epithets": [],
-    "affiliations": [
-      {
-        "name": "Marines",
-        "former": true,
-        "since": null
-      }
-    ],
-    "occupations": [],
-    "crewId": null,
-    "job": "Vegapunk - le bien",
-    "fruitId": null,
-    "haki": {
-      "observation": false,
-      "armament": false,
-      "conqueror": false
-    }
-  },
-  {
-    "id": "punk-02-lilith",
-    "apiId": 764,
-    "wikiTitle": "Vegapunk/Lilith",
-    "name": {
-      "fr": "Punk 02 - Lilith",
-      "en": "Punk 02 - Lilith"
-    },
-    "aliases": [],
-    "canon": true,
-    "debut": {
-      "chapter": 1061,
-      "episode": 1090
-    },
-    "gender": "female",
-    "races": [],
-    "origin": {
-      "sea": "grand-line",
-      "place": "Egghead",
-      "since": null
-    },
-    "age": null,
-    "height": null,
-    "status": "alive",
-    "bounties": [],
-    "epithets": [],
-    "affiliations": [
-      {
-        "name": "Marines",
-        "former": true,
-        "since": null
-      }
-    ],
-    "occupations": [],
-    "crewId": null,
-    "job": "Vegapunk - le mal",
-    "fruitId": null,
-    "haki": {
-      "observation": false,
-      "armament": false,
-      "conqueror": false
-    }
-  },
-  {
-    "id": "punk-03-edison",
-    "apiId": 765,
-    "wikiTitle": "Vegapunk/Edison",
-    "name": {
-      "fr": "Punk 03 - Edison",
-      "en": "Punk 03 - Edison"
-    },
-    "aliases": [],
-    "canon": true,
-    "debut": {
-      "chapter": 1065,
-      "episode": 1095
-    },
-    "gender": null,
-    "races": [],
-    "origin": {
-      "sea": "grand-line",
-      "place": "Egghead",
-      "since": null
-    },
-    "age": null,
-    "height": null,
-    "status": "alive",
-    "bounties": [],
-    "epithets": [],
-    "affiliations": [
-      {
-        "name": "Marines",
-        "former": true,
-        "since": null
-      }
-    ],
-    "occupations": [],
-    "crewId": null,
-    "job": "Vegapunk - l'inventivité",
-    "fruitId": null,
-    "haki": {
-      "observation": false,
-      "armament": false,
-      "conqueror": false
-    }
-  },
-  {
-    "id": "punk-04-pythagoras",
-    "apiId": 766,
-    "wikiTitle": "Vegapunk/Pythagoras",
-    "name": {
-      "fr": "Punk 04 - Pythagoras",
-      "en": "Punk 04 - Pythagoras"
-    },
-    "aliases": [],
-    "canon": true,
-    "debut": {
-      "chapter": 1065,
-      "episode": 1095
-    },
-    "gender": null,
-    "races": [],
-    "origin": {
-      "sea": "grand-line",
-      "place": "Egghead",
-      "since": null
-    },
-    "age": null,
-    "height": null,
-    "status": "alive",
-    "bounties": [],
-    "epithets": [],
-    "affiliations": [
-      {
-        "name": "Marines",
-        "former": true,
-        "since": null
-      }
-    ],
-    "occupations": [],
-    "crewId": null,
-    "job": "Vegapunk - le savoir",
-    "fruitId": null,
-    "haki": {
-      "observation": false,
-      "armament": false,
-      "conqueror": false
-    }
-  },
-  {
-    "id": "punk-05-atlas",
-    "apiId": 767,
-    "wikiTitle": "Vegapunk/Atlas",
-    "name": {
-      "fr": "Punk 05 - Atlas",
-      "en": "Punk 05 - Atlas"
-    },
-    "aliases": [],
-    "canon": true,
-    "debut": {
-      "chapter": 1062,
-      "episode": 1091
-    },
-    "gender": "female",
-    "races": [],
-    "origin": {
-      "sea": "grand-line",
-      "place": "Egghead",
-      "since": null
-    },
-    "age": null,
-    "height": null,
-    "status": "alive",
-    "bounties": [],
-    "epithets": [],
-    "affiliations": [
-      {
-        "name": "Marines",
-        "former": true,
-        "since": null
-      }
-    ],
-    "occupations": [],
-    "crewId": null,
-    "job": "Vegapunk - la violence",
-    "fruitId": null,
-    "haki": {
-      "observation": false,
-      "armament": false,
-      "conqueror": false
-    }
-  },
-  {
-    "id": "punk-06-york",
-    "apiId": 768,
-    "wikiTitle": "Vegapunk/York",
-    "name": {
-      "fr": "Punk 06 - York",
-      "en": "Punk 06 - York"
-    },
-    "aliases": [],
-    "canon": true,
-    "debut": {
-      "chapter": 1065,
-      "episode": 1095
-    },
-    "gender": "female",
-    "races": [
-      "human"
-    ],
-    "origin": {
-      "sea": "grand-line",
-      "place": "Egghead",
-      "since": null
-    },
-    "age": null,
-    "height": null,
-    "status": "alive",
-    "bounties": [],
-    "epithets": [],
-    "affiliations": [
-      {
-        "name": "World Government",
-        "former": false,
-        "since": null
-      },
-      {
-        "name": "Marines",
-        "former": false,
-        "since": null
-      }
-    ],
-    "occupations": [
-      {
-        "name": "Scientist",
-        "former": false,
-        "since": null
-      },
-      {
-        "name": "World Noble",
-        "former": false,
-        "since": 1179
-      }
-    ],
-    "crewId": null,
-    "job": "Vegapunk - l'envie",
-    "fruitId": null,
-    "haki": {
-      "observation": false,
-      "armament": false,
-      "conqueror": false
-    }
-  },
-  {
     "id": "s-snake",
     "apiId": 769,
     "wikiTitle": "S-Snake",
@@ -44765,6 +45307,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 3,
     "debut": {
       "chapter": 1059,
       "episode": 1087
@@ -44812,6 +45355,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 3,
     "debut": {
       "chapter": 1059,
       "episode": 1087
@@ -44859,6 +45403,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 1062,
       "episode": 1092
@@ -44906,6 +45451,7 @@
     },
     "aliases": [],
     "canon": true,
+    "tier": 4,
     "debut": {
       "chapter": 1065,
       "episode": 1094
@@ -44955,6 +45501,7 @@
       "Karasu"
     ],
     "canon": true,
+    "tier": 3,
     "debut": {
       "chapter": 593,
       "episode": 510
@@ -45013,6 +45560,7 @@
       "St. Jaygarcia Saturn"
     ],
     "canon": true,
+    "tier": 1,
     "debut": {
       "chapter": 233,
       "episode": 151
@@ -45077,6 +45625,7 @@
       "St. Marcus Mars"
     ],
     "canon": true,
+    "tier": 2,
     "debut": {
       "chapter": 233,
       "episode": 151
@@ -45136,6 +45685,7 @@
       "St. Topman Warcury"
     ],
     "canon": true,
+    "tier": 2,
     "debut": {
       "chapter": 233,
       "episode": 151
@@ -45195,6 +45745,7 @@
       "St. Ethanbaron V. Nusjuro"
     ],
     "canon": true,
+    "tier": 2,
     "debut": {
       "chapter": 233,
       "episode": 151
@@ -45254,6 +45805,7 @@
       "St. Shepherd Ju Peter"
     ],
     "canon": true,
+    "tier": 2,
     "debut": {
       "chapter": 233,
       "episode": 151
@@ -45302,56 +45854,6 @@
     }
   },
   {
-    "id": "imu-neronna",
-    "apiId": 779,
-    "wikiTitle": "Nerona Imu",
-    "name": {
-      "fr": "Imu Neronna",
-      "en": "Imu Neronna"
-    },
-    "aliases": [],
-    "canon": true,
-    "debut": {
-      "chapter": 906,
-      "episode": 885
-    },
-    "gender": "male",
-    "races": [],
-    "origin": null,
-    "age": null,
-    "height": null,
-    "status": "alive",
-    "bounties": [],
-    "epithets": [],
-    "affiliations": [
-      {
-        "name": "World Government",
-        "former": false,
-        "since": null
-      },
-      {
-        "name": "First Twenty",
-        "former": false,
-        "since": 1179
-      }
-    ],
-    "occupations": [
-      {
-        "name": "King of the World",
-        "former": false,
-        "since": 1179
-      }
-    ],
-    "crewId": null,
-    "job": "Souverain absolu du monde",
-    "fruitId": null,
-    "haki": {
-      "observation": true,
-      "armament": false,
-      "conqueror": true
-    }
-  },
-  {
     "id": "figarland-shamrock",
     "apiId": 780,
     "wikiTitle": "Figarland Shamrock",
@@ -45363,6 +45865,7 @@
       "Saint Figarland Shamrock"
     ],
     "canon": true,
+    "tier": 3,
     "debut": {
       "chapter": 907,
       "episode": 887
@@ -45415,10 +45918,14 @@
     "wikiTitle": "Vegapunk/Shaka",
     "name": {
       "fr": "Vegapunk “Shaka”",
-      "en": "Vegapunk “Shaka”"
+      "en": "Vegapunk Shaka"
     },
-    "aliases": [],
+    "aliases": [
+      "Vegapunk Shaka",
+      "Shaka the Good"
+    ],
     "canon": true,
+    "tier": 3,
     "debut": {
       "chapter": 1062,
       "episode": 1091
@@ -45430,8 +45937,8 @@
       "place": "Egghead",
       "since": null
     },
-    "age": null,
-    "height": null,
+    "age": 2,
+    "height": 220,
     "status": "deceased",
     "bounties": [],
     "epithets": [],
@@ -45458,10 +45965,14 @@
     "wikiTitle": "Vegapunk/Lilith",
     "name": {
       "fr": "Vegapunk “Lilith”",
-      "en": "Vegapunk “Lilith”"
+      "en": "Vegapunk Lilith"
     },
-    "aliases": [],
+    "aliases": [
+      "Vegapunk Lilith",
+      "Lilith"
+    ],
     "canon": true,
+    "tier": 2,
     "debut": {
       "chapter": 1061,
       "episode": 1090
@@ -45473,8 +45984,8 @@
       "place": "Egghead",
       "since": null
     },
-    "age": null,
-    "height": null,
+    "age": 2,
+    "height": 204,
     "status": "alive",
     "bounties": [],
     "epithets": [],
@@ -45501,10 +46012,14 @@
     "wikiTitle": "Vegapunk/Edison",
     "name": {
       "fr": "Vegapunk “Edison”",
-      "en": "Vegapunk “Edison”"
+      "en": "Vegapunk Edison"
     },
-    "aliases": [],
+    "aliases": [
+      "Vegapunk Edison",
+      "Edison the Thinker"
+    ],
     "canon": true,
+    "tier": 3,
     "debut": {
       "chapter": 1065,
       "episode": 1095
@@ -45516,8 +46031,8 @@
       "place": "Egghead",
       "since": null
     },
-    "age": null,
-    "height": null,
+    "age": 2,
+    "height": 100,
     "status": "deceased",
     "bounties": [],
     "epithets": [],
@@ -45544,10 +46059,14 @@
     "wikiTitle": "Vegapunk/Pythagoras",
     "name": {
       "fr": "Vegapunk “Pythagoras”",
-      "en": "Vegapunk “Pythagoras”"
+      "en": "Vegapunk Pythagoras"
     },
-    "aliases": [],
+    "aliases": [
+      "Vegapunk Pythagoras",
+      "Pythagoras the Wise"
+    ],
     "canon": true,
+    "tier": 3,
     "debut": {
       "chapter": 1065,
       "episode": 1095
@@ -45559,8 +46078,8 @@
       "place": "Egghead",
       "since": null
     },
-    "age": null,
-    "height": null,
+    "age": 2,
+    "height": 341,
     "status": "deceased",
     "bounties": [],
     "epithets": [],
@@ -45587,10 +46106,14 @@
     "wikiTitle": "Vegapunk/Atlas",
     "name": {
       "fr": "Vegapunk “Atlas”",
-      "en": "Vegapunk “Atlas”"
+      "en": "Vegapunk Atlas"
     },
-    "aliases": [],
+    "aliases": [
+      "Vegapunk Atlas",
+      "Atlas the Violent"
+    ],
     "canon": true,
+    "tier": 3,
     "debut": {
       "chapter": 1062,
       "episode": 1091
@@ -45602,8 +46125,8 @@
       "place": "Egghead",
       "since": null
     },
-    "age": null,
-    "height": null,
+    "age": 2,
+    "height": 729,
     "status": "deceased",
     "bounties": [],
     "epithets": [],
@@ -45630,10 +46153,14 @@
     "wikiTitle": "Vegapunk/York",
     "name": {
       "fr": "Vegapunk “York”",
-      "en": "Vegapunk “York”"
+      "en": "Vegapunk York"
     },
-    "aliases": [],
+    "aliases": [
+      "Vegapunk York",
+      "York"
+    ],
     "canon": true,
+    "tier": 3,
     "debut": {
       "chapter": 1065,
       "episode": 1095
@@ -45647,8 +46174,8 @@
       "place": "Egghead",
       "since": null
     },
-    "age": null,
-    "height": null,
+    "age": 2,
+    "height": 482,
     "status": "alive",
     "bounties": [],
     "epithets": [],
@@ -45678,6 +46205,189 @@
     ],
     "crewId": null,
     "job": "Scientifique - Désir / cupidité",
+    "fruitId": null,
+    "haki": {
+      "observation": false,
+      "armament": false,
+      "conqueror": false
+    }
+  },
+  {
+    "id": "inuarashi",
+    "apiId": 100000,
+    "wikiTitle": "Inuarashi",
+    "name": {
+      "fr": "Inuarashi",
+      "en": "Inuarashi"
+    },
+    "aliases": [
+      "Dogstorm",
+      "Dogupine"
+    ],
+    "canon": true,
+    "tier": 1,
+    "debut": {
+      "chapter": 808,
+      "episode": 756
+    },
+    "gender": "male",
+    "races": [
+      "mink"
+    ],
+    "origin": {
+      "sea": "grand-line",
+      "place": null,
+      "since": null
+    },
+    "age": 40,
+    "height": 511,
+    "status": "unknown",
+    "bounties": [],
+    "epithets": [
+      {
+        "en": "Duke Inuarashi",
+        "since": 807
+      },
+      {
+        "en": "Ruler of Day",
+        "since": 807
+      }
+    ],
+    "affiliations": [
+      {
+        "name": "Mokomo Dukedom",
+        "former": false,
+        "since": null
+      },
+      {
+        "name": "Musketeers",
+        "former": false,
+        "since": null
+      },
+      {
+        "name": "Kouzuki Family",
+        "former": false,
+        "since": 817
+      },
+      {
+        "name": "Inuarashi Musketeer Squad",
+        "former": false,
+        "since": null
+      },
+      {
+        "name": "Ninja-Pirate-Mink-Samurai Alliance",
+        "former": true,
+        "since": null
+      },
+      {
+        "name": "Nine Red Scabbards",
+        "former": false,
+        "since": 939
+      },
+      {
+        "name": "Roger Pirates",
+        "former": true,
+        "since": null
+      },
+      {
+        "name": "Whitebeard Pirates",
+        "former": true,
+        "since": 820
+      }
+    ],
+    "occupations": [
+      {
+        "name": "Daimyo",
+        "former": false,
+        "since": 1127
+      },
+      {
+        "name": "Ruler of the Mokomo Dukedom",
+        "former": true,
+        "since": 807
+      },
+      {
+        "name": "Commander of the Musketeers",
+        "former": false,
+        "since": null
+      },
+      {
+        "name": "Retainer",
+        "former": false,
+        "since": 819
+      },
+      {
+        "name": "Samurai",
+        "former": false,
+        "since": 939
+      },
+      {
+        "name": "Pirate Apprentice",
+        "former": true,
+        "since": null
+      }
+    ],
+    "crewId": null,
+    "job": null,
+    "fruitId": null,
+    "haki": {
+      "observation": true,
+      "armament": true,
+      "conqueror": false
+    }
+  },
+  {
+    "id": "namur",
+    "apiId": 100001,
+    "wikiTitle": "Namur",
+    "name": {
+      "fr": "Namur",
+      "en": "Namur"
+    },
+    "aliases": [
+      "Namule"
+    ],
+    "canon": true,
+    "tier": 4,
+    "debut": {
+      "chapter": 552,
+      "episode": 461
+    },
+    "gender": "male",
+    "races": [
+      "fishman"
+    ],
+    "origin": {
+      "sea": "grand-line",
+      "place": null,
+      "since": null
+    },
+    "age": null,
+    "height": null,
+    "status": "unknown",
+    "bounties": [],
+    "epithets": [],
+    "affiliations": [
+      {
+        "name": "Whitebeard Pirates",
+        "former": false,
+        "since": 552
+      }
+    ],
+    "occupations": [
+      {
+        "name": "8th Division Commander",
+        "former": false,
+        "since": null
+      },
+      {
+        "name": "Pirate",
+        "former": false,
+        "since": 552
+      }
+    ],
+    "crewId": null,
+    "job": null,
     "fruitId": null,
     "haki": {
       "observation": false,

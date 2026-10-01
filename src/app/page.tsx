@@ -1,12 +1,17 @@
+import Link from "next/link";
+import { GameGrid } from "@/components/GameGrid";
+import { JsonLd } from "@/components/JsonLd";
 import { characters, fruits, meta } from "@/lib/data";
-import { GAME_CATEGORIES, GAMES } from "@/lib/games/catalog";
+import { GAMES } from "@/lib/games/catalog";
+import { SITE_DESCRIPTION, SITE_NAME, SITE_URL } from "@/lib/site";
 import { isPlayableCharacter } from "@/lib/spoilers";
 
 const number = new Intl.NumberFormat("fr-FR");
 
 export default function Home() {
+  const live = GAMES.filter((g) => g.status === "live").length;
   const stats = [
-    { value: GAMES.length, label: "mini-jeux prévus" },
+    { value: live, label: "jeux disponibles" },
     { value: characters.filter((c) => isPlayableCharacter(c, "manga")).length, label: "personnages" },
     { value: fruits.length, label: "fruits du démon" },
     { value: meta.latestChapter, label: "chapitres couverts" },
@@ -14,9 +19,19 @@ export default function Home() {
 
   return (
     <>
+      <JsonLd
+        data={{
+          "@context": "https://schema.org",
+          "@type": "WebSite",
+          name: SITE_NAME,
+          url: SITE_URL,
+          description: SITE_DESCRIPTION,
+          inLanguage: "fr",
+        }}
+      />
       <section className="mx-auto w-full max-w-6xl px-4 pt-14 pb-12">
         <p className="mb-4 inline-block rounded-full border border-straw/40 bg-straw/10 px-3 py-1 text-sm font-semibold text-straw">
-          En construction : les premiers jeux arrivent
+          {live} jeux disponibles, {GAMES.length - live} en préparation
         </p>
         <h1 className="max-w-3xl font-display text-5xl leading-none tracking-wide text-foam sm:text-7xl">
           Tous les mini-jeux One Piece, <span className="text-straw">au même endroit</span>
@@ -25,6 +40,20 @@ export default function Home() {
           Silhouettes, primes, fruits du démon, défis quotidiens : des parties courtes, gratuites et sans inscription,
           jouables sur ordinateur comme sur téléphone.
         </p>
+        <div className="mt-7 flex flex-wrap gap-3">
+          <Link
+            href="/jeux/onepiecedle"
+            className="rounded-lg bg-straw px-5 py-3 font-bold text-ink transition-colors hover:bg-straw-dark"
+          >
+            Le défi du jour
+          </Link>
+          <Link
+            href="/jeux"
+            className="rounded-lg border border-sea-600 bg-sea-700 px-5 py-3 font-bold text-foam transition-colors hover:bg-sea-600"
+          >
+            Tous les jeux
+          </Link>
+        </div>
 
         <dl className="mt-10 grid grid-cols-2 gap-3 sm:grid-cols-4">
           {stats.map((stat) => (
@@ -65,31 +94,8 @@ export default function Home() {
         <h2 id="jeux-titre" className="font-display text-4xl tracking-wide text-foam">
           Les jeux
         </h2>
-        <div className="mt-6 space-y-10">
-          {GAME_CATEGORIES.map((category) => {
-            const games = GAMES.filter((g) => g.category === category.id);
-            return (
-              <div key={category.id}>
-                <h3 className="font-display text-2xl tracking-wide text-straw">
-                  {category.title} <span className="font-sans text-base font-semibold text-mist">· {games.length}</span>
-                </h3>
-                <p className="mt-1 text-mist">{category.description}</p>
-                <ul className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-                  {games.map((g) => (
-                    <li key={g.slug} className="rounded-xl border border-sea-700 bg-sea-800/70 p-4">
-                      <div className="flex items-start justify-between gap-3">
-                        <h4 className="font-bold text-foam">{g.title}</h4>
-                        <span className="shrink-0 rounded-full bg-sea-700 px-2 py-0.5 text-xs font-semibold text-mist">
-                          Bientôt
-                        </span>
-                      </div>
-                      <p className="mt-1 text-sm text-mist">{g.pitch}</p>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            );
-          })}
+        <div className="mt-6">
+          <GameGrid />
         </div>
       </section>
     </>

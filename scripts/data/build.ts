@@ -15,6 +15,7 @@ import {
   type DatasetMeta,
   type Fruit,
   type FruitType,
+  type Group,
   type Island,
   type Race,
   type Saga,
@@ -22,7 +23,7 @@ import {
   type Ship,
   type Sword,
 } from "../../src/lib/data/schema";
-import type { WikiEntry } from "./fetch-wiki";
+import { EXTRA_ID_BASE, type WikiEntry } from "./fetch-wiki";
 import { GENERATED_DIR, OVERRIDES_DIR, RAW_DIR, readJson, writeJson } from "./lib/io";
 import { cleanValue, collectNamedRefs, linkTargets, parseEntries } from "./lib/wikitext";
 
@@ -286,6 +287,14 @@ function parseHeight(value: string | undefined): number | null {
   return heights.length ? Math.max(...heights) : null;
 }
 
+/** Noms des éditions anglaises (« Dogstorm », un par ligne), sans leurs annotations entre parenthèses. */
+function englishNames(value: string | undefined): string[] {
+  return cleanValue(value ?? "")
+    .split("\n")
+    .map((name) => name.replace(/\(.*?\)/g, "").trim())
+    .filter(Boolean);
+}
+
 function cleanTitle(title: string): string {
   return title
     .replace(/\s*\(.*?\)\s*/g, " ")
@@ -327,6 +336,19 @@ function buildCrews(api: { fr: ApiCrew[]; en: ApiCrew[] }) {
   return { crews, idByApi };
 }
 
+/**
+ * Type d'un fruit d'après sa fiche wiki, plus fiable que l'API. Un fruit dont la
+ * vraie nature a été révélée après coup (celui de Luffy) liste ses deux types :
+ * le plus précis l'emporte.
+ */
+function parseWikiFruitType(value: string | undefined): FruitType | null {
+  const text = cleanValue(value ?? "");
+  if (/Mythical Zoan/i.test(text)) return "zoan-mythical";
+  if (/Ancient Zoan/i.test(text)) return "zoan-ancient";
+  if (/Artificial|SMILE/i.test(text)) return null;
+  return (["zoan", "logia", "paramecia"] as const).find((type) => new RegExp(type, "i").test(text)) ?? null;
+}
+
 function buildFruits(api: { fr: ApiFruit[]; en: ApiFruit[] }, wiki: Record<number, WikiEntry>) {
   const slugger = makeSlugger();
   const idByApi = new Map<number, string>();
@@ -335,11 +357,11 @@ function buildFruits(api: { fr: ApiFruit[]; en: ApiFruit[] }, wiki: Record<numbe
 
   api.fr.forEach((fr, i) => {
     const en = api.en[i];
-    const type = FRUIT_TYPE_BY_API[fr.type?.trim().toLowerCase() ?? ""];
+    const entry = wiki[fr.id];
+    const type = parseWikiFruitType(entry?.params.type) ?? FRUIT_TYPE_BY_API[fr.type?.trim().toLowerCase() ?? ""];
     // L'API contient quelques entrées vides ou sans type exploitable
     if (!type || slugify(fr.name) === "fruit") return;
 
-    const entry = wiki[fr.id];
     const duplicate = entry && byWikiTitle.get(entry.title);
     if (duplicate) {
       idByApi.set(fr.id, duplicate.id);
@@ -361,7 +383,24 @@ function buildFruits(api: { fr: ApiFruit[]; en: ApiFruit[] }, wiki: Record<numbe
     if (entry) byWikiTitle.set(entry.title, fruit);
     fruits.push(fruit);
   });
-  return { fruits, idByApi };
+
+  // Titre de page wiki (ou titre redirigé vers elle) → identifiant du fruit
+  const idByWikiTitle = new Map<string, string>();
+  for (const [apiId, entry] of Object.entries(wiki)) {
+    const id = idByApi.get(Number(apiId));
+    if (!id) continue;
+    idByWikiTitle.set(entry.title, id);
+    idByWikiTitle.set(entry.requested, id);
+  }
+  return { fruits, idByApi, idByWikiTitle };
+}
+
+/** Notoriété déduite de l'article wiki : découpé en onglets ou long = personnage important. */
+function tierOf(entry: WikiEntry | undefined): number {
+  if (!entry) return 4;
+  if (entry.tabbed || entry.size >= 50_000) return 1;
+  if (entry.size >= 25_000) return 2;
+  return entry.size >= 10_000 ? 3 : 4;
 }
 
 type CharacterOverride = Partial<Omit<Character, "name">> & { name?: Partial<Character["name"]> };
@@ -371,11 +410,13 @@ function buildCharacters(
   wiki: Record<number, WikiEntry>,
   crewIdByApi: Map<number, string>,
   fruitIdByApi: Map<number, string>,
+  fruitIdByWikiTitle: Map<string, string>,
   overrides: Record<string, CharacterOverride>,
 ) {
   const slugger = makeSlugger();
   const byWikiTitle = new Map<string, Character[]>();
   const characters: Character[] = [];
+  const verifiedFruitIds = new Set(fruitIdByWikiTitle.values());
 
   // Pages du wiki qui décrivent plusieurs personnages à la fois (« Mozu and Kiwi »)
   const titleUses = new Map<string, number>();
@@ -410,16 +451,31 @@ function buildCharacters(
     const enName = ownPage ? cleanTitle(entry.title) : en.name.split(" / ")[0].trim();
     const debut = parseDebut(params.first);
 
+    // Les fruits attribués par l'API comportent des erreurs : la fiche wiki du
+    // personnage fait foi quand elle existe.
+    const apiFruitId = fr.fruit ? (fruitIdByApi.get(fr.fruit.id) ?? null) : null;
+    const wikiFruitTitle = linkTargets(params.dfname ?? "")[0];
+    // Fruit de l'API non rattaché à une page wiki : rien ne le contredit, on le garde
+    const unverifiedApiFruit = apiFruitId && !verifiedFruitIds.has(apiFruitId) ? apiFruitId : null;
+    const fruitId = !ownPage
+      ? apiFruitId
+      : wikiFruitTitle
+        ? (fruitIdByWikiTitle.get(wikiFruitTitle) ?? unverifiedApiFruit)
+        : params.dfname
+          ? unverifiedApiFruit
+          : null;
+
     const character: Character = {
       id: slugger(enName, fr.id),
       apiId: fr.id,
       wikiTitle: entry?.title ?? null,
       name: { fr: frName, en: enName },
       aliases: uniqueStrings(
-        [...frAliases, enName, ...en.name.split(" / "), ownPage ? cleanValue(params.ename ?? "") : null],
+        [...frAliases, enName, ...en.name.split(" / "), ...(ownPage ? englishNames(params.ename) : [])],
         [frName],
       ),
       canon: debut?.chapter != null && !offCanon,
+      tier: tierOf(entry),
       debut,
       gender: has("Male Characters") ? "male" : has("Female Characters") ? "female" : null,
       races: parseRaces(traits),
@@ -439,7 +495,7 @@ function buildCharacters(
       occupations: parseMemberships(params.occupation, refs),
       crewId: fr.crew ? (crewIdByApi.get(fr.crew.id) ?? null) : null,
       job: blank(fr.job),
-      fruitId: fr.fruit ? (fruitIdByApi.get(fr.fruit.id) ?? null) : null,
+      fruitId,
       haki: {
         observation: has("Observation Haki Users"),
         armament: has("Armament Haki Users"),
@@ -455,10 +511,11 @@ function buildCharacters(
 
     const override = overrides[character.id];
     if (override) {
-      const { name, ...rest } = override;
+      // Les autres noms s'ajoutent à ceux trouvés par l'import ; le reste les remplace
+      const { name, aliases = [], ...rest } = override;
       Object.assign(character, rest);
       character.name = { ...character.name, ...name };
-      character.aliases = uniqueStrings(character.aliases, [character.name.fr]);
+      character.aliases = uniqueStrings([...character.aliases, ...aliases], [character.name.fr]);
     }
 
     if (entry) byWikiTitle.set(entry.title, [...(byWikiTitle.get(entry.title) ?? []), character]);
@@ -588,9 +645,35 @@ async function main() {
     path.join(OVERRIDES_DIR, "spoilers.json"),
   );
 
+  const { dropCharacters } = await readJson<{ dropCharacters: string[] }>(path.join(OVERRIDES_DIR, "api-fixes.json"));
+  const missingDrops = dropCharacters.filter((name) => !apiChars.fr.some((c) => c.name === name));
+  if (missingDrops.length) {
+    throw new Error(`data/overrides/api-fixes.json : noms absents de l'API : ${missingDrops.join(", ")}`);
+  }
+  const kept = apiChars.fr.map((c) => !dropCharacters.includes(c.name));
+  apiChars.fr = apiChars.fr.filter((_, i) => kept[i]);
+  apiChars.en = apiChars.en.filter((_, i) => kept[i]);
+
+  // Personnages absents de l'API, décrits uniquement par leur page wiki
+  const extras = await readJson<{ characters: { name: string }[] }>(
+    path.join(OVERRIDES_DIR, "extra-characters.json"),
+  );
+  extras.characters.forEach((extra, i) => {
+    const character = { id: EXTRA_ID_BASE + i, name: extra.name };
+    apiChars.fr.push(character);
+    apiChars.en.push(character);
+  });
+
   const { crews, idByApi: crewIdByApi } = buildCrews(apiCrews);
-  const { fruits, idByApi: fruitIdByApi } = buildFruits(apiFruits, wikiFruits);
-  const characters = buildCharacters(apiChars, wikiChars, crewIdByApi, fruitIdByApi, characterOverrides);
+  const { fruits, idByApi: fruitIdByApi, idByWikiTitle: fruitIdByWikiTitle } = buildFruits(apiFruits, wikiFruits);
+  const characters = buildCharacters(
+    apiChars,
+    wikiChars,
+    crewIdByApi,
+    fruitIdByApi,
+    fruitIdByWikiTitle,
+    characterOverrides,
+  );
 
   // Utilisateurs des fruits ; à défaut de fiche wiki, un fruit débute avec son premier utilisateur
   for (const fruit of fruits) {
@@ -655,6 +738,18 @@ async function main() {
     destroyed: !!fr.isDestroy,
   }));
 
+  const groupOverrides = await readJson<{ groups: (Omit<Group, "memberIds"> & { members: string[] })[] }>(
+    path.join(OVERRIDES_DIR, "groups.json"),
+  );
+  const characterIds = new Set(characters.filter((c) => c.canon).map((c) => c.id));
+  const groups: Group[] = groupOverrides.groups.map(({ members, ...group }) => {
+    const unknown = members.filter((id) => !characterIds.has(id));
+    if (unknown.length) {
+      throw new Error(`data/overrides/groups.json : groupe ${group.id}, personnages inconnus : ${unknown.join(", ")}`);
+    }
+    return { ...group, memberIds: members };
+  });
+
   const meta: DatasetMeta = {
     latestChapter,
     latestEpisode,
@@ -669,14 +764,16 @@ async function main() {
       islands: islands.length,
       ships: ships.length,
       swords: swords.length,
+      groups: groups.length,
     },
     sources: [
       { name: "One Piece API", url: "https://api-onepiece.com/", license: "Données ouvertes" },
       { name: "One Piece Wiki", url: "https://onepiece.fandom.com/", license: "CC BY-SA 3.0" },
+      { name: "AniList", url: "https://anilist.co/", license: "portraits des personnages" },
     ],
   };
 
-  const dataset = { characters, fruits, crews, sagas, arcs, islands, ships, swords, meta };
+  const dataset = { characters, fruits, crews, sagas, arcs, islands, ships, swords, groups, meta };
   for (const [name, schema] of Object.entries(DATASET_FILES)) {
     const parsed = schema.safeParse(dataset[name as keyof typeof dataset]);
     if (!parsed.success) {

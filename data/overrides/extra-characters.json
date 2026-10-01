@@ -1,0 +1,7 @@
+{
+  "_comment": "Personnages absents de l'API, ajoutés à partir de leur page wiki. `name` est le nom affiché en français.",
+  "characters": [
+    { "name": "Inuarashi", "wikiTitle": "Inuarashi" },
+    { "name": "Namur", "wikiTitle": "Namur" }
+  ]
+}

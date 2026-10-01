@@ -180,11 +180,24 @@ Le lot C peut s'intercaler plus tôt, jeu par jeu, selon l'envie.
 
 ### Avancement
 
-**Phase 0 : faite, sauf deux points.**
+**Phase 0 : faite**, sauf le déploiement sur Vercel et les portraits (aucune image dans le projet, voir section 10).
 
-- Fait : projet Next.js, charte graphique, accueil et page « À propos », pipeline de données validé, marquage spoilers, script de silhouettes, tests.
-- Reste : le déploiement sur Vercel, et les portraits (aucune image n'est encore dans le projet, voir section 10).
-- À reprendre en phase 1 : libellés français des surnoms et des affiliations (ils viennent du wiki, en anglais), et rattachement fiable des personnages aux équipages (celui de l'API contient des erreurs).
+**Phase 1 : 9 jeux en ligne.**
+
+- Fait : moteur de jeu commun, choix anime / manga avant la première partie, défi quotidien (OnePiecedle), trois niveaux de difficulté, records conservés dans le navigateur, pages de jeu référençables (règles, questions fréquentes, données structurées, image de partage, plan du site).
+- Jeux en ligne : OnePiecedle, Révélation, Zoom extrême, Avis de recherche, Plus ou moins, Le classement, Type de fruit, Qui a mangé ce fruit ?, Trouve-les tous.
+- Images : 481 portraits officiels, pris sur AniList. Le One Piece Wiki bloque les téléchargements automatisés.
+- Changements par rapport au plan :
+  - « Zoom extrême » (prévu au lot B) remplace « Silhouette » : le détourage automatique des portraits ne donne pas de silhouettes exploitables.
+  - « Jolly Roger » attend une source de pavillons.
+  - « Avis de recherche » donne en indices l'affiliation, la mer d'origine, l'arc et l'initiale, et non le surnom (les surnoms ne sont disponibles qu'en anglais).
+- Reste : la mise en ligne publique.
+
+**À reprendre plus tard**
+
+- Libellés français des surnoms ; les affiliations sont traduites (`src/lib/data/labels.ts`), avec un repli sur l'anglais pour les plus rares.
+- Affiliation principale de chaque personnage : déduite de l'ordre du wiki, corrigée à la main pour une vingtaine de cas. À relire pour les personnages secondaires.
+- Statut vivant / décédé : non daté, donc non filtré en mode anime.
 
 ## 9. Risques
 
@@ -196,6 +209,6 @@ Le lot C peut s'intercaler plus tôt, jeu par jeu, selon l'envie.
 ## 10. Points à trancher plus tard
 
 - Nom et domaine définitifs.
-- Défi quotidien : un seul tirage « sans spoiler anime » pour tout le monde (recommandé, les résultats restent comparables), ou deux tirages distincts.
-- Origine des images : officielles, ou illustrations refaites pour réduire le risque n°1.
+- Défi quotidien : mis en place avec un seul tirage « sans spoiler anime » pour tout le monde. À revoir si tu préfères deux tirages distincts.
+- Origine des images : officielles (décidé). Reste à trouver des portraits détourés pour « Silhouette » et des pavillons pour « Jolly Roger ».
 - Anglais dès la phase 1 ou plus tard.

@@ -1,7 +1,54 @@
 {
-  "_comment": "Corrections manuelles, par identifiant (slug) de personnage. Les clés fournies remplacent celles produites par l'import ; `name` est fusionné.",
-  "marshall-d-teach": { "name": { "fr": "Marshall D. Teach" }, "aliases": ["Barbe Noire", "Blackbeard", "Teach"] },
-  "kouzuki-momonosuke": { "name": { "fr": "Kozuki Momonosuké" }, "aliases": ["Momonosuke", "Momo"] },
-  "fisher-tiger": { "name": { "fr": "Fisher Tiger" } },
-  "buggy": { "name": { "fr": "Baggy" }, "aliases": ["Buggy", "Baggy le Clown", "Le Clown"] }
+  "_comment": "Corrections manuelles, par identifiant (slug) de personnage. Les clés fournies remplacent celles produites par l'import, sauf `name` (fusionné) et `aliases` (ajoutés).",
+  "marshall-d-teach": {
+    "name": {
+      "fr": "Marshall D. Teach"
+    },
+    "aliases": [
+      "Barbe Noire",
+      "Blackbeard",
+      "Teach"
+    ]
+  },
+  "kouzuki-momonosuke": {
+    "name": {
+      "fr": "Kozuki Momonosuké"
+    },
+    "aliases": [
+      "Momonosuke",
+      "Momo"
+    ]
+  },
+  "fisher-tiger": {
+    "name": {
+      "fr": "Fisher Tiger"
+    }
+  },
+  "buggy": {
+    "name": {
+      "fr": "Baggy"
+    },
+    "aliases": [
+      "Buggy",
+      "Baggy le Clown",
+      "Le Clown"
+    ]
+  },
+  "nerona-imu": {
+    "name": {
+      "fr": "Imu"
+    },
+    "aliases": [
+      "Im",
+      "Im-sama",
+      "Im Sama"
+    ]
+  },
+  "usopp": {
+    "aliases": [
+      "Pipo",
+      "Sogeking",
+      "God Usopp"
+    ]
+  }
 }

@@ -1,0 +1,233 @@
+[
+  {
+    "id": "chapeau-de-paille",
+    "title": "L'équipage du Chapeau de paille",
+    "since": 976,
+    "memberIds": [
+      "monkey-d-luffy",
+      "roronoa-zoro",
+      "nami",
+      "usopp",
+      "sanji",
+      "tony-tony-chopper",
+      "nico-robin",
+      "franky",
+      "brook",
+      "jinbe"
+    ]
+  },
+  {
+    "id": "supernovas",
+    "title": "Les onze Supernovas",
+    "since": 498,
+    "memberIds": [
+      "monkey-d-luffy",
+      "roronoa-zoro",
+      "trafalgar-d-water-law",
+      "eustass-kid",
+      "killer",
+      "capone-bege",
+      "jewelry-bonney",
+      "urouge",
+      "basil-hawkins",
+      "scratchmen-apoo",
+      "x-drake"
+    ]
+  },
+  {
+    "id": "grands-corsaires",
+    "title": "Tous les Grands Corsaires",
+    "since": 802,
+    "memberIds": [
+      "dracule-mihawk",
+      "crocodile",
+      "donquixote-doflamingo",
+      "bartholomew-kuma",
+      "gecko-moria",
+      "boa-hancock",
+      "jinbe",
+      "marshall-d-teach",
+      "trafalgar-d-water-law",
+      "buggy",
+      "edward-weevil"
+    ]
+  },
+  {
+    "id": "empereurs",
+    "title": "Les Empereurs, anciens et actuels",
+    "since": 1053,
+    "memberIds": [
+      "edward-newgate",
+      "kaidou",
+      "charlotte-linlin",
+      "shanks",
+      "marshall-d-teach",
+      "monkey-d-luffy",
+      "buggy"
+    ]
+  },
+  {
+    "id": "amiraux",
+    "title": "Les amiraux de la Marine",
+    "since": 1053,
+    "memberIds": [
+      "kuzan",
+      "borsalino",
+      "sakazuki",
+      "issho",
+      "aramaki"
+    ]
+  },
+  {
+    "id": "commandants-barbe-blanche",
+    "title": "Les seize commandants de Barbe Blanche",
+    "since": 553,
+    "memberIds": [
+      "polo-marco",
+      "portgas-d-ace",
+      "jozu",
+      "thatch",
+      "vista",
+      "blamenco",
+      "rakuyo",
+      "namur",
+      "blenheim",
+      "curiel",
+      "kingdew",
+      "haruta",
+      "atmos",
+      "speed-jiru",
+      "fossa",
+      "izou"
+    ]
+  },
+  {
+    "id": "cp9",
+    "title": "Les agents du CP9 à Enies Lobby",
+    "since": 379,
+    "memberIds": [
+      "rob-lucci",
+      "kaku",
+      "jabra",
+      "blueno",
+      "kumadori",
+      "fukurou",
+      "kalifa"
+    ]
+  },
+  {
+    "id": "agents-baroque-works",
+    "title": "Les agents officiers de Baroque Works",
+    "since": 165,
+    "memberIds": [
+      "daz-bonez",
+      "zala",
+      "bentham",
+      "galdino",
+      "marianne",
+      "babe",
+      "drophy",
+      "gem",
+      "mikita"
+    ]
+  },
+  {
+    "id": "vinsmoke",
+    "title": "Judge Vinsmoke et ses cinq enfants",
+    "since": 840,
+    "memberIds": [
+      "vinsmoke-judge",
+      "vinsmoke-reiju",
+      "vinsmoke-ichiji",
+      "vinsmoke-niji",
+      "sanji",
+      "vinsmoke-yonji"
+    ]
+  },
+  {
+    "id": "generaux-sucres",
+    "title": "Les Généraux sucrés de Big Mom",
+    "since": 894,
+    "memberIds": [
+      "charlotte-katakuri",
+      "charlotte-smoothie",
+      "charlotte-cracker",
+      "charlotte-snack"
+    ]
+  },
+  {
+    "id": "fourreaux-rouges",
+    "title": "Les neuf Fourreaux rouges",
+    "since": 974,
+    "memberIds": [
+      "kin-emon",
+      "kurozumi-kanjuro",
+      "raizo",
+      "kikunojo",
+      "kawamatsu",
+      "denjiro",
+      "ashura-doji",
+      "inuarashi",
+      "nekomamushi"
+    ]
+  },
+  {
+    "id": "tobi-roppo",
+    "title": "Les Tobi Roppo",
+    "since": 978,
+    "memberIds": [
+      "page-one",
+      "ulti",
+      "who-s-who",
+      "black-maria",
+      "sasaki",
+      "x-drake"
+    ]
+  },
+  {
+    "id": "capitaines-titanesques",
+    "title": "Les dix Capitaines titanesques de Barbe Noire",
+    "since": 1081,
+    "memberIds": [
+      "jesus-burgess",
+      "shiryu",
+      "van-augur",
+      "avalo-pizarro",
+      "laffitte",
+      "catarina-devon",
+      "sanjuan-wolf",
+      "vasco-shot",
+      "doc-q",
+      "kuzan"
+    ]
+  },
+  {
+    "id": "cinq-doyens",
+    "title": "Les Cinq Doyens",
+    "since": 1086,
+    "memberIds": [
+      "jaygarcia-saturn",
+      "marcus-mars",
+      "topman-warcury",
+      "ethanbaron-v-nusjuro",
+      "shepherd-ju-peter"
+    ]
+  },
+  {
+    "id": "porteurs-du-d",
+    "title": "Dix porteurs du D.",
+    "since": 957,
+    "memberIds": [
+      "monkey-d-luffy",
+      "monkey-d-garp",
+      "monkey-d-dragon",
+      "portgas-d-ace",
+      "portgas-d-rouge",
+      "gol-d-roger",
+      "marshall-d-teach",
+      "trafalgar-d-water-law",
+      "jaguar-d-saul",
+      "rocks-d-xebec"
+    ]
+  }
+]

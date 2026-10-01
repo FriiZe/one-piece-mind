@@ -73,6 +73,8 @@ export const characterSchema = z.object({
   aliases: z.array(z.string().min(1)),
   /** Personnage du manga (faux : film, hors-série, épisodes hors manga, ou non vérifié). */
   canon: z.boolean(),
+  /** Notoriété, de 1 (personnage majeur) à 4 (figurant) : sert à doser la difficulté. */
+  tier: z.number().int().min(1).max(4),
   /** Première apparition ; `null` si la fiche n'a pas pu être vérifiée. */
   debut: debutSchema.nullable(),
   gender: z.enum(["male", "female"]).nullable(),
@@ -160,6 +162,28 @@ export const swordSchema = z.object({
   destroyed: z.boolean(),
 });
 
+export const groupSchema = z.object({
+  id: slug,
+  title: z.string().min(1),
+  /** Chapitre à partir duquel la composition complète du groupe est connue. */
+  since: chapter,
+  memberIds: z.array(slug).min(2),
+});
+
+/** Inventaire des images (data/generated/images.json, produit par scripts/images/fetch.ts). */
+export const imageManifestSchema = z.object({
+  portraits: z.record(
+    slug,
+    z.object({
+      /** Nom du fichier, sans extension, dans public/images/portraits/. */
+      file: z.string().regex(/^[a-f0-9]{12}$/),
+      width: z.number().int().positive(),
+      height: z.number().int().positive(),
+      source: z.string().min(1),
+    }),
+  ),
+});
+
 export const metaSchema = z.object({
   /** Dernier chapitre connu du jeu de données. */
   latestChapter: chapter,
@@ -182,6 +206,8 @@ export type Arc = z.infer<typeof arcSchema>;
 export type Island = z.infer<typeof islandSchema>;
 export type Ship = z.infer<typeof shipSchema>;
 export type Sword = z.infer<typeof swordSchema>;
+export type Group = z.infer<typeof groupSchema>;
+export type ImageManifest = z.infer<typeof imageManifestSchema>;
 export type DatasetMeta = z.infer<typeof metaSchema>;
 
 export const DATASET_FILES = {
@@ -193,5 +219,6 @@ export const DATASET_FILES = {
   islands: z.array(islandSchema),
   ships: z.array(shipSchema),
   swords: z.array(swordSchema),
+  groups: z.array(groupSchema),
   meta: metaSchema,
 } as const;

@@ -8,7 +8,7 @@
       "en": "Gomu Gomu no Mi"
     },
     "romaji": "Gomu Gomu no Mi",
-    "type": "paramecia",
+    "type": "zoan-mythical",
     "description": "Le Gomu Gomu no Mi, aussi connu sous le nom du Fruit du Gum-Gum en français, est un Fruit du Démon de type Paramecia qui confère au corps de son utilisateur les mêmes propriétés que le caoutchouc, ce qui fait du mangeur un Homme Élastique (ゴム人間, Gomu Ningen). Ce fut autrefois un trésor que Shanks et son équipage avaient pris à un convoi du Gouvernement Mondial, protégé par le CP9, mais qui fut accidentellement mangé par Monkey D. Luffy",
     "debut": {
       "chapter": 1,
@@ -206,6 +206,7 @@
       "episode": 103
     },
     "userIds": [
+      "daz-bonez",
       "s-hawk"
     ]
   },
@@ -759,7 +760,9 @@
       "chapter": 613,
       "episode": 532
     },
-    "userIds": []
+    "userIds": [
+      "vander-decken-ix"
+    ]
   },
   {
     "id": "fuku-fuku-no-mi",
@@ -1273,8 +1276,7 @@
       "episode": 812
     },
     "userIds": [
-      "charlotte-smoothie",
-      "pierre"
+      "charlotte-smoothie"
     ]
   },
   {
@@ -1501,7 +1503,9 @@
       "chapter": 817,
       "episode": 768
     },
-    "userIds": []
+    "userIds": [
+      "raizo"
+    ]
   },
   {
     "id": "moku-moku-no-mi",
@@ -1537,7 +1541,9 @@
       "chapter": 127,
       "episode": 77
     },
-    "userIds": []
+    "userIds": [
+      "crocodile"
+    ]
   },
   {
     "id": "mera-mera-no-mi",
@@ -1850,8 +1856,7 @@
       "episode": 245
     },
     "userIds": [
-      "rob-lucci",
-      "funkfreed"
+      "rob-lucci"
     ]
   },
   {
@@ -2238,7 +2243,7 @@
       "en": "Neko Neko no Mi, Model: Saber Tiger"
     },
     "romaji": "Tori Tori no Mi, Moderu Fenikkusu",
-    "type": "zoan-mythical",
+    "type": "zoan-ancient",
     "description": "celui qui le mange peut se transformer en phénix. Il peut se régénérer et également soigner les blessures d'autres êtres vivants.",
     "debut": {
       "chapter": 998,
@@ -2374,13 +2379,8 @@
     "romaji": null,
     "type": "smile",
     "description": "il permet de se transformer en mouton.",
-    "debut": {
-      "chapter": 795,
-      "episode": null
-    },
-    "userIds": [
-      "sheepshead"
-    ]
+    "debut": null,
+    "userIds": []
   },
   {
     "id": "bat-smile",
@@ -2393,13 +2393,8 @@
     "romaji": null,
     "type": "smile",
     "description": "il permet de se transformer en chauve-souris.",
-    "debut": {
-      "chapter": 914,
-      "episode": null
-    },
-    "userIds": [
-      "batman"
-    ]
+    "debut": null,
+    "userIds": []
   },
   {
     "id": "smile-de-gazelle",
@@ -2412,13 +2407,8 @@
     "romaji": null,
     "type": "smile",
     "description": "il permet de se transformer en gazelle.",
-    "debut": {
-      "chapter": 914,
-      "episode": null
-    },
-    "userIds": [
-      "gazelleman"
-    ]
+    "debut": null,
+    "userIds": []
   },
   {
     "id": "mouse-smile",
@@ -2431,13 +2421,8 @@
     "romaji": null,
     "type": "smile",
     "description": "il permet de se transformer en souris.",
-    "debut": {
-      "chapter": 915,
-      "episode": null
-    },
-    "userIds": [
-      "mouseman"
-    ]
+    "debut": null,
+    "userIds": []
   },
   {
     "id": "lion-smile",
@@ -2450,13 +2435,8 @@
     "romaji": null,
     "type": "smile",
     "description": "il permet de se transformer en lion.",
-    "debut": {
-      "chapter": 915,
-      "episode": null
-    },
-    "userIds": [
-      "holed-em"
-    ]
+    "debut": null,
+    "userIds": []
   },
   {
     "id": "horse-smile",
@@ -2469,13 +2449,8 @@
     "romaji": null,
     "type": "smile",
     "description": "il permet de se transformer en cheval.",
-    "debut": {
-      "chapter": 917,
-      "episode": null
-    },
-    "userIds": [
-      "speed"
-    ]
+    "debut": null,
+    "userIds": []
   },
   {
     "id": "smile",
@@ -2508,13 +2483,8 @@
     "romaji": null,
     "type": "smile",
     "description": "il permet de se transformer en lapin.",
-    "debut": {
-      "chapter": 916,
-      "episode": null
-    },
-    "userIds": [
-      "rabbitman"
-    ]
+    "debut": null,
+    "userIds": []
   },
   {
     "id": "hippopotamus-smile",
@@ -2543,13 +2513,8 @@
     "romaji": null,
     "type": "smile",
     "description": "il permet de se transformer en alpaga.",
-    "debut": {
-      "chapter": 934,
-      "episode": null
-    },
-    "userIds": [
-      "alpacaman"
-    ]
+    "debut": null,
+    "userIds": []
   },
   {
     "id": "smile-of-the-elephant",
@@ -2578,13 +2543,9 @@
     "romaji": null,
     "type": "smile",
     "description": "il permet de se transformer en scorpion.",
-    "debut": {
-      "chapter": 998,
-      "episode": null
-    },
+    "debut": null,
     "userIds": [
-      "trouduc",
-      "nure-onna"
+      "trouduc"
     ]
   },
   {
@@ -2598,13 +2559,8 @@
     "romaji": null,
     "type": "smile",
     "description": "il permet de se transformer en singe.",
-    "debut": {
-      "chapter": 935,
-      "episode": null
-    },
-    "userIds": [
-      "solitaire"
-    ]
+    "debut": null,
+    "userIds": []
   },
   {
     "id": "armadillo-smile",
@@ -2633,13 +2589,8 @@
     "romaji": null,
     "type": "smile",
     "description": "il permet de se transformer en autruche.",
-    "debut": {
-      "chapter": 940,
-      "episode": null
-    },
-    "userIds": [
-      "dachoman"
-    ]
+    "debut": null,
+    "userIds": []
   },
   {
     "id": "flying-squirrel-smile",
@@ -2652,13 +2603,8 @@
     "romaji": null,
     "type": "smile",
     "description": "il permet de se transformer en écureuil volant.",
-    "debut": {
-      "chapter": 979,
-      "episode": null
-    },
-    "userIds": [
-      "bao-huang"
-    ]
+    "debut": null,
+    "userIds": []
   },
   {
     "id": "smile-of-the-white-snake",
@@ -2671,13 +2617,8 @@
     "romaji": null,
     "type": "smile",
     "description": "il permet de se transformer en serpent blanc.",
-    "debut": {
-      "chapter": 980,
-      "episode": null
-    },
-    "userIds": [
-      "tenjo-sagari"
-    ]
+    "debut": null,
+    "userIds": []
   },
   {
     "id": "gorilla-smile",
@@ -2690,14 +2631,8 @@
     "romaji": null,
     "type": "smile",
     "description": "il permet de se transformer en gorille",
-    "debut": {
-      "chapter": 978,
-      "episode": null
-    },
-    "userIds": [
-      "briscola",
-      "mizerka"
-    ]
+    "debut": null,
+    "userIds": []
   },
   {
     "id": "smile-du-coq",
@@ -2710,13 +2645,8 @@
     "romaji": null,
     "type": "smile",
     "description": "il permet de se transformer en coq",
-    "debut": {
-      "chapter": 994,
-      "episode": null
-    },
-    "userIds": [
-      "fourtricks"
-    ]
+    "debut": null,
+    "userIds": []
   },
   {
     "id": "giraffe-smile",
@@ -2729,13 +2659,8 @@
     "romaji": null,
     "type": "smile",
     "description": "il permet de se transformer en girafe",
-    "debut": {
-      "chapter": 994,
-      "episode": null
-    },
-    "userIds": [
-      "hamlet"
-    ]
+    "debut": null,
+    "userIds": []
   },
   {
     "id": "rattlesnake-smile",
@@ -2748,13 +2673,8 @@
     "romaji": null,
     "type": "smile",
     "description": "il permet de se transformer en crotale",
-    "debut": {
-      "chapter": 997,
-      "episode": null
-    },
-    "userIds": [
-      "poker"
-    ]
+    "debut": null,
+    "userIds": []
   },
   {
     "id": "heterodon-smile",
@@ -2781,13 +2701,8 @@
     "romaji": null,
     "type": "smile",
     "description": "il permet de se transformer en caïman",
-    "debut": {
-      "chapter": 1004,
-      "episode": null
-    },
-    "userIds": [
-      "caimanlady"
-    ]
+    "debut": null,
+    "userIds": []
   },
   {
     "id": "pug-smile",
@@ -2800,13 +2715,8 @@
     "romaji": null,
     "type": "smile",
     "description": "il permet de se transformer en carlin",
-    "debut": {
-      "chapter": 1005,
-      "episode": null
-    },
-    "userIds": [
-      "wanyudo"
-    ]
+    "debut": null,
+    "userIds": []
   },
   {
     "id": "goe-goe-no-mi",
@@ -2839,7 +2749,9 @@
       "chapter": null,
       "episode": 54
     },
-    "userIds": []
+    "userIds": [
+      "apis"
+    ]
   },
   {
     "id": "kama-kama-no-mi",
@@ -3336,7 +3248,7 @@
       "en": "Toro Toro no Mi"
     },
     "romaji": "Dero Dero no Mi",
-    "type": "paramecia",
+    "type": "logia",
     "description": "Ce fruit permet à son utilisateur de dissoudre toute chose en liquide, y compris lui-même, en tirant des rayons dans les yeux de ses adversaires.",
     "debut": null,
     "userIds": [
@@ -3688,7 +3600,7 @@
       "en": "Batto Batto no Mi"
     },
     "romaji": "Mori Mori no Mi",
-    "type": "logia",
+    "type": "zoan",
     "description": "Un fruit de type Zoan qui transforme son utilisateur en créature vampirique, spécialisé dans l’infiltration et l’attaque furtive plutôt que la force brute.",
     "debut": {
       "chapter": 1072,

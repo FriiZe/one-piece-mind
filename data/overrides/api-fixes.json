@@ -1,0 +1,12 @@
+{
+  "_comment": "Entrées de l'API à ignorer (doublons que la fusion automatique ne repère pas), désignées par leur nom français dans l'API.",
+  "dropCharacters": [
+    "Imu Neronna",
+    "Punk 01 - Shaka",
+    "Punk 02 - Lilith",
+    "Punk 03 - Edison",
+    "Punk 04 - Pythagoras",
+    "Punk 05 - Atlas",
+    "Punk 06 - York"
+  ]
+}

@@ -26,20 +26,38 @@ export const GAME_CATEGORIES: GameCategory[] = [
   { id: "defis", title: "Défis", description: "Les modes longs, pour ceux qui connaissent tout." },
 ];
 
+/** Jeux jouables. Chacun a son composant (src/games/ui/GameRunner.tsx) et sa page (src/games/content.ts). */
+export const LIVE_SLUGS = [
+  "onepiecedle",
+  "revelation",
+  "zoom-extreme",
+  "avis-de-recherche",
+  "plus-ou-moins",
+  "le-classement",
+  "type-de-fruit",
+  "qui-a-mange-ce-fruit",
+  "trouve-les-tous",
+] as const;
+export type LiveSlug = (typeof LIVE_SLUGS)[number];
+
+export function isLiveSlug(slug: string): slug is LiveSlug {
+  return (LIVE_SLUGS as readonly string[]).includes(slug);
+}
+
 const game = (
   slug: string,
   title: string,
   category: GameCategoryId,
   batch: Game["batch"],
   pitch: string,
-): Game => ({ slug, title, category, batch, pitch, status: "soon" });
+): Game => ({ slug, title, category, batch, pitch, status: isLiveSlug(slug) ? "live" : "soon" });
 
 export const GAMES: Game[] = [
   game("silhouette", "Silhouette", "oeil", "A", "Reconnais un personnage à son ombre."),
   game("silhouette-qcm", "Silhouette QCM", "oeil", "B", "La même ombre, avec quatre propositions."),
   game("zoom-extreme", "Zoom extrême", "oeil", "B", "Un détail très agrandi qui dézoome peu à peu."),
   game("revelation", "Révélation", "oeil", "A", "Une image pixelisée qui se précise avec le temps."),
-  game("avis-de-recherche", "Avis de recherche", "oeil", "A", "L'affiche sans le nom : la prime et le surnom suffisent-ils ?"),
+  game("avis-de-recherche", "Avis de recherche", "oeil", "A", "L'affiche sans nom ni photo : la prime suffit-elle à le reconnaître ?"),
   game("jolly-roger", "Jolly Roger", "oeil", "A", "Retrouve l'équipage à partir de son pavillon."),
   game("avant-apres-ellipse", "Avant / après l'ellipse", "oeil", "B", "Associe chaque personnage à sa version d'avant ou d'après."),
   game("fruit-du-demon", "Fruit du démon", "oeil", "B", "Reconnais un fruit à son dessin."),
@@ -85,3 +103,7 @@ export const GAMES: Game[] = [
   game("connexions", "Connexions", "defis", "C", "Seize personnages, quatre familles cachées."),
   game("recrute-ton-equipage", "Recrute ton équipage", "defis", "C", "Un tirage au hasard, dix postes à pourvoir : compose le meilleur équipage."),
 ];
+
+export function getGame(slug: string): Game | undefined {
+  return GAMES.find((g) => g.slug === slug);
+}

@@ -19,6 +19,7 @@ const base: Character = {
   name: { fr: "Test", en: "Test" },
   aliases: [],
   canon: true,
+  tier: 1,
   debut: { chapter: 900, episode: 900 },
   gender: null,
   races: [],

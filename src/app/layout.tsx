@@ -24,7 +24,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
               {SITE_NAME}
             </Link>
             <nav aria-label="Navigation principale" className="flex gap-5 text-sm font-semibold text-mist">
-              <Link href="/#jeux" className="hover:text-foam">
+              <Link href="/jeux" className="hover:text-foam">
                 Jeux
               </Link>
               <Link href="/a-propos" className="hover:text-foam">

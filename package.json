@@ -13,7 +13,8 @@
     "data:fetch-wiki": "tsx scripts/data/fetch-wiki.ts",
     "data:build": "tsx scripts/data/build.ts",
     "data:refresh": "npm run data:fetch-api && npm run data:fetch-wiki && npm run data:build",
-    "images:silhouettes": "tsx scripts/images/silhouettes.ts"
+    "images:silhouettes": "tsx scripts/images/silhouettes.ts",
+    "images:fetch": "tsx scripts/images/fetch.ts"
   },
   "dependencies": {
     "next": "16.3.8",

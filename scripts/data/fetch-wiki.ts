@@ -11,6 +11,8 @@ import { OVERRIDES_DIR, RAW_DIR, chunk, fetchJson, readJson, sleep, writeJson } 
 import { extractTemplate, linkTargets } from "./lib/wikitext";
 
 const WIKI_API = "https://onepiece.fandom.com/api.php";
+/** Identifiants attribués aux personnages de data/overrides/extra-characters.json. */
+export const EXTRA_ID_BASE = 100_000;
 const BATCH = 50;
 
 type WikiPage = {
@@ -31,9 +33,15 @@ export type WikiEntry = {
   title: string;
   /** "title" : titre déduit du nom ; "search" : trouvé par la recherche du wiki. */
   matchedBy: "title" | "search";
+  /** Titre demandé, avant redirection (peut différer de `title`). */
+  requested: string;
   params: Record<string, string>;
   /** Catégories de la page (genre, race, haki, mer d'origine...). */
   categories: string[];
+  /** Longueur de l'article, en caractères : indice de l'importance du personnage. */
+  size: number;
+  /** Article découpé en onglets, ce que le wiki réserve aux personnages majeurs. */
+  tabbed: boolean;
 };
 
 type Item = { id: number; name: string; candidates: string[] };
@@ -138,7 +146,7 @@ async function enrich(
   const pages = await fetchPages(items.flatMap((i) => i.candidates));
   const pendingTabs = new Map<
     string,
-    { item: Item; title: string; matchedBy: WikiEntry["matchedBy"]; categories: string[] }
+{ item: Item; title: string; matchedBy: WikiEntry["matchedBy"]; requested: string; categories: string[]; size: number }
   >();
 
   const tryPage = (item: Item, requested: string, matchedBy: WikiEntry["matchedBy"], source = pages) => {
@@ -146,12 +154,13 @@ async function enrich(
     if (!page) return false;
     const box = readInfobox(page.content, template);
     const categories = readCategories(page.content);
+    const size = page.content.length;
     if (box.params) {
-      result[item.id] = { title: page.title, matchedBy, params: box.params, categories };
+      result[item.id] = { title: page.title, matchedBy, requested, params: box.params, categories, size, tabbed: false };
       return true;
     }
     if (box.tabsTemplate) {
-      pendingTabs.set(box.tabsTemplate, { item, title: page.title, matchedBy, categories });
+      pendingTabs.set(box.tabsTemplate, { item, title: page.title, matchedBy, requested, categories, size });
       return true;
     }
     return false;
@@ -177,9 +186,9 @@ async function enrich(
 
   // 3. Infobox rangées dans un modèle « Tabs Top »
   const tabsPages = await fetchPages([...pendingTabs.keys()]);
-  for (const [tabsTitle, { item, title, matchedBy, categories }] of pendingTabs) {
+  for (const [tabsTitle, { item, title, matchedBy, requested, categories, size }] of pendingTabs) {
     const params = extractTemplate(tabsPages.get(tabsTitle)?.content ?? "", template);
-    if (params) result[item.id] = { title, matchedBy, params, categories };
+    if (params) result[item.id] = { title, matchedBy, requested, params, categories, size, tabbed: true };
   }
 
   return result;
@@ -231,11 +240,13 @@ async function main() {
   const characters = await readJson<{ id: number; name: string; fruit?: { id: number } | null }[]>(
     path.join(RAW_DIR, "api/characters.en.json"),
   );
-  const charItems = characters.map((c) => ({
-    id: c.id,
-    name: c.name,
-    candidates: characterCandidates(c.name, aliases),
-  }));
+  const extras = await readJson<{ characters: { name: string; wikiTitle: string }[] }>(
+    path.join(OVERRIDES_DIR, "extra-characters.json"),
+  );
+  const charItems = [
+    ...characters.map((c) => ({ id: c.id, name: c.name, candidates: characterCandidates(c.name, aliases) })),
+    ...extras.characters.map((c, i) => ({ id: EXTRA_ID_BASE + i, name: c.name, candidates: [c.wikiTitle] })),
+  ];
   const charResult = await enrich(charItems, "Char Box");
   await writeJson(path.join(RAW_DIR, "wiki/characters.json"), charResult);
   report("Personnages", charItems, charResult);

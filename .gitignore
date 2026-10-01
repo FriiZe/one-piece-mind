@@ -43,5 +43,6 @@ next-env.d.ts
 # données brutes téléchargées (régénérables : npm run data:refresh)
 /data/raw/
 
-# portraits sources des silhouettes (origine des images à trancher)
+
+# portraits détourés fournis à la main pour les silhouettes (voir README)
 /assets/portraits/

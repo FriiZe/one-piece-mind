@@ -1,0 +1,260 @@
+"use client";
+
+import { useEffect, useMemo, useRef, useState } from "react";
+import { portraitUrl, type PlayCharacter } from "../cards";
+import { byDifficulty, type Difficulty } from "../engine/difficulty";
+import { createRng, randomSeed } from "../engine/rng";
+import { CharacterSearch } from "../ui/CharacterSearch";
+import { Button, Progress, ResultPanel } from "../ui/primitives";
+import { StartScreen } from "../ui/StartScreen";
+import { useBest } from "../ui/storage";
+import type { GameProps } from "../ui/types";
+import {
+  generateRounds,
+  MAX_SCORE,
+  PIXEL_COLUMNS,
+  pointsFor,
+  STEP_SECONDS,
+  STEPS,
+  ZOOM_FACTORS,
+  zoomFocus,
+  zoomWindow,
+  type Variant,
+} from "./logic";
+
+type Focus = { x: number; y: number };
+
+/**
+ * L'image mystère est dessinée dans un canevas : elle n'apparaît jamais nette
+ * dans la page tant que la manche n'est pas terminée.
+ */
+function MysteryImage({
+  src,
+  variant,
+  step,
+  revealed,
+  focus,
+}: {
+  src: string;
+  variant: Variant;
+  step: number;
+  revealed: boolean;
+  focus: Focus;
+}) {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const [image, setImage] = useState<HTMLImageElement | null>(null);
+
+  useEffect(() => {
+    const loading = new Image();
+    loading.onload = () => setImage(loading);
+    loading.src = src;
+    return () => {
+      loading.onload = null;
+    };
+  }, [src]);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    const context = canvas?.getContext("2d");
+    if (!canvas || !context || !image) return;
+    const { naturalWidth: width, naturalHeight: height } = image;
+    canvas.width = width;
+    canvas.height = height;
+
+    if (revealed) {
+      context.drawImage(image, 0, 0);
+    } else if (variant === "pixel") {
+      // Réduire l'image à quelques pavés, puis l'agrandir sans lissage
+      const columns = PIXEL_COLUMNS[step];
+      const rows = Math.max(1, Math.round((columns * height) / width));
+      const small = document.createElement("canvas");
+      small.width = columns;
+      small.height = rows;
+      small.getContext("2d")!.drawImage(image, 0, 0, columns, rows);
+      context.imageSmoothingEnabled = false;
+      context.drawImage(small, 0, 0, columns, rows, 0, 0, width, height);
+    } else {
+      const view = zoomWindow(width, height, focus, ZOOM_FACTORS[step]);
+      context.drawImage(image, view.x, view.y, view.width, view.height, 0, 0, width, height);
+    }
+  }, [image, variant, step, revealed, focus]);
+
+  return (
+    <div className="flex h-[min(46vh,24rem)] justify-center">
+      {/* Dimensions par défaut au format portrait, le temps que l'image se charge */}
+      <canvas
+        ref={canvasRef}
+        width={230}
+        height={345}
+        role="img"
+        aria-label={revealed ? "Portrait du personnage" : "Image mystère"}
+        className="h-full w-auto max-w-full rounded-xl border-2 border-sea-600 bg-sea-900"
+      />
+    </div>
+  );
+}
+
+type Run = {
+  seed: number;
+  difficulty: Difficulty;
+  index: number;
+  step: number;
+  wrong: string[];
+  /** Points gagnés sur l'image en cours, `null` tant qu'elle est en jeu. */
+  outcome: number | null;
+  score: number;
+  finished: boolean;
+  newBest: boolean;
+};
+
+const INTRO: Record<Variant, string> = {
+  pixel: "Huit portraits pixelisés qui se précisent toutes les cinq secondes. Plus tu réponds tôt, plus tu marques.",
+  zoom: "Huit portraits vus de très près, qui dézooment toutes les cinq secondes. Plus tu réponds tôt, plus tu marques.",
+};
+
+export function RevealGame({ data, variant }: GameProps & { variant: Variant }) {
+  const slug = variant === "pixel" ? "revelation" : "zoom-extreme";
+  const [run, setRun] = useState<Run | null>(null);
+  const [best, submitBest] = useBest(`${slug}.${run?.difficulty ?? "normal"}`);
+
+  const seed = run?.seed;
+  const difficulty = run?.difficulty;
+  const rounds = useMemo(
+    () =>
+      seed === undefined || difficulty === undefined
+        ? []
+        : generateRounds(createRng(seed), byDifficulty(data.characters, difficulty)),
+    [data.characters, seed, difficulty],
+  );
+  const index = run?.index ?? 0;
+  const focus = useMemo(() => zoomFocus(createRng((seed ?? 0) + index + 1)), [seed, index]);
+
+  // L'image se précise toute seule tant que la manche est en cours
+  const ticking = run !== null && !run.finished && run.outcome === null && run.step < STEPS - 1;
+  useEffect(() => {
+    if (!ticking) return;
+    const timer = window.setInterval(() => {
+      setRun((current) =>
+        current && current.outcome === null && current.step < STEPS - 1 ? { ...current, step: current.step + 1 } : current,
+      );
+    }, STEP_SECONDS * 1000);
+    return () => window.clearInterval(timer);
+  }, [ticking, index]);
+
+  function start(level: Difficulty) {
+    setRun({
+      seed: randomSeed(),
+      difficulty: level,
+      index: 0,
+      step: 0,
+      wrong: [],
+      outcome: null,
+      score: 0,
+      finished: false,
+      newBest: false,
+    });
+  }
+
+  if (!run || !rounds.length) {
+    return (
+      <StartScreen onStart={start}>
+        <p className="text-mist">{INTRO[variant]}</p>
+      </StartScreen>
+    );
+  }
+
+  if (run.finished) {
+    return (
+      <ResultPanel
+        title={`${run.score} / ${MAX_SCORE}`}
+        best={best !== null ? { label: "Record à ce niveau", value: `${best} / ${MAX_SCORE}` } : null}
+        newBest={run.newBest}
+        actions={
+          <>
+            <Button onClick={() => start(run.difficulty)}>Rejouer</Button>
+            <Button variant="secondary" onClick={() => setRun(null)}>
+              Changer de difficulté
+            </Button>
+          </>
+        }
+      />
+    );
+  }
+
+  const target = rounds[run.index];
+  const done = run.outcome !== null;
+  const last = run.index === rounds.length - 1;
+
+  function guess(character: PlayCharacter) {
+    if (!run || done) return;
+    if (character.id === target.id) {
+      const points = pointsFor(run.step);
+      setRun({ ...run, outcome: points, score: run.score + points });
+      return;
+    }
+    const wrong = [...run.wrong, character.id];
+    // Une erreur fait avancer l'image d'un palier ; au dernier palier, elle est perdue
+    if (run.step >= STEPS - 1) setRun({ ...run, wrong, outcome: 0 });
+    else setRun({ ...run, wrong, step: run.step + 1 });
+  }
+
+  function next() {
+    if (!run) return;
+    if (last) {
+      setRun({ ...run, finished: true, newBest: submitBest(run.score) });
+      return;
+    }
+    setRun({ ...run, index: run.index + 1, step: 0, wrong: [], outcome: null });
+  }
+
+  return (
+    <div className="space-y-4">
+      <Progress current={run.index + 1} total={rounds.length} score={`Score : ${run.score}`} />
+      <MysteryImage
+        key={target.id}
+        src={portraitUrl(target.img)}
+        variant={variant}
+        step={run.step}
+        revealed={done}
+        focus={focus}
+      />
+
+      {!done && (
+        <>
+          <CharacterSearch
+            characters={data.characters}
+            excludeIds={new Set(run.wrong)}
+            onPick={guess}
+            label="Qui est-ce ?"
+            placeholder="Qui est-ce ?"
+          />
+          <p className="flex flex-wrap items-center justify-between gap-2 text-sm text-mist" aria-live="polite">
+            <span>
+              Cette image vaut encore {pointsFor(run.step)} point{pointsFor(run.step) > 1 ? "s" : ""}.
+            </span>
+            <button
+              type="button"
+              className="underline underline-offset-4 hover:text-foam"
+              onClick={() => setRun({ ...run, outcome: 0 })}
+            >
+              Passer
+            </button>
+          </p>
+        </>
+      )}
+
+      {done && (
+        <div className="flex flex-wrap items-center justify-between gap-3" aria-live="polite">
+          <p className={`font-bold ${run.outcome ? "text-emerald-300" : "text-vest"}`}>
+            {run.outcome
+              ? `${target.name} : +${run.outcome} point${run.outcome > 1 ? "s" : ""}.`
+              : `C'était ${target.name}.`}
+          </p>
+          <Button autoFocus onClick={next}>
+            {last ? "Voir mon score" : "Image suivante"}
+          </Button>
+        </div>
+      )}
+    </div>
+  );
+}
