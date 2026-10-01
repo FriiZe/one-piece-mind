@@ -3,7 +3,7 @@ import { CollectionView } from "@/components/CollectionView";
 
 export const metadata: Metadata = {
   title: "Ma collection",
-  description: "Les avis de recherche que tu as recrutés en jouant, et la taverne pour en recruter d'autres.",
+  description: "Les avis de recherche que tu as recrutés en jouant, et tes doublons à défaire.",
   robots: { index: false },
 };
 

@@ -69,6 +69,7 @@ src/lib/server/    base de données, mots de passe, sessions, enregistrement des
 prisma/            schéma et migrations
 ```
 
+- **Boutique.** Les Berrys s'y dépensent en avis de recherche : une recrue à l'unité (`buyRecruit`, 1 500 ฿) ou un booster de cinq avis, dont au moins un rare (`buyBooster`, 6 000 ฿). Le tirage a lieu sur le serveur à l'achat ; l'ouverture animée (`src/components/PackOpening.tsx`) ne fait que dévoiler des avis déjà acquis.
 - **Doublons.** Un avis obtenu plusieurs fois peut être défait contre des Berrys (`sellDuplicates`), selon sa rareté. On garde toujours un exemplaire, le doré s'il y en a un. Ces Berrys ne comptent ni dans la prime du joueur ni dans le plafond journalier.
 - **Objectifs et défis.** Chaque jeu a six objectifs (régularité et réussite), et trois défis communs à tous les joueurs changent chaque lundi (`objectives.ts`, `weekly.ts`). Leurs primes s'ajoutent aux gains de la partie qui les fait atteindre, hors plafond journalier.
 - **Une seule implémentation des règles.** `src/lib/economy` est appliqué tel quel par le navigateur (invité) et par le serveur (compte) ; `tests/economy.test.ts` en fixe le comportement.
@@ -107,6 +108,7 @@ src/components/multi/     page d'accueil du multijoueur et écran du salon
 - **Le serveur fait foi.** Les questions sont tirées côté serveur à partir de la graine du salon ; la bonne réponse et les points de la question en cours ne partent qu'à la correction.
 - **Joueurs sans compte.** À son arrivée, un joueur reçoit un ticket (identifiant et jeton) gardé dans son navigateur ; il le renvoie à chaque appel. Recharger la page ne fait pas quitter le salon.
 - **Berrys.** Payés une seule fois par partie aux joueurs connectés, selon le score et la place, dans la limite du plafond journalier.
+- **Notifications.** La cloche de l'en-tête compte les demandes d'ami reçues, les invitations dans un salon et, pour un administrateur, les quiz masqués à relire (`/api/notifications`). Elle est relue toutes les quarante-cinq secondes tant que l'onglet est visible ; le détail n'est chargé qu'à l'ouverture.
 - **Ménage.** Les salons de plus de 24 heures sont supprimés à la création d'un nouveau salon.
 - **Les tests de `tests/multi.test.ts`** jouent une partie complète et le parcours des amis sur la base locale ; ils sont ignorés sans `DATABASE_URL`.
 

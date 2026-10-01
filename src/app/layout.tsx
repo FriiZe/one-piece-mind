@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Bangers, Nunito } from "next/font/google";
 import Link from "next/link";
-import { HeaderNav } from "@/components/HeaderNav";
+import { HeaderAccount, HeaderNav } from "@/components/HeaderNav";
 import { PlayerProvider } from "@/lib/player/PlayerProvider";
 import { SITE_DESCRIPTION, SITE_NAME, SITE_TAGLINE, SITE_URL } from "@/lib/site";
 import "./globals.css";
@@ -29,11 +29,12 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       <body className="flex min-h-full flex-col font-sans">
         <PlayerProvider>
           <header className="border-b border-sea-700/60">
-            <div className="mx-auto flex w-full max-w-6xl items-center justify-between gap-4 px-4 py-4">
+            <div className="mx-auto flex w-full max-w-6xl flex-wrap items-center justify-between gap-x-4 gap-y-3 px-4 py-4">
               <Link href="/" className="font-display text-2xl tracking-wide text-straw">
                 {SITE_NAME}
               </Link>
               <HeaderNav />
+              <HeaderAccount />
             </div>
           </header>
 
@@ -49,7 +50,8 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
                   { href: "/quiz", label: "Quiz de la commu" },
                   { href: "/defis", label: "Défis" },
                   { href: "/collection", label: "Collection" },
-                  { href: "/profil", label: "Profil" },
+                  { href: "/boutique", label: "Boutique" },
+                  { href: "/profil", label: "Mon compte" },
                 ].map((link) => (
                   <Link key={link.href} href={link.href} className="hover:text-foam">
                     {link.label}

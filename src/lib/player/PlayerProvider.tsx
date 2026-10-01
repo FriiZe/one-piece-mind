@@ -13,10 +13,19 @@ import { createRng, randomSeed } from "@/games/engine/rng";
 import { evaluateReport, type GameReport } from "@/games/report";
 import { loadGameData } from "@/games/ui/data";
 import { useStored } from "@/games/ui/storage";
-import { applyGame, assignPost, buyRecruit, EMPTY_PLAYER, normalizePlayer, sellDuplicates, type PlayerState } from "@/lib/economy";
+import {
+  applyGame,
+  assignPost,
+  buyBooster,
+  buyRecruit,
+  EMPTY_PLAYER,
+  normalizePlayer,
+  sellDuplicates,
+  type PlayerState,
+} from "@/lib/economy";
 import type { SpoilerMode } from "@/lib/spoilers";
-import { buyRecruitAction, sellDuplicatesAction, setCrewAction, submitGameAction } from "./actions";
-import type { CrewResult, GameResult, MeResponse, RecruitResult, SellResult } from "./types";
+import { buyBoosterAction, buyRecruitAction, sellDuplicatesAction, setCrewAction, submitGameAction } from "./actions";
+import type { BoosterResult, CrewResult, GameResult, MeResponse, RecruitResult, SellResult } from "./types";
 
 type PlayerContext = {
   /** `loading` tant qu'on ne sait pas si le visiteur est connecté. */
@@ -26,6 +35,8 @@ type PlayerContext = {
   state: PlayerState;
   reportGame: (report: GameReport) => Promise<GameResult>;
   recruit: (mode: SpoilerMode) => Promise<RecruitResult>;
+  /** Achète un booster : plusieurs avis d'un coup. */
+  booster: (mode: SpoilerMode) => Promise<BoosterResult>;
   assign: (post: string, characterId: string | null) => Promise<CrewResult>;
   /** Défait les doublons d'un avis, ou de tous les avis visibles dans ce mode (`characterId` nul). */
   sell: (mode: SpoilerMode, characterId: string | null) => Promise<SellResult>;
@@ -116,6 +127,22 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
     [isUser, guest, setGuest],
   );
 
+  const booster = useCallback(
+    async (mode: SpoilerMode): Promise<BoosterResult> => {
+      if (isUser) {
+        const result = await buyBoosterAction(mode).catch(() => ({ ok: false, reason: "unavailable" }) as const);
+        if (result.ok) setRemote(result.state);
+        return result;
+      }
+      const data = resolveGameData(await loadGameData(), mode);
+      const bought = buyBooster(guest, data.characters, createRng(randomSeed()));
+      if (typeof bought === "string") return { ok: false, reason: bought };
+      setGuest(bought.state);
+      return { ok: true, ...bought };
+    },
+    [isUser, guest, setGuest],
+  );
+
   const assign = useCallback(
     async (post: string, characterId: string | null): Promise<CrewResult> => {
       if (isUser) {
@@ -155,11 +182,12 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
       state,
       reportGame,
       recruit,
+      booster,
       assign,
       sell,
       refresh,
     }),
-    [me, isUser, state, reportGame, recruit, assign, sell, refresh],
+    [me, isUser, state, reportGame, recruit, booster, assign, sell, refresh],
   );
 
   return <Context.Provider value={value}>{children}</Context.Provider>;

@@ -6,57 +6,25 @@ import type { ResolvedData } from "@/games/cards";
 import { formatNumber } from "@/games/engine/text";
 import { Button, Panel } from "@/games/ui/primitives";
 import { WithGameData } from "@/games/ui/WithGameData";
-import { crewBonuses, duplicatesValue, RARITY_LABELS, spareCopies, tavernCost, type Recruit } from "@/lib/economy";
+import { BOOSTER_SIZE, duplicatesValue, RARITY_LABELS, spareCopies } from "@/lib/economy";
 import { usePlayer } from "@/lib/player/PlayerProvider";
 import { CharacterCard } from "./CharacterCard";
 import { CharacterDetails } from "./CharacterDetails";
 
 const TIERS = [1, 2, 3, 4];
 
-function Tavern({ data }: { data: ResolvedData }) {
-  const { state, recruit } = usePlayer();
-  const [busy, setBusy] = useState(false);
-  const [last, setLast] = useState<Recruit | null>(null);
-  const [error, setError] = useState<string | null>(null);
-
-  const cost = tavernCost(crewBonuses(state, data.characterById).discount);
-  const character = last ? (data.characterById.get(last.characterId) ?? null) : null;
-
-  async function buy() {
-    setBusy(true);
-    setError(null);
-    const result = await recruit(data.mode);
-    setBusy(false);
-    if (result.ok) setLast(result.recruit);
-    else setError(result.reason === "insufficient" ? "Pas assez de Berrys." : "Recrutement indisponible pour l'instant.");
-  }
-
+/** La boutique est l'autre façon d'agrandir sa collection : on y renvoie depuis ici. */
+function ShopLink() {
+  const { state } = usePlayer();
   return (
-    <Panel className="flex flex-wrap items-center gap-4">
-      <div className="min-w-0 flex-1 space-y-2">
-        <h2 className="font-display text-3xl tracking-wide text-straw">La taverne</h2>
-        <p className="text-mist">
-          Paie une tournée et un personnage rejoint ta collection, à coup sûr. Les plus célèbres sont les plus rares.
-        </p>
-        <div className="flex flex-wrap items-center gap-3">
-          <Button onClick={buy} disabled={busy || state.berrys < cost}>
-            Recruter pour {formatNumber(cost)} ฿
-          </Button>
-          <span className="text-sm text-mist">Tu as {formatNumber(state.berrys)} ฿.</span>
-        </div>
-        <p className="min-h-6 text-sm font-semibold text-foam" aria-live="polite">
-          {error ??
-            (last &&
-              (last.duplicate
-                ? `Nouvel avis de ${character?.name ?? "ce personnage"} : tu l'avais déjà.`
-                : `${character?.name ?? "Un personnage"} rejoint ta collection !`) + (last.golden ? " Avis doré !" : ""))}
-        </p>
-      </div>
-      {last && (
-        <div className="w-32 shrink-0">
-          <CharacterCard character={character} golden={last.golden} />
-        </div>
-      )}
+    <Panel className="flex flex-wrap items-center justify-between gap-3">
+      <p className="min-w-0 flex-1 text-mist">
+        <strong className="text-foam">La boutique</strong> vend des recrues à l&apos;unité et des boosters de {BOOSTER_SIZE} avis à
+        ouvrir. Tu as {formatNumber(state.berrys)} ฿.
+      </p>
+      <Link href="/boutique" className="rounded-lg bg-straw px-4 py-2.5 font-bold text-ink hover:bg-straw-dark">
+        Aller à la boutique
+      </Link>
     </Panel>
   );
 }
@@ -176,7 +144,7 @@ function Collection({ data }: { data: ResolvedData }) {
         <Panel>
           <p className="text-mist">
             {owned.length === 0
-              ? "Ta collection est vide. Réussis une partie, ou passe à la taverne, pour recruter ton premier personnage."
+              ? "Ta collection est vide. Réussis une partie, ou passe à la boutique, pour recruter ton premier personnage."
               : "Aucun avis de cette rareté pour l'instant."}
           </p>
           {owned.length === 0 && (
@@ -218,7 +186,7 @@ export function CollectionView() {
     <WithGameData loading="Chargement de la collection…">
       {({ data }) => (
         <div className="space-y-8">
-          <Tavern data={data} />
+          <ShopLink />
           <Duplicates data={data} />
           <Collection data={data} />
         </div>

@@ -1,10 +1,27 @@
 import "server-only";
 import { playerBounty } from "@/lib/economy";
-import { MAX_FRIENDS, type FriendResult, type FriendsOverview } from "@/lib/multi/friends";
+import { MAX_FRIENDS, type FriendResult, type FriendsOverview, type NotificationCounts } from "@/lib/multi/friends";
 import { db } from "./db";
 
 /** Durée de validité d'une invitation dans un salon. */
 const INVITE_LIFETIME_MS = 2 * 3_600_000;
+
+/** Invitations encore utiles : récentes, et dans un salon qui n'a pas commencé. */
+const openInvites = (userId: string) => ({
+  toId: userId,
+  createdAt: { gte: new Date(Date.now() - INVITE_LIFETIME_MS) },
+  room: { status: "lobby" },
+});
+
+/** Nombre de demandes et d'invitations en attente. `admin` : compte aussi les quiz masqués à relire. */
+export async function pendingCounts(userId: string, admin: boolean): Promise<NotificationCounts> {
+  const [requests, invites, hiddenQuizzes] = await Promise.all([
+    db().friendship.count({ where: { addresseeId: userId, status: "pending" } }),
+    db().roomInvite.count({ where: openInvites(userId) }),
+    admin ? db().quiz.count({ where: { status: "hidden" } }) : 0,
+  ]);
+  return { requests, invites, hiddenQuizzes };
+}
 
 export async function friendsOverview(userId: string): Promise<FriendsOverview> {
   const [links, invites] = await Promise.all([
@@ -17,7 +34,7 @@ export async function friendsOverview(userId: string): Promise<FriendsOverview> 
       orderBy: { createdAt: "asc" },
     }),
     db().roomInvite.findMany({
-      where: { toId: userId, createdAt: { gte: new Date(Date.now() - INVITE_LIFETIME_MS) }, room: { status: "lobby" } },
+      where: openInvites(userId),
       include: { room: { select: { code: true } }, from: { select: { username: true } } },
       orderBy: { createdAt: "desc" },
     }),

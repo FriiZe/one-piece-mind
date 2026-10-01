@@ -8,6 +8,7 @@ import { evaluateReport, reportKey, reportSchema } from "@/games/report";
 import {
   applyGame,
   assignPost,
+  buyBooster,
   buyRecruit,
   EMPTY_PLAYER,
   POST_IDS,
@@ -16,7 +17,7 @@ import {
   type PostId,
 } from "@/lib/economy";
 import { isLiveSlug } from "@/lib/games/catalog";
-import type { CrewResult, GameResult, RecruitResult, SellResult } from "@/lib/player/types";
+import type { BoosterResult, CrewResult, GameResult, RecruitResult, SellResult } from "@/lib/player/types";
 import type { SpoilerMode } from "@/lib/spoilers";
 import { Prisma } from "@/generated/prisma/client";
 import { db } from "./db";
@@ -156,6 +157,24 @@ export async function buyRecruitFor(userId: string, mode: SpoilerMode): Promise<
 
     await addToCollection(tx, userId, bought.recruit.characterId, bought.recruit.golden);
     return { ok: true, state: await loadState(userId, tx), recruit: bought.recruit, cost: bought.cost };
+  });
+}
+
+export async function buyBoosterFor(userId: string, mode: SpoilerMode): Promise<BoosterResult> {
+  const data = gameData(mode);
+  return db().$transaction(async (tx) => {
+    const bought = buyBooster(await loadState(userId, tx), data.characters, secureRng());
+    if (typeof bought === "string") return { ok: false, reason: bought };
+
+    // Le débit n'a lieu que si le solde le permet encore : deux achats simultanés ne passent pas tous les deux
+    const paid = await tx.user.updateMany({
+      where: { id: userId, berrys: { gte: bought.cost } },
+      data: { berrys: { decrement: bought.cost } },
+    });
+    if (paid.count === 0) return { ok: false, reason: "insufficient" };
+
+    for (const recruit of bought.recruits) await addToCollection(tx, userId, recruit.characterId, recruit.golden);
+    return { ok: true, state: await loadState(userId, tx), recruits: bought.recruits, cost: bought.cost };
   });
 }
 

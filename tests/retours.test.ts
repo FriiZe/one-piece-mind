@@ -2,10 +2,15 @@ import "dotenv/config";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { buildGameData, resolveGameData } from "@/games/cards";
 import * as dcc from "@/games/duo-carre-cash/logic";
+import { createRng } from "@/games/engine/rng";
 import { editDistance, matchesAnswer } from "@/games/engine/text";
 import { parseEstimate, sliderToValue, valueToSlider } from "@/games/estimate/logic";
 import { evaluateReport, reportSchema } from "@/games/report";
 import {
+  BOOSTER_COST,
+  BOOSTER_SIZE,
+  boosterCost,
+  buyBooster,
   DUPLICATE_VALUE,
   duplicatesValue,
   EMPTY_PLAYER,
@@ -32,7 +37,7 @@ import {
 } from "@/lib/quiz/rules";
 import { accountsEnabled, db } from "@/lib/server/db";
 import { DUMMY_HASH } from "@/lib/server/password";
-import { loadState, sellDuplicatesFor } from "@/lib/server/player";
+import { buyBoosterFor, loadState, sellDuplicatesFor } from "@/lib/server/player";
 import { createQuiz, deleteQuiz, getQuiz, listQuizzes, reportQuiz, restoreQuiz, submitQuizPlay } from "@/lib/server/quizzes";
 
 const raw = buildGameData();
@@ -103,6 +108,47 @@ describe("doublons de la collection", () => {
     );
     // Même avec la réduction maximale et une collection complète, un recrutement coûte plus qu'il ne rend
     expect(expected).toBeLessThan(TAVERN_COST / 2);
+  });
+});
+
+describe("booster de la boutique", () => {
+  const pool: Recruitable[] = [
+    { id: "legende", tier: 1, affiliation: null },
+    { id: "rare", tier: 2, affiliation: null },
+    ...Array.from({ length: 30 }, (_, i) => ({ id: `commun-${i}`, tier: 4, affiliation: null })),
+  ];
+  const tierOf = new Map(pool.map((c) => [c.id, c.tier]));
+  const rich: PlayerState = { ...EMPTY_PLAYER, berrys: 10_000, lifetimeBerrys: 10_000 };
+
+  it("coûte moins cher qu'à l'unité et se refuse sans les Berrys", () => {
+    expect(boosterCost(0)).toBe(BOOSTER_COST);
+    expect(BOOSTER_COST).toBeGreaterThan(TAVERN_COST);
+    expect(BOOSTER_COST).toBeLessThan(TAVERN_COST * BOOSTER_SIZE);
+    expect(boosterCost(0.9)).toBe(BOOSTER_COST / 2);
+    expect(buyBooster({ ...EMPTY_PLAYER, berrys: BOOSTER_COST - 10 }, pool, createRng(1))).toBe("insufficient");
+    expect(buyBooster(rich, [], createRng(1))).toBe("empty");
+  });
+
+  it("contient cinq avis, dont toujours un rare ou mieux", () => {
+    for (let seed = 1; seed <= 200; seed++) {
+      const bought = buyBooster(rich, pool, createRng(seed));
+      if (typeof bought === "string") throw new Error(bought);
+      expect(bought.recruits).toHaveLength(BOOSTER_SIZE);
+      expect(bought.recruits.some((recruit) => tierOf.get(recruit.characterId)! <= 2)).toBe(true);
+      expect(bought.state.berrys).toBe(rich.berrys - BOOSTER_COST);
+      // La prime du joueur ne bouge pas : il a dépensé, pas gagné
+      expect(bought.state.lifetimeBerrys).toBe(rich.lifetimeBerrys);
+      const counted = Object.values(bought.state.collection).reduce((sum, entry) => sum + entry.count, 0);
+      expect(counted).toBe(BOOSTER_SIZE);
+    }
+  });
+
+  it("signale un doublon tiré deux fois dans le même booster", () => {
+    const tiny: Recruitable[] = [{ id: "seul", tier: 2, affiliation: null }];
+    const bought = buyBooster(rich, tiny, createRng(3));
+    if (typeof bought === "string") throw new Error(bought);
+    expect(bought.recruits.map((recruit) => recruit.duplicate)).toEqual([false, true, true, true, true]);
+    expect(bought.state.collection.seul.count).toBe(BOOSTER_SIZE);
   });
 });
 
@@ -312,6 +358,22 @@ describe.skipIf(!accountsEnabled)("quiz et doublons, en base", () => {
     expect(state.berrys).toBe(2 * DUPLICATE_VALUE[2]);
     expect(state.lifetimeBerrys).toBe(0);
     expect(await sellDuplicatesFor(player.id, "anime", null)).toEqual({ ok: false, reason: "nothing" });
+    await db().user.update({ where: { id: player.id }, data: { berrys: 0 } });
+  });
+
+  it("vend un booster à un compte : cinq avis de plus, le prix en moins", async () => {
+    const [, player] = users;
+    expect(await buyBoosterFor(player.id, "anime")).toEqual({ ok: false, reason: "insufficient" });
+    await db().user.update({ where: { id: player.id }, data: { berrys: BOOSTER_COST + 500 } });
+    const before = Object.values((await loadState(player.id)).collection).reduce((sum, entry) => sum + entry.count, 0);
+
+    const bought = await buyBoosterFor(player.id, "anime");
+    if (!bought.ok) throw new Error(bought.reason);
+    expect(bought.recruits).toHaveLength(BOOSTER_SIZE);
+    expect(bought.cost).toBe(BOOSTER_COST);
+    expect(bought.state.berrys).toBe(500);
+    expect(Object.values(bought.state.collection).reduce((sum, entry) => sum + entry.count, 0)).toBe(before + BOOSTER_SIZE);
+    expect(bought.recruits.every((recruit) => anime.characterById.has(recruit.characterId))).toBe(true);
     await db().user.update({ where: { id: player.id }, data: { berrys: 0 } });
   });
 

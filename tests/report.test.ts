@@ -104,18 +104,20 @@ describe("recalcul d'une partie à partir de son compte rendu", () => {
 
   it("Révélation : paie selon le palier, refuse un déroulé impossible", () => {
     const targets = reveal.generateRounds(createRng(SEED), normal);
-    const found = (index: number, step: number) => ({ type: "guess", id: targets[index].id, step }) as const;
-    const miss = (step: number) => ({ type: "guess", id: "personne", step }) as const;
+    const found = (index: number) => ({ type: "guess", id: targets[index].id }) as const;
+    const miss = { type: "guess", id: "personne" } as const;
+    const more = { type: "hint" } as const;
     const rounds = [
-      [found(0, 0)], // 6 points
-      [miss(0), found(1, 1)], // une erreur : 5 points
-      [miss(2), found(2, 2)], // palier incohérent après une erreur : rien
+      [found(0)], // du premier coup : 6 points
+      [miss, found(1)], // une erreur : 5 points
+      [more, miss, found(2)], // une demande et une erreur : 4 points
       [{ type: "pass" } as const],
-      [miss(5), found(4, 5)], // erreur au dernier palier : image perdue
+      [miss, miss, more, miss, miss, miss, found(4)], // six paliers épuisés : image perdue
+      [miss, more, more, miss, more, found(5)], // trouvé au dernier palier : 1 point
     ];
     const report = { seed: SEED, mode: "anime", difficulty: "normal", rounds } as const;
-    expect(run({ slug: "revelation", ...report })).toMatchObject({ score: 11, max: 48, category: "oeil" });
-    expect(run({ slug: "zoom-extreme", ...report })?.score).toBe(11);
+    expect(run({ slug: "revelation", ...report })).toMatchObject({ score: 16, max: 48, category: "oeil" });
+    expect(run({ slug: "zoom-extreme", ...report })?.score).toBe(16);
   });
 });
 

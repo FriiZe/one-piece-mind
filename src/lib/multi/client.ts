@@ -2,7 +2,7 @@
 
 /** Accès au salon depuis le navigateur : identité du joueur, appels au serveur, relecture régulière de l'état. */
 import { useCallback, useEffect, useRef, useState } from "react";
-import type { FriendsOverview } from "./friends";
+import type { FriendsOverview, NotificationCounts } from "./friends";
 import type { Result, RoomError, RoomTicket, RoomView } from "./types";
 
 const ticketKey = (code: string) => `opm.room.${code}`;
@@ -171,6 +171,49 @@ export function useFriends(enabled: boolean): { friends: FriendsOverview | null;
   }, [enabled, kick]);
 
   return { friends: enabled ? friends : null, reload };
+}
+
+const NOTIFICATIONS_CHANGED = "opm:notifications";
+
+/** À appeler après une action qui change les demandes en attente : la cloche se met à jour sans attendre. */
+export function notificationsChanged(): void {
+  window.dispatchEvent(new Event(NOTIFICATIONS_CHANGED));
+}
+
+/**
+ * Demandes et invitations en attente du joueur connecté. Relu toutes les
+ * quarante-cinq secondes tant que l'onglet est visible, et dès qu'il le redevient.
+ */
+export function useNotifications(enabled: boolean): NotificationCounts | null {
+  const [counts, setCounts] = useState<NotificationCounts | null>(null);
+
+  useEffect(() => {
+    if (!enabled) return;
+    let cancelled = false;
+    const load = () =>
+      fetch("/api/notifications", { cache: "no-store" })
+        .then((response) => (response.ok ? (response.json() as Promise<NotificationCounts>) : null))
+        .then((data) => {
+          if (!cancelled && data) setCounts(data);
+        })
+        .catch(() => undefined);
+    // Un onglet en arrière-plan n'interroge pas le serveur : il se met à jour en revenant au premier plan
+    const refresh = () => {
+      if (document.visibilityState === "visible") load();
+    };
+    load();
+    const timer = window.setInterval(refresh, 45_000);
+    document.addEventListener("visibilitychange", refresh);
+    window.addEventListener(NOTIFICATIONS_CHANGED, load);
+    return () => {
+      cancelled = true;
+      window.clearInterval(timer);
+      document.removeEventListener("visibilitychange", refresh);
+      window.removeEventListener(NOTIFICATIONS_CHANGED, load);
+    };
+  }, [enabled]);
+
+  return enabled ? counts : null;
 }
 
 export const ROOM_ERRORS: Record<RoomError, string> = {

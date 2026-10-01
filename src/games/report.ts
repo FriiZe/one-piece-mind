@@ -37,7 +37,8 @@ const posterEvent = z.discriminatedUnion("type", [
   z.object({ type: z.literal("pass") }),
 ]);
 const revealEvent = z.discriminatedUnion("type", [
-  z.object({ type: z.literal("guess"), id, step: z.number().int().min(0).max(reveal.STEPS - 1) }),
+  z.object({ type: z.literal("guess"), id }),
+  z.object({ type: z.literal("hint") }),
   z.object({ type: z.literal("pass") }),
 ]);
 const revealRounds = z.array(z.array(revealEvent).max(reveal.STEPS + 1)).max(reveal.ROUNDS);

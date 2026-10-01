@@ -43,3 +43,80 @@ body {
   outline: 2px solid var(--color-straw);
   outline-offset: 2px;
 }
+
+/*
+ * Ouverture d'un booster à la boutique : le paquet qui flotte puis éclate, les
+ * cartes distribuées une à une, le halo des cartes rares, le reflet des dorées.
+ */
+@theme {
+  --animate-pack-idle: pack-idle 2.4s ease-in-out infinite;
+  --animate-pack-open: pack-open 0.7s ease-in forwards;
+  --animate-card-deal: card-deal 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  --animate-card-glow: card-glow 1.6s ease-in-out infinite;
+  --animate-shine: shine 2.4s linear infinite;
+  /* Ce qui se lit sous une carte n'apparaît qu'une fois la carte assez tournée pour être vue */
+  --animate-card-label: card-label 0.3s ease-out 0.4s both;
+
+  @keyframes pack-idle {
+    0%,
+    100% {
+      transform: rotate(-2deg) translateY(0);
+    }
+    50% {
+      transform: rotate(2deg) translateY(-8px);
+    }
+  }
+  @keyframes pack-open {
+    0% {
+      transform: scale(1);
+    }
+    25% {
+      transform: scale(1.06) rotate(-4deg);
+    }
+    50% {
+      transform: scale(1.1) rotate(4deg);
+      filter: brightness(1.4);
+      opacity: 1;
+    }
+    100% {
+      transform: scale(1.6);
+      filter: brightness(3);
+      opacity: 0;
+    }
+  }
+  @keyframes card-deal {
+    from {
+      opacity: 0;
+      transform: translateY(48px) scale(0.6) rotate(-8deg);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+  @keyframes card-glow {
+    0%,
+    100% {
+      box-shadow: 0 0 12px 2px var(--glow);
+    }
+    50% {
+      box-shadow: 0 0 30px 9px var(--glow);
+    }
+  }
+  @keyframes card-label {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+  @keyframes shine {
+    from {
+      background-position: 200% 0;
+    }
+    to {
+      background-position: -200% 0;
+    }
+  }
+}

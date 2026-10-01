@@ -13,6 +13,10 @@ export type RecruitResult =
 
 export type CrewResult = { ok: true; state: PlayerState } | { ok: false; reason: "not-owned" | "unknown-post" | "unavailable" };
 
+export type BoosterResult =
+  | { ok: true; state: PlayerState; recruits: Recruit[]; cost: number }
+  | { ok: false; reason: "insufficient" | "empty" | "unavailable" };
+
 /** Doublons défaits : `berrys` rendus pour `sold` avis. */
 export type SellResult = { ok: true; state: PlayerState; berrys: number; sold: number } | { ok: false; reason: "nothing" | "unavailable" };
 

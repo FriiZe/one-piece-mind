@@ -14,7 +14,7 @@ import {
 } from "@/lib/multi/rules";
 import type { RoomTicket, RoomView } from "@/lib/multi/types";
 import { accountsEnabled, db } from "@/lib/server/db";
-import { answerFriendRequest, friendsOverview, removeFriend, requestFriend } from "@/lib/server/friends";
+import { answerFriendRequest, friendsOverview, pendingCounts, removeFriend, requestFriend } from "@/lib/server/friends";
 import { DUMMY_HASH } from "@/lib/server/password";
 import { answerRoom, createRoom, inviteToRoom, joinRoom, restartRoom, startRoom, viewRoom } from "@/lib/server/rooms";
 
@@ -223,6 +223,9 @@ describe.skipIf(!accountsEnabled)("salon et amis, en base", () => {
     const pending = await friendsOverview(b.id);
     expect(pending.incoming).toMatchObject([{ username: a.username }]);
     expect((await friendsOverview(a.id)).outgoing).toMatchObject([{ username: b.username }]);
+    // La cloche du destinataire compte la demande ; celle de l'expéditeur, rien
+    expect(await pendingCounts(b.id, false)).toEqual({ requests: 1, invites: 0, hiddenQuizzes: 0 });
+    expect(await pendingCounts(a.id, false)).toEqual({ requests: 0, invites: 0, hiddenQuizzes: 0 });
     // Seul le destinataire peut répondre
     expect(await answerFriendRequest(a.id, pending.incoming[0].id, true)).toEqual({ ok: false, error: "not-found" });
     expect(await answerFriendRequest(b.id, pending.incoming[0].id, true)).toEqual({ ok: true, accepted: true });
@@ -230,6 +233,7 @@ describe.skipIf(!accountsEnabled)("salon et amis, en base", () => {
     const friends = await friendsOverview(a.id);
     expect(friends).toMatchObject({ friends: [{ id: b.id, username: b.username }], incoming: [], outgoing: [] });
     expect(friends.friends[0].bounty).toBeGreaterThanOrEqual(0);
+    expect((await pendingCounts(b.id, false)).requests).toBe(0);
   });
 
   it("relance le salon, puis y invite un ami", async () => {
@@ -244,6 +248,7 @@ describe.skipIf(!accountsEnabled)("salon et amis, en base", () => {
     expect(await inviteToRoom(host, a, "quelqu-un-d-autre")).toEqual({ ok: false, error: "forbidden" });
     expect(await inviteToRoom(host, a, b.id)).toEqual({ ok: true });
     expect((await friendsOverview(b.id)).invites).toEqual([{ code, from: a.username }]);
+    expect(await pendingCounts(b.id, false)).toMatchObject({ requests: 0, invites: 1 });
 
     // L'ami invité entre avec son compte : son pseudo est celui du compte
     const joined = await joinRoom(code, { user: b });

@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { portraitUrl, type ResolvedData } from "@/games/cards";
 import { formatNumber } from "@/games/engine/text";
 import { Button, Panel } from "@/games/ui/primitives";
@@ -227,12 +227,23 @@ function Crew({ data }: { data: ResolvedData }) {
 }
 
 export function ProfileView() {
+  const { status } = usePlayer();
+
+  // Les rubriques n'apparaissent qu'une fois le joueur reconnu : un lien vers « #amis » ou « #compte » est suivi à ce moment-là
+  useEffect(() => {
+    if (status === "loading") return;
+    const id = window.location.hash.slice(1);
+    if (id) document.getElementById(id)?.scrollIntoView();
+  }, [status]);
+
   return (
     <div className="space-y-8">
+      {/* Un invité vient d'abord ici pour se connecter ou créer son compte */}
+      {status === "guest" && <AccountPanel />}
       <Bounty />
       <WithGameData loading="Chargement de l'équipage…">{({ data }) => <Crew data={data} />}</WithGameData>
       <FriendsPanel />
-      <AccountPanel />
+      {status === "user" && <AccountPanel />}
     </div>
   );
 }

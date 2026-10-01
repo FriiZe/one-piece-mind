@@ -48,8 +48,14 @@ const DIFFICULTY_FACTOR: Record<Difficulty, number> = { facile: 0.7, normal: 1, 
 /** Plafond de Berrys gagnés en jouant, par jour (heure de Paris). */
 export const DAILY_BERRY_CAP = 20_000;
 
-/** Prix d'un recrutement à la taverne, avant réduction. */
+/** Prix d'une recrue à la boutique, avant réduction. */
 export const TAVERN_COST = 1500;
+
+/** Booster : plusieurs avis d'un coup, moins chers qu'à l'unité, dont au moins un rare ou légendaire. */
+export const BOOSTER_SIZE = 5;
+export const BOOSTER_COST = 6000;
+/** Rareté la plus commune que peut avoir la carte garantie (1 = légendaire, 2 = rare). */
+export const BOOSTER_GUARANTEED_TIER = 2;
 
 /** Part de chaque rareté dans les recrutements (1 = légendaire, 4 = commun). */
 export const RARITY_WEIGHTS: Record<number, number> = { 1: 4, 2: 14, 3: 32, 4: 50 };
@@ -231,7 +237,39 @@ export function tavernCost(discount: number): number {
   return roundToTen(TAVERN_COST * (1 - Math.min(discount, 0.5)));
 }
 
-/** Recrutement payant à la taverne : toujours réussi, au prix de `tavernCost`. */
+export function boosterCost(discount: number): number {
+  return roundToTen(BOOSTER_COST * (1 - Math.min(discount, 0.5)));
+}
+
+/**
+ * Achat d'un booster : `BOOSTER_SIZE` avis tirés comme à l'unité. Si aucun des
+ * premiers n'est au moins rare, le dernier l'est à coup sûr.
+ */
+export function buyBooster(
+  state: PlayerState,
+  pool: readonly Recruitable[],
+  rng: Rng,
+): { state: PlayerState; recruits: Recruit[]; cost: number } | "insufficient" | "empty" {
+  const byId = new Map(pool.map((c) => [c.id, c]));
+  const bonuses = crewBonuses(state, byId);
+  const cost = boosterCost(bonuses.discount);
+  if (state.berrys < cost) return "insufficient";
+
+  const guaranteed = pool.filter((c) => c.tier <= BOOSTER_GUARANTEED_TIER);
+  const isGood = (recruit: Recruit) => (byId.get(recruit.characterId)?.tier ?? 4) <= BOOSTER_GUARANTEED_TIER;
+  let next: PlayerState = { ...state, berrys: state.berrys - cost };
+  const recruits: Recruit[] = [];
+  for (let i = 0; i < BOOSTER_SIZE; i++) {
+    const owed = i === BOOSTER_SIZE - 1 && guaranteed.length > 0 && !recruits.some(isGood);
+    const recruit = drawRecruit(rng, owed ? guaranteed : pool, next, bonuses.golden);
+    if (!recruit) return "empty";
+    recruits.push(recruit);
+    next = withRecruit(next, recruit);
+  }
+  return { state: next, recruits, cost };
+}
+
+/** Achat d'une recrue à la boutique : toujours réussi, au prix de `tavernCost`. */
 export function buyRecruit(
   state: PlayerState,
   pool: readonly Recruitable[],

@@ -5,7 +5,7 @@ import { useState } from "react";
 import { formatNumber } from "@/games/engine/text";
 import { Button, Panel } from "@/games/ui/primitives";
 import { rankOf } from "@/lib/economy";
-import { useFriends } from "@/lib/multi/client";
+import { notificationsChanged, useFriends } from "@/lib/multi/client";
 import type { FriendError, FriendResult } from "@/lib/multi/friends";
 import {
   answerFriendRequestAction,
@@ -40,6 +40,7 @@ export function FriendsPanel() {
     setBusy(false);
     setMessage(result.ok ? { text: success(result), ok: true } : { text: ERRORS[result.error], ok: false });
     reload();
+    notificationsChanged();
   }
 
   return (

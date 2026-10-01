@@ -52,14 +52,14 @@ export const GAME_CONTENT: Record<LiveSlug, GameContent> = {
   revelation: {
     metaTitle: "Révélation : reconnais le personnage One Piece pixelisé",
     metaDescription:
-      "Un portrait de personnage One Piece pixelisé qui se précise peu à peu. Reconnais-le le plus tôt possible : huit images par partie, trois niveaux de difficulté.",
+      "Un portrait de personnage One Piece pixelisé, qui se précise à chacune de tes propositions. Reconnais-le en un minimum d'essais : huit images par partie, trois niveaux de difficulté.",
     intro:
-      "Le portrait commence en gros pavés de couleur et se précise toutes les cinq secondes. Une chevelure, un chapeau, une couleur de peau : à toi de reconnaître le personnage avant que l'image ne soit nette.",
+      "Le portrait commence en gros pavés de couleur et ne se précise qu'après chacune de tes propositions. Une chevelure, un chapeau, une couleur de peau : à toi de reconnaître le personnage avant que l'image ne soit nette.",
     howTo: [
-      "Observe l'image : elle gagne en netteté toutes les cinq secondes, en six paliers.",
+      "Observe l'image : elle passe par six paliers de netteté, et n'avance que lorsque tu te trompes. Prends ton temps, il n'y a pas de chrono.",
       "Tape le nom du personnage dès que tu le reconnais.",
       "Une bonne réponse au premier palier vaut 6 points, puis un point de moins à chaque palier.",
-      "Une erreur fait avancer l'image d'un palier. Huit images par partie, 48 points au maximum.",
+      "Aucune idée ? Un bouton précise l'image sans proposer de nom : il coûte un palier, comme une erreur. Huit images par partie, 48 points au maximum.",
     ],
     faq: [
       {
@@ -68,7 +68,7 @@ export const GAME_CONTENT: Record<LiveSlug, GameContent> = {
       },
       {
         question: "Que se passe-t-il si je ne trouve pas ?",
-        answer: "Au dernier palier, l'image reste affichée sans limite de temps. Une erreur à ce stade, ou le bouton « Passer », révèle la réponse sans rapporter de point.",
+        answer: "L'image n'avance jamais toute seule. Au dernier palier, une erreur révèle la réponse sans rapporter de point, tout comme le bouton « Passer ».",
       },
       SPOILER_FAQ,
     ],
@@ -76,14 +76,14 @@ export const GAME_CONTENT: Record<LiveSlug, GameContent> = {
   "zoom-extreme": {
     metaTitle: "Zoom extrême : reconnais le personnage One Piece à un détail",
     metaDescription:
-      "Un détail très agrandi d'un portrait One Piece, qui dézoome peu à peu. Un œil, une cicatrice, un bout de chapeau : reconnais le personnage le plus tôt possible.",
+      "Un détail très agrandi d'un portrait One Piece, qui dézoome à chacune de tes propositions. Un œil, une cicatrice, un bout de chapeau : reconnais le personnage en un minimum d'essais.",
     intro:
-      "Tu ne vois d'abord qu'un détail du portrait, grossi cinq fois : un œil, une mèche, un morceau de vêtement. L'image s'élargit toutes les cinq secondes.",
+      "Tu ne vois d'abord qu'un détail du portrait, grossi cinq fois : un œil, une mèche, un morceau de vêtement. L'image ne s'élargit qu'après chacune de tes propositions.",
     howTo: [
-      "Observe le détail affiché : le cadre s'élargit toutes les cinq secondes, en six paliers.",
+      "Observe le détail affiché : le cadre s'élargit en six paliers, et n'avance que lorsque tu te trompes. Prends ton temps, il n'y a pas de chrono.",
       "Tape le nom du personnage dès que tu le reconnais.",
       "Une bonne réponse au premier palier vaut 6 points, puis un point de moins à chaque palier.",
-      "Une erreur élargit le cadre d'un palier. Huit images par partie, 48 points au maximum.",
+      "Aucune idée ? Un bouton dézoome sans proposer de nom : il coûte un palier, comme une erreur. Huit images par partie, 48 points au maximum.",
     ],
     faq: [
       {

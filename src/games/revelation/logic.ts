@@ -1,7 +1,8 @@
 /**
  * Règles communes aux deux jeux d'image mystère : « Révélation » (image
  * pixelisée qui se précise) et « Zoom extrême » (détail qui dézoome). L'image
- * passe par six paliers ; plus on trouve tôt, plus on marque.
+ * passe par six paliers et n'avance que lorsque le joueur se trompe ou demande
+ * à en voir plus : moins il lui faut d'essais, plus il marque.
  */
 import type { PlayCharacter } from "../cards";
 import { byDifficulty, type Difficulty } from "../engine/difficulty";
@@ -12,8 +13,6 @@ export type Pictured = PlayCharacter & { img: string };
 
 /** Nombre de paliers avant l'image nette. */
 export const STEPS = 6;
-/** Durée d'un palier, en secondes, avant de passer seul au suivant. */
-export const STEP_SECONDS = 5;
 export const ROUNDS = 8;
 export const MAX_SCORE = ROUNDS * STEPS;
 
@@ -51,19 +50,24 @@ export function zoomWindow(width: number, height: number, focus: { x: number; y:
   return { x: clamp(focus.x * width - w / 2, width - w), y: clamp(focus.y * height - h / 2, height - h), width: w, height: h };
 }
 
-/** Action du joueur sur une image, avec le palier où elle a eu lieu. */
-export type RevealEvent = { type: "guess"; id: string; step: number } | { type: "pass" };
+/**
+ * Action du joueur sur une image : une proposition, une demande d'en voir plus
+ * (`hint`, qui coûte autant qu'une erreur) ou l'abandon de l'image.
+ */
+export type RevealEvent = { type: "guess"; id: string } | { type: "hint" } | { type: "pass" };
 
-/** Points d'une image, en rejouant les actions du joueur. Un déroulé incohérent ne rapporte rien. */
+/**
+ * Points d'une image, en rejouant les actions du joueur. Le palier n'est pas
+ * déclaré par le navigateur : il se déduit du nombre d'erreurs et de demandes.
+ */
 export function scoreRound(target: Pictured, events: readonly RevealEvent[]): number {
-  // Une erreur fait avancer l'image d'un palier : le palier suivant ne peut pas être plus bas
-  let minimum = 0;
+  let step = 0;
   for (const event of events) {
     if (event.type === "pass") return 0;
-    if (!Number.isInteger(event.step) || event.step < minimum || event.step >= STEPS) return 0;
-    if (event.id === target.id) return pointsFor(event.step);
-    if (event.step >= STEPS - 1) return 0;
-    minimum = event.step + 1;
+    if (event.type === "guess" && event.id === target.id) return pointsFor(step);
+    // Une erreur au dernier palier perd l'image ; il n'y a plus rien à dévoiler non plus
+    if (step >= STEPS - 1) return 0;
+    step++;
   }
   return 0;
 }

@@ -16,7 +16,7 @@ export const POSTS: Record<PostId, { label: string; effect: string; bonus: Bonus
   medecin: { label: "Médecin", effect: "Berrys sur les jeux « Savoir »", bonus: { kind: "berrys", scope: "savoir" } },
   archeologue: { label: "Archéologue", effect: "Berrys sur les jeux « Mots et indices »", bonus: { kind: "berrys", scope: "mots" } },
   charpentier: { label: "Charpentier", effect: "Berrys sur les jeux « Primes et mesures »", bonus: { kind: "berrys", scope: "primes" } },
-  musicien: { label: "Musicien", effect: "Réduction à la taverne", bonus: { kind: "discount" } },
+  musicien: { label: "Musicien", effect: "Réduction à la boutique", bonus: { kind: "discount" } },
   timonier: { label: "Timonier", effect: "Chances d'obtenir un avis doré", bonus: { kind: "golden" } },
 };
 

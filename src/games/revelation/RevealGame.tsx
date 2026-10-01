@@ -16,7 +16,6 @@ import {
   MAX_SCORE,
   PIXEL_COLUMNS,
   pointsFor,
-  STEP_SECONDS,
   STEPS,
   ZOOM_FACTORS,
   zoomFocus,
@@ -113,8 +112,8 @@ type Run = {
 };
 
 const INTRO: Record<Variant, string> = {
-  pixel: "Huit portraits pixelisés qui se précisent toutes les cinq secondes. Plus tu réponds tôt, plus tu marques.",
-  zoom: "Huit portraits vus de très près, qui dézooment toutes les cinq secondes. Plus tu réponds tôt, plus tu marques.",
+  pixel: "Huit portraits pixelisés. L'image ne se précise qu'après chaque proposition : moins il t'en faut, plus tu marques.",
+  zoom: "Huit portraits vus de très près. L'image ne dézoome qu'après chaque proposition : moins il t'en faut, plus tu marques.",
 };
 
 export function RevealGame({ data, variant }: GameProps & { variant: Variant }) {
@@ -134,18 +133,6 @@ export function RevealGame({ data, variant }: GameProps & { variant: Variant }) 
   );
   const index = run?.index ?? 0;
   const focus = useMemo(() => zoomFocus(createRng((seed ?? 0) + index + 1)), [seed, index]);
-
-  // L'image se précise toute seule tant que la manche est en cours
-  const ticking = run !== null && !run.finished && run.outcome === null && run.step < STEPS - 1;
-  useEffect(() => {
-    if (!ticking) return;
-    const timer = window.setInterval(() => {
-      setRun((current) =>
-        current && current.outcome === null && current.step < STEPS - 1 ? { ...current, step: current.step + 1 } : current,
-      );
-    }, STEP_SECONDS * 1000);
-    return () => window.clearInterval(timer);
-  }, [ticking, index]);
 
   function start(level: Difficulty) {
     reward.reset();
@@ -199,14 +186,14 @@ export function RevealGame({ data, variant }: GameProps & { variant: Variant }) 
 
   function guess(character: PlayCharacter) {
     if (!run || done) return;
-    const log = logged({ type: "guess", id: character.id, step: run.step });
+    const log = logged({ type: "guess", id: character.id });
     if (character.id === target.id) {
       const points = pointsFor(run.step);
       setRun({ ...run, log, outcome: points, score: run.score + points });
       return;
     }
     const wrong = [...run.wrong, character.id];
-    // Une erreur fait avancer l'image d'un palier ; au dernier palier, elle est perdue
+    // L'image n'avance que sur une erreur ; au dernier palier, elle est perdue
     if (run.step >= STEPS - 1) setRun({ ...run, log, wrong, outcome: 0 });
     else setRun({ ...run, log, wrong, step: run.step + 1 });
   }
@@ -244,15 +231,28 @@ export function RevealGame({ data, variant }: GameProps & { variant: Variant }) 
           />
           <p className="flex flex-wrap items-center justify-between gap-2 text-sm text-mist" aria-live="polite">
             <span>
-              Cette image vaut encore {pointsFor(run.step)} point{pointsFor(run.step) > 1 ? "s" : ""}.
+              Palier {run.step + 1} sur {STEPS} : cette image vaut encore {pointsFor(run.step)} point
+              {pointsFor(run.step) > 1 ? "s" : ""}.
             </span>
-            <button
-              type="button"
-              className="underline underline-offset-4 hover:text-foam"
-              onClick={() => setRun({ ...run, log: logged({ type: "pass" }), outcome: 0 })}
-            >
-              Passer
-            </button>
+            <span className="flex gap-4">
+              {/* Sans idée, on peut faire avancer l'image sans nommer quelqu'un : cela coûte autant qu'une erreur */}
+              {run.step < STEPS - 1 && (
+                <button
+                  type="button"
+                  className="underline underline-offset-4 hover:text-foam"
+                  onClick={() => setRun({ ...run, log: logged({ type: "hint" }), step: run.step + 1 })}
+                >
+                  {variant === "pixel" ? "Aucune idée : préciser l'image" : "Aucune idée : dézoomer"}
+                </button>
+              )}
+              <button
+                type="button"
+                className="underline underline-offset-4 hover:text-foam"
+                onClick={() => setRun({ ...run, log: logged({ type: "pass" }), outcome: 0 })}
+              >
+                Passer
+              </button>
+            </span>
           </p>
         </>
       )}
