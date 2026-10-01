@@ -20,11 +20,12 @@ export function QuizFlow({
 }: {
   questions: QuizQuestion[];
   columns?: 2 | 3;
-  onFinish: (score: number) => void;
+  onFinish: (score: number, answers: string[]) => void;
 }) {
   const [index, setIndex] = useState(0);
   const [score, setScore] = useState(0);
   const [chosen, setChosen] = useState<string | null>(null);
+  const [answers, setAnswers] = useState<string[]>([]);
 
   const question = questions[index];
   const answered = chosen !== null;
@@ -33,12 +34,13 @@ export function QuizFlow({
   function answer(optionId: string) {
     if (answered) return;
     setChosen(optionId);
+    setAnswers([...answers, optionId]);
     if (optionId === question.answerId) setScore(score + 1);
   }
 
   function next() {
     if (last) {
-      onFinish(score);
+      onFinish(score, answers);
       return;
     }
     setIndex(index + 1);

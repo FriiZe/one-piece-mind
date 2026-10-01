@@ -2,21 +2,22 @@
 
 import { useMemo, useState } from "react";
 import { byDifficulty, type Difficulty } from "../engine/difficulty";
-import { createRng, pick, randomSeed } from "../engine/rng";
+import { randomSeed } from "../engine/rng";
 import { formatBounty } from "../engine/text";
 import { Button, ResultPanel } from "../ui/primitives";
 import { StartScreen } from "../ui/StartScreen";
 import { useBest } from "../ui/storage";
 import type { GameProps } from "../ui/types";
-import { bountyPool, isCorrect, nextOpponent, type Answer, type Bountied } from "./logic";
+import { RewardSummary } from "@/components/RewardSummary";
+import { useGameReward } from "@/lib/player/useGameReward";
+import { advanceChain, bountyPool, isCorrect, startChain, type Answer, type Bountied, type Chain } from "./logic";
 
-type Run = {
+type Run = Chain & {
   seed: number;
   difficulty: Difficulty;
-  current: Bountied;
-  next: Bountied;
   streak: number;
-  seen: string[];
+  /** Toutes les réponses données, pour le compte rendu de partie. */
+  answers: Answer[];
   /** Réponse donnée à la manche en cours, tant que la prime dévoilée est affichée. */
   answer: Answer | null;
   lost: boolean;
@@ -42,6 +43,7 @@ function Card({ character, bounty, tone }: { character: Bountied; bounty: string
 export default function PlusOuMoins({ data }: GameProps) {
   const [run, setRun] = useState<Run | null>(null);
   const [best, submitBest] = useBest(`plus-ou-moins.${run?.difficulty ?? "normal"}`);
+  const reward = useGameReward();
   const difficulty = run?.difficulty;
   const pool = useMemo(
     () => (difficulty ? bountyPool(byDifficulty(data.characters, difficulty)) : []),
@@ -50,28 +52,25 @@ export default function PlusOuMoins({ data }: GameProps) {
 
   function start(level: Difficulty) {
     const seed = randomSeed();
-    const rng = createRng(seed);
-    const candidates = bountyPool(byDifficulty(data.characters, level));
-    const current = pick(rng, candidates);
-    const next = nextOpponent(rng, candidates, current, [current.id]);
-    setRun({ seed, difficulty: level, current, next, streak: 0, seen: [current.id, next.id], answer: null, lost: false, newBest: false });
+    const chain = startChain(seed, bountyPool(byDifficulty(data.characters, level)));
+    reward.reset();
+    setRun({ ...chain, seed, difficulty: level, streak: 0, answers: [], answer: null, lost: false, newBest: false });
   }
 
   function answer(choice: Answer) {
     if (!run || run.answer) return;
+    const answers = [...run.answers, choice];
     if (!isCorrect(run.current, run.next, choice)) {
-      setRun({ ...run, answer: choice, lost: true, newBest: submitBest(run.streak) });
+      setRun({ ...run, answers, answer: choice, lost: true, newBest: submitBest(run.streak) });
+      reward.submit({ slug: "plus-ou-moins", seed: run.seed, mode: data.mode, difficulty: run.difficulty, answers });
       return;
     }
-    setRun({ ...run, answer: choice, streak: run.streak + 1 });
+    setRun({ ...run, answers, answer: choice, streak: run.streak + 1 });
   }
 
   function advance() {
     if (!run) return;
-    // Un tirage par manche, déterminé par la graine de la partie
-    const rng = createRng(run.seed + run.streak);
-    const next = nextOpponent(rng, pool, run.next, run.seen.slice(-12));
-    setRun({ ...run, current: run.next, next, seen: [...run.seen, next.id], answer: null });
+    setRun({ ...run, ...advanceChain(run.seed, run.streak, pool, run), answer: null });
   }
 
   if (!run) {
@@ -133,6 +132,7 @@ export default function PlusOuMoins({ data }: GameProps) {
             La prime de {run.next.name} est de {formatBounty(run.next.bounty)}, celle de {run.current.name} de{" "}
             {formatBounty(run.current.bounty)}.
           </p>
+          <RewardSummary view={reward.view} data={data} />
         </ResultPanel>
       )}
     </div>

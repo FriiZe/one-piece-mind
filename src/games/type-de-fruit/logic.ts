@@ -1,6 +1,8 @@
 import type { FruitCard } from "../cards";
-import { pick, shuffle, type Rng } from "../engine/rng";
+import { createRng, pick, shuffle, type Rng } from "../engine/rng";
 import type { FruitType } from "@/lib/data/schema";
+
+export const QUIZ_LENGTH = 10;
 
 export const FAMILIES = ["paramecia", "logia", "zoan"] as const;
 export type FruitFamily = (typeof FAMILIES)[number];
@@ -15,7 +17,7 @@ export function familyOf(type: FruitType): FruitFamily | null {
  * Tire `count` fruits en équilibrant les familles : sans cela, les Paramecia,
  * trois fois plus nombreux, rendraient la réponse trop prévisible.
  */
-export function generateQuiz(rng: Rng, fruits: readonly FruitCard[], count = 10): FruitCard[] {
+export function generateQuiz(rng: Rng, fruits: readonly FruitCard[], count = QUIZ_LENGTH): FruitCard[] {
   const remaining = new Map<FruitFamily, FruitCard[]>(
     FAMILIES.map((family) => [family, shuffle(rng, fruits.filter((f) => familyOf(f.type) === family))]),
   );
@@ -26,4 +28,11 @@ export function generateQuiz(rng: Rng, fruits: readonly FruitCard[], count = 10)
     quiz.push(remaining.get(pick(rng, available))!.pop()!);
   }
   return quiz;
+}
+
+/** Rejoue une partie à partir de sa graine et des réponses données. */
+export function evaluate(seed: number, answers: readonly string[], fruits: readonly FruitCard[]) {
+  const quiz = generateQuiz(createRng(seed), fruits);
+  const score = quiz.filter((fruit, index) => answers[index] === familyOf(fruit.type)).length;
+  return { score, max: quiz.length };
 }

@@ -1,7 +1,8 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  // Les portraits sont déjà réduits et convertis en WebP à l'import (scripts/images/fetch.ts)
+  images: { unoptimized: true },
 };
 
 export default nextConfig;

@@ -10,10 +10,9 @@ import { Button, Progress, ResultPanel } from "../ui/primitives";
 import { StartScreen } from "../ui/StartScreen";
 import { useBest } from "../ui/storage";
 import type { GameProps } from "../ui/types";
-import { generatePosters, hintsFor, isAccepted, MAX_POINTS, pointsFor } from "./logic";
-
-const POSTERS = 5;
-const MAX_SCORE = POSTERS * MAX_POINTS;
+import { RewardSummary } from "@/components/RewardSummary";
+import { useGameReward } from "@/lib/player/useGameReward";
+import { generatePosters, hintsFor, isAccepted, MAX_SCORE, pointsFor, type PosterEvent } from "./logic";
 
 type Run = {
   seed: number;
@@ -22,6 +21,8 @@ type Run = {
   /** Nombre d'indices dévoilés sur l'affiche en cours. */
   revealed: number;
   wrong: string[];
+  /** Actions du joueur, affiche par affiche, pour le compte rendu de partie. */
+  log: PosterEvent[][];
   /** Issue de l'affiche en cours : points gagnés, ou `null` tant qu'elle est en jeu. */
   outcome: number | null;
   score: number;
@@ -49,6 +50,7 @@ function Poster({ bounty, name }: { bounty: number; name: string | null }) {
 export default function AvisDeRecherche({ data }: GameProps) {
   const [run, setRun] = useState<Run | null>(null);
   const [best, submitBest] = useBest(`avis-de-recherche.${run?.difficulty ?? "normal"}`);
+  const reward = useGameReward();
 
   const seed = run?.seed;
   const difficulty = run?.difficulty;
@@ -56,17 +58,19 @@ export default function AvisDeRecherche({ data }: GameProps) {
     () =>
       seed === undefined || difficulty === undefined
         ? []
-        : generatePosters(createRng(seed), byDifficulty(data.characters, difficulty), POSTERS),
+        : generatePosters(createRng(seed), byDifficulty(data.characters, difficulty)),
     [data.characters, seed, difficulty],
   );
 
   function start(level: Difficulty) {
+    reward.reset();
     setRun({
       seed: randomSeed(),
       difficulty: level,
       index: 0,
       revealed: 0,
       wrong: [],
+      log: [[]],
       outcome: null,
       score: 0,
       finished: false,
@@ -98,35 +102,41 @@ export default function AvisDeRecherche({ data }: GameProps) {
             </Button>
           </>
         }
-      />
+      >
+        <RewardSummary view={reward.view} data={data} />
+      </ResultPanel>
     );
   }
 
   const target = posters[run.index];
+  /** Ajoute une action au journal de l'affiche en cours. */
+  const logged = (event: PosterEvent) => run.log.map((events, i) => (i === run.index ? [...events, event] : events));
   const hints = hintsFor(target, data);
   const done = run.outcome !== null;
   const excluded = new Set(run.wrong);
 
   function guess(character: PlayCharacter) {
     if (!run || done) return;
+    const log = logged({ type: "guess", id: character.id });
     if (isAccepted(character, target, run.revealed, data)) {
       const points = pointsFor(run.revealed);
-      setRun({ ...run, outcome: points, score: run.score + points });
+      setRun({ ...run, log, outcome: points, score: run.score + points });
       return;
     }
     const wrong = [...run.wrong, character.id];
     // Une erreur dévoile l'indice suivant ; sans indice restant, l'affiche est perdue
-    if (run.revealed >= hints.length) setRun({ ...run, wrong, outcome: 0 });
-    else setRun({ ...run, wrong, revealed: run.revealed + 1 });
+    if (run.revealed >= hints.length) setRun({ ...run, log, wrong, outcome: 0 });
+    else setRun({ ...run, log, wrong, revealed: run.revealed + 1 });
   }
 
   function next() {
     if (!run) return;
     if (run.index === posters.length - 1) {
       setRun({ ...run, finished: true, newBest: submitBest(run.score) });
+      reward.submit({ slug: "avis-de-recherche", seed: run.seed, mode: data.mode, difficulty: run.difficulty, posters: run.log });
       return;
     }
-    setRun({ ...run, index: run.index + 1, revealed: 0, wrong: [], outcome: null });
+    setRun({ ...run, index: run.index + 1, revealed: 0, wrong: [], log: [...run.log, []], outcome: null });
   }
 
   return (
@@ -163,7 +173,7 @@ export default function AvisDeRecherche({ data }: GameProps) {
                     <button
                       type="button"
                       className="underline underline-offset-4 hover:text-foam"
-                      onClick={() => setRun({ ...run, revealed: run.revealed + 1 })}
+                      onClick={() => setRun({ ...run, log: logged({ type: "hint" }), revealed: run.revealed + 1 })}
                     >
                       Un indice
                     </button>
@@ -171,7 +181,7 @@ export default function AvisDeRecherche({ data }: GameProps) {
                   <button
                     type="button"
                     className="underline underline-offset-4 hover:text-foam"
-                    onClick={() => setRun({ ...run, outcome: 0 })}
+                    onClick={() => setRun({ ...run, log: logged({ type: "pass" }), outcome: 0 })}
                   >
                     Passer
                   </button>

@@ -1,0 +1,16 @@
+# Base de données locale pour le développement : docker compose up -d
+services:
+  db:
+    image: postgres:17
+    environment:
+      POSTGRES_USER: onepiecemind
+      POSTGRES_PASSWORD: onepiecemind
+      POSTGRES_DB: onepiecemind
+    ports:
+      # 5433 pour ne pas gêner un Postgres déjà installé sur la machine
+      - "5433:5432"
+    volumes:
+      - db-data:/var/lib/postgresql/data
+
+volumes:
+  db-data:

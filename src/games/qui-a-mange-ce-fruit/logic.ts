@@ -1,5 +1,6 @@
 import type { FruitCard, PlayCharacter, ResolvedData } from "../cards";
-import { sample, shuffle, type Rng } from "../engine/rng";
+import { byDifficulty, type Difficulty } from "../engine/difficulty";
+import { createRng, sample, shuffle, type Rng } from "../engine/rng";
 
 export type Question =
   | { kind: "fruit-to-user"; fruit: FruitCard; options: PlayCharacter[]; answerId: string }
@@ -40,3 +41,10 @@ export function answerLabel(question: Question): string {
   return question.options.find((o) => o.id === question.answerId)!.name;
 }
 
+
+/** Rejoue une partie à partir de sa graine et des réponses données. */
+export function evaluate(seed: number, difficulty: Difficulty, answers: readonly string[], data: ResolvedData) {
+  const quiz = generateQuiz(createRng(seed), data, byDifficulty(data.characters, difficulty));
+  const score = quiz.filter((question, index) => answers[index] === question.answerId).length;
+  return { score, max: quiz.length };
+}

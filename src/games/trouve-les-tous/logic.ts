@@ -40,3 +40,10 @@ export function matchMember(input: string, forms: Map<string, string>, found: Re
 export function membersOf(group: GroupCard, characterById: Map<string, PlayCharacter>): PlayCharacter[] {
   return group.memberIds.map((id) => characterById.get(id)!);
 }
+
+/** Compte les membres réellement trouvés : chaque identifiant doit appartenir au groupe, une seule fois. */
+export function evaluate(group: GroupCard, found: readonly string[]) {
+  const members = new Set(group.memberIds);
+  const score = new Set(found.filter((id) => members.has(id))).size;
+  return { score, max: group.memberIds.length };
+}

@@ -1,13 +1,18 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import type { GroupCard } from "../cards";
+import { randomSeed } from "../engine/rng";
 import { Button, Panel, ResultPanel } from "../ui/primitives";
 import { useStored } from "../ui/storage";
 import type { GameProps } from "../ui/types";
+import { RewardSummary } from "@/components/RewardSummary";
+import { useGameReward } from "@/lib/player/useGameReward";
 import { acceptedForms, matchMember, membersOf, timeLimit } from "./logic";
 
 type Run = {
+  /** Identifie la partie : une même partie n'est récompensée qu'une fois. */
+  seed: number;
   group: GroupCard;
   found: string[];
   remaining: number;
@@ -54,9 +59,28 @@ export default function TrouveLesTous({ data }: GameProps) {
     setRecords({ ...records, [group.id]: finalScore });
   }, [group, finalScore, records, setRecords]);
 
+  // Compte rendu de partie, envoyé une seule fois quand elle se termine (chrono compris)
+  const reward = useGameReward();
+  const reported = useRef<number | null>(null);
+  const finishedRun = run?.over ? run : null;
+  const { submit } = reward;
+  useEffect(() => {
+    if (!finishedRun || reported.current === finishedRun.seed) return;
+    reported.current = finishedRun.seed;
+    submit({
+      slug: "trouve-les-tous",
+      seed: finishedRun.seed,
+      mode: data.mode,
+      groupId: finishedRun.group.id,
+      found: finishedRun.found,
+    });
+  }, [finishedRun, data.mode, submit]);
+
   function start(chosen: GroupCard) {
     setInput("");
+    reward.reset();
     setRun({
+      seed: randomSeed(),
       group: chosen,
       found: [],
       remaining: timeLimit(chosen.memberIds.length),
@@ -183,6 +207,7 @@ export default function TrouveLesTous({ data }: GameProps) {
             <p>Les oubliés sont en rouge ci-dessus.</p>
           )}
           {beaten && <p className="font-semibold">Nouveau record !</p>}
+          <RewardSummary view={reward.view} data={data} />
         </ResultPanel>
       )}
     </div>

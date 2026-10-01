@@ -1,5 +1,6 @@
 import type { PlayCharacter } from "../cards";
-import { pick, shuffle, type Rng } from "../engine/rng";
+import { byDifficulty, type Difficulty } from "../engine/difficulty";
+import { createRng, pick, shuffle, type Rng } from "../engine/rng";
 
 export const CRITERIA = {
   bounty: { label: "prime", order: "de la plus haute à la plus basse" },
@@ -9,6 +10,8 @@ export const CRITERIA = {
 export type Criterion = keyof typeof CRITERIA;
 
 export const ROUND_SIZE = 5;
+export const ROUNDS = 5;
+export const MAX_SCORE = ROUNDS * ROUND_SIZE;
 export type Round = { criterion: Criterion; items: PlayCharacter[] };
 
 /** Cinq personnages aux valeurs toutes différentes pour le critère tiré, dans un ordre mélangé. */
@@ -39,4 +42,25 @@ export function correctOrder(round: Round): string[] {
 export function scoreRound(round: Round, orderedIds: readonly string[]): number {
   const expected = correctOrder(round);
   return orderedIds.filter((id, index) => expected[index] === id).length;
+}
+
+/** La manche n° `index` d'une partie : chaque manche a son propre tirage, dérivé de la graine. */
+export function roundAt(seed: number, index: number, characters: readonly PlayCharacter[]): Round {
+  return generateRound(createRng(seed + index), characters);
+}
+
+/** Rejoue une partie à partir de sa graine et des classements proposés. */
+export function evaluate(seed: number, difficulty: Difficulty, orders: readonly (readonly string[])[], characters: readonly PlayCharacter[]) {
+  const pool = byDifficulty(characters, difficulty);
+  let score = 0;
+  for (let index = 0; index < ROUNDS; index++) {
+    const round = roundAt(seed, index, pool);
+    const order = orders[index] ?? [];
+    // Un classement n'est noté que s'il contient exactement les cinq personnages de la manche
+    const ids = new Set(round.items.map((c) => c.id));
+    if (order.length === ids.size && order.every((id) => ids.has(id)) && new Set(order).size === ids.size) {
+      score += scoreRound(round, order);
+    }
+  }
+  return { score, max: MAX_SCORE };
 }

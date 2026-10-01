@@ -7,6 +7,8 @@ import { Button, ResultPanel } from "../ui/primitives";
 import { QuizFlow, type QuizQuestion } from "../ui/QuizFlow";
 import { StartScreen } from "../ui/StartScreen";
 import { useBest } from "../ui/storage";
+import { RewardSummary } from "@/components/RewardSummary";
+import { useGameReward } from "@/lib/player/useGameReward";
 import type { GameProps } from "../ui/types";
 import { answerLabel, generateQuiz } from "./logic";
 
@@ -16,6 +18,7 @@ export default function QuiAMangeCeFruit({ data }: GameProps) {
   const [run, setRun] = useState<Run | null>(null);
   const [result, setResult] = useState<{ score: number; newBest: boolean } | null>(null);
   const [best, submitBest] = useBest(`qui-a-mange-ce-fruit.${run?.difficulty ?? "normal"}`);
+  const reward = useGameReward();
 
   const questions = useMemo<QuizQuestion[]>(() => {
     if (!run) return [];
@@ -57,6 +60,7 @@ export default function QuiAMangeCeFruit({ data }: GameProps) {
     return (
       <StartScreen
         onStart={(difficulty) => {
+          reward.reset();
           setResult(null);
           setRun({ seed: randomSeed(), difficulty });
         }}
@@ -78,6 +82,7 @@ export default function QuiAMangeCeFruit({ data }: GameProps) {
           <>
             <Button
               onClick={() => {
+                reward.reset();
                 setResult(null);
                 setRun({ seed: randomSeed(), difficulty: run.difficulty });
               }}
@@ -89,11 +94,20 @@ export default function QuiAMangeCeFruit({ data }: GameProps) {
             </Button>
           </>
         }
-      />
+      >
+        <RewardSummary view={reward.view} data={data} />
+      </ResultPanel>
     );
   }
 
   return (
-    <QuizFlow key={run.seed} questions={questions} onFinish={(score) => setResult({ score, newBest: submitBest(score) })} />
+    <QuizFlow
+      key={run.seed}
+      questions={questions}
+      onFinish={(score, answers) => {
+        setResult({ score, newBest: submitBest(score) });
+        reward.submit({ slug: "qui-a-mange-ce-fruit", seed: run.seed, mode: data.mode, difficulty: run.difficulty, answers });
+      }}
+    />
   );
 }

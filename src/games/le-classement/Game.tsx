@@ -3,16 +3,15 @@
 import { useMemo, useState } from "react";
 import type { PlayCharacter } from "../cards";
 import { byDifficulty, type Difficulty } from "../engine/difficulty";
-import { createRng, randomSeed } from "../engine/rng";
+import { randomSeed } from "../engine/rng";
 import { formatBounty, formatHeight } from "../engine/text";
 import { Button, Panel, Progress, ResultPanel } from "../ui/primitives";
 import { StartScreen } from "../ui/StartScreen";
 import { useBest } from "../ui/storage";
 import type { GameProps } from "../ui/types";
-import { CRITERIA, correctOrder, generateRound, ROUND_SIZE, type Criterion } from "./logic";
-
-const ROUNDS = 5;
-const MAX_SCORE = ROUNDS * ROUND_SIZE;
+import { RewardSummary } from "@/components/RewardSummary";
+import { useGameReward } from "@/lib/player/useGameReward";
+import { CRITERIA, correctOrder, MAX_SCORE, roundAt, ROUNDS, type Criterion } from "./logic";
 
 function formatValue(character: PlayCharacter, criterion: Criterion): string {
   if (criterion === "bounty") return formatBounty(character.bounty);
@@ -27,6 +26,8 @@ type Run = {
   /** Ordre proposé par le joueur pour la manche en cours ; `null` tant qu'il n'a rien déplacé. */
   order: string[] | null;
   submitted: boolean;
+  /** Classements validés aux manches précédentes, pour le compte rendu de partie. */
+  orders: string[][];
   score: number;
   finished: boolean;
   newBest: boolean;
@@ -35,6 +36,7 @@ type Run = {
 export default function LeClassement({ data }: GameProps) {
   const [run, setRun] = useState<Run | null>(null);
   const [best, submitBest] = useBest(`le-classement.${run?.difficulty ?? "normal"}`);
+  const reward = useGameReward();
 
   const seed = run?.seed;
   const roundIndex = run?.round;
@@ -43,12 +45,23 @@ export default function LeClassement({ data }: GameProps) {
     () =>
       seed === undefined || roundIndex === undefined || difficulty === undefined
         ? null
-        : generateRound(createRng(seed + roundIndex), byDifficulty(data.characters, difficulty)),
+        : roundAt(seed, roundIndex, byDifficulty(data.characters, difficulty)),
     [data.characters, seed, roundIndex, difficulty],
   );
 
   function start(level: Difficulty) {
-    setRun({ seed: randomSeed(), difficulty: level, round: 0, order: null, submitted: false, score: 0, finished: false, newBest: false });
+    reward.reset();
+    setRun({
+      seed: randomSeed(),
+      difficulty: level,
+      round: 0,
+      order: null,
+      submitted: false,
+      orders: [],
+      score: 0,
+      finished: false,
+      newBest: false,
+    });
   }
 
   if (!run || !round) {
@@ -76,7 +89,9 @@ export default function LeClassement({ data }: GameProps) {
             </Button>
           </>
         }
-      />
+      >
+        <RewardSummary view={reward.view} data={data} />
+      </ResultPanel>
     );
   }
 
@@ -97,13 +112,14 @@ export default function LeClassement({ data }: GameProps) {
   function submit() {
     if (!run) return;
     const points = order.filter((id, index) => expected[index] === id).length;
-    setRun({ ...run, order, submitted: true, score: run.score + points });
+    setRun({ ...run, order, submitted: true, orders: [...run.orders, order], score: run.score + points });
   }
 
   function next() {
     if (!run) return;
     if (run.round === ROUNDS - 1) {
       setRun({ ...run, finished: true, newBest: submitBest(run.score) });
+      reward.submit({ slug: "le-classement", seed: run.seed, mode: data.mode, difficulty: run.difficulty, orders: run.orders });
       return;
     }
     setRun({ ...run, round: run.round + 1, order: null, submitted: false });

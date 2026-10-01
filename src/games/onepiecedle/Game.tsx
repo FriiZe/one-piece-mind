@@ -3,14 +3,16 @@
 import { useMemo, useState } from "react";
 import { resolveGameData, type PlayCharacter, type ResolvedData } from "../cards";
 import { dailyNumber, isNextDay } from "../engine/daily";
-import { byDifficulty, type Difficulty } from "../engine/difficulty";
-import { createRng, pick, randomSeed } from "../engine/rng";
+import type { Difficulty } from "../engine/difficulty";
+import { randomSeed } from "../engine/rng";
 import { CharacterSearch } from "../ui/CharacterSearch";
 import { Button, Panel, ResultPanel, ShareButton } from "../ui/primitives";
 import { StartScreen } from "../ui/StartScreen";
 import { useDailyKey, useStored } from "../ui/storage";
 import type { GameProps } from "../ui/types";
-import { COLUMNS, compare, dailyTarget, eligible, shareGrid, type Cell } from "./logic";
+import { RewardSummary } from "@/components/RewardSummary";
+import { useGameReward } from "@/lib/player/useGameReward";
+import { COLUMNS, compare, dailyTarget, freeTarget, shareGrid, type Cell } from "./logic";
 
 const CELL_TONES = {
   exact: "bg-emerald-600 text-white",
@@ -127,6 +129,7 @@ function Daily({ data, raw }: GameProps) {
   const today = useDailyKey();
   const [stored, setStored] = useStored<DailyState>("opm.onepiecedle.daily", NO_DAILY);
   const [streak, setStreak] = useStored<Streak>("opm.onepiecedle.streak", NO_STREAK);
+  const reward = useGameReward();
 
   // Le personnage du jour est tiré parmi ceux que connaissent aussi les joueurs du mode anime
   const target = useMemo(() => dailyTarget(resolveGameData(raw, "anime").characters, today), [raw, today]);
@@ -136,7 +139,10 @@ function Daily({ data, raw }: GameProps) {
   function guess(character: PlayCharacter) {
     const next = [...guessIds, character.id];
     setStored({ key: today, guessIds: next });
-    if (character.id === target.id && streak.lastWin !== today) {
+    if (character.id !== target.id) return;
+    // Le défi n'est payé qu'une fois par jour : c'est le compte rendu, pas ce composant, qui le garantit
+    reward.submit({ slug: "onepiecedle-daily", day: today, mode: data.mode, guesses: next });
+    if (streak.lastWin !== today) {
       const follows = streak.lastWin !== null && isNextDay(streak.lastWin, today);
       setStreak({ lastWin: today, count: follows ? streak.count + 1 : 1 });
     }
@@ -164,6 +170,7 @@ function Daily({ data, raw }: GameProps) {
               Trouvé en {rows.length} essai{rows.length > 1 ? "s" : ""}. Prochain personnage à minuit.
             </p>
             {streak.count > 1 && <p className="font-semibold">{streak.count} jours d&apos;affilée.</p>}
+            <RewardSummary view={reward.view} data={data} />
           </ResultPanel>
         ) : (
           <p className="text-mist">
@@ -180,17 +187,19 @@ type FreeRun = { seed: number; difficulty: Difficulty; guessIds: string[]; gaveU
 
 function Free({ data }: GameProps) {
   const [run, setRun] = useState<FreeRun | null>(null);
+  const reward = useGameReward();
   const seed = run?.seed;
   const difficulty = run?.difficulty;
   const target = useMemo(
     () =>
-      seed === undefined || difficulty === undefined
-        ? null
-        : pick(createRng(seed), eligible(byDifficulty(data.characters, difficulty))),
+      seed === undefined || difficulty === undefined ? null : freeTarget(seed, difficulty, data.characters),
     [data.characters, seed, difficulty],
   );
 
-  const start = (level: Difficulty) => setRun({ seed: randomSeed(), difficulty: level, guessIds: [], gaveUp: false });
+  function start(level: Difficulty) {
+    reward.reset();
+    setRun({ seed: randomSeed(), difficulty: level, guessIds: [], gaveUp: false });
+  }
 
   if (!run || !target) {
     return (
@@ -199,6 +208,9 @@ function Free({ data }: GameProps) {
       </StartScreen>
     );
   }
+
+  const report = (guesses: string[]) =>
+    reward.submit({ slug: "onepiecedle", seed: run.seed, mode: data.mode, difficulty: run.difficulty, guesses });
 
   const replay = (
     <>
@@ -215,22 +227,36 @@ function Free({ data }: GameProps) {
       target={target}
       guessIds={run.guessIds}
       gaveUp={run.gaveUp}
-      onGuess={(character) => setRun({ ...run, guessIds: [...run.guessIds, character.id] })}
+      onGuess={(character) => {
+        const guessIds = [...run.guessIds, character.id];
+        setRun({ ...run, guessIds });
+        if (character.id === target.id) report(guessIds);
+      }}
       footer={({ won, rows }) =>
         won ? (
           <ResultPanel title={`${target.name} !`} actions={replay}>
             <p>
               Trouvé en {rows.length} essai{rows.length > 1 ? "s" : ""}.
             </p>
+            <RewardSummary view={reward.view} data={data} />
           </ResultPanel>
         ) : run.gaveUp ? (
-          <ResultPanel title={`C'était ${target.name}`} actions={replay} />
+          <ResultPanel title={`C'était ${target.name}`} actions={replay}>
+            <RewardSummary view={reward.view} data={data} />
+          </ResultPanel>
         ) : (
           <p className="flex flex-wrap items-center justify-between gap-2 text-mist">
             <span>
               {rows.length} essai{rows.length > 1 ? "s" : ""}
             </span>
-            <Button variant="ghost" className="px-0 py-0" onClick={() => setRun({ ...run, gaveUp: true })}>
+            <Button
+              variant="ghost"
+              className="px-0 py-0"
+              onClick={() => {
+                setRun({ ...run, gaveUp: true });
+                report(run.guessIds);
+              }}
+            >
               Abandonner
             </Button>
           </p>

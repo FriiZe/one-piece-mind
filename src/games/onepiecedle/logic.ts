@@ -1,5 +1,6 @@
 import type { PlayCharacter, ResolvedData } from "../cards";
-import { createRng, seedFromString, shuffle } from "../engine/rng";
+import { byDifficulty, type Difficulty } from "../engine/difficulty";
+import { createRng, pick, seedFromString, shuffle } from "../engine/rng";
 import { dailyNumber } from "../engine/daily";
 import { formatBounty, formatHeight } from "../engine/text";
 import { FRUIT_TYPE_LABELS, HAKI_LABELS, SEA_LABELS } from "@/lib/data/labels";
@@ -96,4 +97,22 @@ export function shareGrid(rows: Cell[][]): string {
   return rows
     .map((cells) => cells.map((c) => (c.direction === "up" ? "⬆️" : c.direction === "down" ? "⬇️" : SQUARES[c.verdict])).join(""))
     .join("\n");
+}
+
+/** Personnage à trouver d'une partie libre. */
+export function freeTarget(seed: number, difficulty: Difficulty, characters: readonly PlayCharacter[]): PlayCharacter {
+  return pick(createRng(seed), eligible(byDifficulty(characters, difficulty)));
+}
+
+/** Nombre d'essais au-delà duquel la réussite ne baisse plus. */
+const WORST_ATTEMPTS = 10;
+
+/**
+ * Note une partie : 1 si le personnage est trouvé du premier coup, puis de
+ * moins en moins à chaque essai, 0 s'il n'est pas trouvé.
+ */
+export function evaluate(target: PlayCharacter, guesses: readonly string[]) {
+  const attempts = guesses.indexOf(target.id) + 1;
+  const max = WORST_ATTEMPTS;
+  return { score: attempts === 0 ? 0 : Math.max(2, max + 1 - attempts), max };
 }

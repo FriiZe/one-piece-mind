@@ -9,6 +9,8 @@ import { Button, Progress, ResultPanel } from "../ui/primitives";
 import { StartScreen } from "../ui/StartScreen";
 import { useBest } from "../ui/storage";
 import type { GameProps } from "../ui/types";
+import { RewardSummary } from "@/components/RewardSummary";
+import { useGameReward } from "@/lib/player/useGameReward";
 import {
   generateRounds,
   MAX_SCORE,
@@ -19,6 +21,7 @@ import {
   ZOOM_FACTORS,
   zoomFocus,
   zoomWindow,
+  type RevealEvent,
   type Variant,
 } from "./logic";
 
@@ -100,6 +103,8 @@ type Run = {
   index: number;
   step: number;
   wrong: string[];
+  /** Actions du joueur, image par image, pour le compte rendu de partie. */
+  log: RevealEvent[][];
   /** Points gagnés sur l'image en cours, `null` tant qu'elle est en jeu. */
   outcome: number | null;
   score: number;
@@ -116,6 +121,7 @@ export function RevealGame({ data, variant }: GameProps & { variant: Variant }) 
   const slug = variant === "pixel" ? "revelation" : "zoom-extreme";
   const [run, setRun] = useState<Run | null>(null);
   const [best, submitBest] = useBest(`${slug}.${run?.difficulty ?? "normal"}`);
+  const reward = useGameReward();
 
   const seed = run?.seed;
   const difficulty = run?.difficulty;
@@ -142,12 +148,14 @@ export function RevealGame({ data, variant }: GameProps & { variant: Variant }) 
   }, [ticking, index]);
 
   function start(level: Difficulty) {
+    reward.reset();
     setRun({
       seed: randomSeed(),
       difficulty: level,
       index: 0,
       step: 0,
       wrong: [],
+      log: [[]],
       outcome: null,
       score: 0,
       finished: false,
@@ -177,34 +185,40 @@ export function RevealGame({ data, variant }: GameProps & { variant: Variant }) 
             </Button>
           </>
         }
-      />
+      >
+        <RewardSummary view={reward.view} data={data} />
+      </ResultPanel>
     );
   }
 
   const target = rounds[run.index];
+  /** Ajoute une action au journal de l'image en cours. */
+  const logged = (event: RevealEvent) => run.log.map((events, i) => (i === run.index ? [...events, event] : events));
   const done = run.outcome !== null;
   const last = run.index === rounds.length - 1;
 
   function guess(character: PlayCharacter) {
     if (!run || done) return;
+    const log = logged({ type: "guess", id: character.id, step: run.step });
     if (character.id === target.id) {
       const points = pointsFor(run.step);
-      setRun({ ...run, outcome: points, score: run.score + points });
+      setRun({ ...run, log, outcome: points, score: run.score + points });
       return;
     }
     const wrong = [...run.wrong, character.id];
     // Une erreur fait avancer l'image d'un palier ; au dernier palier, elle est perdue
-    if (run.step >= STEPS - 1) setRun({ ...run, wrong, outcome: 0 });
-    else setRun({ ...run, wrong, step: run.step + 1 });
+    if (run.step >= STEPS - 1) setRun({ ...run, log, wrong, outcome: 0 });
+    else setRun({ ...run, log, wrong, step: run.step + 1 });
   }
 
   function next() {
     if (!run) return;
     if (last) {
       setRun({ ...run, finished: true, newBest: submitBest(run.score) });
+      reward.submit({ slug, seed: run.seed, mode: data.mode, difficulty: run.difficulty, rounds: run.log });
       return;
     }
-    setRun({ ...run, index: run.index + 1, step: 0, wrong: [], outcome: null });
+    setRun({ ...run, index: run.index + 1, step: 0, wrong: [], log: [...run.log, []], outcome: null });
   }
 
   return (
@@ -235,7 +249,7 @@ export function RevealGame({ data, variant }: GameProps & { variant: Variant }) 
             <button
               type="button"
               className="underline underline-offset-4 hover:text-foam"
-              onClick={() => setRun({ ...run, outcome: 0 })}
+              onClick={() => setRun({ ...run, log: logged({ type: "pass" }), outcome: 0 })}
             >
               Passer
             </button>

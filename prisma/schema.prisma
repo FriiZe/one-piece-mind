@@ -1,0 +1,92 @@
+// Comptes et progression des joueurs. Les règles du jeu (gains, recrutement,
+// bonus) sont dans src/lib/economy ; cette base ne fait que conserver l'état.
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id           String   @id @default(cuid())
+  /// Pseudo tel que le joueur l'a écrit.
+  username     String
+  /// Pseudo en minuscules : deux pseudos ne peuvent pas différer par la seule casse.
+  usernameKey  String   @unique
+  passwordHash String
+  createdAt    DateTime @default(now())
+
+  berrys         Int    @default(0)
+  /// Total gagné depuis la création du compte : fixe la prime du joueur.
+  lifetimeBerrys Int    @default(0)
+  games          Int    @default(0)
+  /// Gains du jour (date de Paris), pour le plafond journalier.
+  dayKey         String @default("")
+  dayEarned      Int    @default(0)
+
+  sessions   Session[]
+  collection CollectionEntry[]
+  crew       CrewSlot[]
+  results    GameResult[]
+}
+
+model Session {
+  /// Empreinte SHA-256 du jeton : le jeton lui-même n'existe que dans le cookie.
+  id        String   @id
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+}
+
+model CollectionEntry {
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  characterId String
+  count       Int      @default(1)
+  golden      Int      @default(0)
+  firstAt     DateTime @default(now())
+
+  @@id([userId, characterId])
+}
+
+model CrewSlot {
+  userId      String
+  user        User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  post        String
+  characterId String
+
+  @@id([userId, post])
+}
+
+/// Une partie récompensée. La contrainte d'unicité empêche de faire payer deux fois la même.
+model GameResult {
+  id         String   @id @default(cuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  slug       String
+  /// Graine du tirage, ou « daily:AAAA-MM-JJ » pour le défi du jour.
+  reportKey  String
+  mode       String
+  difficulty String?
+  score      Int
+  maxScore   Int
+  berrys     Int
+  recruitId  String?
+  createdAt  DateTime @default(now())
+
+  @@unique([userId, slug, reportKey])
+  @@index([userId, createdAt])
+}
+
+/// Compteur de tentatives de connexion, par pseudo et par adresse.
+model AuthThrottle {
+  key         String   @id
+  count       Int
+  windowStart DateTime
+}

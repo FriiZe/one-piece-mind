@@ -46,3 +46,8 @@ next-env.d.ts
 
 # portraits détourés fournis à la main pour les silhouettes (voir README)
 /assets/portraits/
+
+/src/generated/prisma
+
+# modèle de configuration, sans secret
+!.env.example

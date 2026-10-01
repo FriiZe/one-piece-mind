@@ -5,21 +5,24 @@ import { createRng, randomSeed } from "../engine/rng";
 import { Button, Panel, ResultPanel } from "../ui/primitives";
 import { QuizFlow, type QuizQuestion } from "../ui/QuizFlow";
 import { useBest } from "../ui/storage";
+import { RewardSummary } from "@/components/RewardSummary";
+import { useGameReward } from "@/lib/player/useGameReward";
 import type { GameProps } from "../ui/types";
 import { FRUIT_TYPE_LABELS } from "@/lib/data/labels";
-import { FAMILIES, familyOf, generateQuiz } from "./logic";
+import { FAMILIES, familyOf, generateQuiz, QUIZ_LENGTH } from "./logic";
 
 const FAMILY_LABELS = { paramecia: "Paramecia", logia: "Logia", zoan: "Zoan" } as const;
-const LENGTH = 10;
+const LENGTH = QUIZ_LENGTH;
 
 export default function TypeDeFruit({ data }: GameProps) {
   const [seed, setSeed] = useState<number | null>(null);
   const [result, setResult] = useState<{ score: number; newBest: boolean } | null>(null);
   const [best, submitBest] = useBest("type-de-fruit");
+  const reward = useGameReward();
 
   const questions = useMemo<QuizQuestion[]>(() => {
     if (seed === null) return [];
-    return generateQuiz(createRng(seed), data.fruits, LENGTH).map((fruit) => ({
+    return generateQuiz(createRng(seed), data.fruits).map((fruit) => ({
       id: fruit.id,
       prompt: (
         <div className="text-center">
@@ -34,6 +37,7 @@ export default function TypeDeFruit({ data }: GameProps) {
   }, [seed, data.fruits]);
 
   function start() {
+    reward.reset();
     setResult(null);
     setSeed(randomSeed());
   }
@@ -56,6 +60,7 @@ export default function TypeDeFruit({ data }: GameProps) {
         actions={<Button onClick={start}>Rejouer</Button>}
       >
         <p>{result.score === LENGTH ? "Sans faute : rien ne t'échappe." : "Les Zoan et les Logia sont plus rares qu'on ne croit."}</p>
+        <RewardSummary view={reward.view} data={data} />
       </ResultPanel>
     );
   }
@@ -65,7 +70,10 @@ export default function TypeDeFruit({ data }: GameProps) {
       key={seed}
       questions={questions}
       columns={3}
-      onFinish={(score) => setResult({ score, newBest: submitBest(score) })}
+      onFinish={(score, answers) => {
+        setResult({ score, newBest: submitBest(score) });
+        reward.submit({ slug: "type-de-fruit", seed, mode: data.mode, answers });
+      }}
     />
   );
 }

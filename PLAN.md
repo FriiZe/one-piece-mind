@@ -21,7 +21,7 @@ Site de mini-jeux One Piece, gratuit, jouable dans le navigateur, dans l'esprit 
 |---|---|---|
 | Pages | Génération statique pour l'accueil, le catalogue, `/jeux/[slug]`, le wiki | Le jeu lui-même est un composant client chargé dans la page |
 | Base de données | Postgres Neon (Marketplace Vercel) + Prisma | Même duo que `one-piece-league` |
-| Auth | Auth.js : Discord + Google, et mode invité | Progression invitée en local, fusionnée à l'inscription |
+| Auth | Comptes créés sur le site (pseudo + mot de passe), et mode invité | Progression invitée en local, reprise à l'inscription. Discord et Google plus tard |
 | Temps réel | WebSockets natifs des Vercel Functions + Redis Upstash | Voir risque n°2 |
 | Fichiers | Vercel Blob (images, audio) | |
 | Tâches planifiées | Vercel Cron | Tirage quotidien, boss hebdo, fin de saison classée |
@@ -36,7 +36,7 @@ Site de mini-jeux One Piece, gratuit, jouable dans le navigateur, dans l'esprit 
 
 Le cadre autour (chrono, score, combo, écran de résultat, partage, gain de Berrys) est écrit une seule fois. Ajouter un jeu revient à écrire un générateur et un composant.
 
-**Triche.** Dès qu'une partie rapporte des Berrys, des avis de recherche ou des points classés, la manche est générée et corrigée côté serveur (la réponse n'est jamais envoyée au client). Les parties « pour le plaisir » en invité restent 100 % client.
+**Triche.** Les jeux tournent dans le navigateur. En fin de partie, le jeu envoie la graine du tirage et les réponses données ; le serveur rejoue la partie, recalcule le score et attribue les gains (une fois par partie, avec un plafond journalier). Le classé (phase 5) demandera des manches générées par le serveur.
 
 ## 3. Données
 
@@ -192,6 +192,15 @@ Le lot C peut s'intercaler plus tôt, jeu par jeu, selon l'envie.
   - « Jolly Roger » attend une source de pavillons.
   - « Avis de recherche » donne en indices l'affiliation, la mer d'origine, l'arc et l'initiale, et non le surnom (les surnoms ne sont disponibles qu'en anglais).
 - Reste : la mise en ligne publique.
+
+**Phase 2 : faite, hors mise en production.**
+
+- Fait : Berrys gagnés à chaque partie, plafond journalier, recrutement après une bonne partie, taverne (recrutement payant), collection d'avis de recherche avec raretés et avis dorés, équipage de dix postes avec bonus, prime et rang du joueur, comptes, reprise de la progression d'invité à l'inscription.
+- Décisions prises en cours de route :
+  - Vérification des parties : le serveur rejoue la partie à partir des réponses envoyées, plutôt que de générer chaque manche lui-même. On ne peut pas inventer un score ; un tricheur qui lit les données du navigateur peut en revanche bien répondre.
+  - Comptes : pseudo et mot de passe créés sur le site, sans Discord ni Google pour l'instant. Sans adresse e-mail, pas de récupération de mot de passe.
+  - Bonus d'équipage : uniquement des bonus de gains. Les règles des jeux ne changent pas, donc les scores restent comparables.
+- Reste : créer la base Neon et renseigner `DATABASE_URL` en production (voir README). Sans elle, le site fonctionne en mode invité.
 
 **À reprendre plus tard**
 
