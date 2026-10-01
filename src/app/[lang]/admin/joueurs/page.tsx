@@ -8,9 +8,11 @@ import { playerBounty } from "@/lib/economy";
 import { localePath } from "@/lib/i18n";
 import { getLocale, getT } from "@/lib/i18n/server";
 import { ADMIN_USER_SORTS, adminUsers, type AdminUserSort } from "@/lib/server/admin";
-import { currentUser } from "@/lib/server/session";
+import { currentAdmin } from "@/lib/server/admin-access";
 
 export async function generateMetadata(): Promise<Metadata> {
+  // Le titre ne doit pas trahir la page : sans administrateur, ce sont les métadonnées de la 404 qui servent
+  if (!(await currentAdmin())) notFound();
   const t = await getT();
   return { title: t("Joueurs — Administration", "Players — Administration"), robots: { index: false, follow: false } };
 }
@@ -22,7 +24,7 @@ export default async function AdminPlayersPage({ searchParams }: PageProps<"/[la
   const query = first(params.q).trim().slice(0, 40);
   const sort = ADMIN_USER_SORTS.find((id) => id === first(params.tri)) ?? "recent";
   // Pour tout autre visiteur qu'un administrateur, cette page n'existe pas
-  const list = await adminUsers(await currentUser(), { query, sort, page: Number(first(params.page)) || 1 });
+  const list = await adminUsers(await currentAdmin(), { query, sort, page: Number(first(params.page)) || 1 });
   if (!list) notFound();
 
   const locale = await getLocale();

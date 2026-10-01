@@ -7,9 +7,11 @@ import { formatNumber } from "@/games/engine/text";
 import { formatAgo, formatDay, gameTitle } from "@/lib/admin/format";
 import { getLocale, getT } from "@/lib/i18n/server";
 import { ADMIN_PERIODS, adminOverview, DEFAULT_ADMIN_PERIOD, type AdminDay } from "@/lib/server/admin";
-import { currentUser } from "@/lib/server/session";
+import { currentAdmin } from "@/lib/server/admin-access";
 
 export async function generateMetadata(): Promise<Metadata> {
+  // Le titre ne doit pas trahir la page : sans administrateur, ce sont les métadonnées de la 404 qui servent
+  if (!(await currentAdmin())) notFound();
   const t = await getT();
   return { title: t("Administration", "Administration"), robots: { index: false, follow: false } };
 }
@@ -18,7 +20,7 @@ export default async function AdminPage({ searchParams }: PageProps<"/[lang]/adm
   const { jours } = await searchParams;
   const period = ADMIN_PERIODS.find((days) => String(days) === jours) ?? DEFAULT_ADMIN_PERIOD;
   // Pour tout autre visiteur qu'un administrateur, cette page n'existe pas
-  const overview = await adminOverview(await currentUser(), period);
+  const overview = await adminOverview(await currentAdmin(), period);
   if (!overview) notFound();
 
   const locale = await getLocale();

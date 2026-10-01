@@ -9,9 +9,11 @@ import { characterById } from "@/lib/data";
 import { DAILY_BERRY_CAP, playerBounty, POST_IDS, rankOf } from "@/lib/economy";
 import { getLocale, getT } from "@/lib/i18n/server";
 import { adminUser } from "@/lib/server/admin";
-import { currentUser } from "@/lib/server/session";
+import { currentAdmin } from "@/lib/server/admin-access";
 
 export async function generateMetadata(): Promise<Metadata> {
+  // Le titre ne doit pas trahir la page : sans administrateur, ce sont les métadonnées de la 404 qui servent
+  if (!(await currentAdmin())) notFound();
   const t = await getT();
   return { title: t("Fiche d'un joueur — Administration", "Player record — Administration"), robots: { index: false, follow: false } };
 }
@@ -19,7 +21,7 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function AdminPlayerPage({ params }: PageProps<"/[lang]/admin/joueurs/[id]">) {
   const { id } = await params;
   // Pour tout autre visiteur qu'un administrateur, cette page n'existe pas
-  const player = await adminUser(await currentUser(), id);
+  const player = await adminUser(await currentAdmin(), id);
   if (!player) notFound();
 
   const locale = await getLocale();
