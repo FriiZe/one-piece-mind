@@ -27,6 +27,7 @@ import {
   TRAIT_STEPS,
   TRAITS,
   rankOf,
+  OFF_DAY_RECRUIT_CHANCE,
   recruitChance,
   tavernCost,
   weekKey,
@@ -137,14 +138,28 @@ describe("jeux du jour", () => {
     expect(seen.size).toBeGreaterThan(25);
   });
 
-  it("ne verse ni Berrys ni recrue pour un jeu hors sélection, mais compte la partie", () => {
-    const played = applyGame(EMPTY_PLAYER, outcome(), pool, OFF_DAY, () => 0);
+  it("ne verse pas de Berrys pour un jeu hors sélection, mais compte la partie", () => {
+    const played = applyGame(EMPTY_PLAYER, outcome(), pool, OFF_DAY, never);
     expect(played.reward).toMatchObject({ daily: "off", berrys: 0, recruit: null });
     expect(played.state.day).toEqual({ key: OFF_DAY, earned: 0, done: [] });
     // Les objectifs du jeu restent dus : ils ne dépendent pas de la sélection du jour
     expect(played.reward.objectives.length).toBeGreaterThan(0);
     expect(played.state.stats["le-classement"]).toEqual({ games: 1, best: 1 });
     expect(played.state.games).toBe(1);
+  });
+
+  it("laisse une chance sur cinq de recruter après une partie réussie hors sélection", () => {
+    const under = () => OFF_DAY_RECRUIT_CHANCE - 0.01;
+    const lucky = applyGame(EMPTY_PLAYER, outcome({ performance: 0.5 }), pool, OFF_DAY, under);
+    expect(lucky.reward).toMatchObject({ daily: "off", berrys: 0 });
+    expect(lucky.reward.recruit).not.toBeNull();
+    expect(lucky.state.collection[lucky.reward.recruit!.characterId].count).toBe(1);
+    // La recrue ne valide rien : le jeu n'entre pas dans les jeux du jour
+    expect(lucky.state.day.done).toEqual([]);
+
+    expect(applyGame(EMPTY_PLAYER, outcome(), pool, OFF_DAY, () => OFF_DAY_RECRUIT_CHANCE).reward.recruit).toBeNull();
+    // Sous la moitié des points, la partie n'est pas réussie : aucune chance
+    expect(applyGame(EMPTY_PLAYER, outcome({ performance: 0.49 }), pool, OFF_DAY, () => 0).reward.recruit).toBeNull();
   });
 
   it("paie un jeu du jour une seule fois, et seulement à partir de la moitié des points", () => {

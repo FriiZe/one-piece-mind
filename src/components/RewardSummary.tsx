@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import type { ResolvedData } from "@/games/cards";
 import { formatNumber } from "@/games/engine/text";
 import { useUntilMidnight } from "@/games/ui/storage";
+import { OFF_DAY_RECRUIT_CHANCE } from "@/lib/economy";
 import { usePlayer } from "@/lib/player/PlayerProvider";
 import { useDaily } from "@/lib/player/useDaily";
 import type { RewardView } from "@/lib/player/useGameReward";
@@ -17,9 +18,9 @@ const REFUSALS = {
   unavailable: "Récompense indisponible pour l'instant. Réessaie dans un moment.",
 } as const;
 
-/** Pourquoi une partie n'a pas rapporté de Berrys : seuls les jeux du jour paient, une fois chacun. */
+/** Pourquoi une partie n'a pas rapporté de Berrys : seuls les jeux du jour en paient, une fois chacun. */
 const UNPAID = {
-  off: "Ce jeu n'est pas dans la sélection du jour : cette partie ne rapporte pas de Berrys.",
+  off: `Hors sélection du jour : pas de Berrys. Une partie réussie a ${Math.round(OFF_DAY_RECRUIT_CHANCE * 100)} % de chances de rapporter une recrue.`,
   done: "Tu as déjà validé ce jeu aujourd'hui : il rapportera de nouveau des Berrys un autre jour.",
   missed: "Jeu du jour non validé : il faut au moins la moitié des points. Tu peux retenter ta chance.",
 } as const;
@@ -88,7 +89,9 @@ export function RewardSummary({ view, data }: { view: RewardView | null; data: R
           {reward.daily === "paid" ? (
             <p className="text-xs font-extrabold tracking-[0.15em] uppercase">Jeu du jour validé</p>
           ) : (
-            <p className="text-sm font-semibold">{UNPAID[reward.daily]}</p>
+            <p className="text-sm font-semibold">
+              {reward.daily === "off" && recruit ? "Hors sélection du jour : pas de Berrys, mais une recrue." : UNPAID[reward.daily]}
+            </p>
           )}
           {(reward.daily === "paid" || reward.total > 0) && (
             <p className="font-display text-[34px] leading-tight tracking-wide text-vest-dark">+{formatNumber(reward.total)} ฿</p>

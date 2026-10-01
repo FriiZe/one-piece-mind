@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { formatNumber } from "@/games/engine/text";
 import { useUntilMidnight } from "@/games/ui/storage";
-import { DAILY_GAMES, DAILY_PASS } from "@/lib/economy";
+import { DAILY_GAMES, DAILY_PASS, OFF_DAY_RECRUIT_CHANCE } from "@/lib/economy";
 import { isRewardless, type LiveSlug } from "@/lib/games/catalog";
 import { useDaily, type DailyEntry } from "@/lib/player/useDaily";
 import { CheckIcon, GameBadge, Segments } from "./GameBadge";
@@ -158,7 +158,7 @@ export function DailyChip({ slug }: { slug: LiveSlug }) {
   if (!entry) {
     return (
       <span className={`${base} border-sea-700 text-mist`}>
-        Hors sélection du jour : pas de Berrys aujourd&apos;hui ·{" "}
+        Hors sélection du jour : pas de Berrys, mais {Math.round(OFF_DAY_RECRUIT_CHANCE * 100)} % de chances de recrue ·{" "}
         <Link href="/#jeux-du-jour" className="text-straw underline underline-offset-4">
           Voir les jeux du jour
         </Link>

@@ -1,8 +1,8 @@
 import type { Difficulty } from "@/games/engine/difficulty";
 import { randomInt, type Rng } from "@/games/engine/rng";
-import type { LiveSlug } from "@/lib/games/catalog";
+import { isRewardless, type LiveSlug } from "@/lib/games/catalog";
 import { berryBonus, crewBonuses } from "./crew";
-import { DAILY_CHALLENGE, dailyStatus } from "./daily";
+import { DAILY_CHALLENGE, DAILY_PASS, dailyStatus } from "./daily";
 import { newlyMet, withGame } from "./objectives";
 import type { CollectionEntry, GameOutcome, Milestone, PlayerState, Recruit, Recruitable, Reward } from "./types";
 import { currentWeek, weekKey, weeklyChallenges } from "./weekly";
@@ -136,14 +136,18 @@ function withRecruit(state: PlayerState, recruit: Recruit): PlayerState {
   };
 }
 
+/** Chance de recruter après une partie réussie à un jeu hors sélection du jour, avant le bonus du navigateur. */
+export const OFF_DAY_RECRUIT_CHANCE = 0.2;
+
 /** Berrys offerts à la création d'un compte. */
 export const SIGNUP_BERRYS = 500;
 
 /**
  * Applique le résultat d'une partie. Seuls les jeux du jour et le défi du
- * jour rapportent des Berrys (bonus d'équipage et plafond journalier compris)
- * et un éventuel recrutement, une fois par jour chacun ; toute partie compte
- * en revanche pour les objectifs du jeu et les défis de la semaine. `pool` :
+ * jour rapportent des Berrys (bonus d'équipage et plafond journalier compris),
+ * une fois par jour chacun ; un jeu hors sélection ne rapporte pas de Berrys,
+ * mais une partie réussie peut y faire recruter. Toute partie compte pour les
+ * objectifs du jeu et les défis de la semaine. `pool` :
  * les personnages que le joueur a le droit de voir dans son mode spoiler.
  */
 export function applyGame(
@@ -205,8 +209,15 @@ export function applyGame(
     week: { key: week.key, progress, done },
   };
 
-  // Une recrue ne se gagne que sur une partie payée ; le défi du jour réussi en assure une
-  const chance = !paid ? 0 : outcome.daily ? 1 : recruitChance(outcome.performance, bonuses.recruit);
+  // Le défi du jour réussi assure une recrue, un jeu du jour validé en donne souvent une ; hors sélection, une
+  // partie réussie garde une petite chance. Un jeu du jour raté, ou déjà validé aujourd'hui, n'en donne pas.
+  const chance = paid
+    ? outcome.daily
+      ? 1
+      : recruitChance(outcome.performance, bonuses.recruit)
+    : daily === "off" && outcome.performance >= DAILY_PASS && !isRewardless(outcome.slug)
+      ? Math.min(0.9, OFF_DAY_RECRUIT_CHANCE * (1 + bonuses.recruit))
+      : 0;
   const recruit = rng() < chance ? drawRecruit(rng, pool, next, bonuses.golden) : null;
   if (recruit) next = withRecruit(next, recruit);
 
