@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { DailyGames } from "@/components/DailyGames";
 import { CATEGORY_TONES } from "@/components/GameBadge";
 import { HomeStrip } from "@/components/HomeStrip";
+import { HomeTogether } from "@/components/HomeTogether";
 import { JsonLd } from "@/components/JsonLd";
 import Link from "@/components/Link";
 import { formatNumber } from "@/games/engine/text";
@@ -67,6 +68,7 @@ export default async function Home() {
 
       <DailyGames />
       <HomeStrip />
+      <HomeTogether locale={locale} />
 
       <section aria-labelledby="jeux-titre" className="space-y-4">
         <div className="flex flex-wrap items-baseline justify-between gap-2">
