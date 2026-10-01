@@ -33,6 +33,8 @@ type PlayerContext = {
   status: "loading" | "guest" | "user";
   accountsEnabled: boolean;
   username: string | null;
+  /** Le joueur connecté administre le site : il voit le lien vers `/admin`. */
+  isAdmin: boolean;
   state: PlayerState;
   reportGame: (report: GameReport) => Promise<GameResult>;
   recruit: (mode: SpoilerMode) => Promise<RecruitResult>;
@@ -181,6 +183,7 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
       status: me === null ? "loading" : isUser ? "user" : "guest",
       accountsEnabled: me?.accountsEnabled ?? false,
       username: me?.user?.username ?? null,
+      isAdmin: me?.user?.admin ?? false,
       state,
       reportGame,
       recruit,

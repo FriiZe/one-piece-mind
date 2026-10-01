@@ -152,10 +152,26 @@ npx vercel --prod
 - **Migrations** : appliquées pendant le build de production (`scripts/db/migrate-on-deploy.mjs`). Rien à lancer à la main.
 - **Région** : les fonctions tournent à Francfort (`vercel.json`), à côté de la base.
 - **Réglages locaux** : `.vercelignore` empêche l'envoi de `.env`, que la CLI n'écarte pas d'elle-même.
-- **Administrateurs** : `ADMIN_USERNAMES` (pseudos séparés par des virgules) est à définir dans les variables d'environnement de production pour modérer les quiz de la communauté.
+- **Administrateurs** : `ADMIN_USERNAMES` (pseudos séparés par des virgules) est à définir dans les variables d'environnement de production pour modérer les quiz de la communauté et ouvrir l'administration (`/admin`).
 - **Adresse du site** : déduite du domaine de production ; `NEXT_PUBLIC_SITE_URL` ne sert qu'à en imposer une autre (domaine personnalisé).
 
 Les préversions et le poste de développement ne sont pas reliés à la base de production : les préversions tournent en mode invité, le développement sur la base Docker locale.
+
+## Administration
+
+```
+src/lib/server/admin.ts    chiffres du tableau de bord, liste des joueurs, fiche d'un joueur
+src/lib/admin/format.ts    dates, graduations, titres des jeux
+src/components/admin/      graphique par jour, tuiles, en-tête
+src/app/[lang]/admin/      /admin, /admin/joueurs, /admin/joueurs/[id]
+```
+
+- **Accès.** Réservé aux pseudos de `ADMIN_USERNAMES`. Pour tout autre visiteur, connecté ou non, ces pages répondent 404 : chaque fonction de `admin.ts` vérifie elle-même le demandeur et ne renvoie rien sinon. Un administrateur trouve le lien sur son profil.
+- **Vue d'ensemble** (`/admin`). Comptes, inscriptions et parties du jour, joueurs vus sur 24 heures et 7 jours ; puis, sur 7, 30 ou 90 jours (`?jours=`), les inscriptions, les joueurs actifs et les parties jour par jour, les jeux les plus joués et les dernières inscriptions. Les jours changent à minuit, heure de Paris.
+- **Joueurs** (`/admin/joueurs`). Recherche par pseudo, tri par inscription, dernière visite, parties, prime ou Berrys, par pages de 50. La fiche d'un joueur donne son parcours : dernières parties, résultats par jeu, collection, sessions ouvertes, quiz écrits.
+- **Dernière visite.** `User.lastSeenAt` est mis à jour à la lecture de la session, au plus une fois toutes les dix minutes par joueur. Un compte qui n'est pas revenu depuis l'ajout de la colonne n'a pas de dernière visite.
+- **Limite.** Seuls les comptes sont suivis : un invité joue dans son navigateur sans rien envoyer au serveur. Une « partie » est une partie récompensée (`GameResult`).
+- **Les tests de `tests/admin.test.ts`** couvrent, sur la base locale, le refus des non-administrateurs, les décomptes par jour, la recherche et la fiche.
 
 ## Jeu de données
 

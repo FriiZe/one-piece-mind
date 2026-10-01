@@ -221,7 +221,7 @@ function GuestProfile() {
 }
 
 export function ProfileView() {
-  const { status } = usePlayer();
+  const { status, isAdmin } = usePlayer();
   const t = useT();
 
   // Les rubriques n'apparaissent qu'une fois le joueur reconnu : un lien vers « #amis » ou « #compte » est suivi à ce moment-là
@@ -242,6 +242,15 @@ export function ProfileView() {
         <FriendsPanel />
         <AccountPanel />
         <ShipLink />
+        {isAdmin && (
+          <Link
+            href="/admin"
+            className="flex flex-wrap items-center justify-between gap-2 rounded-2xl border border-sea-700 px-5 py-4 font-bold text-foam transition-colors hover:border-straw"
+          >
+            <span>{t("Administration", "Administration")}</span>
+            <span className="text-sm text-mist">{t("Inscriptions, joueurs actifs, parties", "Sign-ups, active players, games")}</span>
+          </Link>
+        )}
       </div>
     </div>
   );

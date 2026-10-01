@@ -24,7 +24,8 @@ export type SellResult = { ok: true; state: PlayerState; berrys: number; sold: n
 export type MeResponse = {
   /** Faux tant qu'aucune base de données n'est configurée : le site fonctionne alors en mode invité. */
   accountsEnabled: boolean;
-  user: { username: string } | null;
+  /** `admin` : le joueur a accès à l'administration du site (`/admin`). */
+  user: { username: string; admin: boolean } | null;
   state: PlayerState | null;
 };
 

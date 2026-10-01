@@ -8,6 +8,8 @@ const DAY = 86_400_000;
 const LIFETIME = 30 * DAY;
 /** En deçà, la session est prolongée à la prochaine visite. */
 const RENEW_BELOW = 15 * DAY;
+/** La dernière visite d'un joueur est notée au plus une fois par tranche de cette durée. */
+const SEEN_EVERY = 10 * 60_000;
 
 /** Seule l'empreinte du jeton est enregistrée : une fuite de la base ne donne pas accès aux sessions. */
 const sessionId = (token: string) => createHash("sha256").update(token).digest("hex");
@@ -41,14 +43,19 @@ export async function currentUser(): Promise<SessionUser | null> {
 
   const session = await db().session.findUnique({
     where: { id: sessionId(token) },
-    select: { id: true, expiresAt: true, user: { select: { id: true, username: true } } },
+    select: { id: true, expiresAt: true, user: { select: { id: true, username: true, lastSeenAt: true } } },
   });
   if (!session) return null;
   if (session.expiresAt.getTime() <= Date.now()) {
     await db().session.deleteMany({ where: { id: session.id } });
     return null;
   }
-  return session.user;
+  const { lastSeenAt, ...user } = session.user;
+  // Dernière visite, pour le suivi des joueurs actifs (src/lib/server/admin.ts)
+  if (!lastSeenAt || Date.now() - lastSeenAt.getTime() > SEEN_EVERY) {
+    await db().user.updateMany({ where: { id: user.id }, data: { lastSeenAt: new Date() } });
+  }
+  return user;
 }
 
 /** Prolonge une session proche de sa fin. À appeler là où un cookie peut être écrit (action, route). */

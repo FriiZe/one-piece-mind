@@ -18,6 +18,8 @@ model User {
   usernameKey  String   @unique
   passwordHash String
   createdAt    DateTime @default(now())
+  /// Dernière visite avec une session ouverte, à quelques minutes près ; vide tant que le joueur n'est pas revenu.
+  lastSeenAt   DateTime?
 
   berrys         Int    @default(0)
   /// Total gagné depuis la création du compte : fixe la prime du joueur.
