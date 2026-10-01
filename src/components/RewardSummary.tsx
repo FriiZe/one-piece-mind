@@ -14,6 +14,13 @@ const REFUSALS = {
   unavailable: "Récompense indisponible pour l'instant. Réessaie dans un moment.",
 } as const;
 
+/** Pourquoi une partie n'a pas rapporté de Berrys : seuls les jeux du jour paient, une fois chacun. */
+const UNPAID = {
+  off: "Ce jeu n'est pas dans la sélection du jour : cette partie ne rapporte pas de Berrys.",
+  done: "Tu as déjà validé ce jeu aujourd'hui : il rapportera de nouveau des Berrys un autre jour.",
+  missed: "Jeu du jour non validé : il faut au moins la moitié des points. Tu peux retenter ta chance.",
+} as const;
+
 /** Ce que la partie a rapporté : Berrys et, parfois, un avis de recherche. */
 export function RewardSummary({ view, data }: { view: RewardView | null; data: ResolvedData }) {
   const { status, accountsEnabled } = usePlayer();
@@ -28,7 +35,10 @@ export function RewardSummary({ view, data }: { view: RewardView | null; data: R
   return (
     <div className="mt-3 flex flex-wrap items-center gap-4 rounded-xl border-2 border-ink/15 bg-white/50 p-3" aria-live="polite">
       <div className="min-w-0 flex-1">
-        <p className="font-display text-3xl tracking-wide text-vest-dark">+{formatNumber(reward.total)} ฿</p>
+        {reward.daily !== "paid" && <p className="text-sm font-semibold">{UNPAID[reward.daily]}</p>}
+        {(reward.daily === "paid" || reward.total > 0) && (
+          <p className="font-display text-3xl tracking-wide text-vest-dark">+{formatNumber(reward.total)} ฿</p>
+        )}
         {reward.bonus > 0 && <p className="text-sm">dont {formatNumber(reward.bonus)} ฿ grâce à ton équipage</p>}
         {reward.capped && <p className="text-sm font-semibold">Plafond de gains du jour atteint.</p>}
         {(reward.objectives.length > 0 || reward.weekly.length > 0) && (
@@ -54,9 +64,15 @@ export function RewardSummary({ view, data }: { view: RewardView | null; data: R
           </p>
         )}
         <p className="mt-1 text-sm">
-          <Link href="/collection" className="underline underline-offset-4">
-            Voir ma collection
-          </Link>
+          {reward.daily === "paid" ? (
+            <Link href="/collection" className="underline underline-offset-4">
+              Voir ma collection
+            </Link>
+          ) : (
+            <Link href="/#jeux-du-jour" className="underline underline-offset-4">
+              Voir les jeux du jour
+            </Link>
+          )}
           {status === "guest" && accountsEnabled && (
             <>
               {" · "}

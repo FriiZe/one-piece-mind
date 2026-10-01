@@ -3,7 +3,8 @@
 import { useActionState, useEffect, useState } from "react";
 import { Button, Panel } from "@/games/ui/primitives";
 import { writeStored } from "@/games/ui/storage";
-import { EMPTY_PLAYER } from "@/lib/economy";
+import { formatNumber } from "@/games/engine/text";
+import { EMPTY_PLAYER, SIGNUP_BERRYS } from "@/lib/economy";
 import { loginAction, logoutAction, signupAction, type AuthState } from "@/lib/player/actions";
 import { usePlayer } from "@/lib/player/PlayerProvider";
 
@@ -67,7 +68,8 @@ function SignupForm() {
       <Credentials mode="signup" username={result.username} />
       <input type="hidden" name="guest" value={JSON.stringify(state)} />
       <p className="text-sm text-mist">
-        Ta progression actuelle (Berrys, collection, équipage) sera reprise sur ton compte. Sans adresse e-mail, un mot de
+        <strong className="text-straw">{formatNumber(SIGNUP_BERRYS)} ฿ offerts</strong> à la création du compte. Ta progression
+        actuelle (Berrys, collection, équipage) sera reprise sur ton compte. Sans adresse e-mail, un mot de
         passe oublié ne peut pas être récupéré : note-le bien.
       </p>
       {result.error && (

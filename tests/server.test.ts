@@ -5,7 +5,7 @@ import { dailyKey } from "@/games/engine/daily";
 import { createRng } from "@/games/engine/rng";
 import * as dle from "@/games/onepiecedle/logic";
 import * as typeDeFruit from "@/games/type-de-fruit/logic";
-import { DAILY_CHALLENGE_BERRYS, TAVERN_COST } from "@/lib/economy";
+import { DAILY_CHALLENGE_BERRYS, dailyGames, TAVERN_COST } from "@/lib/economy";
 import { accountsEnabled, db } from "@/lib/server/db";
 import { DUMMY_HASH, hashPassword, verifyPassword } from "@/lib/server/password";
 import { buyRecruitFor, loadState, sanitizeGuestState, setCrewFor, submitGame } from "@/lib/server/player";
@@ -87,8 +87,17 @@ describe.skipIf(!accountsEnabled)("récompenses enregistrées en base", () => {
     answers: typeDeFruit.generateQuiz(createRng(seed), data.fruits).map((f) => typeDeFruit.familyOf(f.type)),
   });
 
+  /** Un jour où « Type de fruit » est jeu du jour : seuls les jeux du jour rapportent des Berrys. */
+  const fruitDay = (() => {
+    for (let i = 0; i < 400; i++) {
+      const day = new Date(Date.parse("2026-10-01T00:00:00Z") + i * 86_400_000).toISOString().slice(0, 10);
+      if (dailyGames(day).includes("type-de-fruit")) return day;
+    }
+    throw new Error("Type de fruit n'est jamais jeu du jour");
+  })();
+
   it("recalcule le score, crédite les Berrys et refuse la même partie une seconde fois", async () => {
-    const first = await submitGame(userId, perfectFruitQuiz(101));
+    const first = await submitGame(userId, perfectFruitQuiz(101), fruitDay);
     if (!first.ok) throw new Error(first.reason);
     expect(first.outcome).toMatchObject({ score: 10, max: 10 });
     expect(first.reward.berrys).toBe(250);
@@ -98,12 +107,18 @@ describe.skipIf(!accountsEnabled)("récompenses enregistrées en base", () => {
     expect(first.state).toMatchObject({ berrys: first.reward.total, lifetimeBerrys: first.reward.total, games: 1 });
     expect(first.state.stats["type-de-fruit"]).toEqual({ games: 1, best: 1 });
 
-    expect(await submitGame(userId, perfectFruitQuiz(101))).toEqual({ ok: false, reason: "duplicate" });
+    expect(await submitGame(userId, perfectFruitQuiz(101), fruitDay)).toEqual({ ok: false, reason: "duplicate" });
+    // Une autre partie du même jeu, le même jour : acceptée, mais le jeu du jour est déjà validé
+    const again = await submitGame(userId, perfectFruitQuiz(103), fruitDay);
+    if (!again.ok) throw new Error(again.reason);
+    expect(again.reward).toMatchObject({ daily: "done", berrys: 0, recruit: null });
+    expect(again.state.day).toMatchObject({ key: fruitDay, done: ["type-de-fruit"] });
     const reloaded = await loadState(userId);
-    expect(reloaded.berrys).toBe(first.reward.total);
+    expect(reloaded.berrys).toBe(first.reward.total + again.reward.total);
+    expect(reloaded.day).toEqual(again.state.day);
     // Le parcours par jeu et les défis de la semaine sont bien relus depuis la base
-    expect(reloaded.stats).toEqual(first.state.stats);
-    expect(reloaded.week).toEqual(first.state.week);
+    expect(reloaded.stats).toEqual(again.state.stats);
+    expect(reloaded.week).toEqual(again.state.week);
   });
 
   it("ignore un score annoncé par le navigateur et refuse un compte rendu mal formé", async () => {

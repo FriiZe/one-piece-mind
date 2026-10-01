@@ -5,6 +5,7 @@
  * elles vérifient donc toutes la session et ne font confiance à aucun argument.
  */
 import type { GameReport } from "@/games/report";
+import { SIGNUP_BERRYS } from "@/lib/economy";
 import { accountsEnabled, db } from "@/lib/server/db";
 import { DUMMY_HASH, hashPassword, verifyPassword } from "@/lib/server/password";
 import { buyBoosterFor, buyRecruitFor, sanitizeGuestState, sellDuplicatesFor, setCrewFor, submitGame } from "@/lib/server/player";
@@ -105,8 +106,9 @@ export async function signupAction(_: AuthState, form: FormData): Promise<AuthSt
         username,
         usernameKey: username.toLowerCase(),
         passwordHash: await hashPassword(password),
-        berrys: guest?.berrys ?? 0,
-        lifetimeBerrys: guest?.lifetimeBerrys ?? 0,
+        // Cadeau de bienvenue, en plus de la progression d'invité reprise
+        berrys: (guest?.berrys ?? 0) + SIGNUP_BERRYS,
+        lifetimeBerrys: (guest?.lifetimeBerrys ?? 0) + SIGNUP_BERRYS,
         games: guest?.games ?? 0,
         stats: guest?.stats ?? {},
         collection: guest ? { create: guest.collection } : undefined,

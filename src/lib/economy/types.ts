@@ -5,6 +5,7 @@
  */
 import type { Difficulty } from "@/games/engine/difficulty";
 import type { GameCategoryId, LiveSlug } from "@/lib/games/catalog";
+import type { DailyStatus } from "./daily";
 
 export const POST_IDS = [
   "capitaine",
@@ -49,8 +50,8 @@ export type PlayerState = {
   games: number;
   collection: Record<string, CollectionEntry>;
   crew: Partial<Record<PostId, string>>;
-  /** Gains du jour (date de Paris), pour le plafond journalier. */
-  day: { key: string; earned: number };
+  /** Gains du jour (date de Paris), pour le plafond journalier, et jeux du jour déjà validés. */
+  day: { key: string; earned: number; done: string[] };
   /** Par jeu. */
   stats: Record<string, GameStats>;
   week: WeekProgress;
@@ -62,14 +63,14 @@ export const EMPTY_PLAYER: PlayerState = {
   games: 0,
   collection: {},
   crew: {},
-  day: { key: "", earned: 0 },
+  day: { key: "", earned: 0, done: [] },
   stats: {},
   week: { key: "", progress: [], done: [] },
 };
 
 /** Complète un état enregistré avant l'ajout d'un champ (progression d'invité gardée dans le navigateur). */
 export function normalizePlayer(state: Partial<PlayerState> | null | undefined): PlayerState {
-  return { ...EMPTY_PLAYER, ...state };
+  return { ...EMPTY_PLAYER, ...state, day: { ...EMPTY_PLAYER.day, ...state?.day } };
 }
 
 /** Ce que l'économie a besoin de savoir d'un personnage. */
@@ -99,6 +100,8 @@ export type Recruit = {
 export type Milestone = { label: string; berrys: number };
 
 export type Reward = {
+  /** Ce que la partie vaut au regard des jeux du jour : seule une partie `paid` rapporte des Berrys. */
+  daily: DailyStatus;
   /** Gains de la partie elle-même, bonus d'équipage compris. */
   berrys: number;
   /** Part des gains due aux bonus d'équipage. */

@@ -227,6 +227,8 @@ async function claimReward(room: RoomRow, player: RoomRow["players"][number]): P
         games: { increment: 1 },
         dayKey: today,
         dayEarned: earnedToday + berrys,
+        // Premier gain de la journée : les jeux du jour validés la veille ne comptent plus
+        ...(user.dayKey === today ? {} : { dayDone: [] }),
       },
     });
     await tx.roomPlayer.update({ where: { id: player.id }, data: { rewardBerrys: berrys } });

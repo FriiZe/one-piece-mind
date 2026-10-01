@@ -2,6 +2,7 @@ import type { Difficulty } from "@/games/engine/difficulty";
 import { randomInt, type Rng } from "@/games/engine/rng";
 import type { LiveSlug } from "@/lib/games/catalog";
 import { berryBonus, crewBonuses } from "./crew";
+import { DAILY_CHALLENGE, dailyStatus } from "./daily";
 import { newlyMet, withGame } from "./objectives";
 import type { CollectionEntry, GameOutcome, Milestone, PlayerState, Recruit, Recruitable, Reward } from "./types";
 import { currentWeek, weekKey, weeklyChallenges } from "./weekly";
@@ -135,10 +136,15 @@ function withRecruit(state: PlayerState, recruit: Recruit): PlayerState {
   };
 }
 
+/** Berrys offerts à la création d'un compte. */
+export const SIGNUP_BERRYS = 500;
+
 /**
- * Applique le résultat d'une partie : Berrys (bonus d'équipage et plafond
- * journalier compris) et éventuel recrutement. `pool` : les personnages que
- * le joueur a le droit de voir dans son mode spoiler.
+ * Applique le résultat d'une partie. Seuls les jeux du jour et le défi du
+ * jour rapportent des Berrys (bonus d'équipage et plafond journalier compris)
+ * et un éventuel recrutement, une fois par jour chacun ; toute partie compte
+ * en revanche pour les objectifs du jeu et les défis de la semaine. `pool` :
+ * les personnages que le joueur a le droit de voir dans son mode spoiler.
  */
 export function applyGame(
   state: PlayerState,
@@ -149,10 +155,15 @@ export function applyGame(
 ): { state: PlayerState; reward: Reward } {
   const bonuses = crewBonuses(state, new Map(pool.map((c) => [c.id, c])));
   const base = outcome.daily ? DAILY_CHALLENGE_BERRYS : BASE_BERRYS[outcome.slug];
-  const plain = base * (outcome.difficulty ? DIFFICULTY_FACTOR[outcome.difficulty] : 1) * outcome.performance;
+  const sameDay = state.day.key === dayKey;
+  const doneToday = sameDay ? state.day.done : [];
+  const daily = dailyStatus(outcome.slug, outcome.daily, outcome.performance, dayKey, doneToday);
+  const paid = daily === "paid";
+
+  const plain = paid ? base * (outcome.difficulty ? DIFFICULTY_FACTOR[outcome.difficulty] : 1) * outcome.performance : 0;
   const wanted = roundToTen(plain * (1 + berryBonus(bonuses, outcome.category, outcome.daily)));
 
-  const earnedToday = state.day.key === dayKey ? state.day.earned : 0;
+  const earnedToday = sameDay ? state.day.earned : 0;
   const berrys = Math.max(0, Math.min(wanted, DAILY_BERRY_CAP - earnedToday));
 
   // Objectifs du jeu atteints avec cette partie
@@ -185,19 +196,24 @@ export function applyGame(
     berrys: state.berrys + total,
     lifetimeBerrys: state.lifetimeBerrys + total,
     games: state.games + 1,
-    day: { key: dayKey, earned: earnedToday + berrys },
+    day: {
+      key: dayKey,
+      earned: earnedToday + berrys,
+      done: paid ? [...doneToday, outcome.daily ? DAILY_CHALLENGE : outcome.slug] : doneToday,
+    },
     stats: { ...state.stats, [outcome.slug]: stats },
     week: { key: week.key, progress, done },
   };
 
-  // Le défi du jour réussi assure un recrutement
-  const chance = outcome.daily && outcome.performance > 0 ? 1 : recruitChance(outcome.performance, bonuses.recruit);
+  // Une recrue ne se gagne que sur une partie payée ; le défi du jour réussi en assure une
+  const chance = !paid ? 0 : outcome.daily ? 1 : recruitChance(outcome.performance, bonuses.recruit);
   const recruit = rng() < chance ? drawRecruit(rng, pool, next, bonuses.golden) : null;
   if (recruit) next = withRecruit(next, recruit);
 
   return {
     state: next,
     reward: {
+      daily,
       berrys,
       bonus: Math.max(0, Math.min(berrys, wanted - roundToTen(plain))),
       capped: berrys < wanted,

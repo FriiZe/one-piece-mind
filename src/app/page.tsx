@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { DailyGames } from "@/components/DailyGames";
 import { GameGrid } from "@/components/GameGrid";
 import { JsonLd } from "@/components/JsonLd";
 import { characters, fruits, meta } from "@/lib/data";
@@ -42,10 +43,10 @@ export default function Home() {
         </p>
         <div className="mt-7 flex flex-wrap gap-3">
           <Link
-            href="/jeux/onepiecedle"
+            href="#jeux-du-jour"
             className="rounded-lg bg-straw px-5 py-3 font-bold text-ink transition-colors hover:bg-straw-dark"
           >
-            Le défi du jour
+            Les jeux du jour
           </Link>
           <Link
             href="/jeux"
@@ -77,6 +78,10 @@ export default function Home() {
           ))}
         </dl>
       </section>
+
+      <div className="mx-auto w-full max-w-6xl px-4 pb-12">
+        <DailyGames />
+      </div>
 
       <section aria-labelledby="spoilers" className="mx-auto w-full max-w-6xl px-4 pb-12">
         <div className="rounded-2xl bg-parchment p-6 text-ink sm:p-8">

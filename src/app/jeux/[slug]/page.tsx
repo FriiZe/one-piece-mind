@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { DailyBanner } from "@/components/DailyGames";
 import { GameObjectives } from "@/components/GameObjectives";
 import { JsonLd } from "@/components/JsonLd";
 import { GAME_CONTENT } from "@/games/content";
@@ -85,7 +86,8 @@ export default async function GamePage({ params }: PageProps<"/jeux/[slug]">) {
         <p className="mt-2 max-w-2xl text-lg text-mist">{content.intro}</p>
       </header>
 
-      <section aria-label="Le jeu">
+      <section aria-label="Le jeu" className="space-y-4">
+        <DailyBanner slug={slug} />
         <GameRunner slug={slug} />
       </section>
 

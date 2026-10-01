@@ -221,6 +221,8 @@ export async function submitQuizPlay(user: SessionUser, id: string, input: unkno
             games: { increment: 1 },
             dayKey: today,
             dayEarned: earnedToday + berrys,
+            // Premier gain de la journée : les jeux du jour validés la veille ne comptent plus
+            ...(player.dayKey === today ? {} : { dayDone: [] }),
           },
         });
       }

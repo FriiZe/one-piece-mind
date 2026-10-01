@@ -2,6 +2,10 @@ import { describe, expect, it } from "vitest";
 import { createRng } from "@/games/engine/rng";
 import {
   applyGame,
+  DAILY_CHALLENGE,
+  DAILY_GAMES,
+  dailyGames,
+  SIGNUP_BERRYS,
   assignPost,
   BASE_BERRYS,
   buyRecruit,
@@ -31,6 +35,7 @@ import {
   type PlayerState,
   type Recruitable,
 } from "@/lib/economy";
+import { isRewardless, type LiveSlug } from "@/lib/games/catalog";
 
 const pool: Recruitable[] = [
   { id: "luffy", tier: 1, affiliation: "Chapeau de paille" },
@@ -56,41 +61,119 @@ const outcome = (overrides: Partial<GameOutcome> = {}): GameOutcome => ({
   daily: false,
   ...overrides,
 });
+/** Premier jour, à partir d'une date, où ce jeu fait partie des jeux du jour. */
+function dayWith(slug: LiveSlug, from = "2026-10-01"): string {
+  for (let i = 0; i < 400; i++) {
+    const day = new Date(Date.parse(`${from}T00:00:00Z`) + i * 86_400_000).toISOString().slice(0, 10);
+    if (dailyGames(day).includes(slug)) return day;
+  }
+  throw new Error(`${slug} n'est jamais jeu du jour`);
+}
+/** Deux jours où « Le classement », le jeu des exemples, rapporte des Berrys ; et un jour où il n'en rapporte pas. */
+const DAY = dayWith("le-classement");
+const LATER = dayWith("le-classement", new Date(Date.parse(`${DAY}T00:00:00Z`) + 86_400_000).toISOString().slice(0, 10));
+const OFF_DAY = (() => {
+  for (let i = 1; i < 400; i++) {
+    const day = new Date(Date.parse(`${DAY}T00:00:00Z`) + i * 86_400_000).toISOString().slice(0, 10);
+    if (!dailyGames(day).includes("le-classement")) return day;
+  }
+  throw new Error("pas de jour sans Le classement");
+})();
+
 /** Tirage qui ne recrute jamais : `rng()` renvoie toujours presque 1. */
 const never = () => 0.999;
 
 describe("gains d'une partie", () => {
   it("paie le barème du jeu, modulé par la réussite et la difficulté", () => {
-    const play = (o: Partial<GameOutcome>) => applyGame(EMPTY_PLAYER, outcome(o), pool, "2026-10-01", never).reward.berrys;
+    const play = (o: Partial<GameOutcome>) => applyGame(EMPTY_PLAYER, outcome(o), pool, DAY, never).reward.berrys;
     expect(play({})).toBe(BASE_BERRYS["le-classement"]);
     expect(play({ performance: 0.5 })).toBe(250);
     expect(play({ difficulty: "expert" })).toBe(750);
     expect(play({ difficulty: "facile" })).toBe(350);
+    // Sous la moitié des points, le jeu du jour n'est pas validé : rien n'est versé
+    expect(play({ performance: 0.4 })).toBe(0);
     expect(play({ performance: 0 })).toBe(0);
     expect(play({ slug: "onepiecedle", category: "mots", daily: true, difficulty: null })).toBe(DAILY_CHALLENGE_BERRYS);
   });
 
   it("crédite le solde, le total gagné et le compteur de parties", () => {
-    const { state, reward } = applyGame({ ...EMPTY_PLAYER, berrys: 100, lifetimeBerrys: 900 }, outcome(), pool, "2026-10-01", never);
+    const { state, reward } = applyGame({ ...EMPTY_PLAYER, berrys: 100, lifetimeBerrys: 900 }, outcome(), pool, DAY, never);
     expect(reward.berrys).toBe(500);
     expect(state).toMatchObject({
       berrys: 100 + reward.total,
       lifetimeBerrys: 900 + reward.total,
       games: 1,
       // Seuls les gains de la partie comptent pour le plafond du jour, pas les primes d'objectifs
-      day: { key: "2026-10-01", earned: 500 },
+      day: { key: DAY, earned: 500, done: ["le-classement"] },
     });
   });
 
   it("plafonne les gains de la journée, puis repart le lendemain", () => {
-    const almost: PlayerState = { ...EMPTY_PLAYER, day: { key: "2026-10-01", earned: DAILY_BERRY_CAP - 120 } };
-    const sameDay = applyGame(almost, outcome(), pool, "2026-10-01", never);
+    const almost: PlayerState = { ...EMPTY_PLAYER, day: { key: DAY, earned: DAILY_BERRY_CAP - 120, done: [] } };
+    const sameDay = applyGame(almost, outcome(), pool, DAY, never);
     expect(sameDay.reward).toMatchObject({ berrys: 120, capped: true });
-    expect(applyGame(sameDay.state, outcome(), pool, "2026-10-01", never).reward.berrys).toBe(0);
+    expect(applyGame(sameDay.state, outcome(), pool, DAY, never).reward.berrys).toBe(0);
 
-    const nextDay = applyGame(sameDay.state, outcome(), pool, "2026-10-02", never);
+    const nextDay = applyGame(sameDay.state, outcome(), pool, LATER, never);
     expect(nextDay.reward).toMatchObject({ berrys: 500, capped: false });
-    expect(nextDay.state.day).toEqual({ key: "2026-10-02", earned: 500 });
+    expect(nextDay.state.day).toEqual({ key: LATER, earned: 500, done: ["le-classement"] });
+  });
+});
+
+describe("jeux du jour", () => {
+  it("tire cinq jeux par jour, les mêmes pour tous, sans OnePiecedle ni jeu sans récompense", () => {
+    const seen = new Set<string>();
+    for (let i = 0; i < 60; i++) {
+      const day = new Date(Date.parse("2026-10-01T00:00:00Z") + i * 86_400_000).toISOString().slice(0, 10);
+      const games = dailyGames(day);
+      expect(games).toHaveLength(DAILY_GAMES);
+      expect(new Set(games).size).toBe(DAILY_GAMES);
+      expect(dailyGames(day)).toEqual(games);
+      expect(games).not.toContain("onepiecedle");
+      expect(games.some(isRewardless)).toBe(false);
+      games.forEach((slug) => seen.add(slug));
+    }
+    // La sélection tourne : en deux mois, presque tout le catalogue y passe
+    expect(seen.size).toBeGreaterThan(25);
+  });
+
+  it("ne verse ni Berrys ni recrue pour un jeu hors sélection, mais compte la partie", () => {
+    const played = applyGame(EMPTY_PLAYER, outcome(), pool, OFF_DAY, () => 0);
+    expect(played.reward).toMatchObject({ daily: "off", berrys: 0, recruit: null });
+    expect(played.state.day).toEqual({ key: OFF_DAY, earned: 0, done: [] });
+    // Les objectifs du jeu restent dus : ils ne dépendent pas de la sélection du jour
+    expect(played.reward.objectives.length).toBeGreaterThan(0);
+    expect(played.state.stats["le-classement"]).toEqual({ games: 1, best: 1 });
+    expect(played.state.games).toBe(1);
+  });
+
+  it("paie un jeu du jour une seule fois, et seulement à partir de la moitié des points", () => {
+    const missed = applyGame(EMPTY_PLAYER, outcome({ performance: 0.3 }), pool, DAY, never);
+    expect(missed.reward).toMatchObject({ daily: "missed", berrys: 0 });
+    expect(missed.state.day.done).toEqual([]);
+
+    // Une partie ratée ne ferme rien : la suivante peut valider le jeu
+    const passed = applyGame(missed.state, outcome({ performance: 0.5 }), pool, DAY, never);
+    expect(passed.reward).toMatchObject({ daily: "paid", berrys: 250 });
+    expect(passed.state.day.done).toEqual(["le-classement"]);
+
+    const again = applyGame(passed.state, outcome(), pool, DAY, () => 0);
+    expect(again.reward).toMatchObject({ daily: "done", berrys: 0, recruit: null });
+    expect(again.state.day).toEqual(passed.state.day);
+
+    // Le lendemain où le jeu revient dans la sélection, il paie de nouveau
+    expect(applyGame(again.state, outcome(), pool, LATER, never).reward).toMatchObject({ daily: "paid", berrys: 500 });
+  });
+
+  it("paie le défi du jour une fois, en plus des cinq jeux", () => {
+    const challenge = outcome({ slug: "onepiecedle", category: "mots", daily: true, difficulty: null });
+    const won = applyGame(EMPTY_PLAYER, challenge, pool, DAY, never);
+    expect(won.reward).toMatchObject({ daily: "paid", berrys: DAILY_CHALLENGE_BERRYS });
+    expect(won.state.day.done).toEqual([DAILY_CHALLENGE]);
+    expect(applyGame(won.state, challenge, pool, DAY, never).reward).toMatchObject({ daily: "done", berrys: 0 });
+    // La partie libre d'OnePiecedle, elle, n'est jamais un jeu du jour
+    expect(applyGame(EMPTY_PLAYER, { ...challenge, daily: false }, pool, DAY, never).reward.daily).toBe("off");
+    expect(SIGNUP_BERRYS).toBe(500);
   });
 });
 
@@ -106,11 +189,11 @@ describe("recrutement", () => {
   it("recrute à coup sûr après un défi du jour réussi, jamais après une partie ratée", () => {
     const daily = outcome({ slug: "onepiecedle", category: "mots", daily: true, performance: 0.2 });
     // 0.95 : au-dessus de toute chance ordinaire, en dessous de la certitude
-    const won = applyGame(EMPTY_PLAYER, daily, pool, "2026-10-01", () => 0.95);
+    const won = applyGame(EMPTY_PLAYER, daily, pool, DAY, () => 0.95);
     expect(won.reward.recruit).not.toBeNull();
     expect(won.state.collection[won.reward.recruit!.characterId]).toEqual({ count: 1, golden: 0 });
 
-    const lost = applyGame(EMPTY_PLAYER, outcome({ performance: 0.2 }), pool, "2026-10-01", () => 0);
+    const lost = applyGame(EMPTY_PLAYER, outcome({ performance: 0.2 }), pool, DAY, () => 0);
     expect(lost.reward.recruit).toBeNull();
   });
 
@@ -174,9 +257,9 @@ describe("équipage", () => {
 
   it("applique le bonus du poste aux gains de sa catégorie seulement", () => {
     const state: PlayerState = { ...owning("vergo"), crew: { charpentier: "vergo" } };
-    const primes = applyGame(state, outcome(), pool, "2026-10-01", never).reward;
+    const primes = applyGame(state, outcome(), pool, DAY, never).reward;
     expect(primes).toMatchObject({ berrys: 570, bonus: 70 });
-    const savoir = applyGame(state, outcome({ slug: "type-de-fruit", category: "savoir" }), pool, "2026-10-01", never).reward;
+    const savoir = applyGame(state, outcome({ slug: "type-de-fruit", category: "savoir" }), pool, dayWith("type-de-fruit"), never).reward;
     expect(savoir).toMatchObject({ berrys: 250, bonus: 0 });
   });
 
@@ -239,7 +322,7 @@ describe("objectifs par jeu", () => {
   const sum = (milestones: { berrys: number }[]) => milestones.reduce((total, m) => total + m.berrys, 0);
 
   it("verse chaque prime une seule fois, quand l'objectif est atteint", () => {
-    const first = applyGame(EMPTY_PLAYER, outcome(), pool, "2026-10-01", never);
+    const first = applyGame(EMPTY_PLAYER, outcome(), pool, DAY, never);
     expect(first.reward.objectives.map((o) => o.label)).toEqual([
       "Jouer une première partie",
       "Marquer la moitié des points",
@@ -249,7 +332,7 @@ describe("objectifs par jeu", () => {
     expect(sum(first.reward.objectives)).toBe(100 + 200 + 500 + 1500);
     expect(first.state.stats["le-classement"]).toEqual({ games: 1, best: 1 });
 
-    const second = applyGame(first.state, outcome(), pool, "2026-10-01", never);
+    const second = applyGame(first.state, outcome(), pool, DAY, never);
     expect(second.reward.objectives).toEqual([]);
     expect(second.reward.total).toBe(second.reward.berrys + sum(second.reward.weekly));
   });
@@ -324,8 +407,9 @@ describe("défis de la semaine", () => {
 
   it("complète une progression enregistrée avant l'ajout des objectifs", () => {
     const old = { berrys: 40, lifetimeBerrys: 40, games: 1, collection: {}, crew: {}, day: { key: "2026-10-01", earned: 40 } };
-    const state = normalizePlayer(old);
-    expect(state).toMatchObject({ berrys: 40, stats: {}, week: { key: "" } });
+    const state = normalizePlayer(old as unknown as Partial<PlayerState>);
+    // Les champs ajoutés depuis, y compris à l'intérieur de `day`, prennent leur valeur de départ
+    expect(state).toMatchObject({ berrys: 40, stats: {}, week: { key: "" }, day: { key: "2026-10-01", earned: 40, done: [] } });
     expect(() => applyGame(state, outcome(), pool, "2026-10-02", never)).not.toThrow();
   });
 });

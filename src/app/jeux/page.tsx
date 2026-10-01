@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { DailyGames } from "@/components/DailyGames";
 import { GameGrid } from "@/components/GameGrid";
 import { GAMES } from "@/lib/games/catalog";
 
@@ -19,6 +20,9 @@ export default function GamesPage() {
         sans inscription.
       </p>
       <div className="mt-8">
+        <DailyGames />
+      </div>
+      <div className="mt-10">
         <GameGrid />
       </div>
     </div>

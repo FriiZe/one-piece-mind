@@ -243,6 +243,7 @@ Le lot C peut s'intercaler plus tôt, jeu par jeu, selon l'envie.
   - Recrute ton équipage est devenu un classement à l'aveugle : dix primes tirées une à une, à placer du capitaine au mousse.
   - Restent en attente, faute de matière : Silhouette, Silhouette QCM, Jolly Roger, Avant / après l'ellipse, Fruit du démon (dessin), Voix et répliques, GeoPiece, Qui a dit ça ?
 - Glisser-déposer dans les jeux où l'on range : Le classement, Chronologie (à la souris, ou au doigt par la poignée ; les flèches restent pour le clavier) et Recrute ton équipage (à la souris).
+- Récompenses recentrées sur le retour quotidien : seuls le défi du jour et cinq jeux tirés chaque jour rapportent des Berrys et des recrues, une fois chacun, à partir de la moitié des points. La sélection est mise en avant sur l'accueil, la liste des jeux et la page Défis ; chaque page de jeu dit s'il paie aujourd'hui. 500 ฿ sont offerts à l'inscription. Les salons multijoueur et les quiz de la communauté gardent leurs propres gains.
 - Échanges entre amis : un avis contre un avis, sur proposition acceptée. Reste à faire : échanger plusieurs avis à la fois, choisir de donner l'exemplaire doré plutôt que l'ordinaire.
 
 **À reprendre plus tard**

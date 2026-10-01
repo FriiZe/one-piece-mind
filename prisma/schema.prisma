@@ -26,6 +26,8 @@ model User {
   /// Gains du jour (date de Paris), pour le plafond journalier.
   dayKey         String @default("")
   dayEarned      Int    @default(0)
+  /// Jeux du jour déjà validés à cette date (liste d'identifiants).
+  dayDone        Json   @default("[]")
   /// Parcours par jeu ({ jeu: { games, best } }), pour les objectifs.
   stats          Json   @default("{}")
   /// Avancement des défis de la semaine ({ key, progress, done }).

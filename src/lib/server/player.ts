@@ -52,6 +52,7 @@ export async function loadState(userId: string, client: Tx = db()): Promise<Play
       games: true,
       dayKey: true,
       dayEarned: true,
+      dayDone: true,
       stats: true,
       week: true,
       collection: { select: { characterId: true, count: true, golden: true } },
@@ -62,7 +63,7 @@ export async function loadState(userId: string, client: Tx = db()): Promise<Play
     berrys: user.berrys,
     lifetimeBerrys: user.lifetimeBerrys,
     games: user.games,
-    day: { key: user.dayKey, earned: user.dayEarned },
+    day: { key: user.dayKey, earned: user.dayEarned, done: z.array(z.string()).safeParse(user.dayDone).data ?? [] },
     // Colonnes JSON : on ne se fie à leur contenu qu'après validation
     stats: statsSchema.safeParse(user.stats).data ?? {},
     week: weekSchema.safeParse(user.week).data ?? EMPTY_PLAYER.week,
@@ -88,13 +89,12 @@ const MAX_GAMES_PER_MINUTE = 20;
  * Récompense une partie. Le compte rendu vient du navigateur : il est validé,
  * la partie est rejouée ici, et seul ce recalcul fixe les gains.
  */
-export async function submitGame(userId: string, input: unknown): Promise<GameResult> {
+export async function submitGame(userId: string, input: unknown, today = dailyKey()): Promise<GameResult> {
   const parsed = reportSchema.safeParse(input);
   if (!parsed.success) return { ok: false, reason: "invalid" };
   const report = parsed.data;
 
   const data = gameData(report.mode);
-  const today = dailyKey();
   const outcome = evaluateReport(report, { data, animeCharacters: gameData("anime").characters, today });
   if (!outcome) return { ok: false, reason: "invalid" };
 
@@ -128,6 +128,7 @@ export async function submitGame(userId: string, input: unknown): Promise<GameRe
           games: { increment: 1 },
           dayKey: applied.state.day.key,
           dayEarned: applied.state.day.earned,
+          dayDone: applied.state.day.done,
           stats: applied.state.stats,
           week: applied.state.week,
         },

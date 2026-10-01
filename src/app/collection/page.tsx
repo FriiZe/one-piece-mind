@@ -13,7 +13,7 @@ export default function CollectionPage() {
       <header>
         <h1 className="font-display text-5xl tracking-wide text-foam">Ma collection</h1>
         <p className="mt-2 max-w-2xl text-lg text-mist">
-          Chaque bonne partie peut te faire recruter un personnage. Place ensuite tes recrues aux postes de ton équipage
+          Un jeu du jour réussi peut te faire recruter un personnage. Place ensuite tes recrues aux postes de ton équipage
           pour gagner davantage.
         </p>
       </header>

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { ChallengesView } from "@/components/ChallengesView";
+import { DailyGames } from "@/components/DailyGames";
 
 export const metadata: Metadata = {
   title: "Défis One Piece du jour et de la semaine",
@@ -14,9 +15,10 @@ export default function ChallengesPage() {
       <header>
         <h1 className="font-display text-5xl tracking-wide text-foam">Défis</h1>
         <p className="mt-2 max-w-2xl text-lg text-mist">
-          Un défi par jour, trois par semaine. Ils rapportent plus que les parties ordinaires.
+          Les jeux du jour, à valider une fois chacun, et trois défis qui changent chaque lundi.
         </p>
       </header>
+      <DailyGames />
       <ChallengesView />
     </div>
   );
