@@ -1,0 +1,16 @@
+# Ce que la CLI Vercel n'envoie pas lors d'un `vercel deploy`.
+# Dès que ce fichier existe, .gitignore n'est plus pris en compte : tout ce
+# qui ne doit pas partir est donc listé ici.
+
+# Réglages locaux : en production, les variables se définissent dans Vercel
+.env
+.env.*
+!.env.example
+
+# Régénéré ou inutile au build
+/data/raw
+/src/generated
+/assets
+/tests
+/coverage
+/docker-compose.yml

@@ -72,7 +72,9 @@ prisma/            schéma et migrations
 
 1. Créer une base Postgres (Neon, depuis le Marketplace Vercel) et renseigner `DATABASE_URL` avec sa chaîne de connexion « pooled » dans les variables d'environnement du projet Vercel, ainsi que `NEXT_PUBLIC_SITE_URL`.
 2. Appliquer les migrations sur cette base : `DATABASE_URL="..." npm run db:deploy`.
-3. Déployer. Le client de base de données est généré à l'installation (`postinstall`) et au build.
+3. Déployer : `npx vercel --prod`. Le client de base de données est généré à l'installation (`postinstall`) et au build.
+
+Le projet Vercel s'appelle `one-piece-mind` (https://one-piece-mind.vercel.app). `.vercelignore` empêche l'envoi des réglages locaux (`.env`) : la CLI ne tient pas compte de `.gitignore` pour eux. L'adresse du site est déduite du domaine de production ; `NEXT_PUBLIC_SITE_URL` ne sert qu'à en imposer une autre (domaine personnalisé).
 
 ## Jeu de données
 
