@@ -1,13 +1,14 @@
 import type { Metadata } from "next";
 import { MultiHome } from "@/components/multi/MultiHome";
 import { TogetherTabs } from "@/components/TogetherTabs";
+import { pageMetadata } from "@/lib/site";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: "Multijoueur : un quiz One Piece entre amis",
   description:
     "Crée un salon, partage son code et affronte tes amis sur un quiz One Piece : mêmes questions pour tous, chrono commun et classement en direct. Sans inscription.",
-  alternates: { canonical: "/multi" },
-};
+  path: "/multi",
+});
 
 export default function MultiPage() {
   return (

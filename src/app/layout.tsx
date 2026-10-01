@@ -3,7 +3,7 @@ import { Bangers, Nunito } from "next/font/google";
 import Link from "next/link";
 import { SiteHeader, TabBar } from "@/components/HeaderNav";
 import { PlayerProvider } from "@/lib/player/PlayerProvider";
-import { SITE_DESCRIPTION, SITE_NAME, SITE_TAGLINE, SITE_URL } from "@/lib/site";
+import { OPEN_GRAPH, SITE_DESCRIPTION, SITE_NAME, SITE_TAGLINE, SITE_URL } from "@/lib/site";
 import "./globals.css";
 
 const display = Bangers({
@@ -20,7 +20,7 @@ export const metadata: Metadata = {
     template: `%s — ${SITE_NAME}`,
   },
   description: SITE_DESCRIPTION,
-  openGraph: { siteName: SITE_NAME, locale: "fr_FR", type: "website" },
+  openGraph: OPEN_GRAPH,
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

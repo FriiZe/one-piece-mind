@@ -1,12 +1,13 @@
 import type { Metadata } from "next";
 import { ChallengesView } from "@/components/ChallengesView";
+import { pageMetadata } from "@/lib/site";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: "Défis One Piece du jour et de la semaine",
   description:
     "Le défi One Piece du jour, identique pour tous les joueurs, et trois défis qui changent chaque lundi : des Berrys et des personnages à gagner.",
-  alternates: { canonical: "/defis" },
-};
+  path: "/defis",
+});
 
 export default function ChallengesPage() {
   return (

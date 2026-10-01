@@ -7,7 +7,7 @@ import { JsonLd } from "@/components/JsonLd";
 import { GAME_CONTENT } from "@/games/content";
 import { GameRunner } from "@/games/ui/GameRunner";
 import { GAME_CATEGORIES, GAMES, getGame, isLiveSlug, isRewardless, LIVE_SLUGS } from "@/lib/games/catalog";
-import { SITE_NAME, SITE_URL } from "@/lib/site";
+import { pageMetadata, SITE_NAME, SITE_URL } from "@/lib/site";
 
 // Seuls les jeux en ligne ont une page : toute autre adresse renvoie une 404.
 export const dynamicParams = false;
@@ -20,12 +20,7 @@ export async function generateMetadata({ params }: PageProps<"/jeux/[slug]">): P
   const { slug } = await params;
   if (!isLiveSlug(slug)) return {};
   const content = GAME_CONTENT[slug];
-  return {
-    title: content.metaTitle,
-    description: content.metaDescription,
-    alternates: { canonical: `/jeux/${slug}` },
-    openGraph: { title: content.metaTitle, description: content.metaDescription, url: `/jeux/${slug}` },
-  };
+  return pageMetadata({ title: content.metaTitle, description: content.metaDescription, path: `/jeux/${slug}` });
 }
 
 export default async function GamePage({ params }: PageProps<"/jeux/[slug]">) {
@@ -50,11 +45,13 @@ export default async function GamePage({ params }: PageProps<"/jeux/[slug]">) {
               name: game.title,
               description: content.metaDescription,
               url,
+              image: `${url}/opengraph-image`,
               inLanguage: "fr",
               genre: "Quiz",
               gamePlatform: "Navigateur web",
               applicationCategory: "Game",
               operatingSystem: "Tous",
+              isAccessibleForFree: true,
               offers: { "@type": "Offer", price: "0", priceCurrency: "EUR" },
               publisher: { "@type": "Organization", name: SITE_NAME, url: SITE_URL },
             },
@@ -69,8 +66,9 @@ export default async function GamePage({ params }: PageProps<"/jeux/[slug]">) {
             {
               "@type": "BreadcrumbList",
               itemListElement: [
-                { "@type": "ListItem", position: 1, name: "Jeux", item: `${SITE_URL}/jeux` },
-                { "@type": "ListItem", position: 2, name: game.title, item: url },
+                { "@type": "ListItem", position: 1, name: "Accueil", item: `${SITE_URL}/` },
+                { "@type": "ListItem", position: 2, name: "Jeux", item: `${SITE_URL}/jeux` },
+                { "@type": "ListItem", position: 3, name: game.title, item: url },
               ],
             },
           ],

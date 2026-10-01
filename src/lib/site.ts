@@ -12,3 +12,22 @@ export const SITE_URL = (
   process.env.NEXT_PUBLIC_SITE_URL ||
   (process.env.VERCEL_PROJECT_PRODUCTION_URL ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}` : "http://localhost:3000")
 ).replace(/\/$/, "");
+
+/**
+ * Champs Open Graph communs. Une page qui déclare son propre `openGraph`
+ * remplace celui du layout en entier : elle doit donc les reprendre.
+ */
+export const OPEN_GRAPH = { siteName: SITE_NAME, locale: "fr_FR", type: "website" } as const;
+
+/**
+ * Métadonnées d'une page indexable : titre, description, adresse canonique
+ * et leur reprise pour les aperçus de partage.
+ */
+export function pageMetadata({ title, description, path }: { title: string; description: string; path: string }) {
+  return {
+    title,
+    description,
+    alternates: { canonical: path },
+    openGraph: { ...OPEN_GRAPH, title, description, url: path },
+  };
+}

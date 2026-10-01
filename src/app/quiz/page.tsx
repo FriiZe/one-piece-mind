@@ -3,13 +3,14 @@ import Link from "next/link";
 import { QuizHome } from "@/components/quiz/QuizHome";
 import { TogetherTabs } from "@/components/TogetherTabs";
 import { COMMUNITY_BERRYS } from "@/lib/quiz/rules";
+import { pageMetadata } from "@/lib/site";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: "Quiz de la commu : des quiz One Piece créés par les joueurs",
   description:
     "Des quiz One Piece écrits par les joueurs, à jouer en Duo, Carré ou Cash : deux propositions, quatre, ou aucune. Crée le tien et partage-le.",
-  alternates: { canonical: "/quiz" },
-};
+  path: "/quiz",
+});
 
 export default function QuizPage() {
   return (

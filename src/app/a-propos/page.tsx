@@ -1,11 +1,12 @@
 import type { Metadata } from "next";
 import { meta } from "@/lib/data";
-import { SITE_NAME } from "@/lib/site";
+import { pageMetadata, SITE_NAME } from "@/lib/site";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: "À propos",
   description: `Ce qu'est ${SITE_NAME}, d'où viennent ses données et à qui appartient One Piece.`,
-};
+  path: "/a-propos",
+});
 
 export default function About() {
   return (
