@@ -94,6 +94,7 @@ export async function signupAction(_: AuthState, form: FormData): Promise<AuthSt
         berrys: guest?.berrys ?? 0,
         lifetimeBerrys: guest?.lifetimeBerrys ?? 0,
         games: guest?.games ?? 0,
+        stats: guest?.stats ?? {},
         collection: guest ? { create: guest.collection } : undefined,
         crew: guest ? { create: guest.crew } : undefined,
       },

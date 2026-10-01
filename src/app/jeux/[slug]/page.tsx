@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { GameObjectives } from "@/components/GameObjectives";
 import { JsonLd } from "@/components/JsonLd";
 import { GAME_CONTENT } from "@/games/content";
 import { GameRunner } from "@/games/ui/GameRunner";
@@ -87,6 +88,8 @@ export default async function GamePage({ params }: PageProps<"/jeux/[slug]">) {
       <section aria-label="Le jeu">
         <GameRunner slug={slug} />
       </section>
+
+      <GameObjectives slug={slug} />
 
       <section aria-labelledby="comment-jouer" className="space-y-3">
         <h2 id="comment-jouer" className="font-display text-3xl tracking-wide text-straw">

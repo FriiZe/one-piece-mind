@@ -28,9 +28,23 @@ export function RewardSummary({ view, data }: { view: RewardView | null; data: R
   return (
     <div className="mt-3 flex flex-wrap items-center gap-4 rounded-xl border-2 border-ink/15 bg-white/50 p-3" aria-live="polite">
       <div className="min-w-0 flex-1">
-        <p className="font-display text-3xl tracking-wide text-vest-dark">+{formatNumber(reward.berrys)} ฿</p>
+        <p className="font-display text-3xl tracking-wide text-vest-dark">+{formatNumber(reward.total)} ฿</p>
         {reward.bonus > 0 && <p className="text-sm">dont {formatNumber(reward.bonus)} ฿ grâce à ton équipage</p>}
         {reward.capped && <p className="text-sm font-semibold">Plafond de gains du jour atteint.</p>}
+        {(reward.objectives.length > 0 || reward.weekly.length > 0) && (
+          <ul className="mt-1 space-y-0.5 text-sm font-semibold">
+            {reward.objectives.map((objective) => (
+              <li key={objective.label}>
+                Objectif atteint : {objective.label} (+{formatNumber(objective.berrys)} ฿)
+              </li>
+            ))}
+            {reward.weekly.map((challenge) => (
+              <li key={challenge.label}>
+                Défi de la semaine réussi : {challenge.label} (+{formatNumber(challenge.berrys)} ฿)
+              </li>
+            ))}
+          </ul>
+        )}
         {recruit && (
           <p className="mt-1 font-semibold">
             {recruit.duplicate

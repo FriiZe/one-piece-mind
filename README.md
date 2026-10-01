@@ -41,16 +41,22 @@ src/games/
 ├── cards.ts       données compactes envoyées au navigateur, ramenées au mode du joueur
 ├── content.ts     textes des pages de jeu (règles, questions fréquentes, métadonnées)
 ├── ui/            éléments communs : lanceur, choix du mode spoiler, saisie assistée, quiz
+├── qcm/           quiz à choix : douze jeux, un générateur de questions chacun
+├── estimate/      estimation d'un nombre au curseur : trois jeux
+├── clues/         personnage à retrouver par indices successifs : deux jeux
 └── <jeu>/         logic.ts (fonctions pures, testées) et Game.tsx (affichage)
 ```
+
+La plupart des jeux appartiennent à une famille qui partage son déroulé, son composant et la forme de son compte rendu. Ajouter un quiz à choix revient à écrire un générateur dans `src/games/qcm/logic.ts`.
 
 Les jeux tournent dans le navigateur. Les données (`/data/jeux.json`, générées à la compilation) sont téléchargées une fois, puis filtrées selon le mode du joueur par `resolveGameData` : un jeu ne reçoit jamais un personnage ou une information que le joueur n'a pas encore vus.
 
 Pour ajouter un jeu :
 
-1. écrire `src/games/<slug>/logic.ts` et ses tests dans `tests/games.test.ts` ;
-2. écrire `src/games/<slug>/Game.tsx`, qui reçoit `GameProps` ;
-3. ajouter le slug à `LIVE_SLUGS` (`src/lib/games/catalog.ts`) : TypeScript réclame alors son composant dans `GameRunner.tsx` et ses textes dans `content.ts`.
+1. écrire sa logique (un générateur dans une famille existante, ou `src/games/<slug>/logic.ts`) et ses tests ;
+2. écrire `src/games/<slug>/Game.tsx` si aucune famille ne convient ;
+3. ajouter le slug à `LIVE_SLUGS` (`src/lib/games/catalog.ts`) : TypeScript réclame alors son composant dans `GameRunner.tsx`, ses textes dans `content.ts` et son barème dans `src/lib/economy/rewards.ts` ;
+4. déclarer la forme de son compte rendu et son recalcul dans `src/games/report.ts`.
 
 La page `/jeux/<slug>`, son image de partage et son entrée dans le plan du site sont créées automatiquement.
 
@@ -63,6 +69,7 @@ src/lib/server/    base de données, mots de passe, sessions, enregistrement des
 prisma/            schéma et migrations
 ```
 
+- **Objectifs et défis.** Chaque jeu a six objectifs (régularité et réussite), et trois défis communs à tous les joueurs changent chaque lundi (`objectives.ts`, `weekly.ts`). Leurs primes s'ajoutent aux gains de la partie qui les fait atteindre, hors plafond journalier.
 - **Une seule implémentation des règles.** `src/lib/economy` est appliqué tel quel par le navigateur (invité) et par le serveur (compte) ; `tests/economy.test.ts` en fixe le comportement.
 - **Vérification des parties.** En fin de partie, le jeu envoie un compte rendu (`src/games/report.ts`) : la graine du tirage et les réponses données, jamais un score. Le serveur rejoue la partie (`evaluateReport`), recalcule le score et attribue les gains. Une même partie n'est payée qu'une fois, et les gains sont plafonnés par jour. Limite assumée : un joueur qui lit les données dans son navigateur peut bien répondre ; ce qu'il ne peut pas faire, c'est inventer un score.
 - **Comptes.** Pseudo et mot de passe, sans adresse e-mail : un mot de passe oublié ne peut donc pas être récupéré. Mots de passe hachés avec scrypt, sessions en base (seule l'empreinte du jeton est enregistrée), cookie `HttpOnly`, tentatives de connexion limitées. À la création du compte, la progression d'invité est reprise, avec des plafonds.
@@ -98,6 +105,8 @@ Le pipeline tient en trois scripts (`scripts/data/`) :
 1. `fetch-api.ts` télécharge [api-onepiece.com](https://api-onepiece.com/) : personnages, fruits, équipages, arcs, épisodes, îles, navires, sabres.
 2. `fetch-wiki.ts` complète chaque personnage et chaque fruit avec l'infobox du [One Piece Wiki](https://onepiece.fandom.com/) (CC BY-SA) : première apparition, historique des primes, surnoms, origine, affiliations, et les catégories de la page (genre, race, haki).
 3. `build.ts` fusionne le tout, applique `data/overrides/`, valide chaque fichier avec son schéma Zod (`src/lib/data/schema.ts`) et écrit `data/generated/`.
+
+Contenus rédigés à la main (`data/curated/`) : surnoms en français, techniques, armes, navires et devinettes en emojis. Ils ne viennent d'aucune source importée ; les tests vérifient seulement que les personnages cités existent.
 
 Corrections manuelles :
 

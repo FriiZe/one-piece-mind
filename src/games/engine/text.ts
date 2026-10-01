@@ -10,6 +10,17 @@ export function normalizeText(value: string): string {
     .trim();
 }
 
+/**
+ * Un texte donné en indice contient-il un mot du nom à trouver ?
+ * (« Arc Arlong Park » ou « Équipage d'Arlong » quand il faut trouver Arlong.)
+ */
+export function revealsName(text: string, name: string): boolean {
+  const shown = normalizeText(text).split(" ");
+  return normalizeText(name)
+    .split(" ")
+    .some((word) => word.length >= 3 && shown.includes(word));
+}
+
 type Named = { name: string; altName?: string | null; aliases: string[] };
 
 /** Toutes les graphies normalisées sous lesquelles un personnage peut être saisi. */

@@ -6,6 +6,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   return [
     { url: `${SITE_URL}/`, changeFrequency: "weekly", priority: 1 },
     { url: `${SITE_URL}/jeux`, changeFrequency: "weekly", priority: 0.9 },
+    { url: `${SITE_URL}/defis`, changeFrequency: "weekly", priority: 0.6 },
     ...LIVE_SLUGS.map((slug) => ({
       url: `${SITE_URL}/jeux/${slug}`,
       // Le défi du jour change quotidiennement, les autres pages rarement

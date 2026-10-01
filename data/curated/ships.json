@@ -1,0 +1,31 @@
+{
+  "_comment": "Navires et leur équipage. `crew` est le nom de l'organisation tel qu'il figure dans les affiliations (en anglais), traduit à l'affichage.",
+  "ships": [
+    { "name": "Vogue Merry", "crew": "Straw Hat Pirates" },
+    { "name": "Thousand Sunny", "crew": "Straw Hat Pirates" },
+    { "name": "Moby Dick", "crew": "Whitebeard Pirates" },
+    { "name": "Oro Jackson", "crew": "Roger Pirates" },
+    { "name": "Red Force", "crew": "Red Hair Pirates" },
+    { "name": "Big Top", "crew": "Buggy Pirates" },
+    { "name": "Miss Love Duck", "crew": "Alvida Pirates" },
+    { "name": "Bezan Black", "crew": "Black Cat Pirates" },
+    { "name": "Dreadnaught Sabre", "crew": "Krieg Pirates" },
+    { "name": "Shark Superb", "crew": "Arlong Pirates" },
+    { "name": "Polar Tang", "crew": "Heart Pirates" },
+    { "name": "Victoria Punk", "crew": "Kid Pirates" },
+    { "name": "Thriller Bark", "crew": "Thriller Bark Pirates" },
+    { "name": "Queen Mama Chanter", "crew": "Big Mom Pirates" },
+    { "name": "Nostra Castello", "crew": "Fire Tank Pirates" },
+    { "name": "Saber of Xebec", "crew": "Blackbeard Pirates" },
+    { "name": "Perfume Yuda", "crew": "Kuja Pirates" },
+    { "name": "Sexy Foxy", "crew": "Foxy Pirates" },
+    { "name": "Going Luffy-senpai", "crew": "Barto Club" },
+    { "name": "Hollandais Volant", "crew": "Flying Pirates" },
+    { "name": "Piece of Spadille", "crew": "Spade Pirates" },
+    { "name": "Great Erik", "crew": "Giant Warrior Pirates" },
+    { "name": "Naglfar", "crew": "New Giant Warrior Pirates" },
+    { "name": "Mammoth", "crew": "Beasts Pirates" },
+    { "name": "Numancia Flamingo", "crew": "Donquixote Pirates" },
+    { "name": "Snapper Head", "crew": "Sun Pirates" }
+  ]
+}

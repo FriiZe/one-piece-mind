@@ -7,15 +7,22 @@ import {
   BASE_BERRYS,
   buyRecruit,
   crewBonuses,
+  daysLeftInWeek,
   DAILY_BERRY_CAP,
   DAILY_CHALLENGE_BERRYS,
   drawRecruit,
   EMPTY_PLAYER,
+  isMet,
+  normalizePlayer,
+  objectiveProgress,
+  OBJECTIVES,
   playerBounty,
   POST_IDS,
   rankOf,
   recruitChance,
   tavernCost,
+  weekKey,
+  weeklyChallenges,
   type GameOutcome,
   type PlayerState,
   type Recruitable,
@@ -60,8 +67,15 @@ describe("gains d'une partie", () => {
   });
 
   it("crédite le solde, le total gagné et le compteur de parties", () => {
-    const { state } = applyGame({ ...EMPTY_PLAYER, berrys: 100, lifetimeBerrys: 900 }, outcome(), pool, "2026-10-01", never);
-    expect(state).toMatchObject({ berrys: 600, lifetimeBerrys: 1400, games: 1, day: { key: "2026-10-01", earned: 500 } });
+    const { state, reward } = applyGame({ ...EMPTY_PLAYER, berrys: 100, lifetimeBerrys: 900 }, outcome(), pool, "2026-10-01", never);
+    expect(reward.berrys).toBe(500);
+    expect(state).toMatchObject({
+      berrys: 100 + reward.total,
+      lifetimeBerrys: 900 + reward.total,
+      games: 1,
+      // Seuls les gains de la partie comptent pour le plafond du jour, pas les primes d'objectifs
+      day: { key: "2026-10-01", earned: 500 },
+    });
   });
 
   it("plafonne les gains de la journée, puis repart le lendemain", () => {
@@ -176,6 +190,101 @@ describe("équipage", () => {
   it("ignore un membre que le mode spoiler du joueur ne montre pas", () => {
     const state: PlayerState = { ...owning("inconnu"), crew: { capitaine: "inconnu" } };
     expect(crewBonuses(state, byId).berrys).toEqual({});
+  });
+});
+
+describe("objectifs par jeu", () => {
+  const sum = (milestones: { berrys: number }[]) => milestones.reduce((total, m) => total + m.berrys, 0);
+
+  it("verse chaque prime une seule fois, quand l'objectif est atteint", () => {
+    const first = applyGame(EMPTY_PLAYER, outcome(), pool, "2026-10-01", never);
+    expect(first.reward.objectives.map((o) => o.label)).toEqual([
+      "Jouer une première partie",
+      "Marquer la moitié des points",
+      "Marquer 80 % des points",
+      "Réussir un sans-faute",
+    ]);
+    expect(sum(first.reward.objectives)).toBe(100 + 200 + 500 + 1500);
+    expect(first.state.stats["le-classement"]).toEqual({ games: 1, best: 1 });
+
+    const second = applyGame(first.state, outcome(), pool, "2026-10-01", never);
+    expect(second.reward.objectives).toEqual([]);
+    expect(second.reward.total).toBe(second.reward.berrys + sum(second.reward.weekly));
+  });
+
+  it("suit chaque jeu séparément et garde la meilleure réussite", () => {
+    let state = applyGame(EMPTY_PLAYER, outcome({ performance: 0.6 }), pool, "2026-10-01", never).state;
+    state = applyGame(state, outcome({ performance: 0.3 }), pool, "2026-10-01", never).state;
+    expect(state.stats["le-classement"]).toEqual({ games: 2, best: 0.6 });
+
+    const other = applyGame(state, outcome({ slug: "haki", category: "savoir", performance: 0.9 }), pool, "2026-10-01", never);
+    expect(other.reward.objectives.map((o) => o.label)).toContain("Jouer une première partie");
+    expect(other.state.stats.haki).toEqual({ games: 1, best: 0.9 });
+  });
+
+  it("récompense la régularité à la dixième partie", () => {
+    let state = EMPTY_PLAYER;
+    let tenth: ReturnType<typeof applyGame> | undefined;
+    for (let i = 0; i < 10; i++) {
+      tenth = applyGame(state, outcome({ performance: 0.1 }), pool, "2026-10-01", never);
+      state = tenth.state;
+    }
+    expect(tenth!.reward.objectives).toEqual([{ label: "Jouer 10 parties", berrys: 500 }]);
+    expect(isMet(OBJECTIVES[1], state.stats["le-classement"])).toBe(true);
+    expect(objectiveProgress(OBJECTIVES[2], state.stats["le-classement"])).toBeCloseTo(0.2);
+  });
+});
+
+describe("défis de la semaine", () => {
+  it("découpe l'année en semaines qui commencent le lundi", () => {
+    expect(weekKey("2026-10-01")).toBe("2026-S40");
+    expect(weekKey("2026-09-28")).toBe("2026-S40");
+    expect(weekKey("2026-09-27")).toBe("2026-S39");
+    expect(weekKey("2026-01-01")).toBe("2026-S01");
+    // Le 1er janvier 2027 est un vendredi : il appartient encore à la dernière semaine de 2026
+    expect(weekKey("2027-01-01")).toBe("2026-S53");
+    expect(weekKey("2027-01-04")).toBe("2027-S01");
+    expect(daysLeftInWeek("2026-09-28")).toBe(7);
+    expect(daysLeftInWeek("2026-10-04")).toBe(1);
+  });
+
+  it("propose trois défis, les mêmes pour tous pendant une semaine", () => {
+    const challenges = weeklyChallenges("2026-S40");
+    expect(challenges).toHaveLength(3);
+    expect(weeklyChallenges("2026-S40").map((c) => c.label)).toEqual(challenges.map((c) => c.label));
+    expect(challenges[0].slug).not.toBe(challenges[1].slug);
+    expect(challenges[2].label).toBe("Réussir 3 défis du jour");
+    expect(weeklyChallenges("2026-S41")[2].label).toBe("Gagner 5 000 Berrys en jouant");
+  });
+
+  it("fait avancer un défi partie après partie et le paie une fois terminé", () => {
+    const [regular] = weeklyChallenges("2026-S40");
+    const game = outcome({ slug: regular.slug!, category: "savoir", performance: 0.1, difficulty: null });
+    let state = EMPTY_PLAYER;
+    const paid: number[] = [];
+    for (let i = 0; i < 6; i++) {
+      const applied = applyGame(state, game, pool, "2026-10-01", never);
+      state = applied.state;
+      paid.push(applied.reward.weekly.filter((w) => w.label === regular.label).length);
+    }
+    expect(paid).toEqual([0, 0, 0, 0, 1, 0]);
+    expect(state.week).toMatchObject({ key: "2026-S40" });
+    expect(state.week.progress[0]).toBe(5);
+    expect(state.week.done[0]).toBe(true);
+  });
+
+  it("repart de zéro la semaine suivante", () => {
+    const played = applyGame(EMPTY_PLAYER, outcome(), pool, "2026-10-01", never).state;
+    const nextWeek = applyGame(played, outcome({ performance: 0 }), pool, "2026-10-05", never).state;
+    expect(nextWeek.week.key).toBe("2026-S41");
+    expect(nextWeek.week.done).toEqual([false, false, false]);
+  });
+
+  it("complète une progression enregistrée avant l'ajout des objectifs", () => {
+    const old = { berrys: 40, lifetimeBerrys: 40, games: 1, collection: {}, crew: {}, day: { key: "2026-10-01", earned: 40 } };
+    const state = normalizePlayer(old);
+    expect(state).toMatchObject({ berrys: 40, stats: {}, week: { key: "" } });
+    expect(() => applyGame(state, outcome(), pool, "2026-10-02", never)).not.toThrow();
   });
 });
 

@@ -360,3 +360,21 @@ describe("catalogue", () => {
     }
   });
 });
+
+describe("indices qui donneraient la réponse", () => {
+  it("repère un mot du nom dans un indice", async () => {
+    const { revealsName } = await import("@/games/engine/text");
+    expect(revealsName("Équipage d'Arlong", "Arlong")).toBe(true);
+    expect(revealsName("Arc Arlong Park", "Arlong")).toBe(true);
+    expect(revealsName("Équipage du Chapeau de paille", "Monkey D. Luffy")).toBe(false);
+    // Les mots très courts (« D. ») ne comptent pas
+    expect(revealsName("Clan des D.", "Monkey D. Luffy")).toBe(false);
+  });
+
+  it("ne les propose pas sur un avis de recherche", () => {
+    const arlong = get("arlong");
+    const hints = avis.hintsFor(arlong, manga);
+    expect(hints.map((h) => h.value).join(" ")).not.toMatch(/Arlong/);
+    expect(hints.at(-1)!.key).toBe("initial");
+  });
+});

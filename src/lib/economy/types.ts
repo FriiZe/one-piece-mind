@@ -27,6 +27,21 @@ export type CollectionEntry = {
   golden: number;
 };
 
+/** Parcours du joueur sur un jeu : c'est ce que mesurent les objectifs. */
+export type GameStats = {
+  games: number;
+  /** Meilleure réussite, de 0 à 1. */
+  best: number;
+};
+
+/** Avancement des défis de la semaine (voir weekly.ts). */
+export type WeekProgress = {
+  /** Semaine concernée, au format « 2026-S40 ». */
+  key: string;
+  progress: number[];
+  done: boolean[];
+};
+
 export type PlayerState = {
   berrys: number;
   /** Total gagné depuis le début : c'est lui qui fixe la prime du joueur. */
@@ -36,6 +51,9 @@ export type PlayerState = {
   crew: Partial<Record<PostId, string>>;
   /** Gains du jour (date de Paris), pour le plafond journalier. */
   day: { key: string; earned: number };
+  /** Par jeu. */
+  stats: Record<string, GameStats>;
+  week: WeekProgress;
 };
 
 export const EMPTY_PLAYER: PlayerState = {
@@ -45,7 +63,14 @@ export const EMPTY_PLAYER: PlayerState = {
   collection: {},
   crew: {},
   day: { key: "", earned: 0 },
+  stats: {},
+  week: { key: "", progress: [], done: [] },
 };
+
+/** Complète un état enregistré avant l'ajout d'un champ (progression d'invité gardée dans le navigateur). */
+export function normalizePlayer(state: Partial<PlayerState> | null | undefined): PlayerState {
+  return { ...EMPTY_PLAYER, ...state };
+}
 
 /** Ce que l'économie a besoin de savoir d'un personnage. */
 export type Recruitable = { id: string; tier: number; affiliation: string | null };
@@ -70,11 +95,21 @@ export type Recruit = {
   duplicate: boolean;
 };
 
+/** Prime versée pour un objectif ou un défi atteint à l'occasion d'une partie. */
+export type Milestone = { label: string; berrys: number };
+
 export type Reward = {
+  /** Gains de la partie elle-même, bonus d'équipage compris. */
   berrys: number;
   /** Part des gains due aux bonus d'équipage. */
   bonus: number;
   /** Le plafond journalier a réduit les gains. */
   capped: boolean;
   recruit: Recruit | null;
+  /** Objectifs du jeu atteints avec cette partie. */
+  objectives: Milestone[];
+  /** Défis de la semaine terminés avec cette partie. */
+  weekly: Milestone[];
+  /** Tout ce que la partie a rapporté : gains, objectifs et défis. */
+  total: number;
 };

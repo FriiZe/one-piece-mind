@@ -2,7 +2,9 @@ import type { Difficulty } from "@/games/engine/difficulty";
 import { randomInt, type Rng } from "@/games/engine/rng";
 import type { LiveSlug } from "@/lib/games/catalog";
 import { berryBonus, crewBonuses } from "./crew";
-import type { GameOutcome, PlayerState, Recruit, Recruitable, Reward } from "./types";
+import { newlyMet, withGame } from "./objectives";
+import type { GameOutcome, Milestone, PlayerState, Recruit, Recruitable, Reward } from "./types";
+import { currentWeek, weekKey, weeklyChallenges } from "./weekly";
 
 /** Berrys d'une partie parfaite en difficulté normale, avant bonus. */
 export const BASE_BERRYS: Record<LiveSlug, number> = {
@@ -15,6 +17,27 @@ export const BASE_BERRYS: Record<LiveSlug, number> = {
   "type-de-fruit": 250,
   "qui-a-mange-ce-fruit": 350,
   "trouve-les-tous": 400,
+  memo: 400,
+  wordle: 400,
+  anagramme: 400,
+  "les-indices": 500,
+  surnoms: 350,
+  orthographe: 350,
+  emojis: 400,
+  "devine-la-prime": 500,
+  "grand-ou-vieux": 300,
+  "premiere-apparition": 500,
+  "prime-d-equipage": 500,
+  equipage: 350,
+  haki: 350,
+  techniques: 350,
+  "armes-et-sabres": 350,
+  navires: 350,
+  "origine-et-race": 350,
+  chronologie: 500,
+  "dans-quel-arc": 350,
+  "vrai-ou-faux": 250,
+  "mode-aleatoire": 400,
 };
 export const DAILY_CHALLENGE_BERRYS = 1500;
 
@@ -96,12 +119,39 @@ export function applyGame(
   const earnedToday = state.day.key === dayKey ? state.day.earned : 0;
   const berrys = Math.max(0, Math.min(wanted, DAILY_BERRY_CAP - earnedToday));
 
+  // Objectifs du jeu atteints avec cette partie
+  const stats = withGame(state.stats[outcome.slug], outcome.performance);
+  const objectives: Milestone[] = newlyMet(state.stats[outcome.slug], stats).map(({ label, berrys: prize }) => ({
+    label,
+    berrys: prize,
+  }));
+
+  // Défis de la semaine que cette partie fait avancer, et ceux qu'elle termine
+  const challenges = weeklyChallenges(weekKey(dayKey));
+  const week = currentWeek(state.week, weekKey(dayKey));
+  const progress = [...week.progress];
+  const done = [...week.done];
+  const weekly: Milestone[] = [];
+  challenges.forEach((challenge, index) => {
+    if (done[index]) return;
+    progress[index] = Math.min(challenge.target, progress[index] + challenge.advance(outcome, berrys));
+    if (progress[index] >= challenge.target) {
+      done[index] = true;
+      weekly.push({ label: challenge.label, berrys: challenge.berrys });
+    }
+  });
+
+  // Les primes d'objectifs et de défis s'ajoutent aux gains, hors plafond journalier
+  const total = berrys + [...objectives, ...weekly].reduce((sum, milestone) => sum + milestone.berrys, 0);
+
   let next: PlayerState = {
     ...state,
-    berrys: state.berrys + berrys,
-    lifetimeBerrys: state.lifetimeBerrys + berrys,
+    berrys: state.berrys + total,
+    lifetimeBerrys: state.lifetimeBerrys + total,
     games: state.games + 1,
     day: { key: dayKey, earned: earnedToday + berrys },
+    stats: { ...state.stats, [outcome.slug]: stats },
+    week: { key: week.key, progress, done },
   };
 
   // Le défi du jour réussi assure un recrutement
@@ -111,7 +161,15 @@ export function applyGame(
 
   return {
     state: next,
-    reward: { berrys, bonus: Math.max(0, Math.min(berrys, wanted - roundToTen(plain))), capped: berrys < wanted, recruit },
+    reward: {
+      berrys,
+      bonus: Math.max(0, Math.min(berrys, wanted - roundToTen(plain))),
+      capped: berrys < wanted,
+      recruit,
+      objectives,
+      weekly,
+      total,
+    },
   };
 }
 

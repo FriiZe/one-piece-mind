@@ -13,7 +13,7 @@ import { createRng, randomSeed } from "@/games/engine/rng";
 import { evaluateReport, type GameReport } from "@/games/report";
 import { loadGameData } from "@/games/ui/data";
 import { useStored } from "@/games/ui/storage";
-import { applyGame, assignPost, buyRecruit, EMPTY_PLAYER, type PlayerState } from "@/lib/economy";
+import { applyGame, assignPost, buyRecruit, EMPTY_PLAYER, normalizePlayer, type PlayerState } from "@/lib/economy";
 import type { SpoilerMode } from "@/lib/spoilers";
 import { buyRecruitAction, setCrewAction, submitGameAction } from "./actions";
 import type { CrewResult, GameResult, MeResponse, RecruitResult } from "./types";
@@ -43,7 +43,9 @@ const NO_KEYS: string[] = [];
 
 export function PlayerProvider({ children }: { children: ReactNode }) {
   const [me, setMe] = useState<MeResponse | null>(null);
-  const [guest, setGuest] = useStored<PlayerState>("opm.player", EMPTY_PLAYER);
+  const [storedGuest, setGuest] = useStored<PlayerState>("opm.player", EMPTY_PLAYER);
+  // Une progression enregistrée par une version précédente du site peut ne pas avoir tous les champs
+  const guest = useMemo(() => normalizePlayer(storedGuest), [storedGuest]);
   const [rewarded, setRewarded] = useStored<string[]>(REWARDED_KEY, NO_KEYS);
   const [remote, setRemote] = useState<PlayerState | null>(null);
 

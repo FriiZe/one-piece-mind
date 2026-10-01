@@ -3,8 +3,13 @@
  * côté serveur à partir du jeu de données ; `resolveGameData` les ramène
  * ensuite au mode spoiler du joueur.
  */
+import emojisJson from "@data/curated/emojis.json";
+import epithetsJson from "@data/curated/epithets.json";
+import shipsJson from "@data/curated/ships.json";
+import techniquesJson from "@data/curated/techniques.json";
+import weaponsJson from "@data/curated/weapons.json";
 import { arcOfChapter, arcs, characters, fruits, groups, images, meta } from "@/lib/data";
-import { mainAffiliation, type HakiType } from "@/lib/data/labels";
+import { mainAffiliation, translateAffiliation, type HakiType } from "@/lib/data/labels";
 import type { Character, FruitType, Race, Sea } from "@/lib/data/schema";
 import { currentBounty, isPlayableCharacter, isPlayableFruit, viewCharacter, type SpoilerMode } from "@/lib/spoilers";
 
@@ -25,6 +30,8 @@ export type CharacterCard = ModeFacts & {
   tier: number;
   /** Chapitre de première apparition. */
   debut: number;
+  /** Épisode de première apparition, `null` s'il n'est pas connu. */
+  episode: number | null;
   /** Numéro de l'arc de première apparition (voir `GameData.arcs`), `null` pour le chapitre 0. */
   arc: number | null;
   gender: "male" | "female" | null;
@@ -51,9 +58,21 @@ export type FruitCard = {
 
 export type GroupCard = { id: string; title: string; since: number; memberIds: string[] };
 
+/** Contenus rédigés à la main (data/curated) : surnoms, techniques, armes, navires, devinettes. */
+export type Extras = {
+  epithets: { characterId: string; text: string }[];
+  techniques: { name: string; characterId: string }[];
+  weapons: { name: string; kind: string; characterId: string }[];
+  /** `crew` : nom français de l'équipage. */
+  ships: { name: string; crew: string }[];
+  emojis: { characterId: string; emojis: string }[];
+};
+
 export type GameData = {
   animeCutoffChapter: number;
   latestChapter: number;
+  latestEpisode: number;
+  extras: Extras;
   arcs: { number: number; title: string }[];
   characters: CharacterCard[];
   fruits: FruitCard[];
@@ -90,6 +109,7 @@ function toCard(character: Character): CharacterCard {
     aliases,
     tier: character.tier,
     debut,
+    episode: character.debut!.episode,
     arc: arcOfChapter(debut)?.number ?? null,
     gender: character.gender,
     races: character.races,
@@ -106,6 +126,14 @@ export function buildGameData(): GameData {
   return {
     animeCutoffChapter: meta.animeCutoffChapter,
     latestChapter: meta.latestChapter,
+    latestEpisode: meta.latestEpisode,
+    extras: {
+      epithets: Object.entries(epithetsJson.epithets).map(([characterId, text]) => ({ characterId, text })),
+      techniques: techniquesJson.techniques,
+      weapons: weaponsJson.weapons,
+      ships: shipsJson.ships.map((ship) => ({ name: ship.name, crew: translateAffiliation(ship.crew) })),
+      emojis: Object.entries(emojisJson.emojis).map(([characterId, emojis]) => ({ characterId, emojis })),
+    },
     arcs: arcs
       .filter((arc) => arc.kind === "manga")
       .map((arc) => ({ number: arc.number, title: arc.title.fr.replace(/^Arc\s+/i, "").trim() })),
@@ -125,6 +153,10 @@ export type PlayCharacter = Omit<CharacterCard, "anime">;
 /** Les données telles que le joueur a le droit de les voir dans son mode. */
 export type ResolvedData = {
   mode: SpoilerMode;
+  /** Dernier chapitre (mode manga) ou dernier chapitre adapté (mode anime) que le joueur connaît. */
+  latestChapter: number;
+  latestEpisode: number;
+  extras: Extras;
   arcs: Map<number, string>;
   characters: PlayCharacter[];
   characterById: Map<string, PlayCharacter>;
@@ -142,8 +174,20 @@ export function resolveGameData(data: GameData, mode: SpoilerMode): ResolvedData
   const characterById = new Map(resolved.map((c) => [c.id, c]));
   const playableFruits = data.fruits.filter((f) => f.debut <= limit);
 
+  // Un contenu rédigé n'est montré que si son personnage est déjà connu du joueur
+  const known = <T extends { characterId: string }>(items: T[]) => items.filter((item) => characterById.has(item.characterId));
+
   return {
     mode,
+    latestChapter: mode === "anime" ? data.animeCutoffChapter : data.latestChapter,
+    latestEpisode: data.latestEpisode,
+    extras: {
+      epithets: known(data.extras.epithets),
+      techniques: known(data.extras.techniques),
+      weapons: known(data.extras.weapons),
+      ships: data.extras.ships,
+      emojis: known(data.extras.emojis),
+    },
     arcs: new Map(data.arcs.map((arc) => [arc.number, arc.title])),
     characters: resolved,
     characterById,

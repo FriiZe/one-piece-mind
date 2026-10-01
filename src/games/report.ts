@@ -8,14 +8,21 @@ import { z } from "zod";
 import { getGame } from "@/lib/games/catalog";
 import type { GameOutcome } from "@/lib/economy/types";
 import type { ResolvedData } from "./cards";
+import * as anagramme from "./anagramme/logic";
 import * as avis from "./avis-de-recherche/logic";
+import * as chronologie from "./chronologie/logic";
+import * as clues from "./clues/logic";
+import * as estimate from "./estimate/logic";
 import * as classement from "./le-classement/logic";
+import * as memo from "./memo/logic";
 import * as onepiecedle from "./onepiecedle/logic";
 import * as plusOuMoins from "./plus-ou-moins/logic";
+import * as qcm from "./qcm/logic";
 import * as quiAMange from "./qui-a-mange-ce-fruit/logic";
 import * as reveal from "./revelation/logic";
 import * as trouve from "./trouve-les-tous/logic";
 import * as typeDeFruit from "./type-de-fruit/logic";
+import * as wordle from "./wordle/logic";
 
 const seed = z.number().int().nonnegative().max(0xffffffff);
 const mode = z.enum(["anime", "manga"]);
@@ -57,6 +64,38 @@ export const reportSchema = z.discriminatedUnion("slug", [
   z.object({ slug: z.literal("onepiecedle-daily"), day, mode, guesses: z.array(id).max(200) }),
   z.object({ slug: z.literal("revelation"), seed, mode, difficulty, rounds: revealRounds }),
   z.object({ slug: z.literal("zoom-extreme"), seed, mode, difficulty, rounds: revealRounds }),
+  // Familles de jeux qui partagent un même déroulé : le compte rendu a la même forme pour tous
+  z.object({ slug: z.enum(qcm.QCM_SLUGS), seed, mode, difficulty, answers: z.array(z.string().max(120)).max(qcm.QCM_LENGTH) }),
+  z.object({
+    slug: z.enum(estimate.ESTIMATE_SLUGS),
+    seed,
+    mode,
+    difficulty,
+    answers: z.array(z.number().nonnegative().max(1e12)).max(estimate.ESTIMATE_LENGTH),
+  }),
+  z.object({
+    slug: z.enum(clues.CLUE_SLUGS),
+    seed,
+    mode,
+    difficulty,
+    rounds: z.array(z.array(posterEvent).max(12)).max(clues.CLUE_ROUNDS),
+  }),
+  z.object({
+    slug: z.literal("chronologie"),
+    seed,
+    mode,
+    difficulty,
+    orders: z.array(z.array(id).max(chronologie.ROUND_SIZE)).max(chronologie.ROUNDS),
+  }),
+  z.object({ slug: z.literal("anagramme"), seed, mode, difficulty, answers: z.array(z.string().max(40)).max(anagramme.ROUNDS) }),
+  z.object({ slug: z.literal("wordle"), seed, mode, difficulty, guesses: z.array(z.string().max(12)).max(wordle.MAX_TRIES) }),
+  z.object({
+    slug: z.literal("memo"),
+    seed,
+    mode,
+    difficulty,
+    flips: z.array(z.tuple([z.number().int().min(0).max(31), z.number().int().min(0).max(31)])).max(300),
+  }),
 ]);
 export type GameReport = z.infer<typeof reportSchema>;
 
@@ -113,5 +152,22 @@ export function evaluateReport(report: GameReport, { data, animeCharacters, toda
     case "revelation":
     case "zoom-extreme":
       return outcome(reveal.evaluate(report.seed, report.difficulty, report.rounds, data.characters));
+    case "chronologie":
+      return outcome(chronologie.evaluate(report.seed, report.difficulty, report.orders, data));
+    case "anagramme":
+      return outcome(anagramme.evaluate(report.seed, report.difficulty, report.answers, data.characters));
+    case "wordle":
+      return outcome(wordle.evaluate(report.seed, report.difficulty, report.guesses, data.characters));
+    case "memo":
+      return outcome(memo.evaluate(report.seed, report.difficulty, report.flips, data));
+    case "devine-la-prime":
+    case "premiere-apparition":
+    case "prime-d-equipage":
+      return outcome(estimate.evaluate(report.slug, report.seed, report.difficulty, report.answers, data));
+    case "les-indices":
+    case "emojis":
+      return outcome(clues.evaluate(report.slug, report.seed, report.difficulty, report.rounds, data));
+    default:
+      return outcome(qcm.evaluate(report.slug, report.seed, report.difficulty, report.answers, data));
   }
 }

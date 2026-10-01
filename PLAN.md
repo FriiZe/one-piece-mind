@@ -202,6 +202,16 @@ Le lot C peut s'intercaler plus tôt, jeu par jeu, selon l'envie.
   - Bonus d'équipage : uniquement des bonus de gains. Les règles des jeux ne changent pas, donc les scores restent comparables.
 - En ligne sur https://one-piece-mind.vercel.app, avec une base Neon : les comptes sont ouverts.
 
+**Phase 3 : 21 jeux du lot B, objectifs et défis de la semaine.**
+
+- Jeux ajoutés : Mémo, Wordle, Anagramme, Les indices, Surnoms, Orthographe, Emojis, Devine la prime, Grand ou vieux, Première apparition, Prime d'équipage, Équipage, Haki, Techniques, Armes et sabres, Navires, Origine et race, Chronologie, Dans quel arc ?, Vrai ou faux, Mode aléatoire. Le site compte 30 jeux.
+- Objectifs : six par jeu (jouer 1, 10, 50 parties ; marquer 50 %, 80 %, 100 % des points), avec une prime chacun.
+- Défis de la semaine : trois défis communs à tous, renouvelés le lundi, sur la page « Défis ».
+- Contenus rédigés à la main pour cinq jeux (`data/curated/`) : surnoms français, techniques, armes, navires, devinettes en emojis. À relire.
+- Jeux du lot B non livrés, faute de matière :
+  - Silhouette QCM, Avant / après l'ellipse, Fruit du démon (au dessin) : pas d'images adaptées.
+  - Qui a dit ça ? : pas de recueil de citations.
+
 **À reprendre plus tard**
 
 - Libellés français des surnoms ; les affiliations sont traduites (`src/lib/data/labels.ts`), avec un repli sur l'anglais pour les plus rares.

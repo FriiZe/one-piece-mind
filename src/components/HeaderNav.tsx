@@ -12,6 +12,9 @@ export function HeaderNav() {
       <Link href="/jeux" className="hover:text-foam">
         Jeux
       </Link>
+      <Link href="/defis" className="hover:text-foam">
+        Défis
+      </Link>
       <Link href="/collection" className="hover:text-foam">
         Collection
       </Link>

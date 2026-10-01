@@ -92,10 +92,18 @@ describe.skipIf(!accountsEnabled)("récompenses enregistrées en base", () => {
     if (!first.ok) throw new Error(first.reason);
     expect(first.outcome).toMatchObject({ score: 10, max: 10 });
     expect(first.reward.berrys).toBe(250);
-    expect(first.state).toMatchObject({ berrys: 250, lifetimeBerrys: 250, games: 1 });
+    // Première partie parfaite : les objectifs du jeu s'ajoutent aux gains
+    expect(first.reward.objectives.map((o) => o.label)).toContain("Réussir un sans-faute");
+    expect(first.reward.total).toBeGreaterThan(first.reward.berrys);
+    expect(first.state).toMatchObject({ berrys: first.reward.total, lifetimeBerrys: first.reward.total, games: 1 });
+    expect(first.state.stats["type-de-fruit"]).toEqual({ games: 1, best: 1 });
 
     expect(await submitGame(userId, perfectFruitQuiz(101))).toEqual({ ok: false, reason: "duplicate" });
-    expect((await loadState(userId)).berrys).toBe(250);
+    const reloaded = await loadState(userId);
+    expect(reloaded.berrys).toBe(first.reward.total);
+    // Le parcours par jeu et les défis de la semaine sont bien relus depuis la base
+    expect(reloaded.stats).toEqual(first.state.stats);
+    expect(reloaded.week).toEqual(first.state.week);
   });
 
   it("ignore un score annoncé par le navigateur et refuse un compte rendu mal formé", async () => {
@@ -120,7 +128,7 @@ describe.skipIf(!accountsEnabled)("récompenses enregistrées en base", () => {
     if (!won.ok) throw new Error(won.reason);
     expect(won.reward.berrys).toBe(DAILY_CHALLENGE_BERRYS);
     expect(won.reward.recruit).not.toBeNull();
-    expect(won.state.berrys).toBe(before.berrys + DAILY_CHALLENGE_BERRYS);
+    expect(won.state.berrys).toBe(before.berrys + won.reward.total);
     expect(won.state.collection[won.reward.recruit!.characterId].count).toBeGreaterThanOrEqual(1);
 
     expect(await submitGame(userId, report)).toEqual({ ok: false, reason: "duplicate" });

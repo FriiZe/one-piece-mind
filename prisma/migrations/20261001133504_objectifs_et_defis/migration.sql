@@ -1,0 +1,3 @@
+-- AlterTable
+ALTER TABLE "User" ADD COLUMN     "stats" JSONB NOT NULL DEFAULT '{}',
+ADD COLUMN     "week" JSONB NOT NULL DEFAULT '{}';

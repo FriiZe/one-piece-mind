@@ -5,7 +5,16 @@ import { buildGameData, resolveGameData, type GameData, type ResolvedData } from
 import { dailyKey } from "@/games/engine/daily";
 import { createRng } from "@/games/engine/rng";
 import { evaluateReport, reportKey, reportSchema } from "@/games/report";
-import { applyGame, assignPost, buyRecruit, POST_IDS, type PlayerState, type PostId } from "@/lib/economy";
+import {
+  applyGame,
+  assignPost,
+  buyRecruit,
+  EMPTY_PLAYER,
+  POST_IDS,
+  type PlayerState,
+  type PostId,
+} from "@/lib/economy";
+import { isLiveSlug } from "@/lib/games/catalog";
 import type { CrewResult, GameResult, RecruitResult } from "@/lib/player/types";
 import type { SpoilerMode } from "@/lib/spoilers";
 import { Prisma } from "@/generated/prisma/client";
@@ -29,6 +38,9 @@ const isUniqueViolation = (error: unknown) =>
 
 type Tx = Prisma.TransactionClient;
 
+const statsSchema = z.record(z.string(), z.object({ games: z.number().int().nonnegative(), best: z.number().min(0).max(1) }));
+const weekSchema = z.object({ key: z.string(), progress: z.array(z.number()), done: z.array(z.boolean()) });
+
 export async function loadState(userId: string, client: Tx = db()): Promise<PlayerState> {
   const user = await client.user.findUniqueOrThrow({
     where: { id: userId },
@@ -38,6 +50,8 @@ export async function loadState(userId: string, client: Tx = db()): Promise<Play
       games: true,
       dayKey: true,
       dayEarned: true,
+      stats: true,
+      week: true,
       collection: { select: { characterId: true, count: true, golden: true } },
       crew: { select: { post: true, characterId: true } },
     },
@@ -47,6 +61,9 @@ export async function loadState(userId: string, client: Tx = db()): Promise<Play
     lifetimeBerrys: user.lifetimeBerrys,
     games: user.games,
     day: { key: user.dayKey, earned: user.dayEarned },
+    // Colonnes JSON : on ne se fie à leur contenu qu'après validation
+    stats: statsSchema.safeParse(user.stats).data ?? {},
+    week: weekSchema.safeParse(user.week).data ?? EMPTY_PLAYER.week,
     collection: Object.fromEntries(user.collection.map((e) => [e.characterId, { count: e.count, golden: e.golden }])),
     crew: Object.fromEntries(
       user.crew.filter((slot) => (POST_IDS as readonly string[]).includes(slot.post)).map((slot) => [slot.post, slot.characterId]),
@@ -97,18 +114,20 @@ export async function submitGame(userId: string, input: unknown): Promise<GameRe
           difficulty: outcome.difficulty,
           score: outcome.score,
           maxScore: outcome.max,
-          berrys: reward.berrys,
+          berrys: reward.total,
           recruitId: reward.recruit?.characterId ?? null,
         },
       });
       await tx.user.update({
         where: { id: userId },
         data: {
-          berrys: { increment: reward.berrys },
-          lifetimeBerrys: { increment: reward.berrys },
+          berrys: { increment: reward.total },
+          lifetimeBerrys: { increment: reward.total },
           games: { increment: 1 },
           dayKey: applied.state.day.key,
           dayEarned: applied.state.day.earned,
+          stats: applied.state.stats,
+          week: applied.state.week,
         },
       });
       if (reward.recruit) await addToCollection(tx, userId, reward.recruit.characterId, reward.recruit.golden);
@@ -168,6 +187,7 @@ const guestStateSchema = z.object({
     z.object({ count: z.number().int().positive(), golden: z.number().int().nonnegative() }),
   ),
   crew: z.record(z.string(), z.string().max(80)),
+  stats: statsSchema.optional(),
 });
 
 /** Ce qu'on accepte de reprendre d'un état d'invité : valeurs plafonnées, personnages connus seulement. */
@@ -196,6 +216,8 @@ export function sanitizeGuestState(input: unknown) {
     berrys: Math.min(guest.berrys, IMPORT_LIMITS.berrys, lifetimeBerrys),
     lifetimeBerrys,
     games: guest.games,
+    // Le parcours par jeu est repris pour que les objectifs déjà atteints ne soient pas payés deux fois
+    stats: Object.fromEntries(Object.entries(guest.stats ?? {}).filter(([slug]) => isLiveSlug(slug))),
     collection,
     crew: crew.map(([post, characterId]) => ({ post, characterId })),
   };

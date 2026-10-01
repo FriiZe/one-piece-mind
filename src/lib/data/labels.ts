@@ -44,6 +44,13 @@ export const FRUIT_TYPE_LABELS: Record<FruitType, string> = {
   artificial: "Artificiel",
 };
 
+/** Libellé d'une combinaison de hakis, pour l'affichage et les quiz. */
+export function hakiLabel(haki: readonly HakiType[]): string {
+  if (haki.length === 0) return "Aucun";
+  if (haki.length === 3) return "Les trois";
+  return haki.map((type) => HAKI_LABELS[type]).join(" et ");
+}
+
 export const HAKI_LABELS = {
   observation: "Observation",
   armament: "Armement",
@@ -197,10 +204,11 @@ export function organizationOf(name: string): string {
 
 export function translateAffiliation(name: string): string {
   if (AFFILIATION_FR[name]) return AFFILIATION_FR[name];
+  const of = (owner: string) => (/^[AEIOUYH]/i.test(owner) ? `d'${owner}` : `de ${owner}`);
   const pirates = name.match(/^(.+) Pirates$/);
-  if (pirates) return `Équipage de ${pirates[1]}`;
+  if (pirates) return `Équipage ${of(pirates[1])}`;
   const kingdom = name.match(/^(.+) Kingdom$/);
-  if (kingdom) return `Royaume de ${kingdom[1]}`;
+  if (kingdom) return `Royaume ${of(kingdom[1])}`;
   const family = name.match(/^(.+) Family$/);
   if (family) return `Famille ${family[1]}`;
   return name;

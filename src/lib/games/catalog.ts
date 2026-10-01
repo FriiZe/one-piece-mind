@@ -37,6 +37,28 @@ export const LIVE_SLUGS = [
   "type-de-fruit",
   "qui-a-mange-ce-fruit",
   "trouve-les-tous",
+  // Lot B
+  "memo",
+  "wordle",
+  "anagramme",
+  "les-indices",
+  "surnoms",
+  "orthographe",
+  "emojis",
+  "devine-la-prime",
+  "grand-ou-vieux",
+  "premiere-apparition",
+  "prime-d-equipage",
+  "equipage",
+  "haki",
+  "techniques",
+  "armes-et-sabres",
+  "navires",
+  "origine-et-race",
+  "chronologie",
+  "dans-quel-arc",
+  "vrai-ou-faux",
+  "mode-aleatoire",
 ] as const;
 export type LiveSlug = (typeof LIVE_SLUGS)[number];
 

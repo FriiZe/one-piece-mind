@@ -1,0 +1,26 @@
+{
+  "_comment": "Armes nommées et leur porteur le plus connu.",
+  "weapons": [
+    { "name": "Yoru", "kind": "sabre noir", "characterId": "dracule-mihawk" },
+    { "name": "Wado Ichimonji", "kind": "sabre", "characterId": "roronoa-zoro" },
+    { "name": "Sandai Kitetsu", "kind": "sabre maudit", "characterId": "roronoa-zoro" },
+    { "name": "Yubashiri", "kind": "sabre", "characterId": "roronoa-zoro" },
+    { "name": "Ame no Habakiri", "kind": "sabre", "characterId": "kouzuki-oden" },
+    { "name": "Shigure", "kind": "sabre", "characterId": "tashigi" },
+    { "name": "Kikoku", "kind": "sabre maudit", "characterId": "trafalgar-d-water-law" },
+    { "name": "Durandal", "kind": "épée", "characterId": "cavendish" },
+    { "name": "Murakumogiri", "kind": "naginata", "characterId": "edward-newgate" },
+    { "name": "Gryphon", "kind": "sabre", "characterId": "shanks" },
+    { "name": "Ace", "kind": "sabre", "characterId": "gol-d-roger" },
+    { "name": "Clima-Tact", "kind": "bâton climatique", "characterId": "nami" },
+    { "name": "Kabuto", "kind": "lance-pierre géant", "characterId": "usopp" },
+    { "name": "Soul Solid", "kind": "canne-épée", "characterId": "brook" },
+    { "name": "Hassaikai", "kind": "massue", "characterId": "kaidou" },
+    { "name": "Napoléon", "kind": "chapeau devenu sabre", "characterId": "charlotte-linlin" },
+    { "name": "Kiribachi", "kind": "sabre en dents de scie", "characterId": "arlong" },
+    { "name": "Mogura", "kind": "trident", "characterId": "charlotte-katakuri" },
+    { "name": "Funkfreed", "kind": "épée-éléphant", "characterId": "spandam" },
+    { "name": "Raiu", "kind": "sabre", "characterId": "shiryu" },
+    { "name": "Pretzel", "kind": "épée", "characterId": "charlotte-cracker" }
+  ]
+}
