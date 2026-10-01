@@ -62,7 +62,9 @@ function PlainStart({ game, children }: { game: ReturnType<typeof useRun>; child
   return (
     <Panel className="space-y-4">
       {children}
-      <Button onClick={() => game.start("normal")}>Jouer</Button>
+      <Button onClick={() => game.start("normal")} className="min-h-14 w-full text-lg">
+        Jouer
+      </Button>
     </Panel>
   );
 }

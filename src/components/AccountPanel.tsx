@@ -1,7 +1,7 @@
 "use client";
 
 import { useActionState, useEffect, useState } from "react";
-import { Button, Panel } from "@/games/ui/primitives";
+import { Button } from "@/games/ui/primitives";
 import { writeStored } from "@/games/ui/storage";
 import { formatNumber } from "@/games/engine/text";
 import { EMPTY_PLAYER, SIGNUP_BERRYS } from "@/lib/economy";
@@ -10,13 +10,13 @@ import { usePlayer } from "@/lib/player/PlayerProvider";
 
 const INITIAL: AuthState = { ok: false };
 const INPUT =
-  "w-full rounded-lg border-2 border-sea-600 bg-sea-900 px-3 py-2.5 text-foam placeholder:text-mist/70 focus:border-straw focus:outline-none";
+  "h-12 w-full rounded-[10px] border border-sea-600 bg-sea-900 px-3.5 text-foam placeholder:text-mist/70 focus:border-straw focus:outline-none";
 
 function Credentials({ mode, username }: { mode: "signup" | "login"; username?: string }) {
   return (
     <>
       <label className="block">
-        <span className="mb-1 block text-sm font-semibold text-foam">Pseudo</span>
+        <span className="mb-1.5 block text-[15px] font-bold text-foam">Pseudo</span>
         <input
           name="username"
           type="text"
@@ -31,11 +31,11 @@ function Credentials({ mode, username }: { mode: "signup" | "login"; username?: 
           className={INPUT}
         />
         {mode === "signup" && (
-          <span className="mt-1 block text-xs text-mist">3 à 20 caractères : lettres, chiffres, tiret ou tiret bas.</span>
+          <span className="mt-1.5 block text-[13px] text-mist">3 à 20 caractères : lettres, chiffres, tiret ou tiret bas.</span>
         )}
       </label>
       <label className="block">
-        <span className="mb-1 block text-sm font-semibold text-foam">Mot de passe</span>
+        <span className="mb-1.5 block text-[15px] font-bold text-foam">Mot de passe</span>
         <input
           name="password"
           type="password"
@@ -45,7 +45,7 @@ function Credentials({ mode, username }: { mode: "signup" | "login"; username?: 
           autoComplete={mode === "signup" ? "new-password" : "current-password"}
           className={INPUT}
         />
-        {mode === "signup" && <span className="mt-1 block text-xs text-mist">Au moins 8 caractères.</span>}
+        {mode === "signup" && <span className="mt-1.5 block text-[13px] text-mist">Au moins 8 caractères.</span>}
       </label>
     </>
   );
@@ -64,22 +64,21 @@ function SignupForm() {
   }, [result.ok]);
 
   return (
-    <form action={action} className="space-y-3">
+    <form action={action} className="space-y-4">
       <Credentials mode="signup" username={result.username} />
       <input type="hidden" name="guest" value={JSON.stringify(state)} />
-      <p className="text-sm text-mist">
-        <strong className="text-straw">{formatNumber(SIGNUP_BERRYS)} ฿ offerts</strong> à la création du compte. Ta progression
-        actuelle (Berrys, collection, équipage) sera reprise sur ton compte. Sans adresse e-mail, un mot de
-        passe oublié ne peut pas être récupéré : note-le bien.
-      </p>
       {result.error && (
         <p role="alert" className="font-semibold text-vest">
           {result.error}
         </p>
       )}
-      <Button type="submit" disabled={pending}>
-        {pending ? "Création…" : "Créer mon compte"}
+      <Button type="submit" disabled={pending} className="min-h-[54px] w-full text-[17px]">
+        {pending ? "Création…" : `Créer mon compte · ${formatNumber(SIGNUP_BERRYS)} ฿ offerts`}
       </Button>
+      <p className="text-center text-sm text-mist">
+        Un pseudo et un mot de passe, rien d&apos;autre. Sans adresse e-mail, un mot de passe oublié ne peut pas être récupéré : note-le
+        bien.
+      </p>
     </form>
   );
 }
@@ -92,14 +91,14 @@ function LoginForm() {
   }, [result.ok]);
 
   return (
-    <form action={action} className="space-y-3">
+    <form action={action} className="space-y-4">
       <Credentials mode="login" username={result.username} />
       {result.error && (
         <p role="alert" className="font-semibold text-vest">
           {result.error}
         </p>
       )}
-      <Button type="submit" disabled={pending}>
+      <Button type="submit" disabled={pending} className="min-h-[54px] w-full text-[17px]">
         {pending ? "Connexion…" : "Me connecter"}
       </Button>
     </form>
@@ -122,54 +121,52 @@ export function AccountPanel() {
     window.location.reload();
   }
 
+  if (status === "loading") return null;
+
+  if (status === "user") {
+    return (
+      <section aria-labelledby="compte" className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-sea-700 p-5">
+        <div className="min-w-0 flex-1">
+          <h2 id="compte" className="text-xl font-extrabold text-foam">
+            Compte
+          </h2>
+          <p className="mt-1 text-sm text-mist">
+            Connecté en tant que <strong className="text-foam">{username}</strong>. Ta progression te suit d&apos;un appareil à l&apos;autre.
+          </p>
+        </div>
+        <Button variant="secondary" onClick={logout} disabled={leaving}>
+          Me déconnecter
+        </Button>
+      </section>
+    );
+  }
+
   return (
-    <section aria-labelledby="compte" className="space-y-3">
-      <h2 id="compte" className="font-display text-3xl tracking-wide text-straw">
+    <section aria-labelledby="compte" className="space-y-5 rounded-[20px] border border-sea-600 bg-sea-800 p-5 sm:p-7">
+      <h2 id="compte" className="sr-only">
         Mon compte
       </h2>
-      <Panel className="space-y-4">
-        {status === "loading" ? (
-          <p className="text-mist">Chargement…</p>
-        ) : status === "user" ? (
-          <>
-            <p className="text-mist">
-              Connecté en tant que <strong className="text-foam">{username}</strong>. Ta progression est enregistrée sur
-              ton compte et te suit d&apos;un appareil à l&apos;autre.
-            </p>
-            <Button variant="secondary" onClick={logout} disabled={leaving}>
-              Me déconnecter
-            </Button>
-          </>
-        ) : !accountsEnabled ? (
-          <p className="text-mist">
-            Ta progression est gardée dans ce navigateur. Les comptes ne sont pas encore ouverts.
-          </p>
-        ) : (
-          <>
-            <p className="text-mist">
-              Pour l&apos;instant, ta progression n&apos;existe que dans ce navigateur. Un compte la met à l&apos;abri et
-              la rend disponible sur tes autres appareils.
-            </p>
-            <div role="tablist" aria-label="Compte" className="flex flex-wrap gap-2">
-              {TABS.map((t) => (
-                <button
-                  key={t.id}
-                  type="button"
-                  role="tab"
-                  aria-selected={tab === t.id}
-                  onClick={() => setTab(t.id)}
-                  className={`rounded-full px-4 py-2 text-sm font-bold transition-colors ${
-                    tab === t.id ? "bg-straw text-ink" : "bg-sea-700 text-mist hover:text-foam"
-                  }`}
-                >
-                  {t.label}
-                </button>
-              ))}
-            </div>
-            {tab === "signup" ? <SignupForm /> : <LoginForm />}
-          </>
-        )}
-      </Panel>
+      {!accountsEnabled ? (
+        <p className="text-mist">Ta progression est gardée dans ce navigateur. Les comptes ne sont pas encore ouverts.</p>
+      ) : (
+        <>
+          <div role="tablist" aria-label="Compte" className="grid grid-cols-2 rounded-xl bg-sea-900 p-1 text-sm font-extrabold sm:text-[15px]">
+            {TABS.map((t) => (
+              <button
+                key={t.id}
+                type="button"
+                role="tab"
+                aria-selected={tab === t.id}
+                onClick={() => setTab(t.id)}
+                className={`min-h-11 cursor-pointer rounded-[9px] px-2 transition-colors ${tab === t.id ? "bg-straw text-ink" : "text-mist hover:text-foam"}`}
+              >
+                {t.label}
+              </button>
+            ))}
+          </div>
+          {tab === "signup" ? <SignupForm /> : <LoginForm />}
+        </>
+      )}
     </section>
   );
 }

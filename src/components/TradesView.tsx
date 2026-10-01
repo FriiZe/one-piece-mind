@@ -46,12 +46,16 @@ function TradeRow({
   const give = incoming ? trade.requestedId : trade.offeredId;
   const receive = incoming ? trade.offeredId : trade.requestedId;
   return (
-    <li className="flex flex-col gap-4 rounded-xl border border-sea-700 bg-sea-900/40 p-3 sm:flex-row sm:items-center">
+    <li
+      className={`flex flex-col gap-4 rounded-2xl border p-4 sm:flex-row sm:items-center ${
+        incoming ? "border-straw/50 bg-straw/5" : "border-sea-700 bg-sea-800"
+      }`}
+    >
       <div className="flex items-end gap-2">
         <TradeCard id={give} data={data} label="Tu donnes" />
-        <span aria-hidden="true" className="pb-10 font-display text-2xl text-straw">
-          ⇄
-        </span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" className="mb-12 size-7 shrink-0 text-straw">
+          <path d="M7 8h13M16 4l4 4-4 4M17 16H4M8 12l-4 4 4 4" />
+        </svg>
         <TradeCard id={receive} data={data} label="Tu reçois" />
       </div>
       <div className="min-w-0 flex-1 space-y-2">
@@ -95,6 +99,7 @@ function TradeRow({
 /** Grille d'avis dans laquelle on en choisit un. */
 function Picker({
   title,
+  hint,
   characters,
   collection,
   selected,
@@ -102,6 +107,7 @@ function Picker({
   empty,
 }: {
   title: string;
+  hint?: string;
   characters: PlayCharacter[];
   collection: Record<string, CollectionEntry>;
   selected: string | null;
@@ -109,12 +115,15 @@ function Picker({
   empty: string;
 }) {
   return (
-    <div className="space-y-2">
-      <h3 className="font-bold text-foam">{title}</h3>
+    <div className="space-y-2.5">
+      <h3 className="flex flex-wrap items-baseline justify-between gap-x-3 text-xs font-extrabold tracking-[0.15em] text-mist uppercase">
+        {title}
+        {hint && <span className="text-[13px] font-normal tracking-normal normal-case">{hint}</span>}
+      </h3>
       {characters.length === 0 ? (
         <p className="text-sm text-mist">{empty}</p>
       ) : (
-        <ul className="grid max-h-96 grid-cols-3 gap-2 overflow-y-auto rounded-xl border border-sea-700 p-2 sm:grid-cols-4">
+        <ul className="grid max-h-96 grid-cols-3 gap-2.5 overflow-y-auto p-1 sm:grid-cols-4">
           {characters.map((character) => {
             const entry = collection[character.id];
             const chosen = selected === character.id;
@@ -189,16 +198,18 @@ function Trades({ data }: { data: ResolvedData }) {
   }
 
   const lastCopy = offered ? state.collection[offered]?.count === 1 : false;
+  const offeredCharacter = offered ? data.characterById.get(offered) : undefined;
+  const requestedCharacter = requested ? data.characterById.get(requested) : undefined;
 
   return (
-    <div className="space-y-8">
-      <p className={`min-h-6 font-semibold ${message?.ok ? "text-emerald-300" : "text-vest"}`} aria-live="polite">
+    <div className="space-y-7">
+      <p className={`font-semibold empty:hidden ${message?.ok ? "text-emerald-300" : "text-vest"}`} aria-live="polite">
         {message?.text}
       </p>
 
       {trades && trades.incoming.length > 0 && (
         <section aria-labelledby="recus" className="space-y-3">
-          <h2 id="recus" className="font-display text-3xl tracking-wide text-straw">
+          <h2 id="recus" className="text-xl font-extrabold text-foam">
             Propositions reçues · {trades.incoming.length}
           </h2>
           <ul className="space-y-3">
@@ -222,7 +233,7 @@ function Trades({ data }: { data: ResolvedData }) {
 
       {trades && trades.outgoing.length > 0 && (
         <section aria-labelledby="envoyes" className="space-y-3">
-          <h2 id="envoyes" className="font-display text-3xl tracking-wide text-straw">
+          <h2 id="envoyes" className="text-xl font-extrabold text-foam">
             Propositions envoyées · {trades.outgoing.length}
           </h2>
           <ul className="space-y-3">
@@ -242,14 +253,14 @@ function Trades({ data }: { data: ResolvedData }) {
         </section>
       )}
 
-      <section aria-labelledby="proposer" className="space-y-3">
-        <h2 id="proposer" className="font-display text-3xl tracking-wide text-straw">
+      <section aria-labelledby="proposer" className="space-y-3.5">
+        <h2 id="proposer" className="text-xl font-extrabold text-foam">
           Proposer un échange
         </h2>
-        <Panel className="space-y-5">
-          {!friends ? (
-            <p className="text-mist">Chargement…</p>
-          ) : friends.friends.length === 0 ? (
+        {!friends ? (
+          <p className="text-mist">Chargement…</p>
+        ) : friends.friends.length === 0 ? (
+          <Panel>
             <p className="text-mist">
               Les échanges se font entre amis.{" "}
               <Link href="/profil#amis" className="font-semibold text-straw underline underline-offset-4">
@@ -257,83 +268,110 @@ function Trades({ data }: { data: ResolvedData }) {
               </Link>{" "}
               par son pseudo pour commencer.
             </p>
-          ) : (
-            <>
-              <label className="block max-w-sm">
-                <span className="mb-1 block font-bold text-foam">Avec qui ?</span>
-                <select
-                  value={friendId ?? ""}
-                  onChange={(event) => {
-                    setFriendId(event.target.value || null);
-                    setRequested(null);
-                  }}
-                  className="w-full rounded-lg border-2 border-sea-600 bg-sea-900 px-3 py-2.5 text-foam focus:border-straw focus:outline-none"
-                >
-                  <option value="">Choisis un ami</option>
-                  {friends.friends.map((f) => (
-                    <option key={f.id} value={f.id}>
-                      {f.username}
-                    </option>
-                  ))}
-                </select>
-              </label>
+          </Panel>
+        ) : (
+          <>
+            <div className="grid grid-cols-1 gap-4 lg:grid-cols-[240px_minmax(0,1fr)_minmax(0,1fr)]">
+              <div className="space-y-2.5 rounded-[14px] border border-sea-700 p-4">
+                <h3 className="text-xs font-extrabold tracking-[0.15em] text-mist uppercase">1 · Avec qui</h3>
+                <ul className="space-y-2">
+                  {friends.friends.map((f) => {
+                    const chosen = friendId === f.id;
+                    return (
+                      <li key={f.id}>
+                        <button
+                          type="button"
+                          aria-pressed={chosen}
+                          onClick={() => {
+                            setFriendId(f.id);
+                            setRequested(null);
+                          }}
+                          className={`flex min-h-12 w-full cursor-pointer items-center gap-2.5 rounded-[10px] px-2.5 text-left font-bold transition-colors ${
+                            chosen ? "border-2 border-straw bg-sea-800 text-foam" : "border border-sea-700 text-mist hover:text-foam"
+                          }`}
+                        >
+                          <span aria-hidden="true" className="flex size-8 shrink-0 items-center justify-center rounded-full bg-sea-700 text-mist">
+                            {f.username.charAt(0).toLocaleUpperCase("fr")}
+                          </span>
+                          <span className="truncate">{f.username}</span>
+                        </button>
+                      </li>
+                    );
+                  })}
+                </ul>
+                <Link href="/profil#amis" className="inline-block text-sm font-bold text-mist underline underline-offset-4 hover:text-foam">
+                  Ajouter un ami
+                </Link>
+              </div>
 
-              {friendId &&
-                (friend === null ? (
+              <div className="space-y-2.5 rounded-[14px] border border-sea-700 p-4">
+                <Picker
+                  title="2 · Je donne"
+                  hint={duplicatesOnly ? "Mes doublons" : "Toute ma collection"}
+                  characters={mine}
+                  collection={state.collection}
+                  selected={offered}
+                  onSelect={setOffered}
+                  empty={duplicatesOnly ? "Tu n'as aucun doublon. Décoche la case pour proposer un autre avis." : "Ta collection est vide."}
+                />
+                <label className="flex min-h-11 cursor-pointer items-center gap-2 text-sm text-mist">
+                  <input type="checkbox" checked={duplicatesOnly} onChange={(event) => setDuplicatesOnly(event.target.checked)} className="size-[18px] accent-straw" />
+                  Seulement mes doublons
+                </label>
+              </div>
+
+              <div className="space-y-2.5 rounded-[14px] border border-sea-700 p-4">
+                {!friendId ? (
+                  <>
+                    <h3 className="text-xs font-extrabold tracking-[0.15em] text-mist uppercase">3 · Je demande</h3>
+                    <p className="text-sm text-mist">Choisis d&apos;abord un ami : sa collection s&apos;affichera ici.</p>
+                  </>
+                ) : friend === null ? (
                   <p className="text-mist">Chargement de sa collection…</p>
                 ) : friend === "missing" ? (
                   <p className="font-semibold text-vest">Sa collection n&apos;a pas pu être chargée.</p>
                 ) : (
                   <>
-                    <div className="grid gap-5 lg:grid-cols-2">
-                      <div className="space-y-2">
-                        <Picker
-                          title="Ce que tu donnes"
-                          characters={mine}
-                          collection={state.collection}
-                          selected={offered}
-                          onSelect={setOffered}
-                          empty={duplicatesOnly ? "Tu n'as aucun doublon. Décoche la case pour proposer un autre avis." : "Ta collection est vide."}
-                        />
-                        <label className="flex items-center gap-2 text-sm text-mist">
-                          <input type="checkbox" checked={duplicatesOnly} onChange={(event) => setDuplicatesOnly(event.target.checked)} className="size-4 accent-straw" />
-                          Seulement mes doublons
-                        </label>
-                      </div>
-                      <div className="space-y-2">
-                        <Picker
-                          title={`Ce que tu demandes à ${friend.username}`}
-                          characters={theirs}
-                          collection={friend.collection}
-                          selected={requested}
-                          onSelect={setRequested}
-                          empty={missingOnly ? `${friend.username} n'a aucun avis qui te manque. Décoche la case pour tout voir.` : `La collection de ${friend.username} est vide.`}
-                        />
-                        <label className="flex items-center gap-2 text-sm text-mist">
-                          <input type="checkbox" checked={missingOnly} onChange={(event) => setMissingOnly(event.target.checked)} className="size-4 accent-straw" />
-                          Seulement les avis qui me manquent
-                        </label>
-                      </div>
-                    </div>
-
-                    <div className="space-y-2">
-                      {lastCopy && (
-                        <p className="text-sm font-semibold text-straw">
-                          C&apos;est ton seul exemplaire de cet avis : s&apos;il part, il quitte ta collection et ton équipage.
-                        </p>
-                      )}
-                      <Button onClick={propose} disabled={busy || !offered || !requested}>
-                        Proposer l&apos;échange
-                      </Button>
-                      <p className="text-sm text-mist">
-                        Un avis contre un avis. Rien ne bouge tant que {friend.username} n&apos;a pas accepté ; tu peux annuler d&apos;ici là.
-                      </p>
-                    </div>
+                    <Picker
+                      title="3 · Je demande"
+                      hint={missingOnly ? `Ce qui me manque chez ${friend.username}` : `Toute la collection de ${friend.username}`}
+                      characters={theirs}
+                      collection={friend.collection}
+                      selected={requested}
+                      onSelect={setRequested}
+                      empty={missingOnly ? `${friend.username} n'a aucun avis qui te manque. Décoche la case pour tout voir.` : `La collection de ${friend.username} est vide.`}
+                    />
+                    <label className="flex min-h-11 cursor-pointer items-center gap-2 text-sm text-mist">
+                      <input type="checkbox" checked={missingOnly} onChange={(event) => setMissingOnly(event.target.checked)} className="size-[18px] accent-straw" />
+                      Seulement les avis qui me manquent
+                    </label>
                   </>
-                ))}
-            </>
-          )}
-        </Panel>
+                )}
+              </div>
+            </div>
+
+            <div className="flex flex-wrap items-center gap-4 rounded-[14px] border border-sea-700 bg-sea-800 px-5 py-4">
+              <p className="min-w-0 flex-1 text-mist">
+                {offeredCharacter && requestedCharacter && friend && friend !== "missing" ? (
+                  <>
+                    Tu donnes <strong className="text-foam">{offeredCharacter.name}</strong> à {friend.username} contre{" "}
+                    <strong className="text-foam">{requestedCharacter.name}</strong>. Rien ne bouge tant que {friend.username} n&apos;a pas accepté.
+                  </>
+                ) : (
+                  "Un avis contre un avis : choisis un ami, l'avis que tu donnes et celui que tu demandes."
+                )}
+                {lastCopy && (
+                  <span className="mt-1 block text-sm font-semibold text-straw">
+                    C&apos;est ton seul exemplaire de cet avis : s&apos;il part, il quitte ta collection et ton équipage.
+                  </span>
+                )}
+              </p>
+              <Button onClick={propose} disabled={busy || !offered || !requested} className="min-h-12 px-6">
+                Proposer l&apos;échange
+              </Button>
+            </div>
+          </>
+        )}
       </section>
     </div>
   );

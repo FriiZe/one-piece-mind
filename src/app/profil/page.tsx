@@ -3,14 +3,13 @@ import { ProfileView } from "@/components/ProfileView";
 
 export const metadata: Metadata = {
   title: "Mon profil",
-  description: "Ta prime, ton rang et ton équipage.",
+  description: "Ta prime, ton rang, tes amis et ton compte.",
   robots: { index: false },
 };
 
 export default function ProfilePage() {
   return (
-    <div className="mx-auto w-full max-w-4xl space-y-6 px-4 py-10">
-      <h1 className="font-display text-5xl tracking-wide text-foam">Mon profil</h1>
+    <div className="mx-auto w-full max-w-6xl px-4 py-7 sm:py-8">
       <ProfileView />
     </div>
   );

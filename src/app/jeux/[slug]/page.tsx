@@ -1,12 +1,12 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { DailyBanner } from "@/components/DailyGames";
-import { GameObjectives } from "@/components/GameObjectives";
+import { DailyChip, OtherDailyGames } from "@/components/DailyGames";
+import { GameObjectives, GameRecord } from "@/components/GameObjectives";
 import { JsonLd } from "@/components/JsonLd";
 import { GAME_CONTENT } from "@/games/content";
 import { GameRunner } from "@/games/ui/GameRunner";
-import { GAMES, getGame, isLiveSlug, isRewardless, LIVE_SLUGS } from "@/lib/games/catalog";
+import { GAME_CATEGORIES, GAMES, getGame, isLiveSlug, isRewardless, LIVE_SLUGS } from "@/lib/games/catalog";
 import { SITE_NAME, SITE_URL } from "@/lib/site";
 
 // Seuls les jeux en ligne ont une page : toute autre adresse renvoie une 404.
@@ -34,11 +34,13 @@ export default async function GamePage({ params }: PageProps<"/jeux/[slug]">) {
   if (!game || !isLiveSlug(slug)) notFound();
 
   const content = GAME_CONTENT[slug];
-  const others = GAMES.filter((g) => g.status === "live" && g.slug !== slug).slice(0, 6);
+  const category = GAME_CATEGORIES.find((c) => c.id === game.category)!;
+  const siblings = GAMES.filter((g) => g.status === "live" && g.category === game.category && g.slug !== slug);
+  const rewardless = isRewardless(slug);
   const url = `${SITE_URL}/jeux/${slug}`;
 
   return (
-    <div className="mx-auto w-full max-w-4xl space-y-10 px-4 py-8">
+    <div className="mx-auto w-full max-w-5xl space-y-7 px-4 py-7 sm:py-8">
       <JsonLd
         data={{
           "@context": "https://schema.org",
@@ -75,66 +77,76 @@ export default async function GamePage({ params }: PageProps<"/jeux/[slug]">) {
         }}
       />
 
-      <header>
+      <header className="space-y-3">
         <nav aria-label="Fil d'Ariane" className="text-sm text-mist">
           <Link href="/jeux" className="underline underline-offset-4 hover:text-foam">
             Jeux
           </Link>{" "}
+          /{" "}
+          <Link href={`/jeux#cat-${category.id}`} className="underline underline-offset-4 hover:text-foam">
+            {category.title}
+          </Link>{" "}
           / <span aria-current="page">{game.title}</span>
         </nav>
-        <h1 className="mt-2 font-display text-5xl tracking-wide text-foam">{game.title}</h1>
-        <p className="mt-2 max-w-2xl text-lg text-mist">{content.intro}</p>
+        <div>
+          <h1 className="font-display text-4xl tracking-wide text-foam sm:text-[40px]">{game.title}</h1>
+          <p className="mt-1 max-w-3xl text-mist">{content.intro}</p>
+        </div>
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
+          <DailyChip slug={slug} />
+          <GameRecord slug={slug} />
+        </div>
       </header>
 
-      <section aria-label="Le jeu" className="space-y-4">
-        <DailyBanner slug={slug} />
+      <section aria-label="Le jeu">
         <GameRunner slug={slug} />
       </section>
 
-      {!isRewardless(slug) && <GameObjectives slug={slug} />}
+      <div className={`grid gap-5 ${rewardless ? "" : "lg:grid-cols-2"}`}>
+        {!rewardless && <GameObjectives slug={slug} />}
+        <section aria-labelledby="comment-jouer" className="space-y-3 rounded-2xl border border-sea-700 p-5">
+          <h2 id="comment-jouer" className="text-lg font-extrabold text-foam">
+            Comment jouer
+          </h2>
+          <ol className="list-decimal space-y-2 pl-5 text-sm text-mist marker:font-bold marker:text-straw">
+            {content.howTo.map((step) => (
+              <li key={step}>{step}</li>
+            ))}
+          </ol>
+          <a href="#questions" className="inline-block text-sm font-bold text-straw underline underline-offset-4">
+            Questions fréquentes
+          </a>
+        </section>
+      </div>
 
-      <section aria-labelledby="comment-jouer" className="space-y-3">
-        <h2 id="comment-jouer" className="font-display text-3xl tracking-wide text-straw">
-          Comment jouer
-        </h2>
-        <ol className="list-decimal space-y-2 pl-5 text-mist marker:font-bold marker:text-straw">
-          {content.howTo.map((step) => (
-            <li key={step}>{step}</li>
+      <OtherDailyGames slug={slug} />
+
+      {siblings.length > 0 && (
+        <p className="text-sm text-mist">
+          Dans la même catégorie :{" "}
+          {siblings.map((other, index) => (
+            <span key={other.slug}>
+              {index > 0 && " · "}
+              <Link href={`/jeux/${other.slug}`} className="font-bold text-foam underline underline-offset-4 hover:text-straw">
+                {other.title}
+              </Link>
+            </span>
           ))}
-        </ol>
-      </section>
+        </p>
+      )}
 
-      <section aria-labelledby="questions" className="space-y-3">
-        <h2 id="questions" className="font-display text-3xl tracking-wide text-straw">
+      <section aria-labelledby="questions" className="scroll-mt-6 space-y-3">
+        <h2 id="questions" className="font-display text-[28px] tracking-wide text-foam">
           Questions fréquentes
         </h2>
-        <dl className="space-y-4">
+        <dl className="grid gap-x-8 gap-y-4 md:grid-cols-2">
           {content.faq.map((item) => (
             <div key={item.question}>
               <dt className="font-bold text-foam">{item.question}</dt>
-              <dd className="mt-1 text-mist">{item.answer}</dd>
+              <dd className="mt-1 text-sm text-mist">{item.answer}</dd>
             </div>
           ))}
         </dl>
-      </section>
-
-      <section aria-labelledby="autres-jeux" className="space-y-3">
-        <h2 id="autres-jeux" className="font-display text-3xl tracking-wide text-straw">
-          D&apos;autres jeux
-        </h2>
-        <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          {others.map((other) => (
-            <li key={other.slug}>
-              <Link
-                href={`/jeux/${other.slug}`}
-                className="block h-full rounded-xl border border-sea-600 bg-sea-800/70 p-4 transition-colors hover:border-straw"
-              >
-                <span className="block font-bold text-foam">{other.title}</span>
-                <span className="mt-1 block text-sm text-mist">{other.pitch}</span>
-              </Link>
-            </li>
-          ))}
-        </ul>
       </section>
     </div>
   );

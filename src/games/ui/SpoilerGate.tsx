@@ -42,11 +42,11 @@ export function SpoilerGate({ data, onChoose }: { data: GameData; onChoose: (mod
 
 export function ModeBar({ mode, onChange }: { mode: SpoilerMode; onChange: (mode: SpoilerMode | null) => void }) {
   return (
-    <p className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-mist">
+    <p className="inline-flex min-h-9 flex-wrap items-center gap-x-2 rounded-full border border-sea-700 px-3.5 py-1 text-sm text-mist">
       <span>
-        Mode sans spoiler : <strong className="text-foam">{mode === "anime" ? "à jour sur l'anime" : "à jour sur le manga"}</strong>
+        Sans spoiler : <strong className="text-foam">{mode === "anime" ? "à jour sur l'anime" : "à jour sur le manga"}</strong>
       </span>
-      <button type="button" onClick={() => onChange(null)} className="underline underline-offset-4 hover:text-foam">
+      <button type="button" onClick={() => onChange(null)} className="cursor-pointer font-bold text-straw underline underline-offset-4">
         Changer
       </button>
     </p>

@@ -17,17 +17,19 @@ export function StartScreen({
 }) {
   const [difficulty, setDifficulty] = useStored<Difficulty>("opm.difficulty", "normal");
 
+  const current = DIFFICULTIES.find((d) => d.id === difficulty) ?? DIFFICULTIES[0];
+
   return (
-    <Panel className="space-y-4">
+    <Panel className="space-y-5">
       {children}
-      <fieldset>
-        <legend className="mb-2 font-bold text-foam">Difficulté</legend>
-        <div className="grid gap-2 sm:grid-cols-3">
+      <fieldset className="space-y-2">
+        <legend className="mb-2 text-sm font-bold text-mist">Difficulté</legend>
+        <div className="grid grid-cols-3 rounded-xl border border-sea-700 bg-sea-900 p-1">
           {DIFFICULTIES.map((d) => (
             <label
               key={d.id}
-              className={`cursor-pointer rounded-xl border-2 p-3 transition-colors has-focus-visible:outline-2 has-focus-visible:outline-straw ${
-                difficulty === d.id ? "border-straw bg-straw/10" : "border-sea-600 hover:border-mist"
+              className={`flex min-h-11 cursor-pointer items-center justify-center rounded-[9px] text-[15px] font-extrabold transition-colors has-focus-visible:outline-2 has-focus-visible:outline-straw ${
+                difficulty === d.id ? "bg-straw text-ink" : "text-mist hover:text-foam"
               }`}
             >
               <input
@@ -38,13 +40,17 @@ export function StartScreen({
                 onChange={() => setDifficulty(d.id)}
                 className="sr-only"
               />
-              <span className="block font-bold text-foam">{d.label}</span>
-              <span className="block text-sm text-mist">{d.hint}</span>
+              {d.label}
             </label>
           ))}
         </div>
+        <p className="text-sm text-mist" aria-live="polite">
+          {current.label} : {current.hint.charAt(0).toLowerCase() + current.hint.slice(1)}
+        </p>
       </fieldset>
-      <Button onClick={() => onStart(difficulty)}>{startLabel}</Button>
+      <Button onClick={() => onStart(difficulty)} className="min-h-14 w-full text-lg">
+        {startLabel}
+      </Button>
     </Panel>
   );
 }

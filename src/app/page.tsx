@@ -1,25 +1,23 @@
 import Link from "next/link";
 import { DailyGames } from "@/components/DailyGames";
-import { GameGrid } from "@/components/GameGrid";
+import { CATEGORY_TONES } from "@/components/GameBadge";
+import { HomeStrip } from "@/components/HomeStrip";
 import { JsonLd } from "@/components/JsonLd";
-import { characters, fruits, meta } from "@/lib/data";
-import { GAMES } from "@/lib/games/catalog";
+import { meta } from "@/lib/data";
+import { GAME_CATEGORIES, GAMES } from "@/lib/games/catalog";
 import { SITE_DESCRIPTION, SITE_NAME, SITE_URL } from "@/lib/site";
-import { isPlayableCharacter } from "@/lib/spoilers";
 
 const number = new Intl.NumberFormat("fr-FR");
 
 export default function Home() {
-  const live = GAMES.filter((g) => g.status === "live").length;
-  const stats = [
-    { value: live, label: "jeux disponibles" },
-    { value: characters.filter((c) => isPlayableCharacter(c, "manga")).length, label: "personnages" },
-    { value: fruits.length, label: "fruits du démon" },
-    { value: meta.latestChapter, label: "chapitres couverts" },
-  ];
+  const live = GAMES.filter((g) => g.status === "live");
+  const categories = GAME_CATEGORIES.map((category) => ({
+    ...category,
+    games: live.filter((g) => g.category === category.id),
+  })).filter((category) => category.games.length > 0);
 
   return (
-    <>
+    <div className="mx-auto w-full max-w-6xl space-y-7 px-4 py-7 sm:py-8">
       <JsonLd
         data={{
           "@context": "https://schema.org",
@@ -30,92 +28,54 @@ export default function Home() {
           inLanguage: "fr",
         }}
       />
-      <section className="mx-auto w-full max-w-6xl px-4 pt-14 pb-12">
-        <p className="mb-4 inline-block rounded-full border border-straw/40 bg-straw/10 px-3 py-1 text-sm font-semibold text-straw">
-          {live} jeux disponibles, {GAMES.length - live} en préparation
-        </p>
-        <h1 className="max-w-3xl font-display text-5xl leading-none tracking-wide text-foam sm:text-7xl">
-          Tous les mini-jeux One Piece, <span className="text-straw">au même endroit</span>
-        </h1>
-        <p className="mt-5 max-w-2xl text-lg text-mist">
-          Silhouettes, primes, fruits du démon, défis quotidiens : des parties courtes, gratuites et sans inscription,
-          jouables sur ordinateur comme sur téléphone.
-        </p>
-        <div className="mt-7 flex flex-wrap gap-3">
-          <Link
-            href="#jeux-du-jour"
-            className="rounded-lg bg-straw px-5 py-3 font-bold text-ink transition-colors hover:bg-straw-dark"
-          >
-            Les jeux du jour
-          </Link>
-          <Link
-            href="/jeux"
-            className="rounded-lg border border-sea-600 bg-sea-700 px-5 py-3 font-bold text-foam transition-colors hover:bg-sea-600"
-          >
-            Tous les jeux
-          </Link>
-          {[
-            { href: "/multi", label: "Jouer à plusieurs" },
-            { href: "/quiz", label: "Quiz de la commu" },
-            { href: "/defis", label: "Défis de la semaine" },
-          ].map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              className="rounded-lg border border-sea-600 px-5 py-3 font-bold text-mist transition-colors hover:border-straw hover:text-foam"
-            >
-              {link.label}
-            </Link>
-          ))}
-        </div>
-
-        <dl className="mt-10 grid grid-cols-2 gap-3 sm:grid-cols-4">
-          {stats.map((stat) => (
-            <div key={stat.label} className="flex flex-col-reverse rounded-xl border border-sea-700 bg-sea-800/70 px-4 py-4">
-              <dt className="text-sm text-mist">{stat.label}</dt>
-              <dd className="font-display text-4xl tracking-wide text-straw">{number.format(stat.value)}</dd>
-            </div>
-          ))}
-        </dl>
-      </section>
-
-      <div className="mx-auto w-full max-w-6xl px-4 pb-12">
-        <DailyGames />
+      <div className="flex flex-wrap items-baseline gap-x-4 gap-y-1">
+        <h1 className="font-display text-4xl tracking-wide text-foam sm:text-[40px]">Les mini-jeux One Piece</h1>
+        <p className="text-mist">Des parties courtes, gratuites, sans inscription.</p>
       </div>
 
-      <section aria-labelledby="spoilers" className="mx-auto w-full max-w-6xl px-4 pb-12">
-        <div className="rounded-2xl bg-parchment p-6 text-ink sm:p-8">
-          <h2 id="spoilers" className="font-display text-3xl tracking-wide">
-            Zéro spoiler, promis
+      <DailyGames />
+      <HomeStrip />
+
+      <section aria-labelledby="jeux-titre" className="space-y-4">
+        <div className="flex flex-wrap items-baseline justify-between gap-2">
+          <h2 id="jeux-titre" className="font-display text-[28px] tracking-wide text-foam">
+            Tous les jeux
           </h2>
-          <p className="mt-2 max-w-2xl">
-            Avant chaque partie, tu indiques où tu en es. Les jeux ne tirent alors que des personnages, des primes et
-            des révélations que tu connais déjà.
-          </p>
-          <div className="mt-5 grid gap-3 sm:grid-cols-2">
-            <div className="rounded-xl border-2 border-ink/15 bg-white/50 p-4">
-              <h3 className="font-bold">Je suis à jour sur l&apos;anime</h3>
-              <p className="mt-1 text-sm">
-                Rien au-delà de l&apos;épisode {number.format(meta.latestEpisode)} (chapitre{" "}
-                {number.format(meta.animeCutoffChapter)}).
-              </p>
-            </div>
-            <div className="rounded-xl border-2 border-ink/15 bg-white/50 p-4">
-              <h3 className="font-bold">Je suis à jour sur le manga</h3>
-              <p className="mt-1 text-sm">Tout, jusqu&apos;au chapitre {number.format(meta.latestChapter)}.</p>
-            </div>
-          </div>
+          <Link href="/jeux" className="text-sm font-bold text-straw underline underline-offset-4">
+            {live.length} jeux, {categories.length} catégories
+          </Link>
         </div>
+        <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {categories.map((category) => (
+            <li key={category.id}>
+              <Link
+                href={`/jeux#cat-${category.id}`}
+                className="flex h-full flex-col gap-2 rounded-2xl border border-sea-700 bg-sea-800 p-4 transition-colors hover:border-straw"
+              >
+                <span className="flex items-center gap-2.5">
+                  <span aria-hidden="true" className={`size-3 rounded-full ${CATEGORY_TONES[category.id].dot}`} />
+                  <span className="font-extrabold text-foam">{category.title}</span>
+                  <span className="ml-auto text-[13px] text-mist">
+                    {category.games.length} jeu{category.games.length > 1 ? "x" : ""}
+                  </span>
+                </span>
+                <span className="text-[13px] text-mist">{category.games.map((game) => game.title).join(" · ")}</span>
+              </Link>
+            </li>
+          ))}
+        </ul>
       </section>
 
-      <section id="jeux" aria-labelledby="jeux-titre" className="mx-auto w-full max-w-6xl scroll-mt-6 px-4 pb-16">
-        <h2 id="jeux-titre" className="font-display text-4xl tracking-wide text-foam">
-          Les jeux
+      <section aria-labelledby="spoilers" className="rounded-2xl border border-sea-700 px-5 py-4">
+        <h2 id="spoilers" className="font-extrabold text-foam">
+          Zéro spoiler, promis
         </h2>
-        <div className="mt-6">
-          <GameGrid />
-        </div>
+        <p className="mt-1 text-sm text-mist">
+          Avant ta première partie, tu indiques où tu en es : à jour sur l&apos;anime (rien au-delà de l&apos;épisode{" "}
+          {number.format(meta.latestEpisode)}, chapitre {number.format(meta.animeCutoffChapter)}) ou à jour sur le manga (tout, jusqu&apos;au chapitre{" "}
+          {number.format(meta.latestChapter)}). Les jeux ne tirent alors que des personnages, des primes et des révélations que tu connais déjà.
+        </p>
       </section>
-    </>
+    </div>
   );
 }

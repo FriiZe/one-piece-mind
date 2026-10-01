@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import { formatNumber } from "@/games/engine/text";
-import { Button, Panel } from "@/games/ui/primitives";
+import { Button } from "@/games/ui/primitives";
 import { rankOf } from "@/lib/economy";
 import { notificationsChanged, useFriends } from "@/lib/multi/client";
 import type { FriendError, FriendResult } from "@/lib/multi/friends";
@@ -44,151 +44,134 @@ export function FriendsPanel() {
   }
 
   return (
-    <section aria-labelledby="amis" className="space-y-3">
-      <h2 id="amis" className="font-display text-3xl tracking-wide text-straw">
-        Mes amis
-      </h2>
-      <Panel className="space-y-5">
-        <form
-          className="flex flex-wrap items-end gap-2"
-          onSubmit={(event) => {
-            event.preventDefault();
-            const name = username.trim();
-            if (!name) return;
-            run(
-              () => requestFriendAction(name),
-              (result) => (result.accepted ? `${name} et toi êtes maintenant amis.` : `Demande envoyée à ${name}.`),
-            ).then(() => setUsername(""));
-          }}
-        >
-          <label className="min-w-0 flex-1">
-            <span className="mb-1 block text-sm font-semibold text-foam">Ajouter un ami par son pseudo</span>
-            <input
-              value={username}
-              onChange={(event) => setUsername(event.target.value)}
-              maxLength={20}
-              autoComplete="off"
-              autoCapitalize="off"
-              spellCheck={false}
-              className="w-full rounded-lg border-2 border-sea-600 bg-sea-900 px-3 py-2.5 text-foam focus:border-straw focus:outline-none"
-            />
-          </label>
-          <Button type="submit" disabled={busy || !username.trim()}>
-            Envoyer la demande
-          </Button>
-        </form>
-        <p className={`min-h-6 text-sm font-semibold ${message?.ok ? "text-emerald-300" : "text-vest"}`} aria-live="polite">
-          {message?.text}
-        </p>
+    <section aria-labelledby="amis" className="space-y-4 rounded-2xl border border-sea-700 bg-sea-800 p-5">
+      <div className="flex flex-wrap items-baseline justify-between gap-2">
+        <h2 id="amis" className="text-xl font-extrabold text-foam">
+          Amis <span className="text-base font-semibold text-mist">· {friends?.friends.length ?? 0}</span>
+        </h2>
+        {!!friends?.friends.length && (
+          <Link href="/echanges" className="text-sm font-bold text-straw underline underline-offset-4">
+            Échanger des avis
+          </Link>
+        )}
+      </div>
 
-        {friends?.invites.length ? (
-          <div>
-            <h3 className="mb-2 font-bold text-foam">Invitations dans un salon</h3>
-            <ul className="space-y-2">
-              {friends.invites.map((invite) => (
-                <li key={invite.code} className="flex flex-wrap items-center justify-between gap-2 text-mist">
-                  <span>
-                    <strong className="text-foam">{invite.from}</strong> t&apos;invite dans son salon.
-                  </span>
-                  <Link href={`/multi/${invite.code}`} className="font-bold text-straw underline underline-offset-4">
-                    Rejoindre
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-        ) : null}
-
-        {friends?.incoming.length ? (
-          <div>
-            <h3 className="mb-2 font-bold text-foam">Demandes reçues</h3>
-            <ul className="space-y-2">
-              {friends.incoming.map((request) => (
-                <li key={request.id} className="flex flex-wrap items-center justify-between gap-2">
-                  <span className="font-semibold text-foam">{request.username}</span>
-                  <span className="flex gap-2">
-                    <Button
-                      className="py-1.5 text-sm"
-                      disabled={busy}
-                      onClick={() => run(() => answerFriendRequestAction(request.id, true), () => `${request.username} et toi êtes maintenant amis.`)}
-                    >
-                      Accepter
-                    </Button>
-                    <Button
-                      variant="secondary"
-                      className="py-1.5 text-sm"
-                      disabled={busy}
-                      onClick={() => run(() => answerFriendRequestAction(request.id, false), () => "Demande refusée.")}
-                    >
-                      Refuser
-                    </Button>
-                  </span>
-                </li>
-              ))}
-            </ul>
-          </div>
-        ) : null}
-
-        <div>
-          <h3 className="mb-2 flex flex-wrap items-baseline justify-between gap-2 font-bold text-foam">
-            <span>
-              Amis <span className="font-semibold text-mist">· {friends?.friends.length ?? 0}</span>
-            </span>
-            {!!friends?.friends.length && (
-              <Link href="/echanges" className="text-sm font-semibold text-straw underline underline-offset-4">
-                Échanger des avis
-              </Link>
-            )}
-          </h3>
-          {!friends ? (
-            <p className="text-mist">Chargement…</p>
-          ) : friends.friends.length === 0 ? (
-            <p className="text-mist">Aucun ami pour l&apos;instant. Ajoute quelqu&apos;un par son pseudo pour l&apos;inviter dans tes salons.</p>
-          ) : (
-            <ul className="space-y-2">
-              {friends.friends.map((friend) => (
-                <li key={friend.id} className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-sea-700 px-3 py-2">
-                  <span>
-                    <span className="font-bold text-foam">{friend.username}</span>
-                    <span className="ml-2 text-sm text-mist">
-                      {rankOf(friend.bounty).title} · ฿ {formatNumber(friend.bounty)}
-                    </span>
-                  </span>
-                  <button
-                    type="button"
-                    disabled={busy}
-                    className="text-sm text-mist underline underline-offset-4 hover:text-foam"
-                    onClick={() => run(() => removeFriendAction(friend.id), () => `${friend.username} n'est plus dans tes amis.`)}
-                  >
-                    Retirer
-                  </button>
-                </li>
-              ))}
-            </ul>
-          )}
+      {friends?.incoming.map((request) => (
+        <div key={request.id} className="flex flex-wrap items-center gap-3 rounded-xl border border-straw/50 bg-straw/5 px-4 py-3">
+          <p className="min-w-0 flex-1 text-mist">
+            <strong className="text-foam">{request.username}</strong> te demande en ami.
+          </p>
+          <span className="flex gap-2">
+            <Button
+              className="min-h-11 text-sm"
+              disabled={busy}
+              onClick={() => run(() => answerFriendRequestAction(request.id, true), () => `${request.username} et toi êtes maintenant amis.`)}
+            >
+              Accepter
+            </Button>
+            <Button
+              variant="secondary"
+              className="min-h-11 text-sm"
+              disabled={busy}
+              onClick={() => run(() => answerFriendRequestAction(request.id, false), () => "Demande refusée.")}
+            >
+              Refuser
+            </Button>
+          </span>
         </div>
+      ))}
 
-        {friends?.outgoing.length ? (
-          <div>
-            <h3 className="mb-2 font-bold text-foam">Demandes envoyées</h3>
-            <ul className="space-y-2">
-              {friends.outgoing.map((request) => (
-                <li key={request.id} className="flex flex-wrap items-center justify-between gap-2 text-mist">
-                  <span>{request.username} · en attente</span>
-                  <button
-                    type="button"
-                    disabled={busy}
-                    className="text-sm underline underline-offset-4 hover:text-foam"
-                    onClick={() => run(() => cancelFriendRequestAction(request.id), () => "Demande annulée.")}
-                  >
-                    Annuler
-                  </button>
-                </li>
-              ))}
-            </ul>
-          </div>
-        ) : null}
-      </Panel>
+      {friends?.invites.map((invite) => (
+        <div key={invite.code} className="flex flex-wrap items-center gap-3 rounded-xl border border-straw/50 bg-straw/5 px-4 py-3">
+          <p className="min-w-0 flex-1 text-mist">
+            <strong className="text-foam">{invite.from}</strong> t&apos;invite dans son salon.
+          </p>
+          <Link href={`/multi/${invite.code}`} className="flex min-h-11 items-center rounded-lg bg-straw px-4 text-sm font-bold text-ink hover:bg-straw-dark">
+            Rejoindre
+          </Link>
+        </div>
+      ))}
+
+      {!friends ? (
+        <p className="text-mist">Chargement…</p>
+      ) : friends.friends.length === 0 ? (
+        <p className="text-mist">Aucun ami pour l&apos;instant. Ajoute quelqu&apos;un par son pseudo pour l&apos;inviter dans tes salons et échanger des avis.</p>
+      ) : (
+        <ul className="space-y-2">
+          {friends.friends.map((friend) => (
+            <li key={friend.id} className="flex items-center gap-3 rounded-xl border border-sea-700 px-3 py-2">
+              <span aria-hidden="true" className="flex size-9 shrink-0 items-center justify-center rounded-full bg-sea-700 font-extrabold text-mist">
+                {friend.username.charAt(0).toLocaleUpperCase("fr")}
+              </span>
+              <span className="min-w-0 flex-1">
+                <span className="block truncate font-bold text-foam">{friend.username}</span>
+                <span className="block text-[13px] text-mist">
+                  {rankOf(friend.bounty).title} · ฿ {formatNumber(friend.bounty)}
+                </span>
+              </span>
+              <button
+                type="button"
+                disabled={busy}
+                className="min-h-11 cursor-pointer px-1 text-sm text-mist underline underline-offset-4 hover:text-foam"
+                onClick={() => run(() => removeFriendAction(friend.id), () => `${friend.username} n'est plus dans tes amis.`)}
+              >
+                Retirer
+              </button>
+            </li>
+          ))}
+        </ul>
+      )}
+
+      {friends?.outgoing.length ? (
+        <ul className="space-y-1">
+          {friends.outgoing.map((request) => (
+            <li key={request.id} className="flex flex-wrap items-center justify-between gap-2 text-sm text-mist">
+              <span>Demande envoyée à {request.username} · en attente</span>
+              <button
+                type="button"
+                disabled={busy}
+                className="min-h-11 cursor-pointer underline underline-offset-4 hover:text-foam"
+                onClick={() => run(() => cancelFriendRequestAction(request.id), () => "Demande annulée.")}
+              >
+                Annuler
+              </button>
+            </li>
+          ))}
+        </ul>
+      ) : null}
+
+      <form
+        className="flex flex-wrap items-end gap-2.5"
+        onSubmit={(event) => {
+          event.preventDefault();
+          const name = username.trim();
+          if (!name) return;
+          run(
+            () => requestFriendAction(name),
+            (result) => (result.accepted ? `${name} et toi êtes maintenant amis.` : `Demande envoyée à ${name}.`),
+          ).then(() => setUsername(""));
+        }}
+      >
+        <label className="min-w-0 flex-1">
+          <span className="mb-1.5 block text-sm font-bold text-foam">Ajouter un ami par son pseudo</span>
+          <input
+            value={username}
+            onChange={(event) => setUsername(event.target.value)}
+            placeholder="Pseudo"
+            maxLength={20}
+            autoComplete="off"
+            autoCapitalize="off"
+            spellCheck={false}
+            className="h-11 w-full rounded-[10px] border border-sea-600 bg-sea-900 px-3 text-foam placeholder:text-mist/70 focus:border-straw focus:outline-none"
+          />
+        </label>
+        <Button type="submit" variant="secondary" className="min-h-11 text-sm" disabled={busy || !username.trim()}>
+          Envoyer la demande
+        </Button>
+      </form>
+      <p className={`min-h-5 text-sm font-semibold ${message?.ok ? "text-emerald-300" : "text-vest"}`} aria-live="polite">
+        {message?.text}
+      </p>
     </section>
   );
 }

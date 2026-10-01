@@ -1,312 +1,157 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
-import { portraitUrl, type ResolvedData } from "@/games/cards";
+import { useEffect } from "react";
 import { formatNumber } from "@/games/engine/text";
-import { Button, Panel } from "@/games/ui/primitives";
-import { WithGameData } from "@/games/ui/WithGameData";
-import {
-  crewBonuses,
-  DEFAULT_TRAIT,
-  bonusLabel,
-  FULL_CREW_BONUS,
-  playerBounty,
-  POST_IDS,
-  POSTS,
-  postStrength,
-  rankOf,
-  RARITY_LABELS,
-  TRAIT_STEPS,
-  TRAITS,
-  type CrewTrait,
-  type PostId,
-} from "@/lib/economy";
+import { LoadingPanel } from "@/games/ui/WithGameData";
+import { isMet, OBJECTIVES, playerBounty, POST_IDS, RANKS, rankOf, SIGNUP_BERRYS } from "@/lib/economy";
 import { usePlayer } from "@/lib/player/PlayerProvider";
 import { AccountPanel } from "./AccountPanel";
-import { CharacterCard } from "./CharacterCard";
 import { FriendsPanel } from "./FriendsPanel";
-import { Modal } from "./Modal";
+import { CheckIcon } from "./GameBadge";
 
-const percent = (value: number) => `+${Math.round(value * 100)} %`;
-
-function Bounty() {
+/** L'avis de recherche du joueur : sa prime, son rang et son parcours. */
+function Poster() {
   const { state, username } = usePlayer();
   const bounty = playerBounty(state);
   const rank = rankOf(bounty);
-  const owned = Object.keys(state.collection).length;
+  const from = RANKS.find((r) => r.title === rank.title)?.from ?? 0;
+  const progress = rank.next ? Math.min(1, (bounty - from) / (rank.next.from - from)) : 1;
+  const objectives = Object.values(state.stats).reduce(
+    (sum, stats) => sum + OBJECTIVES.filter((objective) => isMet(objective, stats)).length,
+    0,
+  );
+  const stats = [
+    { label: "parties", value: state.games },
+    { label: "avis recrutés", value: Object.keys(state.collection).length },
+    { label: "objectifs", value: objectives },
+  ];
 
   return (
-    <div className="rounded-2xl bg-parchment p-5 text-ink sm:p-6">
-      <p className="text-sm font-bold tracking-[0.25em] uppercase">{username ?? "Pirate anonyme"}</p>
-      <p className="font-display text-5xl tracking-wide">฿ {formatNumber(bounty)}</p>
-      <p className="mt-1 font-semibold">
-        Rang : {rank.title}
-        {rank.next && ` · ${rank.next.title} à ${formatNumber(rank.next.from)} ฿ de prime`}
+    <section aria-label="Mon avis de recherche" className="rounded-xl border-4 border-parchment-dark bg-parchment p-6 text-center text-ink sm:p-7">
+      <p className="font-display text-5xl leading-none tracking-[0.2em] sm:text-[52px]" aria-hidden="true">
+        WANTED
       </p>
-      <dl className="mt-4 grid grid-cols-3 gap-3 text-center">
-        {[
-          { label: "Berrys", value: state.berrys },
-          { label: "Parties", value: state.games },
-          { label: "Avis recrutés", value: owned },
-        ].map((stat) => (
-          <div key={stat.label} className="flex flex-col-reverse rounded-xl border-2 border-ink/15 bg-white/50 px-2 py-3">
-            <dt className="text-sm">{stat.label}</dt>
-            <dd className="font-display text-3xl tracking-wide">{formatNumber(stat.value)}</dd>
+      <div className="mt-4 flex h-44 items-center justify-center bg-[#d9c9a0] font-display text-7xl text-[#a8966a] sm:h-[200px]" aria-hidden="true">
+        {username ? username.charAt(0).toLocaleUpperCase("fr") : "?"}
+      </div>
+      <p className="mt-3 text-xs font-extrabold tracking-[0.3em]" aria-hidden="true">
+        DEAD OR ALIVE
+      </p>
+      <p className="mt-1 truncate font-display text-4xl tracking-wide sm:text-[40px]">{username ?? "Pirate anonyme"}</p>
+      <p className="font-display text-3xl tracking-wide sm:text-[34px]">฿ {formatNumber(bounty)}</p>
+
+      <div className="mt-4 space-y-1.5">
+        <p className="flex justify-between gap-3 text-sm font-bold">
+          <span>{rank.title}</span>
+          <span>{rank.next ? `${rank.next.title} à ${formatNumber(rank.next.from)} ฿` : "Rang le plus élevé"}</span>
+        </p>
+        <div
+          role="progressbar"
+          aria-label="Progression vers le rang suivant"
+          aria-valuemin={0}
+          aria-valuemax={100}
+          aria-valuenow={Math.round(progress * 100)}
+          className="h-2.5 overflow-hidden rounded-full bg-parchment-dark"
+        >
+          <div className="h-full bg-ink" style={{ width: `${progress * 100}%` }} />
+        </div>
+      </div>
+
+      <dl className="mt-5 grid grid-cols-3 gap-2">
+        {stats.map((stat) => (
+          <div key={stat.label} className="flex flex-col-reverse">
+            <dt className="text-[13px]">{stat.label}</dt>
+            <dd className="font-display text-[26px] tracking-wide">{formatNumber(stat.value)}</dd>
           </div>
         ))}
       </dl>
-      <p className="mt-3 text-sm">
-        Ta prime monte avec tous les Berrys que tu gagnes, même une fois dépensés.{" "}
-        <Link href="/collection" className="font-semibold underline underline-offset-4">
-          Voir ma collection
-        </Link>
-      </p>
-    </div>
+      <p className="mt-4 text-[13px]">Ta prime monte avec tous les Berrys que tu gagnes, même une fois dépensés.</p>
+    </section>
   );
 }
 
-/** Paliers d'un trait : ceux déjà atteints sont allumés. */
-function Steps({ trait }: { trait: CrewTrait }) {
+function ShipLink() {
+  const { state } = usePlayer();
+  const filled = POST_IDS.filter((post) => state.crew[post]).length;
   return (
-    <span className="flex shrink-0 gap-1" aria-label={`Palier ${trait.level} sur ${TRAIT_STEPS.length}`}>
-      {TRAIT_STEPS.map((step, index) => (
-        <span
-          key={step}
-          className={`flex size-7 items-center justify-center rounded-full border text-xs font-bold ${
-            index < trait.level ? "border-straw bg-straw text-ink" : "border-sea-600 text-mist"
-          }`}
-        >
-          {step}
-        </span>
-      ))}
-    </span>
+    <Link
+      href="/navire"
+      className="flex flex-wrap items-center justify-between gap-2 rounded-2xl border border-sea-700 px-5 py-4 font-bold text-foam transition-colors hover:border-straw"
+    >
+      <span>Mon navire : équipage, collection, boutique, échanges</span>
+      <span className="text-sm text-mist">
+        {filled} poste{filled > 1 ? "s" : ""} pourvu{filled > 1 ? "s" : ""} sur {POST_IDS.length}
+      </span>
+    </Link>
   );
 }
 
-/** Traits d'équipage : les membres d'une même affiliation renforcent ensemble un bonus, par paliers. */
-function Traits({ traits, full }: { traits: CrewTrait[]; full: boolean }) {
+const BENEFITS = [
+  { key: "berrys", text: <><strong>{formatNumber(SIGNUP_BERRYS)} ฿ offerts</strong> dès l&apos;inscription</> },
+  { key: "appareils", text: <>Ta collection sur <strong>tous tes appareils</strong></> },
+  { key: "amis", text: <>Des <strong>amis</strong>, des échanges d&apos;avis et des salons à plusieurs</> },
+  { key: "quiz", text: <>Tes propres <strong>quiz</strong>, joués par la commu</> },
+];
+
+/** Le visiteur sans compte : ce qu'il a déjà gagné sur cet appareil, et ce qu'un compte lui apporte. */
+function GuestProfile() {
+  const { state, accountsEnabled } = usePlayer();
+  const owned = Object.keys(state.collection).length;
+
   return (
-    <Panel className="space-y-3">
+    <div className="grid grid-cols-1 gap-7 lg:grid-cols-[minmax(0,1fr)_460px] lg:items-start lg:gap-x-16 lg:pt-6">
       <div>
-        <h3 className="font-display text-2xl tracking-wide text-straw">Traits d&apos;équipage</h3>
-        <p className="text-sm text-mist">
-          Place plusieurs membres d&apos;une même affiliation : à {TRAIT_STEPS[0]} membres leur trait s&apos;active, puis il se
-          renforce à {TRAIT_STEPS.slice(1).join(" et ")}. Plusieurs traits peuvent être actifs en même temps.
+        <h1 className="font-display text-4xl leading-[1.05] tracking-wide text-foam sm:text-[52px]">
+          Monte à bord,
+          <br />
+          garde ton butin
+        </h1>
+        <p className="mt-3 max-w-xl text-lg text-mist">
+          Tu joues déjà sans compte. Avec un pseudo, tes Berrys et ton équipage te suivent partout.
         </p>
       </div>
 
-      {traits.length === 0 ? (
-        <p className="text-sm text-mist">Aucun membre d&apos;équipage n&apos;a d&apos;affiliation pour l&apos;instant.</p>
-      ) : (
-        <ul className="grid grid-cols-1 gap-2 sm:grid-cols-2">
-          {traits.map((trait) => {
-            const next = TRAIT_STEPS[trait.level];
-            return (
-              <li
-                key={trait.affiliation}
-                className={`flex items-center gap-3 rounded-xl border p-3 ${
-                  trait.level > 0 ? "border-straw/60 bg-straw/10" : "border-sea-700 bg-sea-900/40"
-                }`}
-              >
-                <Steps trait={trait} />
-                <div className="min-w-0 flex-1 text-sm">
-                  <p className="font-bold text-foam">
-                    {trait.name}
-                    {trait.level > 0 && <span className="ml-2 font-display text-lg tracking-wide text-straw">{percent(trait.value)}</span>}
-                  </p>
-                  <p className="truncate text-mist">
-                    {trait.affiliation} · {trait.count} membre{trait.count > 1 ? "s" : ""}
-                  </p>
-                  <p className="text-mist">
-                    {trait.effect}
-                    {next !== undefined && ` · à ${next} : ${percent(trait.values[trait.level])}`}
-                  </p>
-                </div>
-              </li>
-            );
-          })}
-        </ul>
-      )}
-
-      <p className="text-sm text-mist">
-        {full ? "Équipage complet : " : "Les dix postes pourvus : "}
-        {percent(FULL_CREW_BONUS)} de Berrys sur tous les jeux.
-      </p>
-
-      <details className="text-sm text-mist">
-        <summary className="cursor-pointer font-semibold text-foam">Tous les traits</summary>
-        <ul className="mt-2 space-y-1">
-          {[...Object.entries(TRAITS), ["Toute autre affiliation", DEFAULT_TRAIT] as const].map(([affiliation, trait]) => (
-            <li key={affiliation}>
-              <strong className="text-foam">{trait.name}</strong> ({affiliation}) : {bonusLabel(trait.bonus).toLowerCase()},{" "}
-              {trait.values.map(percent).join(" / ")}
-            </li>
-          ))}
-        </ul>
-      </details>
-    </Panel>
-  );
-}
-
-function Crew({ data }: { data: ResolvedData }) {
-  const { state, assign } = usePlayer();
-  const [error, setError] = useState<string | null>(null);
-  const [picking, setPicking] = useState<PostId | null>(null);
-
-  const owned = useMemo(
-    () =>
-      data.characters
-        .filter((c) => state.collection[c.id])
-        .sort((a, b) => a.tier - b.tier || a.name.localeCompare(b.name, "fr")),
-    [data.characters, state.collection],
-  );
-  const bonuses = crewBonuses(state, data.characterById);
-  const postOf = (characterId: string) => POST_IDS.find((post) => state.crew[post] === characterId);
-  const aboard = new Map(bonuses.traits.map((trait) => [trait.affiliation, trait.count]));
-
-  async function change(post: PostId, characterId: string | null) {
-    setError(null);
-    setPicking(null);
-    const result = await assign(post, characterId);
-    if (!result.ok) setError("Ce changement n'a pas pu être enregistré.");
-  }
-
-  return (
-    <section aria-labelledby="equipage" className="space-y-4">
-      <div>
-        <h2 id="equipage" className="font-display text-3xl tracking-wide text-straw">
-          Mon équipage
-        </h2>
-        <p className="mt-1 text-mist">
-          Chaque poste donne un bonus, d&apos;autant plus fort que le personnage est rare. Un avis doré le renforce
-          encore. Et des membres d&apos;une même affiliation activent ensemble un trait.
-        </p>
+      {/* Sur téléphone, le formulaire vient juste après l'accroche ; sur ordinateur, il occupe la colonne de droite */}
+      <div className="lg:col-start-2 lg:row-span-2 lg:row-start-1">
+        <AccountPanel />
       </div>
 
-      {owned.length === 0 ? (
-        <Panel>
-          <p className="text-mist">Tu n&apos;as encore recruté personne. Joue une partie pour commencer ta collection.</p>
-          <Link href="/jeux" className="mt-3 inline-block font-bold text-straw underline underline-offset-4">
-            Choisir un jeu
-          </Link>
-        </Panel>
-      ) : (
-        <ul className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-          {POST_IDS.map((post) => {
-            const memberId = state.crew[post];
-            const member = memberId ? data.characterById.get(memberId) : undefined;
-            const golden = !!member && state.collection[member.id]?.golden > 0;
-            return (
-              <li key={post} className="flex gap-3 rounded-xl border border-sea-700 bg-sea-800/70 p-3">
-                <div
-                  className={`relative h-28 w-21 shrink-0 overflow-hidden rounded-lg border-2 bg-sea-900 ${
-                    golden ? "border-straw" : "border-sea-600"
+      <section aria-label="Ce qu'apporte un compte" className="space-y-7">
+        <div className="flex items-center gap-5 rounded-2xl border border-sea-700 bg-sea-800 p-5">
+          <div className="w-[104px] shrink-0 overflow-hidden rounded-lg border-4 border-parchment-dark bg-parchment text-center text-ink" aria-hidden="true">
+            <p className="pt-1.5 font-display tracking-[0.2em]">Wanted</p>
+            <p className="mx-2 my-1 flex h-20 items-center justify-center bg-[#d9c9a0] font-display text-5xl text-[#a8966a]">?</p>
+            <p className="px-1 pb-2 font-display text-sm">Pirate anonyme</p>
+          </div>
+          <div className="space-y-1.5">
+            <h2 className="text-[17px] font-extrabold text-foam">Ta progression sur cet appareil</h2>
+            <p className="text-[15px] text-mist">
+              {formatNumber(state.games)} partie{state.games > 1 ? "s" : ""} · {formatNumber(state.berrys)} ฿ · {owned} avis de recherche
+            </p>
+            {accountsEnabled && <p className="text-[15px] font-bold text-emerald-300">Elle est reprise telle quelle à la création du compte.</p>}
+          </div>
+        </div>
+
+        {accountsEnabled && (
+          <ul className="space-y-3.5">
+            {BENEFITS.map((benefit, index) => (
+              <li key={benefit.key} className="flex items-center gap-3 text-foam [&_strong]:font-extrabold">
+                <span
+                  aria-hidden="true"
+                  className={`flex size-9 shrink-0 items-center justify-center rounded-full font-display text-lg ${
+                    index === 0 ? "bg-straw/20 text-straw" : "bg-sea-700 text-[#8fd0f0]"
                   }`}
                 >
-                  {member?.img ? (
-                    <Image src={portraitUrl(member.img)} alt="" fill sizes="96px" className="object-cover object-top" />
-                  ) : (
-                    <span className="flex h-full items-center justify-center font-display text-4xl text-mist/50" aria-hidden="true">
-                      {member ? member.name.charAt(0) : "?"}
-                    </span>
-                  )}
-                </div>
-                <div className="flex min-w-0 flex-1 flex-col">
-                  <div className="flex items-baseline justify-between gap-2">
-                    <h3 className="font-bold text-foam">{POSTS[post].label}</h3>
-                    {member && (
-                      <span className="font-display text-xl tracking-wide text-straw">
-                        {percent(postStrength(member, state.collection[member.id], post))}
-                      </span>
-                    )}
-                  </div>
-                  <p className="text-sm text-mist">{POSTS[post].effect}</p>
-                  <p className="mt-1 truncate font-semibold text-foam">
-                    {member ? (
-                      <>
-                        {member.name}
-                        <span className="font-normal text-mist">
-                          {" "}
-                          · {RARITY_LABELS[member.tier]}
-                          {golden ? " · doré" : ""}
-                        </span>
-                      </>
-                    ) : (
-                      <span className="font-normal text-mist">Poste libre</span>
-                    )}
-                  </p>
-                  <div className="mt-auto pt-2">
-                    <button
-                      type="button"
-                      onClick={() => setPicking(post)}
-                      aria-label={`${member ? "Changer" : "Choisir"} le personnage au poste de ${POSTS[post].label}`}
-                      className="rounded-lg border border-sea-600 bg-sea-700 px-3 py-1.5 text-sm font-bold text-foam hover:bg-sea-600"
-                    >
-                      {member ? "Changer" : "Choisir"}
-                    </button>
-                  </div>
-                </div>
+                  {index === 0 ? "฿" : <CheckIcon />}
+                </span>
+                <span>{benefit.text}</span>
               </li>
-            );
-          })}
-        </ul>
-      )}
-      {error && (
-        <p role="alert" className="font-semibold text-vest">
-          {error}
-        </p>
-      )}
-
-      {picking && (
-        <Modal title={POSTS[picking].label} onClose={() => setPicking(null)} wide>
-          <p className="text-mist">
-            {POSTS[picking].effect}. Choisis le personnage qui tiendra ce poste ; s&apos;il en occupe déjà un autre, il
-            le quitte.
-          </p>
-          {state.crew[picking] && (
-            <Button variant="secondary" onClick={() => change(picking, null)}>
-              Libérer le poste
-            </Button>
-          )}
-          <ul className="grid grid-cols-3 gap-3 sm:grid-cols-4 md:grid-cols-5">
-            {owned.map((character) => {
-              const entry = state.collection[character.id];
-              const current = state.crew[picking] === character.id;
-              const other = postOf(character.id);
-              return (
-                <li key={character.id} className={`relative rounded-md ${current ? "ring-4 ring-emerald-400" : ""}`}>
-                  <CharacterCard
-                    character={character}
-                    golden={entry.golden > 0}
-                    note={`${percent(postStrength(character, entry, picking))}${
-                      current ? " · en poste" : other ? ` · ${POSTS[other].label}` : ""
-                    }`}
-                  />
-                  {/* Pour composer un trait : l'affiliation, et le nombre de ses membres déjà à bord */}
-                  {character.affiliation && (
-                    <p className="mt-1 truncate text-center text-xs text-mist" title={character.affiliation}>
-                      {character.affiliation}
-                      {aboard.get(character.affiliation) ? ` · ${aboard.get(character.affiliation)} à bord` : ""}
-                    </p>
-                  )}
-                  <button
-                    type="button"
-                    onClick={() => change(picking, character.id)}
-                    aria-label={`Placer ${character.name} au poste de ${POSTS[picking].label}`}
-                    aria-pressed={current}
-                    className="absolute inset-0 cursor-pointer rounded-md focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-straw"
-                  />
-                </li>
-              );
-            })}
+            ))}
           </ul>
-        </Modal>
-      )}
-
-      <Traits traits={bonuses.traits} full={bonuses.full} />
-    </section>
+        )}
+      </section>
+    </div>
   );
 }
 
@@ -320,14 +165,18 @@ export function ProfileView() {
     if (id) document.getElementById(id)?.scrollIntoView();
   }, [status]);
 
+  if (status === "loading") return <LoadingPanel label="Chargement du profil…" />;
+  if (status === "guest") return <GuestProfile />;
+
   return (
-    <div className="space-y-8">
-      {/* Un invité vient d'abord ici pour se connecter ou créer son compte */}
-      {status === "guest" && <AccountPanel />}
-      <Bounty />
-      <WithGameData loading="Chargement de l'équipage…">{({ data }) => <Crew data={data} />}</WithGameData>
-      <FriendsPanel />
-      {status === "user" && <AccountPanel />}
+    <div className="grid grid-cols-1 gap-6 lg:grid-cols-[420px_minmax(0,1fr)] lg:items-start">
+      <h1 className="sr-only">Mon profil</h1>
+      <Poster />
+      <div className="space-y-5">
+        <FriendsPanel />
+        <AccountPanel />
+        <ShipLink />
+      </div>
     </div>
   );
 }

@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { CheckIcon } from "@/components/GameBadge";
 import { useEffect, useMemo, useState } from "react";
 import { formatNumber } from "@/games/engine/text";
 import { Portrait } from "@/games/ui/Portrait";
@@ -33,7 +34,7 @@ function Join({ code, onJoined }: { code: string; onJoined: (ticket: RoomTicket)
   }
 
   return (
-    <Panel>
+    <Panel className="mx-auto max-w-4xl">
       <form onSubmit={join} className="space-y-4">
         <h1 className="font-display text-4xl tracking-wide text-foam">
           Salon <span className="tracking-[0.2em] text-straw">{code}</span>
@@ -75,24 +76,51 @@ function Join({ code, onJoined }: { code: string; onJoined: (ticket: RoomTicket)
   );
 }
 
-function PlayerList({ players, youId, showScores }: { players: RoomPlayerView[]; youId: string; showScores: boolean }) {
+function PlayerList({
+  players,
+  youId,
+  showScores,
+  showAnswered = false,
+}: {
+  players: RoomPlayerView[];
+  youId: string;
+  showScores: boolean;
+  /** Pendant une question : qui a déjà répondu. */
+  showAnswered?: boolean;
+}) {
   return (
-    <ol className="space-y-1.5">
+    <ol className="space-y-2">
       {players.map((player) => (
         <li
           key={player.id}
-          className={`flex items-center gap-3 rounded-lg border px-3 py-2 ${
-            player.id === youId ? "border-straw bg-straw/10" : "border-sea-700 bg-sea-800/70"
+          className={`flex min-h-14 items-center gap-3 rounded-xl px-3 py-2 ${
+            player.id === youId ? "border-2 border-straw bg-sea-900" : "border-2 border-transparent bg-sea-900"
           } ${player.connected ? "" : "opacity-50"}`}
         >
-          {showScores && <span className="w-6 text-center font-display text-xl text-straw">{player.rank}</span>}
-          <span className="min-w-0 flex-1 truncate font-bold text-foam">
+          {showScores && (
+            <span className={`w-5 text-center font-display text-[22px] ${player.rank === 1 ? "text-straw" : "text-mist"}`}>{player.rank}</span>
+          )}
+          <span
+            aria-hidden="true"
+            className={`flex size-9 shrink-0 items-center justify-center rounded-full font-extrabold ${
+              player.id === youId ? "bg-straw/20 text-straw" : "bg-sea-700 text-mist"
+            }`}
+          >
+            {player.name.charAt(0).toLocaleUpperCase("fr")}
+          </span>
+          <span className="min-w-0 flex-1 truncate font-extrabold text-foam">
             {player.name}
+            {player.id === youId && <span className="ml-1.5 font-normal text-mist">(toi)</span>}
             {player.isHost && <span className="ml-2 text-xs font-semibold text-mist">hôte</span>}
-            {player.id === youId && <span className="ml-2 text-xs font-semibold text-straw">toi</span>}
             {!player.connected && <span className="ml-2 text-xs font-semibold text-mist">absent</span>}
           </span>
-          {showScores && <span className="font-display text-xl tracking-wide text-foam">{formatNumber(player.score)}</span>}
+          {showScores && <span className="font-extrabold text-foam">{formatNumber(player.score)}</span>}
+          {showAnswered &&
+            (player.answered ? (
+              <CheckIcon className="size-4 shrink-0 text-emerald-300" />
+            ) : (
+              <span className="shrink-0 text-xs font-bold text-mist">réfléchit</span>
+            ))}
         </li>
       ))}
     </ol>
@@ -190,34 +218,32 @@ function Question({
   const answered = view.players.filter((p) => p.answered).length;
 
   return (
-    <Panel className="space-y-4">
-      <div className="flex items-center justify-between text-sm font-semibold text-mist">
-        <span>
+    <section aria-label="Question" className="space-y-5">
+      <div className="flex items-center gap-4">
+        <span className="text-[15px] font-extrabold whitespace-nowrap text-foam">
           Question {question.index + 1} / {question.total}
         </span>
-        <span aria-live="off">
-          {reveal
-            ? `Suite dans ${Math.max(0, Math.ceil((reveal.nextAt - serverNow) / 1000))} s`
-            : `${Math.ceil(remaining / 1000)} s`}
+        <div className="h-3.5 flex-1 overflow-hidden rounded-full bg-sea-700" aria-hidden="true">
+          {!reveal && (
+            <div
+              className={`h-full transition-[width] duration-200 ease-linear ${remaining < 4000 ? "bg-vest" : "bg-straw"}`}
+              style={{ width: `${(remaining / total) * 100}%` }}
+            />
+          )}
+        </div>
+        <span aria-live="off" className={`text-right whitespace-nowrap ${reveal ? "text-sm font-bold text-mist" : "w-14 font-display text-[34px] leading-none tracking-wide text-straw"}`}>
+          {reveal ? `Suite dans ${Math.max(0, Math.ceil((reveal.nextAt - serverNow) / 1000))} s` : `${Math.ceil(remaining / 1000)} s`}
         </span>
       </div>
-      {!reveal && (
-        <div className="h-2 overflow-hidden rounded-full bg-sea-700" aria-hidden="true">
-          <div
-            className={`h-full transition-[width] duration-200 ease-linear ${remaining < 4000 ? "bg-vest" : "bg-straw"}`}
-            style={{ width: `${(remaining / total) * 100}%` }}
-          />
-        </div>
-      )}
 
-      <div className="space-y-2 text-center">
-        <p className="text-mist">{question.title}</p>
+      <div className="space-y-2 rounded-[20px] border border-sea-700 bg-sea-800 p-6 text-center sm:p-8">
+        <p className="text-xs font-extrabold tracking-[0.15em] text-mist uppercase">{question.title}</p>
         {question.img && <Portrait img={question.img} />}
-        <p className="font-display text-3xl tracking-wide text-straw">{question.subject}</p>
+        <p className="text-2xl leading-tight font-extrabold text-foam sm:text-[30px]">{question.subject}</p>
         {question.detail && <p className="text-mist">{question.detail}</p>}
       </div>
 
-      <div className="grid gap-2 sm:grid-cols-2">
+      <div className="grid gap-3 sm:grid-cols-2 sm:gap-4">
         {question.options.map((option) => {
           const isAnswer = reveal?.answerId === option.id;
           const isChosen = chosen === option.id;
@@ -228,10 +254,10 @@ function Question({
                 ? "border-vest bg-vest/30"
                 : "border-sea-700 bg-sea-800 opacity-60"
             : isChosen
-              ? "border-straw bg-straw/20"
+              ? "border-straw bg-straw/15"
               : chosen
                 ? "border-sea-700 bg-sea-800 opacity-60"
-                : "border-sea-600 bg-sea-700 hover:border-straw";
+                : "cursor-pointer border-sea-600 bg-sea-800 hover:border-straw";
           return (
             <button
               key={option.id}
@@ -241,16 +267,17 @@ function Question({
                 setPicked({ index: question.index, optionId: option.id });
                 onAnswer(option.id);
               }}
-              className={`flex items-center justify-between gap-3 rounded-xl border-2 px-4 py-3 text-left transition-colors disabled:cursor-default ${tone}`}
+              className={`flex min-h-[72px] items-center justify-between gap-3 rounded-2xl border-2 px-4 py-3 text-left transition-colors disabled:cursor-default ${tone}`}
             >
               <span className="flex min-w-0 items-center gap-3">
                 {option.img && <Portrait img={option.img} className="h-20 w-16 shrink-0" />}
                 <span className="min-w-0">
-                  <span className="block font-bold text-foam">
+                  <span className="block text-lg font-extrabold text-foam">
                     {reveal && isAnswer ? "✓ " : reveal && isChosen ? "✗ " : ""}
                     {option.label}
                   </span>
                   {option.detail && <span className="block text-sm text-mist">{option.detail}</span>}
+                  {!reveal && isChosen && <span className="block text-[13px] font-extrabold text-straw">Ta réponse</span>}
                 </span>
               </span>
               {reveal && <span className="shrink-0 text-sm font-semibold text-mist">{reveal.counts[option.id] ?? 0}</span>}
@@ -259,14 +286,14 @@ function Question({
         })}
       </div>
 
-      <p className="min-h-6 font-semibold text-foam" aria-live="polite">
+      <p className={`min-h-6 text-center ${reveal ? "font-bold text-foam" : "text-[15px] text-mist"}`} aria-live="polite">
         {reveal
           ? `${reveal.yourPoints > 0 ? `Bonne réponse : +${formatNumber(reveal.yourPoints)} points.` : chosen ? "Raté." : "Pas de réponse."} ${reveal.explanation}`
           : chosen
-            ? `Réponse enregistrée. ${answered} joueur${answered > 1 ? "s ont" : " a"} répondu sur ${view.players.length}.`
-            : ""}
+            ? `Réponse enregistrée. La correction s'affiche quand tout le monde a répondu, ou à la fin du temps (${answered} sur ${view.players.length}).`
+            : "Plus tu réponds vite, plus la bonne réponse rapporte."}
       </p>
-    </Panel>
+    </section>
   );
 }
 
@@ -334,7 +361,7 @@ export function Room({ code }: { code: string }) {
 
   if (!CODE_PATTERN.test(code)) {
     return (
-      <Panel className="space-y-3">
+      <Panel className="mx-auto max-w-4xl space-y-3">
         <p className="text-foam">Ce code de salon n&apos;est pas valide.</p>
         <Link href="/multi" className="font-bold text-straw underline underline-offset-4">
           Retour au multijoueur
@@ -342,7 +369,7 @@ export function Room({ code }: { code: string }) {
       </Panel>
     );
   }
-  if (!isClient) return <Panel>Chargement du salon…</Panel>;
+  if (!isClient) return <Panel className="mx-auto max-w-4xl">Chargement du salon…</Panel>;
 
   if (!ticket) {
     return (
@@ -359,7 +386,7 @@ export function Room({ code }: { code: string }) {
 
   if (error === "not-found") {
     return (
-      <Panel className="space-y-3">
+      <Panel className="mx-auto max-w-4xl space-y-3">
         <p className="text-foam">Ce salon n&apos;existe plus, ou ta place n&apos;y est plus réservée.</p>
         <div className="flex flex-wrap gap-3">
           <Button
@@ -378,7 +405,7 @@ export function Room({ code }: { code: string }) {
       </Panel>
     );
   }
-  if (!view) return <Panel>Connexion au salon…</Panel>;
+  if (!view) return <Panel className="mx-auto max-w-4xl">Connexion au salon…</Panel>;
 
   async function act(action: string, payload: Record<string, unknown> = {}) {
     setActionError(null);
@@ -388,23 +415,29 @@ export function Room({ code }: { code: string }) {
   }
 
   return (
-    <div className="space-y-4">
+    <div className={`space-y-4 ${view.status === "playing" ? "" : "mx-auto max-w-4xl"}`}>
       {view.status === "lobby" && <Lobby view={view} ticket={ticket} act={act} />}
       {view.status === "playing" && view.question && (
-        <>
+        <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_340px]">
           <Question
             view={view}
             question={view.question}
             clockOffset={clockOffset}
             onAnswer={(optionId) => act("answer", { questionIndex: view.question!.index, optionId })}
           />
-          {view.question.reveal && (
-            <Panel className="space-y-3">
-              <h2 className="font-display text-2xl tracking-wide text-straw">Classement</h2>
-              <PlayerList players={view.players.slice(0, 5)} youId={view.you.id} showScores />
-            </Panel>
-          )}
-        </>
+          <aside className="space-y-3.5 rounded-[20px] border border-sea-700 bg-sea-800 p-5">
+            <div className="flex items-baseline justify-between gap-3">
+              <h2 className="text-lg font-extrabold text-foam">Classement</h2>
+              {!view.question.reveal && (
+                <span className="text-[13px] text-mist">
+                  {view.players.filter((p) => p.answered).length} réponse{view.players.filter((p) => p.answered).length > 1 ? "s" : ""} sur{" "}
+                  {view.players.length}
+                </span>
+              )}
+            </div>
+            <PlayerList players={view.players} youId={view.you.id} showScores showAnswered={!view.question.reveal} />
+          </aside>
+        </div>
       )}
       {view.status === "finished" && <Final view={view} act={act} />}
       <p className="min-h-6 text-sm font-semibold text-vest" aria-live="polite">

@@ -71,7 +71,7 @@ export const BOOSTER_SLOTS: Record<number, number>[] = [
   { 3: 32, 4: 50 },
   { 3: 32, 4: 50 },
   { 2: 25, 3: 35, 4: 40 },
-  { 1: 20, 2: 80 },
+  { 1: 10, 2: 90 },
 ];
 export const BOOSTER_SIZE = BOOSTER_SLOTS.length;
 export const BOOSTER_COST = 6000;

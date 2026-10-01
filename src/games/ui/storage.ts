@@ -89,6 +89,22 @@ export function useDailyKey(): string {
   return useSyncExternalStore(subscribeToClock, dailyKey, dailyKey);
 }
 
+const parisClock = new Intl.DateTimeFormat("fr-FR", { timeZone: "Europe/Paris", hour: "2-digit", minute: "2-digit", hourCycle: "h23" });
+
+function untilMidnight(): string {
+  const parts = parisClock.formatToParts(new Date());
+  const read = (type: string) => Number(parts.find((part) => part.type === type)?.value ?? 0);
+  const left = 24 * 60 - (read("hour") * 60 + read("minute"));
+  const hours = Math.floor(left / 60);
+  return hours > 0 ? `${hours} h ${String(left % 60).padStart(2, "0")}` : `${left} min`;
+}
+const noCountdown = () => null;
+
+/** Temps restant avant minuit à Paris (« 5 h 12 »), quand la sélection du jour change. Nul avant que le navigateur soit prêt. */
+export function useUntilMidnight(): string | null {
+  return useSyncExternalStore(subscribeToClock, untilMidnight, noCountdown);
+}
+
 /** Meilleur score d'un jeu ; `submit` ne l'écrase que s'il est battu (un score nul n'est pas un record). */
 export function useBest(id: string): [number | null, (score: number) => boolean] {
   const [best, setBest] = useStored<number | null>(`opm.best.${id}`, null);
