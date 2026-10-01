@@ -224,8 +224,8 @@ describe.skipIf(!accountsEnabled)("salon et amis, en base", () => {
     expect(pending.incoming).toMatchObject([{ username: a.username }]);
     expect((await friendsOverview(a.id)).outgoing).toMatchObject([{ username: b.username }]);
     // La cloche du destinataire compte la demande ; celle de l'expéditeur, rien
-    expect(await pendingCounts(b.id, false)).toEqual({ requests: 1, invites: 0, trades: 0, hiddenQuizzes: 0 });
-    expect(await pendingCounts(a.id, false)).toEqual({ requests: 0, invites: 0, trades: 0, hiddenQuizzes: 0 });
+    expect(await pendingCounts(b.id, false)).toEqual({ requests: 1, invites: 0, trades: 0, hiddenQuizzes: 0, sales: 0, loot: 0 });
+    expect(await pendingCounts(a.id, false)).toEqual({ requests: 0, invites: 0, trades: 0, hiddenQuizzes: 0, sales: 0, loot: 0 });
     // Seul le destinataire peut répondre
     expect(await answerFriendRequest(a.id, pending.incoming[0].id, true)).toEqual({ ok: false, error: "not-found" });
     expect(await answerFriendRequest(b.id, pending.incoming[0].id, true)).toEqual({ ok: true, accepted: true });

@@ -15,6 +15,7 @@ import { forgetTicket, loadTicket, ROOM_ERRORS, roomAction, saveTicket, useFrien
 import { CODE_PATTERN } from "@/lib/multi/rules";
 import type { RoomPlayerView, RoomQuestionView, RoomTicket, RoomView } from "@/lib/multi/types";
 import { usePlayer } from "@/lib/player/PlayerProvider";
+import { leagueOf } from "@/lib/ranked/rules";
 
 const INPUT =
   "w-full rounded-lg border-2 border-sea-600 bg-sea-900 px-3 py-2.5 text-foam placeholder:text-mist/70 focus:border-straw focus:outline-none";
@@ -231,6 +232,47 @@ function Lobby({ view, ticket, act }: { view: RoomView; ticket: RoomTicket; act:
   );
 }
 
+/** Duel classé sur le point de commencer : les deux adversaires, leur cote, et le décompte avant la première question. */
+function Countdown({ view, clockOffset }: { view: RoomView; clockOffset: number }) {
+  const t = useT();
+  const locale = useLocale();
+  const now = useNow(true);
+  const seconds = now === 0 ? null : Math.max(0, Math.ceil((view.startsAt! - (now + clockOffset)) / 1000));
+  return (
+    <div className="rounded-2xl bg-parchment p-5 text-center text-ink sm:p-7" role="status">
+      <p className="text-sm font-bold tracking-[0.25em] uppercase">Davy Back Fight</p>
+      <div className="mt-4 grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-3">
+        {view.players.slice(0, 2).map((player, index) => {
+          const rating = view.ranked?.ratings[player.id];
+          return (
+            <div key={player.id} className={index === 1 ? "order-3" : ""}>
+              <p className="truncate font-display text-3xl tracking-wide sm:text-4xl">{player.name}</p>
+              {rating !== undefined && (
+                <p className="text-sm font-bold">
+                  {formatNumber(rating, locale)} · {leagueOf(rating).league.title[locale]}
+                </p>
+              )}
+              {player.id === view.you.id && <p className="text-sm">{t("(toi)", "(you)")}</p>}
+            </div>
+          );
+        })}
+        <span className="order-2 font-display text-3xl text-vest-dark" aria-hidden="true">
+          VS
+        </span>
+      </div>
+      <p className="mt-5 font-display text-7xl leading-none tracking-wide" aria-live="off">
+        {seconds ?? "…"}
+      </p>
+      <p className="mt-2 font-semibold">
+        {t(
+          `${view.settings.questionCount} questions, ${view.settings.seconds} secondes chacune. Prépare-toi.`,
+          `${view.settings.questionCount} questions, ${view.settings.seconds} seconds each. Get ready.`,
+        )}
+      </p>
+    </div>
+  );
+}
+
 function Question({
   view,
   question,
@@ -371,11 +413,15 @@ function Final({ view, act }: { view: RoomView; act: (action: string) => Promise
   return (
     <div className="space-y-6">
       <div className="rounded-2xl bg-parchment p-5 text-ink sm:p-6" role="status">
-        <p className="text-sm font-bold tracking-[0.25em] uppercase">{t("Partie terminée", "Game over")}</p>
+        <p className="text-sm font-bold tracking-[0.25em] uppercase">
+          {view.kind === "ranked" ? t("Duel terminé", "Duel over") : t("Partie terminée", "Game over")}
+        </p>
         <h2 className="font-display text-4xl tracking-wide">
-          {winner.id === view.you.id
-            ? t("Tu l'emportes !", "You win!")
-            : t(`${winner.name} l'emporte`, `${winner.name} wins`)}
+          {view.ranked?.result?.outcome === "draw"
+            ? t("Égalité", "It's a draw")
+            : winner.id === view.you.id
+              ? t("Tu l'emportes !", "You win!")
+              : t(`${winner.name} l'emporte`, `${winner.name} wins`)}
         </h2>
         {you && (
           <p className="mt-1 font-semibold">
@@ -383,6 +429,17 @@ function Final({ view, act }: { view: RoomView; act: (action: string) => Promise
               `Tu finis ${you.rank === 1 ? "1er" : `${you.rank}e`} sur ${view.players.length}, avec ${formatNumber(you.score, locale)} points.`,
               `You finish ${englishOrdinal(you.rank)} out of ${view.players.length}, with ${formatNumber(you.score, locale)} ${you.score === 1 ? "point" : "points"}.`,
             )}
+          </p>
+        )}
+        {view.ranked?.result && (
+          <p className="mt-2 font-bold">
+            {t("Ta cote : ", "Your rating: ")}
+            <span className="font-display text-3xl tracking-wide">{formatNumber(view.ranked.result.rating, locale)}</span>{" "}
+            <span className={view.ranked.result.delta >= 0 ? "text-emerald-700" : "text-vest-dark"}>
+              ({view.ranked.result.delta > 0 ? "+" : ""}
+              {view.ranked.result.delta})
+            </span>{" "}
+            · {leagueOf(view.ranked.result.rating).league.title[locale]}
           </p>
         )}
         {view.reward ? (
@@ -401,7 +458,12 @@ function Final({ view, act }: { view: RoomView; act: (action: string) => Promise
           </p>
         )}
         <div className="mt-4 flex flex-wrap items-center gap-3">
-          {view.you.isHost ? (
+          {view.kind === "ranked" ? (
+            // La revanche passe par la file d'attente : elle peut désigner un autre adversaire
+            <Link href="/classe" className="rounded-lg bg-straw px-4 py-2.5 font-bold text-ink hover:bg-straw-dark">
+              {t("Chercher un autre duel", "Find another duel")}
+            </Link>
+          ) : view.you.isHost ? (
             <Button onClick={() => act("restart")}>
               {t("Rejouer avec les mêmes joueurs", "Play again with the same players")}
             </Button>
@@ -410,9 +472,11 @@ function Final({ view, act }: { view: RoomView; act: (action: string) => Promise
               {t("L'hôte peut relancer une partie.", "The host can start a new game.")}
             </span>
           )}
-          <Link href="/multi" className="underline underline-offset-4">
-            {t("Quitter le salon", "Leave the room")}
-          </Link>
+          {view.kind !== "ranked" && (
+            <Link href="/multi" className="underline underline-offset-4">
+              {t("Quitter le salon", "Leave the room")}
+            </Link>
+          )}
         </div>
       </div>
       <Panel className="space-y-3">
@@ -496,9 +560,11 @@ export function Room({ code }: { code: string }) {
     refresh();
   }
 
+  const counting = view.status === "playing" && view.startsAt !== null;
   return (
-    <div className={`space-y-4 ${view.status === "playing" ? "" : "mx-auto max-w-4xl"}`}>
+    <div className={`space-y-4 ${view.status === "playing" && !counting ? "" : "mx-auto max-w-4xl"}`}>
       {view.status === "lobby" && <Lobby view={view} ticket={ticket} act={act} />}
+      {counting && <Countdown view={view} clockOffset={clockOffset} />}
       {view.status === "playing" && view.question && (
         <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_340px]">
           <Question

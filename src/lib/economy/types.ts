@@ -6,6 +6,7 @@
 import type { Difficulty } from "@/games/engine/difficulty";
 import type { GameCategoryId, LiveSlug } from "@/lib/games/catalog";
 import type { Localized } from "@/lib/i18n";
+import { NO_COSMETICS, sanitizeCosmetics, type CosmeticsState } from "./cosmetics";
 import type { DailyStatus } from "./daily";
 
 export const POST_IDS = [
@@ -56,6 +57,8 @@ export type PlayerState = {
   /** Par jeu. */
   stats: Record<string, GameStats>;
   week: WeekProgress;
+  /** Cosmétiques possédés et portés (voir cosmetics.ts). */
+  cosmetics: CosmeticsState;
 };
 
 export const EMPTY_PLAYER: PlayerState = {
@@ -67,11 +70,17 @@ export const EMPTY_PLAYER: PlayerState = {
   day: { key: "", earned: 0, done: [] },
   stats: {},
   week: { key: "", progress: [], done: [] },
+  cosmetics: NO_COSMETICS,
 };
 
 /** Complète un état enregistré avant l'ajout d'un champ (progression d'invité gardée dans le navigateur). */
 export function normalizePlayer(state: Partial<PlayerState> | null | undefined): PlayerState {
-  return { ...EMPTY_PLAYER, ...state, day: { ...EMPTY_PLAYER.day, ...state?.day } };
+  return {
+    ...EMPTY_PLAYER,
+    ...state,
+    day: { ...EMPTY_PLAYER.day, ...state?.day },
+    cosmetics: sanitizeCosmetics(state?.cosmetics?.owned, state?.cosmetics?.equipped),
+  };
 }
 
 /**

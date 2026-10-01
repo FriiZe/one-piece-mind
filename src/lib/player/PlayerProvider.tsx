@@ -17,16 +17,26 @@ import {
   applyGame,
   assignPost,
   buyBooster,
+  buyCosmetic,
   buyRecruit,
   EMPTY_PLAYER,
+  equipCosmetic,
   normalizePlayer,
   sellDuplicates,
   type PlayerState,
 } from "@/lib/economy";
 import { useLocale } from "@/lib/i18n/client";
 import type { SpoilerMode } from "@/lib/spoilers";
-import { buyBoosterAction, buyRecruitAction, sellDuplicatesAction, setCrewAction, submitGameAction } from "./actions";
-import type { BoosterResult, CrewResult, GameResult, MeResponse, RecruitResult, SellResult } from "./types";
+import {
+  buyBoosterAction,
+  buyCosmeticAction,
+  buyRecruitAction,
+  equipCosmeticAction,
+  sellDuplicatesAction,
+  setCrewAction,
+  submitGameAction,
+} from "./actions";
+import type { BoosterResult, CosmeticResult, CrewResult, GameResult, MeResponse, RecruitResult, SellResult } from "./types";
 
 type PlayerContext = {
   /** `loading` tant qu'on ne sait pas si le visiteur est connecté. */
@@ -43,6 +53,12 @@ type PlayerContext = {
   assign: (post: string, characterId: string | null) => Promise<CrewResult>;
   /** Défait les doublons d'un avis, ou de tous les avis visibles dans ce mode (`characterId` nul). */
   sell: (mode: SpoilerMode, characterId: string | null) => Promise<SellResult>;
+  /** Achète un cosmétique à la boutique : il est porté aussitôt. */
+  buyLook: (cosmeticId: string) => Promise<CosmeticResult>;
+  /** Porte un cosmétique possédé, ou revient à l'apparence d'origine (`cosmeticId` nul). */
+  wear: (slot: string, cosmeticId: string | null) => Promise<CosmeticResult>;
+  /** État du joueur connecté renvoyé par une action faite ailleurs (marché, raid). */
+  sync: (state: PlayerState) => void;
   /** Relit l'état du joueur connecté, après un gain obtenu ailleurs que dans un jeu (salon multijoueur). */
   refresh: () => void;
 };
@@ -178,6 +194,36 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
     [isUser, guest, setGuest, locale],
   );
 
+  const buyLook = useCallback(
+    async (cosmeticId: string): Promise<CosmeticResult> => {
+      if (isUser) {
+        const result = await buyCosmeticAction(cosmeticId).catch(() => ({ ok: false, reason: "unavailable" }) as const);
+        if (result.ok) setRemote(result.state);
+        return result;
+      }
+      const bought = buyCosmetic(guest, cosmeticId);
+      if (typeof bought === "string") return { ok: false, reason: bought };
+      setGuest(bought.state);
+      return { ok: true, state: bought.state };
+    },
+    [isUser, guest, setGuest],
+  );
+
+  const wear = useCallback(
+    async (slot: string, cosmeticId: string | null): Promise<CosmeticResult> => {
+      if (isUser) {
+        const result = await equipCosmeticAction(slot, cosmeticId).catch(() => ({ ok: false, reason: "unavailable" }) as const);
+        if (result.ok) setRemote(result.state);
+        return result;
+      }
+      const next = equipCosmetic(guest, slot, cosmeticId);
+      if (typeof next === "string") return { ok: false, reason: next };
+      setGuest(next);
+      return { ok: true, state: next };
+    },
+    [isUser, guest, setGuest],
+  );
+
   const value = useMemo<PlayerContext>(
     () => ({
       status: me === null ? "loading" : isUser ? "user" : "guest",
@@ -190,9 +236,12 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
       booster,
       assign,
       sell,
+      buyLook,
+      wear,
+      sync: setRemote,
       refresh,
     }),
-    [me, isUser, state, reportGame, recruit, booster, assign, sell, refresh],
+    [me, isUser, state, reportGame, recruit, booster, assign, sell, buyLook, wear, refresh],
   );
 
   return <Context.Provider value={value}>{children}</Context.Provider>;

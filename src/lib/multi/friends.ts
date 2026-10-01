@@ -23,6 +23,10 @@ export type NotificationCounts = {
   trades: number;
   /** Quiz de la communauté masqués, à relire : pour les administrateurs seulement. */
   hiddenQuizzes: number;
+  /** Annonces du marché vendues, que le vendeur n'a pas encore vues. */
+  sales: number;
+  /** Butins de raid à récupérer. */
+  loot: number;
 };
 
 export type FriendError = "unknown-user" | "self" | "already" | "limit" | "not-found" | "unavailable";

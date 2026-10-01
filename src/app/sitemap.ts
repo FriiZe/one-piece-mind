@@ -10,6 +10,8 @@ const PAGES: Page[] = [
   { path: "/jeux", changeFrequency: "weekly", priority: 0.9 },
   { path: "/defis", changeFrequency: "weekly", priority: 0.6 },
   { path: "/multi", changeFrequency: "monthly", priority: 0.7 },
+  { path: "/classe", changeFrequency: "monthly", priority: 0.6 },
+  { path: "/raid", changeFrequency: "weekly", priority: 0.6 },
   { path: "/quiz", changeFrequency: "daily", priority: 0.7 },
   ...LIVE_SLUGS.map((slug) => ({
     path: `/jeux/${slug}`,

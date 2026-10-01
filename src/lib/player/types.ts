@@ -1,5 +1,5 @@
 import type { PlayCharacter } from "@/games/cards";
-import type { GameOutcome, PlayerState, Recruit, Reward } from "@/lib/economy";
+import type { CosmeticError, GameOutcome, PlayerState, Recruit, Reward } from "@/lib/economy";
 
 /** Réponse à un compte rendu de partie, que le joueur soit invité ou connecté. */
 export type GameResult =
@@ -19,6 +19,9 @@ export type BoosterResult =
 
 /** Doublons défaits : `berrys` rendus pour `sold` avis. */
 export type SellResult = { ok: true; state: PlayerState; berrys: number; sold: number } | { ok: false; reason: "nothing" | "unavailable" };
+
+/** Achat ou port d'un cosmétique. */
+export type CosmeticResult = { ok: true; state: PlayerState } | { ok: false; reason: CosmeticError | "unavailable" };
 
 /** Ce que renvoie /api/me. */
 export type MeResponse = {

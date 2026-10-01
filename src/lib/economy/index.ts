@@ -1,3 +1,4 @@
+export * from "./cosmetics";
 export * from "./crew";
 export * from "./daily";
 export * from "./objectives";

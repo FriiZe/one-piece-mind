@@ -246,6 +246,25 @@ Le lot C peut s'intercaler plus tôt, jeu par jeu, selon l'envie.
 - Récompenses recentrées sur le retour quotidien : seuls le défi du jour et cinq jeux tirés chaque jour rapportent des Berrys et des recrues, une fois chacun, à partir de la moitié des points. La sélection est mise en avant sur l'accueil, la liste des jeux et la page Défis ; chaque page de jeu dit s'il paie aujourd'hui. 500 ฿ sont offerts à l'inscription. Les salons multijoueur et les quiz de la communauté gardent leurs propres gains.
 - Échanges entre amis : un avis contre un avis, sur proposition acceptée. Reste à faire : échanger plusieurs avis à la fois, choisir de donner l'exemplaire doré plutôt que l'ordinaire.
 
+**Phase 5 : classé, raid, marché et cosmétiques.** Les quiz de la communauté et la boutique avaient été avancés.
+
+- Classé « Davy Back Fight » (`/classe`) : duel à un contre un par file d'attente, dix questions de dix secondes, cote Elo, cinq ligues, une saison par mois avec prime de ligue et titres pour les deux plus hautes.
+- Raid de la semaine (`/raid`) : un Empereur ou un Amiral pour toute la communauté, trois assauts de dix questions par jour, des dégâts renforcés par l'équipage, un butin pour chaque participant si l'adversaire tombe.
+- Marché (`/marche`) : vente d'un exemplaire en trop à prix borné, 10 % de taxe, dix annonces par joueur.
+- Cosmétiques à la boutique : cadres d'avis de recherche, pavillons, navires et titres, visibles sur le profil, l'en-tête du navire et les classements.
+- Décisions prises en cours de route :
+  - Les ligues ne s'appellent pas Mousse à Empereur : ces cinq rangs sont déjà ceux de la prime du joueur. Elles vont d'East Blue à Laugh Tale.
+  - Le classé se joue en mode anime, quelle que soit la préférence du joueur : on ne choisit pas son adversaire, il ne doit pas pouvoir être spoilé. La file est séparée par langue, parce que les questions le sont.
+  - Aucune tâche planifiée : la saison et le raid changent à la première requête qui le constate, comme les défis de la semaine. Vercel Cron n'est pas utilisé.
+  - Le duel réutilise les salons : les questions sont déjà tirées par le serveur, la bonne réponse ne part qu'à la correction.
+  - Les points de vie du raid suivent le nombre de joueurs actifs, pour qu'il reste battable par une petite communauté.
+  - Le marché ne vend que des exemplaires en trop : personne ne se retrouve sans un avis qu'il avait.
+- Limites assumées :
+  - Deux comptes peuvent s'entendre pour monter une cote ; la file ne les réunit plus après cinq duels dans la journée.
+  - En raid, le chrono de chaque question n'est tenu que par le navigateur ; le serveur contrôle la durée totale de l'assaut.
+  - Les prix bornés et la taxe limitent le transfert de Berrys entre comptes par une vente arrangée, sans l'empêcher.
+- Reste à faire : le chat (prévu en dernier, il impose de la modération), l'historique des saisons passées, des annonces qui expirent.
+
 **À reprendre plus tard**
 
 - Libellés français des surnoms ; les affiliations sont traduites (`src/lib/data/labels.ts`), avec un repli sur l'anglais pour les plus rares.

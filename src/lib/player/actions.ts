@@ -9,7 +9,16 @@ import { SIGNUP_BERRYS } from "@/lib/economy";
 import { DEFAULT_LOCALE, isLocale, translator, type Locale } from "@/lib/i18n";
 import { accountsEnabled, db } from "@/lib/server/db";
 import { DUMMY_HASH, hashPassword, verifyPassword } from "@/lib/server/password";
-import { buyBoosterFor, buyRecruitFor, sanitizeGuestState, sellDuplicatesFor, setCrewFor, submitGame } from "@/lib/server/player";
+import {
+  buyBoosterFor,
+  buyCosmeticFor,
+  buyRecruitFor,
+  equipCosmeticFor,
+  sanitizeGuestState,
+  sellDuplicatesFor,
+  setCrewFor,
+  submitGame,
+} from "@/lib/server/player";
 import {
   allowAttempt,
   clearAttempts,
@@ -21,7 +30,7 @@ import {
 } from "@/lib/server/session";
 import type { SpoilerMode } from "@/lib/spoilers";
 import { Prisma } from "@/generated/prisma/client";
-import type { BoosterResult, CrewResult, GameResult, RecruitResult, SellResult } from "./types";
+import type { BoosterResult, CosmeticResult, CrewResult, GameResult, RecruitResult, SellResult } from "./types";
 
 const isMode = (value: unknown): value is SpoilerMode => value === "anime" || value === "manga";
 
@@ -59,6 +68,20 @@ export async function setCrewAction(post: string, characterId: string | null): P
     return { ok: false, reason: "unavailable" };
   }
   return setCrewFor(user.id, post, characterId);
+}
+
+export async function buyCosmeticAction(cosmeticId: string): Promise<CosmeticResult> {
+  const user = await currentUser();
+  if (!user || typeof cosmeticId !== "string" || cosmeticId.length > 80) return { ok: false, reason: "unavailable" };
+  return buyCosmeticFor(user.id, cosmeticId);
+}
+
+export async function equipCosmeticAction(slot: string, cosmeticId: string | null): Promise<CosmeticResult> {
+  const user = await currentUser();
+  if (!user || typeof slot !== "string" || (cosmeticId !== null && (typeof cosmeticId !== "string" || cosmeticId.length > 80))) {
+    return { ok: false, reason: "unavailable" };
+  }
+  return equipCosmeticFor(user.id, slot, cosmeticId);
 }
 
 // ---------------------------------------------------------------------------
@@ -129,6 +152,8 @@ export async function signupAction(_: AuthState, form: FormData): Promise<AuthSt
         lifetimeBerrys: (guest?.lifetimeBerrys ?? 0) + SIGNUP_BERRYS,
         games: guest?.games ?? 0,
         stats: guest?.stats ?? {},
+        cosmetics: guest?.cosmetics.owned ?? [],
+        equipped: guest?.cosmetics.equipped ?? {},
         collection: guest ? { create: guest.collection } : undefined,
         crew: guest ? { create: guest.crew } : undefined,
       },

@@ -34,6 +34,15 @@ model User {
   stats          Json   @default("{}")
   /// Avancement des défis de la semaine ({ key, progress, done }).
   week           Json   @default("{}")
+  /// Cosmétiques achetés ou gagnés (liste d'identifiants), et ceux qui sont portés ({ emplacement: identifiant }).
+  cosmetics      Json   @default("[]")
+  equipped       Json   @default("{}")
+
+  /// Classé : cote du joueur pour la saison `rankedSeason` (« 2026-10 »), vide tant qu'il n'a jamais joué.
+  rating       Int    @default(1000)
+  rankedSeason String @default("")
+  rankedGames  Int    @default(0)
+  rankedWins   Int    @default(0)
 
   sessions   Session[]
   collection CollectionEntry[]
@@ -52,6 +61,15 @@ model User {
 
   tradesProposed Trade[] @relation("tradeFrom")
   tradesReceived Trade[] @relation("tradeTo")
+
+  rankedQueue   RankedQueue?
+  rankedSeasons RankedSeasonResult[]
+  raids         RaidParticipant[]
+  raidAttacks   RaidAttack[]
+  listings      MarketListing[] @relation("listingSeller")
+  purchases     MarketListing[] @relation("listingBuyer")
+
+  @@index([rankedSeason, rating])
 }
 
 model Session {
@@ -149,13 +167,17 @@ model Room {
   /// lobby, playing ou finished.
   status     String   @default("lobby")
   questionIndex Int   @default(0)
-  /// question (on répond) ou reveal (correction affichée).
+  /// countdown (duel classé sur le point de commencer), question (on répond) ou reveal (correction affichée).
   phase      String   @default("question")
   phaseStartedAt DateTime?
   phaseEndsAt    DateTime?
   /// Augmente à chaque changement : un joueur à jour n'a rien à recharger.
   version    Int      @default(0)
   hostId     String?
+  /// friendly (salon à code) ou ranked (duel classé, ouvert par la file d'attente).
+  kind       String   @default("friendly")
+  /// Duel classé : les cotes ont été mises à jour.
+  settledAt  DateTime?
   createdAt  DateTime @default(now())
 
   players RoomPlayer[]
@@ -306,4 +328,134 @@ model Trade {
 
   @@index([toId, status])
   @@index([fromId, status])
+}
+
+/// File d'attente du classé : un joueur qui cherche un adversaire, puis le duel qu'on lui a trouvé.
+model RankedQueue {
+  userId     String   @id
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  /// Langue des questions : on n'affronte qu'un joueur de la même langue.
+  lang       String
+  rating     Int
+  joinedAt   DateTime @default(now())
+  /// Dernier signe de vie : un joueur qui a fermé la page n'est plus proposé à personne.
+  lastSeenAt DateTime @default(now())
+  /// Code du salon du duel, une fois l'adversaire trouvé.
+  roomCode   String?
+
+  @@index([lang, roomCode, lastSeenAt])
+}
+
+/// Duel classé terminé : scores, et cote de chaque joueur avant et après.
+model RankedMatch {
+  id        String   @id @default(cuid())
+  /// Salon du duel. Les salons sont supprimés au bout d'un jour, les duels restent.
+  roomId    String   @unique
+  season    String
+  playerAId String
+  playerBId String
+  nameA     String
+  nameB     String
+  scoreA    Int
+  scoreB    Int
+  ratingA   Int
+  ratingB   Int
+  deltaA    Int
+  deltaB    Int
+  createdAt DateTime @default(now())
+
+  @@index([playerAId, createdAt])
+  @@index([playerBId, createdAt])
+}
+
+/// Bilan d'une saison classée pour un joueur, écrit quand il revient après la fin de la saison.
+model RankedSeasonResult {
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  season    String
+  rating    Int
+  games     Int
+  wins      Int
+  /// Berrys versés pour la ligue atteinte.
+  berrys    Int
+  createdAt DateTime @default(now())
+
+  @@id([userId, season])
+  @@index([season, rating])
+}
+
+/// Raid de la semaine : toute la communauté contre un même adversaire.
+model Raid {
+  /// Semaine du raid, au format « 2026-S40 ».
+  week       String    @id
+  bossId     String
+  hp         Int
+  damage     Int       @default(0)
+  defeatedAt DateTime?
+  createdAt  DateTime  @default(now())
+
+  participants RaidParticipant[]
+  attacks      RaidAttack[]
+}
+
+model RaidParticipant {
+  week    String
+  raid    Raid    @relation(fields: [week], references: [week], onDelete: Cascade)
+  userId  String
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  damage  Int     @default(0)
+  attacks Int     @default(0)
+  /// Le butin du raid vaincu a été récupéré.
+  claimed Boolean @default(false)
+  /// Date du premier assaut : à dégâts égaux, le premier arrivé est devant.
+  firstAt DateTime @default(now())
+
+  @@id([week, userId])
+  @@index([week, damage])
+  @@index([userId, claimed])
+}
+
+/// Un assaut : dix questions tirées par le serveur, dont la graine ne quitte pas la base.
+model RaidAttack {
+  id         String    @id @default(cuid())
+  week       String
+  raid       Raid      @relation(fields: [week], references: [week], onDelete: Cascade)
+  userId     String
+  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  seed       Int
+  mode       String
+  lang       String
+  /// Jour de l'assaut (date de Paris), pour la limite quotidienne.
+  dayKey     String
+  startedAt  DateTime  @default(now())
+  finishedAt DateTime?
+  correct    Int       @default(0)
+  damage     Int       @default(0)
+  berrys     Int       @default(0)
+
+  @@index([userId, dayKey])
+}
+
+/// Annonce du marché : un exemplaire d'avis mis en vente. L'exemplaire quitte la collection du vendeur tant que l'annonce est ouverte.
+model MarketListing {
+  id          String    @id @default(cuid())
+  sellerId    String
+  seller      User      @relation("listingSeller", fields: [sellerId], references: [id], onDelete: Cascade)
+  characterId String
+  golden      Boolean   @default(false)
+  price       Int
+  /// active, sold ou cancelled.
+  status      String    @default("active")
+  buyerId     String?
+  buyer       User?     @relation("listingBuyer", fields: [buyerId], references: [id], onDelete: SetNull)
+  /// Ce que le vendeur a reçu, taxe déduite.
+  proceeds    Int       @default(0)
+  createdAt   DateTime  @default(now())
+  soldAt      DateTime?
+  /// Le vendeur a vu que son annonce était vendue.
+  seenAt      DateTime?
+
+  @@index([status, createdAt])
+  @@index([sellerId, status])
+  @@index([characterId, status])
 }

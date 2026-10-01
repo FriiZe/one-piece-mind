@@ -1,10 +1,16 @@
 import "dotenv/config";
 import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
+import { buildGameData, resolveGameData } from "@/games/cards";
+import { generateMixed, MIX_SLUGS } from "@/games/qcm/logic";
+import { weekKey } from "@/lib/economy";
 import { parsePushSubscription, pushMessage, type PushMessage } from "@/lib/multi/push";
+import { RAID_QUESTIONS, raidBoss } from "@/lib/raid/rules";
 import { accountsEnabled, db } from "@/lib/server/db";
 import { answerFriendRequest, friendsOverview, requestFriend } from "@/lib/server/friends";
+import { buyListing, createListing } from "@/lib/server/market";
 import { DUMMY_HASH } from "@/lib/server/password";
 import { notify, removePushSubscriptions, savePushSubscription } from "@/lib/server/push";
+import { finishRaidAttack, startRaidAttack } from "@/lib/server/raid";
 import { answerTrade, proposeTrade, tradesOverview } from "@/lib/server/trades";
 
 // Aucun message ne part vraiment : on regarde ce que le serveur aurait envoyé, et à qui
@@ -33,6 +39,22 @@ describe("messages des notifications", () => {
     expect(pushMessage({ type: "room-invite", from: "Zoro", code: "ABC23" }, "en").url).toBe("/en/multi/ABC23");
     expect(pushMessage({ type: "trade-accepted", from: "Zoro" }, "fr").url).toBe("/collection");
     expect(pushMessage({ type: "quiz-hidden", title: "Les sabres" }, "fr").body).toContain("« Les sabres »");
+
+    const sale = { type: "market-sold", from: "Zoro", listingId: "annonce-1", character: { fr: "Baggy", en: "Buggy" }, golden: true, proceeds: 1800 } as const;
+    expect(pushMessage(sale, "en")).toEqual({
+      title: "Poster sold on the market",
+      body: "Zoro bought your golden Buggy poster: +1,800 ฿.",
+      url: "/en/marche",
+      tag: "market-sold:annonce-1",
+    });
+    expect(pushMessage({ ...sale, golden: false }, "fr").body).toMatch(/^Zoro a acheté ton avis de Baggy : \+1\s800 ฿\.$/);
+
+    expect(pushMessage({ type: "raid-defeated", week: "2026-S40", boss: { fr: "Kaido", en: "Kaidou" } }, "fr")).toEqual({
+      title: "Raid vaincu !",
+      body: "Kaido est tombé : ton butin t'attend.",
+      url: "/raid",
+      tag: "raid-defeated:2026-S40",
+    });
   });
 
   it("n'accepte que l'abonnement d'un vrai service de notification", () => {
@@ -76,7 +98,10 @@ describe.skipIf(!accountsEnabled)("envoi des notifications, en base", () => {
     send.mockReset();
     send.mockResolvedValue({ statusCode: 201 });
   });
+  // Des semaines de raid que rien d'autre n'utilise
+  const raidDays = ["2032-06-09", "2032-06-16"];
   afterAll(async () => {
+    await db().raid.deleteMany({ where: { week: { in: raidDays.map(weekKey) } } });
     await db().user.deleteMany({ where: { id: { in: users.map((u) => u.id) } } });
     await db().$disconnect();
   });
@@ -115,6 +140,63 @@ describe.skipIf(!accountsEnabled)("envoi des notifications, en base", () => {
     const [trade] = (await tradesOverview(b.id)).incoming;
     expect(await answerTrade(b.id, trade.id, true)).toEqual({ ok: true });
     expect(sent()).toMatchObject([{ to: endpoint("luffy"), title: "Échange accepté", body: expect.stringContaining(b.username), url: "/collection" }]);
+  });
+
+  it("prévient le vendeur quand son annonce du marché est achetée", async () => {
+    const [a, b] = users;
+    // Après l'échange, le premier joueur a l'avis de Nami : il en reçoit un second, qu'il met en vente
+    await db().collectionEntry.update({ where: { userId_characterId: { userId: a.id, characterId: "nami" } }, data: { count: 2 } });
+    await db().user.update({ where: { id: b.id }, data: { berrys: 5000 } });
+    expect((await createListing(a.id, "nami", false, 2000)).ok).toBe(true);
+    const listing = await db().marketListing.findFirstOrThrow({ where: { sellerId: a.id, status: "active" } });
+    // Mettre en vente ne prévient personne
+    expect(sent()).toEqual([]);
+
+    expect((await buyListing(b.id, listing.id)).ok).toBe(true);
+    expect(sent()).toEqual([
+      {
+        to: endpoint("luffy"),
+        title: "Avis vendu au marché",
+        body: expect.stringMatching(new RegExp(`^${b.username} a acheté ton avis de Nami : \\+1\\s800 ฿\\.$`)),
+        url: "/marche",
+        tag: `market-sold:${listing.id}`,
+      },
+    ]);
+
+    // Un achat refusé ne prévient pas le vendeur
+    send.mockClear();
+    expect(await buyListing(b.id, listing.id)).toEqual({ ok: false, error: "gone" });
+    expect(sent()).toEqual([]);
+  });
+
+  it("prévient ceux qui ont droit au butin quand l'adversaire du raid tombe, sauf celui qui l'achève", async () => {
+    const [a, b] = users;
+    const anime = resolveGameData(buildGameData("en"), "anime");
+
+    /** Le second joueur a déjà infligé `damage` ; le premier lance un assaut sans faute, qui achève l'adversaire. */
+    async function defeat(day: string, damage: number) {
+      const week = weekKey(day);
+      const started = await startRaidAttack(a.id, "anime", "en", day);
+      if (!started.ok) throw new Error(started.error);
+      await db().raidParticipant.create({ data: { week, userId: b.id, damage, attacks: 1 } });
+      await db().raid.update({ where: { week }, data: { hp: damage + 1000, damage } });
+      const attack = await db().raidAttack.findUniqueOrThrow({ where: { id: started.attackId } });
+      const answers = generateMixed(attack.seed, MIX_SLUGS, RAID_QUESTIONS, "normal", anime).map((question) => question.answerId);
+      expect(await finishRaidAttack(a.id, started.attackId, answers)).toMatchObject({ ok: true, finisher: true });
+      return week;
+    }
+
+    // Les deux joueurs ont un appareil abonné ; seul celui qui n'est pas devant son écran est prévenu
+    const week = await defeat(raidDays[0], 900);
+    const boss = anime.characterById.get(raidBoss(week).id)!.name;
+    expect(sent()).toEqual([
+      { to: endpoint("nami"), title: "Raid won!", body: `${boss} has fallen: your loot is waiting.`, url: "/en/raid", tag: `raid-defeated:${week}` },
+    ]);
+
+    // Trop peu de dégâts pour prétendre au butin : rien à annoncer
+    send.mockClear();
+    await defeat(raidDays[1], 100);
+    expect(sent()).toEqual([]);
   });
 
   it("ne garde qu'un abonnement par navigateur, et le rattache à la session qui le présente", async () => {

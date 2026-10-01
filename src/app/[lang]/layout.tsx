@@ -60,12 +60,15 @@ export default async function RootLayout({ children, params }: LayoutProps<"/[la
                   {[
                     { href: "/jeux", label: t("Jeux", "Games") },
                     { href: "/multi", label: t("Multijoueur", "Multiplayer") },
+                    { href: "/classe", label: t("Classé", "Ranked") },
+                    { href: "/raid", label: t("Raid", "Raid") },
                     { href: "/quiz", label: t("Quiz de la commu", "Community quizzes") },
                     { href: "/defis", label: t("Défis", "Challenges") },
                     { href: "/navire", label: t("Mon navire", "My ship") },
                     { href: "/collection", label: t("Collection", "Collection") },
                     { href: "/boutique", label: t("Boutique", "Shop") },
                     { href: "/echanges", label: t("Échanges", "Trades") },
+                    { href: "/marche", label: t("Marché", "Market") },
                     { href: "/profil", label: t("Mon compte", "My account") },
                   ].map((link) => (
                     <Link key={link.href} href={link.href} className="hover:text-foam">

@@ -5,15 +5,17 @@ import { spareCopies } from "@/lib/economy";
 import { useLocale, usePath, useT } from "@/lib/i18n/client";
 import { useNotifications } from "@/lib/multi/client";
 import { usePlayer } from "@/lib/player/PlayerProvider";
+import { ShipArt } from "./Cosmetics";
 
 const TABS = [
   { href: "/navire", label: { fr: "Équipage", en: "Crew" } },
   { href: "/collection", label: { fr: "Collection", en: "Collection" } },
   { href: "/boutique", label: { fr: "Boutique", en: "Shop" } },
   { href: "/echanges", label: { fr: "Échanges", en: "Trades" } },
+  { href: "/marche", label: { fr: "Marché", en: "Market" } },
 ];
 
-/** En-tête commun aux pages du navire : ce que possède le joueur, et les quatre rubriques. */
+/** En-tête commun aux pages du navire : le navire du joueur, ce qu'il possède, et les cinq rubriques. */
 export function ShipHeader() {
   const { state, status } = usePlayer();
   const pathname = usePath();
@@ -30,7 +32,14 @@ export function ShipHeader() {
   return (
     <header className="space-y-5">
       <div className="flex flex-wrap items-end justify-between gap-3">
-        <h1 className="font-display text-4xl tracking-wide text-foam sm:text-[40px]">{t("Mon navire", "My ship")}</h1>
+        <div className="flex items-end gap-3">
+          <ShipArt
+            id={state.cosmetics.equipped.ship}
+            flag={state.cosmetics.equipped.flag}
+            className={`h-[60px] w-20 ${status === "loading" ? "invisible" : ""}`}
+          />
+          <h1 className="font-display text-4xl tracking-wide text-foam sm:text-[40px]">{t("Mon navire", "My ship")}</h1>
+        </div>
         <p className={`flex flex-wrap gap-2 text-sm font-bold ${status === "loading" ? "invisible" : ""}`}>
           <span className="rounded-full border border-sea-700 px-3.5 py-2">
             {t(`${owned} avis recruté${owned > 1 ? "s" : ""}`, `${owned} ${owned === 1 ? "poster" : "posters"} recruited`)}
@@ -65,6 +74,14 @@ export function ShipHeader() {
                   aria-label={t(`${counts.trades} en attente`, `${counts.trades} pending`)}
                 >
                   {counts.trades}
+                </span>
+              )}
+              {tab.href === "/marche" && !!counts?.sales && (
+                <span
+                  className="rounded-full bg-vest px-2 py-px text-xs text-white"
+                  aria-label={t(`${counts.sales} vente${counts.sales > 1 ? "s" : ""}`, `${counts.sales} ${counts.sales === 1 ? "sale" : "sales"}`)}
+                >
+                  {counts.sales}
                 </span>
               )}
             </Link>

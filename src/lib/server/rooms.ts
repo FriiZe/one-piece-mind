@@ -26,6 +26,7 @@ import type { SpoilerMode } from "@/lib/spoilers";
 import { Prisma } from "@/generated/prisma/client";
 import { db } from "./db";
 import { notify } from "./push";
+import { DUEL_MAX_MS, duelView, settleDuel } from "./ranked";
 import type { SessionUser } from "./session";
 
 const hashToken = (token: string) => createHash("sha256").update(token).digest("hex");
@@ -186,7 +187,12 @@ async function advance(room: RoomRow): Promise<RoomRow> {
     const total = questionsOf(room).length;
     let data: Prisma.RoomUpdateManyMutationInput | null = null;
 
-    if (room.phase === "question") {
+    if (room.phase === "countdown") {
+      // Duel classé : les deux joueurs ont eu le temps d'arriver, la première question part
+      if (now >= room.phaseEndsAt.getTime()) {
+        data = { phase: "question", phaseStartedAt: new Date(now), phaseEndsAt: new Date(now + room.seconds * 1000) };
+      }
+    } else if (room.phase === "question") {
       const present = room.players.filter((p) => isPresent(p.lastSeenAt, now));
       const answered = await db().roomAnswer.findMany({
         where: { roomId: room.id, questionIndex: room.questionIndex },
@@ -254,7 +260,8 @@ async function claimReward(room: RoomRow, player: RoomRow["players"][number]): P
 async function toView(room: RoomRow, player: RoomRow["players"][number]): Promise<RoomView> {
   const now = Date.now();
   const questions = room.status === "lobby" ? [] : questionsOf(room);
-  const current = room.status === "playing" ? questions[room.questionIndex] : undefined;
+  const counting = room.status === "playing" && room.phase === "countdown";
+  const current = room.status === "playing" && !counting ? questions[room.questionIndex] : undefined;
   const answers = current
     ? await db().roomAnswer.findMany({ where: { roomId: room.id, questionIndex: room.questionIndex } })
     : [];
@@ -272,7 +279,10 @@ async function toView(room: RoomRow, player: RoomRow["players"][number]): Promis
   return {
     code: room.code,
     version: room.version,
+    kind: room.kind === "ranked" ? "ranked" : "friendly",
     status: room.status as RoomView["status"],
+    startsAt: counting ? room.phaseEndsAt!.getTime() : null,
+    ranked: room.kind === "ranked" ? await duelView(room, player.id) : null,
     settings: {
       mode: room.mode as SpoilerMode,
       difficulty: room.difficulty as Difficulty,
@@ -339,6 +349,10 @@ export async function viewRoom(
     room = { ...room, players: room.players.map((p) => (p.id === player.id ? player : p)) };
   }
   room = await advance(room);
+  // Duel classé terminé : les cotes sont mises à jour par la première requête qui le constate
+  if (room.kind === "ranked" && room.status === "finished" && !room.settledAt && (await settleDuel(room))) {
+    room = await db().room.findUniqueOrThrow({ where: { id: room.id }, include: { players: true } });
+  }
 
   const pendingReward = room.status === "finished" && player.userId !== null && !player.rewarded;
   if (knownVersion === room.version && !pendingReward) return { ok: true, unchanged: true, serverNow: Date.now() };
@@ -408,7 +422,8 @@ export async function restartRoom(ticket: RoomTicket): Promise<Result<object>> {
   const found = await authenticate(ticket);
   if (!found) return { ok: false, error: "not-found" };
   const { room, player } = found;
-  if (room.hostId !== player.id || room.status !== "finished") return { ok: false, error: "forbidden" };
+  // Un duel classé ne se relance pas : la revanche passe par la file d'attente
+  if (room.hostId !== player.id || room.status !== "finished" || room.kind === "ranked") return { ok: false, error: "forbidden" };
 
   await db().$transaction([
     db().roomAnswer.deleteMany({ where: { roomId: room.id } }),
@@ -454,4 +469,25 @@ export async function inviteToRoom(ticket: RoomTicket, user: SessionUser | null,
   });
   await notify(friendId, { type: "room-invite", from: user.username, code: found.room.code });
   return { ok: true };
+}
+
+/**
+ * Solde les duels classés que le joueur a laissés en plan. Un salon n'avance
+ * que lorsqu'on l'interroge : si les deux joueurs sont partis avant la fin, le
+ * duel est arrêté ici, sur les points marqués, pour que partir ne permette pas
+ * d'éviter une défaite. À appeler quand le joueur revient dans la file.
+ */
+export async function finishStaleDuels(userId: string): Promise<void> {
+  const seats = await db().roomPlayer.findMany({
+    where: { userId, room: { kind: "ranked", settledAt: null, createdAt: { lt: new Date(Date.now() - DUEL_MAX_MS) } } },
+    select: { roomId: true },
+  });
+  for (const { roomId } of seats) {
+    await db().room.updateMany({
+      where: { id: roomId, status: "playing" },
+      data: { status: "finished", phaseEndsAt: null, version: { increment: 1 } },
+    });
+    const room = await db().room.findUnique({ where: { id: roomId }, include: { players: true } });
+    if (room?.status === "finished") await settleDuel(room);
+  }
 }

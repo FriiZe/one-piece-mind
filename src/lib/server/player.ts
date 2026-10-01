@@ -9,16 +9,22 @@ import {
   applyGame,
   assignPost,
   buyBooster,
+  buyCosmetic,
   buyRecruit,
+  DAILY_BERRY_CAP,
   EMPTY_PLAYER,
+  equipCosmetic,
+  getCosmetic,
+  grantCosmetic,
   POST_IDS,
+  sanitizeCosmetics,
   sellDuplicates,
   type PlayerState,
   type PostId,
 } from "@/lib/economy";
 import { isBuiltSlug } from "@/lib/games/catalog";
 import { DEFAULT_LOCALE, type Locale } from "@/lib/i18n";
-import type { BoosterResult, CrewResult, GameResult, RecruitResult, SellResult } from "@/lib/player/types";
+import type { BoosterResult, CosmeticResult, CrewResult, GameResult, RecruitResult, SellResult } from "@/lib/player/types";
 import type { SpoilerMode } from "@/lib/spoilers";
 import { Prisma } from "@/generated/prisma/client";
 import { db } from "./db";
@@ -31,7 +37,7 @@ const resolved = new Map<string, ResolvedData>();
  * instance du serveur. La langue ne compte que pour rejouer une partie (les
  * libellés servent de réponses) : collection et équipage n'en dépendent pas.
  */
-function gameData(mode: SpoilerMode, locale: Locale = DEFAULT_LOCALE): ResolvedData {
+export function gameData(mode: SpoilerMode, locale: Locale = DEFAULT_LOCALE): ResolvedData {
   const key = `${locale}:${mode}`;
   if (!resolved.has(key)) {
     if (!raw.has(locale)) raw.set(locale, buildGameData(locale));
@@ -41,12 +47,12 @@ function gameData(mode: SpoilerMode, locale: Locale = DEFAULT_LOCALE): ResolvedD
 }
 
 /** Tirage imprévisible pour les récompenses : la graine vient du générateur du système. */
-const secureRng = () => createRng(randomInt(0, 0xffffffff));
+export const secureRng = () => createRng(randomInt(0, 0xffffffff));
 
-const isUniqueViolation = (error: unknown) =>
+export const isUniqueViolation = (error: unknown) =>
   error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2002";
 
-type Tx = Prisma.TransactionClient;
+export type Tx = Prisma.TransactionClient;
 
 const statsSchema = z.record(z.string(), z.object({ games: z.number().int().nonnegative(), best: z.number().min(0).max(1) }));
 const weekSchema = z.object({ key: z.string(), progress: z.array(z.number()), done: z.array(z.boolean()) });
@@ -63,6 +69,8 @@ export async function loadState(userId: string, client: Tx = db()): Promise<Play
       dayDone: true,
       stats: true,
       week: true,
+      cosmetics: true,
+      equipped: true,
       collection: { select: { characterId: true, count: true, golden: true } },
       crew: { select: { post: true, characterId: true } },
     },
@@ -75,6 +83,7 @@ export async function loadState(userId: string, client: Tx = db()): Promise<Play
     // Colonnes JSON : on ne se fie à leur contenu qu'après validation
     stats: statsSchema.safeParse(user.stats).data ?? {},
     week: weekSchema.safeParse(user.week).data ?? EMPTY_PLAYER.week,
+    cosmetics: sanitizeCosmetics(user.cosmetics, user.equipped),
     collection: Object.fromEntries(user.collection.map((e) => [e.characterId, { count: e.count, golden: e.golden }])),
     crew: Object.fromEntries(
       user.crew.filter((slot) => (POST_IDS as readonly string[]).includes(slot.post)).map((slot) => [slot.post, slot.characterId]),
@@ -82,12 +91,44 @@ export async function loadState(userId: string, client: Tx = db()): Promise<Play
   };
 }
 
-async function addToCollection(tx: Tx, userId: string, characterId: string, golden: boolean) {
+export async function addToCollection(tx: Tx, userId: string, characterId: string, golden: boolean) {
   await tx.collectionEntry.upsert({
     where: { userId_characterId: { userId, characterId } },
     create: { userId, characterId, count: 1, golden: golden ? 1 : 0 },
     update: { count: { increment: 1 }, golden: { increment: golden ? 1 : 0 } },
   });
+}
+
+/**
+ * Verse des Berrys gagnés en jouant ailleurs que dans un mini-jeu (raid),
+ * dans la limite du plafond du jour. Renvoie ce qui a réellement été versé.
+ */
+export async function creditPlay(tx: Tx, userId: string, wanted: number, today = dailyKey()): Promise<number> {
+  const user = await tx.user.findUniqueOrThrow({ where: { id: userId }, select: { dayKey: true, dayEarned: true } });
+  const earnedToday = user.dayKey === today ? user.dayEarned : 0;
+  const berrys = Math.max(0, Math.min(wanted, DAILY_BERRY_CAP - earnedToday));
+  await tx.user.update({
+    where: { id: userId },
+    data: {
+      berrys: { increment: berrys },
+      lifetimeBerrys: { increment: berrys },
+      dayKey: today,
+      dayEarned: earnedToday + berrys,
+      // Premier gain de la journée : les jeux du jour validés la veille ne comptent plus
+      ...(user.dayKey === today ? {} : { dayDone: [] }),
+    },
+  });
+  return berrys;
+}
+
+/** Donne à un joueur un cosmétique gagné (classé, raid). Renvoie `false` s'il l'avait déjà. */
+export async function grantCosmeticTo(tx: Tx, userId: string, cosmeticId: string): Promise<boolean> {
+  const user = await tx.user.findUniqueOrThrow({ where: { id: userId }, select: { cosmetics: true, equipped: true } });
+  const before = sanitizeCosmetics(user.cosmetics, user.equipped);
+  const after = grantCosmetic(before, cosmeticId);
+  if (after === before) return false;
+  await tx.user.update({ where: { id: userId }, data: { cosmetics: after.owned } });
+  return true;
 }
 
 /** Parties récompensées par minute au-delà desquelles on refuse : aucun joueur ne va aussi vite. */
@@ -230,6 +271,30 @@ export async function setCrewFor(userId: string, post: string, characterId: stri
   });
 }
 
+export async function buyCosmeticFor(userId: string, cosmeticId: string): Promise<CosmeticResult> {
+  return db().$transaction(async (tx) => {
+    const bought = buyCosmetic(await loadState(userId, tx), cosmeticId);
+    if (typeof bought === "string") return { ok: false, reason: bought };
+
+    // Le débit n'a lieu que si le solde le permet encore : deux achats simultanés ne passent pas tous les deux
+    const paid = await tx.user.updateMany({
+      where: { id: userId, berrys: { gte: bought.cost } },
+      data: { berrys: { decrement: bought.cost }, cosmetics: bought.state.cosmetics.owned, equipped: bought.state.cosmetics.equipped },
+    });
+    if (paid.count === 0) return { ok: false, reason: "insufficient" };
+    return { ok: true, state: await loadState(userId, tx) };
+  });
+}
+
+export async function equipCosmeticFor(userId: string, slot: string, cosmeticId: string | null): Promise<CosmeticResult> {
+  return db().$transaction(async (tx) => {
+    const next = equipCosmetic(await loadState(userId, tx), slot, cosmeticId);
+    if (typeof next === "string") return { ok: false, reason: next };
+    await tx.user.update({ where: { id: userId }, data: { equipped: next.cosmetics.equipped } });
+    return { ok: true, state: await loadState(userId, tx) };
+  });
+}
+
 // ---------------------------------------------------------------------------
 // Reprise de la progression d'un invité à la création du compte
 
@@ -246,6 +311,7 @@ const guestStateSchema = z.object({
   ),
   crew: z.record(z.string(), z.string().max(80)),
   stats: statsSchema.optional(),
+  cosmetics: z.object({ owned: z.array(z.string().max(80)).max(200), equipped: z.record(z.string(), z.string().max(80)) }).optional(),
 });
 
 /** Ce qu'on accepte de reprendre d'un état d'invité : valeurs plafonnées, personnages connus seulement. */
@@ -269,6 +335,12 @@ export function sanitizeGuestState(input: unknown) {
     return true;
   });
 
+  // Seuls les cosmétiques de la boutique se reprennent : les autres se gagnent avec un compte
+  const cosmetics = sanitizeCosmetics(
+    (guest.cosmetics?.owned ?? []).filter((id) => getCosmetic(id)?.price != null),
+    guest.cosmetics?.equipped,
+  );
+
   const lifetimeBerrys = Math.min(guest.lifetimeBerrys, IMPORT_LIMITS.lifetimeBerrys);
   return {
     berrys: Math.min(guest.berrys, IMPORT_LIMITS.berrys, lifetimeBerrys),
@@ -278,5 +350,6 @@ export function sanitizeGuestState(input: unknown) {
     stats: Object.fromEntries(Object.entries(guest.stats ?? {}).filter(([slug]) => isBuiltSlug(slug))),
     collection,
     crew: crew.map(([post, characterId]) => ({ post, characterId })),
+    cosmetics,
   };
 }

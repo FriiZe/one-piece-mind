@@ -19,6 +19,7 @@ import {
 import { useLocale, useT } from "@/lib/i18n/client";
 import { usePlayer } from "@/lib/player/PlayerProvider";
 import { CharacterCard } from "./CharacterCard";
+import { CosmeticsShop } from "./CosmeticsShop";
 import { PackArt, PackOpening } from "./PackOpening";
 
 type Article = "recruit" | "booster";
@@ -228,6 +229,8 @@ function Shop({ data }: { data: ResolvedData }) {
           </p>
         </details>
       </section>
+
+      <CosmeticsShop />
 
       {opening && (
         <PackOpening

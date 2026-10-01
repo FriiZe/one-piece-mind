@@ -1,4 +1,5 @@
 /** Notifications push : ce qu'on annonce à un joueur, et le texte affiché sur son appareil. Calcul pur, partagé avec les tests. */
+import { formatNumber } from "@/games/engine/text";
 import { localePath, type Locale, type Localized } from "@/lib/i18n";
 
 /** Ce qui vient d'arriver à un joueur. `from` est le pseudo de celui qui en est à l'origine. */
@@ -9,6 +10,10 @@ export type PushEvent =
   | { type: "trade-proposed"; from: string }
   | { type: "trade-accepted"; from: string }
   | { type: "trade-declined"; from: string }
+  /** Une annonce du joueur au marché vient d'être achetée. `character` : le nom du personnage dans chaque langue. */
+  | { type: "market-sold"; from: string; listingId: string; character: Localized; golden: boolean; proceeds: number }
+  /** L'adversaire du raid est tombé : le joueur a un butin à récupérer. `boss` : son nom dans chaque langue. */
+  | { type: "raid-defeated"; week: string; boss: Localized }
   /** Pour les administrateurs : un quiz de la communauté vient d'être masqué. */
   | { type: "quiz-hidden"; title: string };
 
@@ -74,6 +79,24 @@ export function pushMessage(event: PushEvent, locale: Locale): PushMessage {
         { fr: `${event.from} a refusé ton échange.`, en: `${event.from} declined your trade.` },
         "/echanges",
         `trade-declined:${event.from}`,
+      );
+    case "market-sold":
+      return message(
+        { fr: "Avis vendu au marché", en: "Poster sold on the market" },
+        {
+          fr: `${event.from} a acheté ton avis ${event.golden ? "doré " : ""}de ${event.character.fr} : +${formatNumber(event.proceeds, "fr")} ฿.`,
+          en: `${event.from} bought your ${event.golden ? "golden " : ""}${event.character.en} poster: +${formatNumber(event.proceeds, "en")} ฿.`,
+        },
+        "/marche",
+        // Une étiquette par annonce : deux ventes rapprochées ne se remplacent pas
+        `market-sold:${event.listingId}`,
+      );
+    case "raid-defeated":
+      return message(
+        { fr: "Raid vaincu !", en: "Raid won!" },
+        { fr: `${event.boss.fr} est tombé : ton butin t'attend.`, en: `${event.boss.en} has fallen: your loot is waiting.` },
+        "/raid",
+        `raid-defeated:${event.week}`,
       );
     case "quiz-hidden":
       return message(

@@ -10,13 +10,15 @@ import { SITE_NAME } from "@/lib/site";
 import { LanguageSwitch } from "./LanguageSwitch";
 import { NotificationBell } from "./NotificationBell";
 
-/** Pages du navire : équipage, collection, boutique, échanges. */
-const SHIP_PATHS = ["/navire", "/collection", "/boutique", "/echanges"];
+/** Pages du navire : équipage, collection, boutique, échanges, marché. */
+const SHIP_PATHS = ["/navire", "/collection", "/boutique", "/echanges", "/marche"];
+/** Pages où l'on joue avec ou contre d'autres joueurs : salons, classé, raid. */
+const MULTI_PATHS = ["/multi", "/classe", "/raid"];
 const under = (pathname: string, ...roots: string[]) => roots.some((root) => pathname === root || pathname.startsWith(`${root}/`));
 
 const LINKS = [
   { href: "/jeux", label: { fr: "Jeux", en: "Games" }, active: (pathname: string) => under(pathname, "/jeux") },
-  { href: "/multi", label: { fr: "Multi", en: "Multi" }, active: (pathname: string) => under(pathname, "/multi") },
+  { href: "/multi", label: { fr: "Multi", en: "Multi" }, active: (pathname: string) => under(pathname, ...MULTI_PATHS) },
   { href: "/quiz", label: { fr: "Quiz", en: "Quizzes" }, active: (pathname: string) => under(pathname, "/quiz") },
   { href: "/navire", label: { fr: "Mon navire", en: "My ship" }, active: (pathname: string) => under(pathname, ...SHIP_PATHS) },
 ];
@@ -66,7 +68,7 @@ const TABS = [
   {
     href: "/multi",
     label: { fr: "À plusieurs", en: "Together" },
-    active: (pathname: string) => under(pathname, "/multi", "/quiz"),
+    active: (pathname: string) => under(pathname, ...MULTI_PATHS, "/quiz"),
     icon: (
       <>
         <circle cx="9" cy="8" r="3.5" />

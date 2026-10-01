@@ -1,6 +1,7 @@
 import type { Difficulty } from "@/games/engine/difficulty";
 import type { MixSlug, QcmOption } from "@/games/qcm/logic";
 import type { Locale } from "@/lib/i18n";
+import type { RoomRankedView } from "@/lib/ranked/types";
 import type { SpoilerMode } from "@/lib/spoilers";
 
 export type RoomSettings = {
@@ -51,7 +52,13 @@ export type RoomQuestionView = {
 export type RoomView = {
   code: string;
   version: number;
+  /** Salon à code entre amis, ou duel classé ouvert par la file d'attente. */
+  kind: "friendly" | "ranked";
   status: "lobby" | "playing" | "finished";
+  /** Duel classé sur le point de commencer : heure de la première question (heure du serveur). */
+  startsAt: number | null;
+  /** Duel classé : cotes des deux joueurs, puis ce que le duel y change. */
+  ranked: RoomRankedView | null;
   settings: RoomSettings;
   you: { id: string; isHost: boolean };
   players: RoomPlayerView[];

@@ -9,6 +9,7 @@ import type { Localized } from "@/lib/i18n";
 import { useLocale, useT } from "@/lib/i18n/client";
 import { usePlayer } from "@/lib/player/PlayerProvider";
 import { AccountPanel } from "./AccountPanel";
+import { FlagArt, frameClass, useCosmeticName } from "./Cosmetics";
 import { FriendsPanel } from "./FriendsPanel";
 import { CheckIcon } from "./GameBadge";
 
@@ -19,6 +20,8 @@ function Poster() {
   const locale = useLocale();
   const bounty = playerBounty(state);
   const rank = rankOf(bounty);
+  const { equipped } = state.cosmetics;
+  const title = useCosmeticName()(equipped.title);
   const from = RANKS.find((r) => r.title === rank.title)?.from ?? 0;
   const progress = rank.next ? Math.min(1, (bounty - from) / (rank.next.from - from)) : 1;
   const objectives = Object.values(state.stats).reduce(
@@ -32,7 +35,11 @@ function Poster() {
   ];
 
   return (
-    <section aria-label={t("Mon avis de recherche", "My wanted poster")} className="rounded-xl border-4 border-parchment-dark bg-parchment p-6 text-center text-ink sm:p-7">
+    <section
+      aria-label={t("Mon avis de recherche", "My wanted poster")}
+      className={`relative rounded-xl border-4 bg-parchment p-6 text-center text-ink sm:p-7 ${frameClass(equipped.frame)}`}
+    >
+      <FlagArt id={equipped.flag} className="absolute top-3 right-3 h-7 w-[42px] shadow" />
       <p className="font-display text-5xl leading-none tracking-[0.2em] sm:text-[52px]" aria-hidden="true">
         WANTED
       </p>
@@ -45,6 +52,7 @@ function Poster() {
       <p className="mt-1 truncate font-display text-4xl tracking-wide sm:text-[40px]">
         {username ?? t("Pirate anonyme", "Anonymous pirate")}
       </p>
+      {title && <p className="text-sm font-extrabold tracking-wide uppercase">{title}</p>}
       <p className="font-display text-3xl tracking-wide sm:text-[34px]">฿ {formatNumber(bounty, locale)}</p>
 
       <div className="mt-4 space-y-1.5">
@@ -99,7 +107,7 @@ function ShipLink() {
       className="flex flex-wrap items-center justify-between gap-2 rounded-2xl border border-sea-700 px-5 py-4 font-bold text-foam transition-colors hover:border-straw"
     >
       <span>
-        {t("Mon navire : équipage, collection, boutique, échanges", "My ship: crew, collection, shop, trades")}
+        {t("Mon navire : équipage, collection, boutique, échanges, marché", "My ship: crew, collection, shop, trades, market")}
       </span>
       <span className="text-sm text-mist">
         {t(

@@ -97,9 +97,15 @@ export function NotificationBell() {
 
   if (!enabled) return null;
 
-  const total = counts ? counts.requests + counts.invites + counts.trades + counts.hiddenQuizzes : 0;
+  const total = counts ? counts.requests + counts.invites + counts.trades + counts.hiddenQuizzes + counts.sales + counts.loot : 0;
   const empty =
-    friends && friends.incoming.length === 0 && friends.invites.length === 0 && !counts?.trades && !counts?.hiddenQuizzes;
+    friends &&
+    friends.incoming.length === 0 &&
+    friends.invites.length === 0 &&
+    !counts?.trades &&
+    !counts?.hiddenQuizzes &&
+    !counts?.sales &&
+    !counts?.loot;
 
   async function answer(requestId: string, accept: boolean) {
     setBusy(true);
@@ -200,6 +206,41 @@ export function NotificationBell() {
                   </span>
                   <Link
                     href="/echanges"
+                    onClick={() => setOpen(false)}
+                    className="shrink-0 font-bold text-straw underline underline-offset-4"
+                  >
+                    {t("Voir", "View")}
+                  </Link>
+                </li>
+              )}
+              {counts && counts.sales > 0 && (
+                <li className="flex items-center justify-between gap-2">
+                  <span className="text-mist">
+                    <strong className="text-foam">
+                      {t(
+                        `${counts.sales} avis vendu${counts.sales > 1 ? "s" : ""}`,
+                        `${counts.sales} ${counts.sales === 1 ? "poster" : "posters"} sold`,
+                      )}
+                    </strong>{" "}
+                    {t("au marché.", "on the market.")}
+                  </span>
+                  <Link
+                    href="/marche"
+                    onClick={() => setOpen(false)}
+                    className="shrink-0 font-bold text-straw underline underline-offset-4"
+                  >
+                    {t("Voir", "View")}
+                  </Link>
+                </li>
+              )}
+              {counts && counts.loot > 0 && (
+                <li className="flex items-center justify-between gap-2">
+                  <span className="text-mist">
+                    <strong className="text-foam">{t("Butin de raid", "Raid loot")}</strong>{" "}
+                    {t("à récupérer.", "to claim.")}
+                  </span>
+                  <Link
+                    href="/raid"
                     onClick={() => setOpen(false)}
                     className="shrink-0 font-bold text-straw underline underline-offset-4"
                   >

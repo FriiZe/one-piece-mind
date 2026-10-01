@@ -2,7 +2,9 @@ import "server-only";
 import { playerBounty } from "@/lib/economy";
 import { MAX_FRIENDS, type FriendResult, type FriendsOverview, type NotificationCounts } from "@/lib/multi/friends";
 import { db } from "./db";
+import { unseenSales } from "./market";
 import { notifyFrom } from "./push";
+import { pendingLootCount } from "./raid";
 
 /** Durée de validité d'une invitation dans un salon. */
 const INVITE_LIFETIME_MS = 2 * 3_600_000;
@@ -16,13 +18,15 @@ const openInvites = (userId: string) => ({
 
 /** Nombre de demandes et d'invitations en attente. `admin` : compte aussi les quiz masqués à relire. */
 export async function pendingCounts(userId: string, admin: boolean): Promise<NotificationCounts> {
-  const [requests, invites, trades, hiddenQuizzes] = await Promise.all([
+  const [requests, invites, trades, hiddenQuizzes, sales, loot] = await Promise.all([
     db().friendship.count({ where: { addresseeId: userId, status: "pending" } }),
     db().roomInvite.count({ where: openInvites(userId) }),
     db().trade.count({ where: { toId: userId, status: "pending" } }),
     admin ? db().quiz.count({ where: { status: "hidden" } }) : 0,
+    unseenSales(userId),
+    pendingLootCount(userId),
   ]);
-  return { requests, invites, trades, hiddenQuizzes };
+  return { requests, invites, trades, hiddenQuizzes, sales, loot };
 }
 
 export async function friendsOverview(userId: string): Promise<FriendsOverview> {
