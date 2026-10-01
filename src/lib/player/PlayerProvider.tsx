@@ -13,10 +13,10 @@ import { createRng, randomSeed } from "@/games/engine/rng";
 import { evaluateReport, type GameReport } from "@/games/report";
 import { loadGameData } from "@/games/ui/data";
 import { useStored } from "@/games/ui/storage";
-import { applyGame, assignPost, buyRecruit, EMPTY_PLAYER, normalizePlayer, type PlayerState } from "@/lib/economy";
+import { applyGame, assignPost, buyRecruit, EMPTY_PLAYER, normalizePlayer, sellDuplicates, type PlayerState } from "@/lib/economy";
 import type { SpoilerMode } from "@/lib/spoilers";
-import { buyRecruitAction, setCrewAction, submitGameAction } from "./actions";
-import type { CrewResult, GameResult, MeResponse, RecruitResult } from "./types";
+import { buyRecruitAction, sellDuplicatesAction, setCrewAction, submitGameAction } from "./actions";
+import type { CrewResult, GameResult, MeResponse, RecruitResult, SellResult } from "./types";
 
 type PlayerContext = {
   /** `loading` tant qu'on ne sait pas si le visiteur est connecté. */
@@ -27,6 +27,10 @@ type PlayerContext = {
   reportGame: (report: GameReport) => Promise<GameResult>;
   recruit: (mode: SpoilerMode) => Promise<RecruitResult>;
   assign: (post: string, characterId: string | null) => Promise<CrewResult>;
+  /** Défait les doublons d'un avis, ou de tous les avis visibles dans ce mode (`characterId` nul). */
+  sell: (mode: SpoilerMode, characterId: string | null) => Promise<SellResult>;
+  /** Relit l'état du joueur connecté, après un gain obtenu ailleurs que dans un jeu (salon multijoueur). */
+  refresh: () => void;
 };
 
 const Context = createContext<PlayerContext | null>(null);
@@ -48,6 +52,8 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
   const guest = useMemo(() => normalizePlayer(storedGuest), [storedGuest]);
   const [rewarded, setRewarded] = useStored<string[]>(REWARDED_KEY, NO_KEYS);
   const [remote, setRemote] = useState<PlayerState | null>(null);
+  const [reload, setReload] = useState(0);
+  const refresh = useCallback(() => setReload((value) => value + 1), []);
 
   useEffect(() => {
     let cancelled = false;
@@ -62,7 +68,7 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [reload]);
 
   const isUser = !!me?.user;
   const state = isUser ? (remote ?? EMPTY_PLAYER) : guest;
@@ -125,6 +131,22 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
     [isUser, guest, setGuest],
   );
 
+  const sell = useCallback(
+    async (mode: SpoilerMode, characterId: string | null): Promise<SellResult> => {
+      if (isUser) {
+        const result = await sellDuplicatesAction(mode, characterId).catch(() => ({ ok: false, reason: "unavailable" }) as const);
+        if (result.ok) setRemote(result.state);
+        return result;
+      }
+      const data = resolveGameData(await loadGameData(), mode);
+      const sale = sellDuplicates(guest, data.characterById, characterId);
+      if (typeof sale === "string") return { ok: false, reason: sale };
+      setGuest(sale.state);
+      return { ok: true, state: sale.state, berrys: sale.berrys, sold: sale.sold };
+    },
+    [isUser, guest, setGuest],
+  );
+
   const value = useMemo<PlayerContext>(
     () => ({
       status: me === null ? "loading" : isUser ? "user" : "guest",
@@ -134,8 +156,10 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
       reportGame,
       recruit,
       assign,
+      sell,
+      refresh,
     }),
-    [me, isUser, state, reportGame, recruit, assign],
+    [me, isUser, state, reportGame, recruit, assign, sell, refresh],
   );
 
   return <Context.Provider value={value}>{children}</Context.Provider>;

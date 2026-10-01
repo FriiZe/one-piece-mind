@@ -100,7 +100,7 @@ export default function Memo({ data }: GameProps) {
               >
                 {visible ? (
                   <>
-                    {card.img && <Portrait img={card.img} className="h-14 w-11 sm:h-20 sm:w-16" />}
+                    {card.img && <Portrait img={card.img} className="mx-auto h-14 w-11 sm:h-20 sm:w-16" />}
                     <span className="line-clamp-3 break-words">{card.label}</span>
                   </>
                 ) : (

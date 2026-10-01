@@ -53,6 +53,19 @@ export default function Home() {
           >
             Tous les jeux
           </Link>
+          {[
+            { href: "/multi", label: "Jouer à plusieurs" },
+            { href: "/quiz", label: "Quiz de la commu" },
+            { href: "/defis", label: "Défis de la semaine" },
+          ].map((link) => (
+            <Link
+              key={link.href}
+              href={link.href}
+              className="rounded-lg border border-sea-600 px-5 py-3 font-bold text-mist transition-colors hover:border-straw hover:text-foam"
+            >
+              {link.label}
+            </Link>
+          ))}
         </div>
 
         <dl className="mt-10 grid grid-cols-2 gap-3 sm:grid-cols-4">

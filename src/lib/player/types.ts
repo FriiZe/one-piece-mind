@@ -13,6 +13,9 @@ export type RecruitResult =
 
 export type CrewResult = { ok: true; state: PlayerState } | { ok: false; reason: "not-owned" | "unknown-post" | "unavailable" };
 
+/** Doublons défaits : `berrys` rendus pour `sold` avis. */
+export type SellResult = { ok: true; state: PlayerState; berrys: number; sold: number } | { ok: false; reason: "nothing" | "unavailable" };
+
 /** Ce que renvoie /api/me. */
 export type MeResponse = {
   /** Faux tant qu'aucune base de données n'est configurée : le site fonctionne alors en mode invité. */

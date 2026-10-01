@@ -104,23 +104,36 @@ export default function TrouveLesTous({ data }: GameProps) {
   if (!run) {
     return (
       <Panel className="space-y-4">
-        <p className="text-mist">Choisis un groupe, puis cite tous ses membres avant la fin du chrono.</p>
+        <p className="text-mist">
+          Choisis un groupe, puis cite tous ses membres avant la fin du chrono.
+          {data.groups.some((g) => (records[g.id] ?? 0) >= g.memberIds.length) &&
+            ` Groupes complétés : ${data.groups.filter((g) => (records[g.id] ?? 0) >= g.memberIds.length).length} sur ${data.groups.length}.`}
+        </p>
         <ul className="grid gap-2 sm:grid-cols-2">
-          {data.groups.map((g) => (
-            <li key={g.id}>
-              <button
-                type="button"
-                onClick={() => start(g)}
-                className="w-full rounded-xl border-2 border-sea-600 bg-sea-700 p-3 text-left transition-colors hover:border-straw"
-              >
-                <span className="block font-bold text-foam">{g.title}</span>
-                <span className="block text-sm text-mist">
-                  {g.memberIds.length} personnages · {formatTime(timeLimit(g.memberIds.length))}
-                  {records[g.id] !== undefined && ` · record : ${records[g.id]} / ${g.memberIds.length}`}
-                </span>
-              </button>
-            </li>
-          ))}
+          {data.groups.map((g) => {
+            // Groupe déjà cité en entier : il ressort dans la liste
+            const complete = (records[g.id] ?? 0) >= g.memberIds.length;
+            return (
+              <li key={g.id}>
+                <button
+                  type="button"
+                  onClick={() => start(g)}
+                  className={`w-full rounded-xl border-2 p-3 text-left transition-colors hover:border-straw ${
+                    complete ? "border-emerald-400 bg-emerald-600/20" : "border-sea-600 bg-sea-700"
+                  }`}
+                >
+                  <span className="flex items-baseline justify-between gap-2">
+                    <span className="font-bold text-foam">{g.title}</span>
+                    {complete && <span className="shrink-0 text-sm font-bold text-emerald-300">✓ Tous trouvés</span>}
+                  </span>
+                  <span className="block text-sm text-mist">
+                    {g.memberIds.length} personnages · {formatTime(timeLimit(g.memberIds.length))}
+                    {!complete && records[g.id] !== undefined && ` · record : ${records[g.id]} / ${g.memberIds.length}`}
+                  </span>
+                </button>
+              </li>
+            );
+          })}
         </ul>
       </Panel>
     );

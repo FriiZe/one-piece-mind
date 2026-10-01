@@ -29,7 +29,7 @@ export function Panel({ children, className = "" }: { children: ReactNode; class
 }
 
 /** Copie un texte dans le presse-papiers (résultat à partager). */
-export function ShareButton({ getText }: { getText: () => string }) {
+export function ShareButton({ getText, label = "Partager mon résultat" }: { getText: () => string; label?: string }) {
   const [state, setState] = useState<"idle" | "copied" | "failed">("idle");
 
   async function share() {
@@ -45,7 +45,7 @@ export function ShareButton({ getText }: { getText: () => string }) {
   return (
     <Button variant="secondary" onClick={share}>
       <span aria-live="polite">
-        {state === "copied" ? "Copié !" : state === "failed" ? "Copie impossible" : "Partager mon résultat"}
+        {state === "copied" ? "Copié !" : state === "failed" ? "Copie impossible" : label}
       </span>
     </Button>
   );

@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import { byDifficulty, type Difficulty } from "../engine/difficulty";
 import { createRng, randomSeed } from "../engine/rng";
 import { Button, ResultPanel } from "../ui/primitives";
+import { Portrait } from "../ui/Portrait";
 import { QuizFlow, type QuizQuestion } from "../ui/QuizFlow";
 import { StartScreen } from "../ui/StartScreen";
 import { useBest } from "../ui/storage";
@@ -35,7 +36,7 @@ export default function QuiAMangeCeFruit({ data }: GameProps) {
               {q.fruit.romaji && <p className="text-mist">{q.fruit.romaji}</p>}
             </div>
           ),
-          options: q.options.map((c) => ({ id: c.id, label: c.name, detail: c.altName ?? undefined })),
+          options: q.options.map((c) => ({ id: c.id, label: c.name, detail: c.altName ?? undefined, img: c.img })),
           answerId: q.answerId,
           explanation,
         };
@@ -43,8 +44,9 @@ export default function QuiAMangeCeFruit({ data }: GameProps) {
       return {
         id: `${index}-${q.character.id}`,
         prompt: (
-          <div className="text-center">
+          <div className="space-y-2 text-center">
             <p className="text-mist">Quel fruit a-t-il mangé ?</p>
+            {q.character.img && <Portrait img={q.character.img} />}
             <p className="font-display text-3xl tracking-wide text-straw">{q.character.name}</p>
             {q.character.altName && <p className="text-mist">{q.character.altName}</p>}
           </div>

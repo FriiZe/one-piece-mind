@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { GameEnd, GameStart } from "../ui/GameEnd";
+import { Portrait } from "../ui/Portrait";
 import { Button, Panel } from "../ui/primitives";
 import type { GameProps } from "../ui/types";
 import { useRun } from "../ui/useRun";
@@ -52,6 +53,7 @@ export default function Wordle({ data }: GameProps) {
   if (finished) {
     return (
       <GameEnd game={game} data={data} max={MAX_TRIES}>
+        {character.img && <Portrait img={character.img} className="h-32 w-24" />}
         <p>{won ? `${character.name} trouvé en ${guesses.length} essai${guesses.length > 1 ? "s" : ""}.` : `C'était ${character.name}.`}</p>
       </GameEnd>
     );

@@ -41,6 +41,21 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
 
           <footer className="border-t border-sea-700/60 text-sm text-mist">
             <div className="mx-auto w-full max-w-6xl space-y-2 px-4 py-8">
+              {/* Toutes les rubriques, y compris celles que l'en-tête masque sur téléphone */}
+              <nav aria-label="Rubriques" className="flex flex-wrap gap-x-5 gap-y-1 font-semibold">
+                {[
+                  { href: "/jeux", label: "Jeux" },
+                  { href: "/multi", label: "Multijoueur" },
+                  { href: "/quiz", label: "Quiz de la commu" },
+                  { href: "/defis", label: "Défis" },
+                  { href: "/collection", label: "Collection" },
+                  { href: "/profil", label: "Profil" },
+                ].map((link) => (
+                  <Link key={link.href} href={link.href} className="hover:text-foam">
+                    {link.label}
+                  </Link>
+                ))}
+              </nav>
               <p>
                 {SITE_NAME} est un site de fans, gratuit et sans but lucratif. One Piece est une œuvre d&apos;Eiichiro
                 Oda, publiée par Shueisha et adaptée par Toei Animation ; ce site n&apos;est affilié à aucun d&apos;eux.

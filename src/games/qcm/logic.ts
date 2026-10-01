@@ -12,7 +12,8 @@ import { RACES, SEAS } from "@/lib/data/schema";
 export const QCM_LENGTH = 10;
 const CHOICES = 4;
 
-export type QcmOption = { id: string; label: string; detail?: string };
+/** `img` : portrait affiché à côté de la proposition, quand c'est un personnage. */
+export type QcmOption = { id: string; label: string; detail?: string; img?: string | null };
 export type QcmQuestion = {
   id: string;
   /** Consigne, en petit au-dessus du sujet. */
@@ -31,7 +32,7 @@ export type QcmQuestion = {
 type Generator = (rng: Rng, data: ResolvedData, pool: readonly PlayCharacter[], count: number) => QcmQuestion[];
 
 const asOption = (label: string): QcmOption => ({ id: label, label });
-const characterOption = (c: PlayCharacter): QcmOption => ({ id: c.id, label: c.name, detail: c.altName ?? undefined });
+const characterOption = (c: PlayCharacter): QcmOption => ({ id: c.id, label: c.name, detail: c.altName ?? undefined, img: c.img });
 
 /** La bonne réponse et trois leurres, mélangés. */
 function choices<T>(rng: Rng, answer: T, others: readonly T[], key: (item: T) => string): T[] {
@@ -415,6 +416,31 @@ const modeAleatoire: Generator = (rng, data, pool, count) => {
   }
   return questions;
 };
+
+/** Quiz utilisables en multijoueur : tous, sauf le mode aléatoire qui n'est qu'un mélange des autres. */
+export type MixSlug = keyof typeof BASE_GENERATORS;
+export const MIX_SLUGS = Object.keys(BASE_GENERATORS) as [MixSlug, ...MixSlug[]];
+
+/** `count` questions tirées parmi les quiz choisis, toutes différentes. */
+export function generateMixed(
+  seed: number,
+  slugs: readonly MixSlug[],
+  count: number,
+  difficulty: Difficulty,
+  data: ResolvedData,
+): QcmQuestion[] {
+  const rng = createRng(seed);
+  const pool = byDifficulty(data.characters, difficulty);
+  const questions: QcmQuestion[] = [];
+  for (let attempt = 0; questions.length < count && attempt < count * 8; attempt++) {
+    const slug = pick(rng, slugs);
+    const [question] = BASE_GENERATORS[slug](rng, data, pool, 1);
+    // L'identifiant est préfixé par le jeu : deux quiz peuvent porter sur le même personnage
+    const id = `${slug}:${question?.id}`;
+    if (question && !questions.some((q) => q.id === id)) questions.push({ ...question, id });
+  }
+  return questions;
+}
 
 const GENERATORS = { ...BASE_GENERATORS, "mode-aleatoire": modeAleatoire } satisfies Record<string, Generator>;
 

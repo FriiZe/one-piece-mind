@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { GameEnd, GameStart } from "../ui/GameEnd";
+import { Portrait } from "../ui/Portrait";
 import { Button, Panel, Progress } from "../ui/primitives";
 import type { GameProps } from "../ui/types";
 import { useRun } from "../ui/useRun";
@@ -98,6 +99,8 @@ export default function Anagramme({ data }: GameProps) {
           <input
             id="anagramme-saisie"
             type="text"
+            // Le champ réapparaît à chaque manche : il reprend la main sans clic
+            autoFocus
             value={input}
             onChange={(event) => setInput(event.target.value)}
             autoComplete="off"
@@ -115,13 +118,17 @@ export default function Anagramme({ data }: GameProps) {
           </Button>
         </form>
       ) : (
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <p className={`font-bold ${found ? "text-emerald-300" : "text-vest"}`}>
-            {found ? `${round.target.name} : +1 point.` : `C'était ${round.target.name}.`}
-          </p>
-          <Button autoFocus onClick={next}>
-            {last ? "Voir mon score" : "Suivant"}
-          </Button>
+        <div className="space-y-3">
+          {round.target.img && <Portrait img={round.target.img} />}
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <p className={`font-bold ${found ? "text-emerald-300" : "text-vest"}`}>
+              {found ? `${round.target.name} : +1 point.` : `C'était ${round.target.name}.`}
+            </p>
+            {/* Entrée valide une réponse, puis passe à la manche suivante */}
+            <Button autoFocus onClick={next}>
+              {last ? "Voir mon score" : "Suivant"}
+            </Button>
+          </div>
         </div>
       )}
       <p className="min-h-6 text-sm font-semibold text-vest" aria-live="polite">

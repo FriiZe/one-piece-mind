@@ -11,11 +11,12 @@ import {
   buyRecruit,
   EMPTY_PLAYER,
   POST_IDS,
+  sellDuplicates,
   type PlayerState,
   type PostId,
 } from "@/lib/economy";
 import { isLiveSlug } from "@/lib/games/catalog";
-import type { CrewResult, GameResult, RecruitResult } from "@/lib/player/types";
+import type { CrewResult, GameResult, RecruitResult, SellResult } from "@/lib/player/types";
 import type { SpoilerMode } from "@/lib/spoilers";
 import { Prisma } from "@/generated/prisma/client";
 import { db } from "./db";
@@ -156,6 +157,34 @@ export async function buyRecruitFor(userId: string, mode: SpoilerMode): Promise<
     await addToCollection(tx, userId, bought.recruit.characterId, bought.recruit.golden);
     return { ok: true, state: await loadState(userId, tx), recruit: bought.recruit, cost: bought.cost };
   });
+}
+
+class ConcurrentChange extends Error {}
+
+/** Défait les doublons d'un avis, ou de tous ceux que le joueur voit dans son mode (`characterId` nul). */
+export async function sellDuplicatesFor(userId: string, mode: SpoilerMode, characterId: string | null): Promise<SellResult> {
+  const data = gameData(mode);
+  try {
+    return await db().$transaction(async (tx) => {
+      const before = await loadState(userId, tx);
+      const sale = sellDuplicates(before, data.characterById, characterId);
+      if (typeof sale === "string") return { ok: false, reason: sale };
+
+      for (const id of sale.changed) {
+        // L'avis doit être resté tel qu'on l'a lu : deux ventes simultanées ne sont pas payées deux fois
+        const updated = await tx.collectionEntry.updateMany({
+          where: { userId, characterId: id, count: before.collection[id].count, golden: before.collection[id].golden },
+          data: sale.state.collection[id],
+        });
+        if (updated.count === 0) throw new ConcurrentChange();
+      }
+      await tx.user.update({ where: { id: userId }, data: { berrys: { increment: sale.berrys } } });
+      return { ok: true, state: await loadState(userId, tx), berrys: sale.berrys, sold: sale.sold };
+    });
+  } catch (error) {
+    if (error instanceof ConcurrentChange) return { ok: false, reason: "unavailable" };
+    throw error;
+  }
 }
 
 export async function setCrewFor(userId: string, post: string, characterId: string | null): Promise<CrewResult> {

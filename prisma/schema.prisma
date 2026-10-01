@@ -35,6 +35,16 @@ model User {
   collection CollectionEntry[]
   crew       CrewSlot[]
   results    GameResult[]
+
+  roomPlayers      RoomPlayer[]
+  friendsRequested Friendship[] @relation("requester")
+  friendsReceived  Friendship[] @relation("addressee")
+  invitesSent      RoomInvite[] @relation("inviteFrom")
+  invitesReceived  RoomInvite[] @relation("inviteTo")
+
+  quizzes     Quiz[]
+  quizReports QuizReport[]
+  quizPlays   QuizPlay[]
 }
 
 model Session {
@@ -93,4 +103,160 @@ model AuthThrottle {
   key         String   @id
   count       Int
   windowStart DateTime
+}
+
+/// Salon multijoueur. Tout son état est ici : chaque joueur le relit environ une fois par seconde.
+model Room {
+  id         String   @id @default(cuid())
+  /// Code à cinq caractères que l'hôte partage.
+  code       String   @unique
+  mode       String
+  difficulty String
+  /// Quiz dans lesquels les questions sont tirées (liste d'identifiants).
+  games      Json
+  questionCount Int
+  /// Temps de réponse par question, en secondes.
+  seconds    Int
+  /// Graine du tirage : les questions sont recalculées à la demande, jamais stockées.
+  seed       Int
+  /// lobby, playing ou finished.
+  status     String   @default("lobby")
+  questionIndex Int   @default(0)
+  /// question (on répond) ou reveal (correction affichée).
+  phase      String   @default("question")
+  phaseStartedAt DateTime?
+  phaseEndsAt    DateTime?
+  /// Augmente à chaque changement : un joueur à jour n'a rien à recharger.
+  version    Int      @default(0)
+  hostId     String?
+  createdAt  DateTime @default(now())
+
+  players RoomPlayer[]
+  answers RoomAnswer[]
+  invites RoomInvite[]
+
+  @@index([createdAt])
+}
+
+model RoomPlayer {
+  id         String   @id @default(cuid())
+  roomId     String
+  room       Room     @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  /// Compte du joueur, s'il est connecté ; un invité n'en a pas.
+  userId     String?
+  user       User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  name       String
+  nameKey    String
+  /// Empreinte du jeton qui identifie ce joueur dans ce salon.
+  tokenHash  String
+  score      Int      @default(0)
+  joinedAt   DateTime @default(now())
+  lastSeenAt DateTime @default(now())
+  /// Les Berrys de la partie ont été versés.
+  rewarded   Boolean  @default(false)
+  rewardBerrys Int    @default(0)
+
+  answers RoomAnswer[]
+
+  @@unique([roomId, nameKey])
+  @@index([roomId])
+}
+
+model RoomAnswer {
+  roomId        String
+  room          Room       @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  playerId      String
+  player        RoomPlayer @relation(fields: [playerId], references: [id], onDelete: Cascade)
+  questionIndex Int
+  optionId      String
+  correct       Boolean
+  points        Int
+  answeredAt    DateTime   @default(now())
+
+  @@id([playerId, questionIndex])
+  @@index([roomId, questionIndex])
+}
+
+/// Lien d'amitié : en attente tant que le destinataire n'a pas accepté.
+model Friendship {
+  id          String   @id @default(cuid())
+  requesterId String
+  requester   User     @relation("requester", fields: [requesterId], references: [id], onDelete: Cascade)
+  addresseeId String
+  addressee   User     @relation("addressee", fields: [addresseeId], references: [id], onDelete: Cascade)
+  /// pending ou accepted.
+  status      String   @default("pending")
+  createdAt   DateTime @default(now())
+
+  @@unique([requesterId, addresseeId])
+  @@index([addresseeId])
+}
+
+/// Invitation d'un ami dans un salon.
+model RoomInvite {
+  id        String   @id @default(cuid())
+  roomId    String
+  room      Room     @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  fromId    String
+  from      User     @relation("inviteFrom", fields: [fromId], references: [id], onDelete: Cascade)
+  toId      String
+  to        User     @relation("inviteTo", fields: [toId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@unique([roomId, toId])
+  @@index([toId])
+}
+
+/// Quiz écrit par un joueur. Il se joue en Duo, Carré ou Cash.
+model Quiz {
+  id          String    @id @default(cuid())
+  authorId    String
+  author      User      @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  title       String
+  description String    @default("")
+  /// anime ou manga : ce qu'il faut avoir vu pour ne pas être spoilé.
+  spoiler     String
+  /// Questions ({ prompt, answer, wrong, alternatives }), validées à l'écriture et à la lecture.
+  questions   Json
+  /// public, ou hidden après plusieurs signalements.
+  status      String    @default("public")
+  /// Relu par un administrateur : les signalements ne le masquent plus.
+  reviewedAt  DateTime?
+  /// Nombre de comptes qui l'ont terminé.
+  plays       Int       @default(0)
+  createdAt   DateTime  @default(now())
+
+  reports QuizReport[]
+  results QuizPlay[]
+
+  @@index([status, createdAt])
+  @@index([authorId])
+}
+
+/// Signalement d'un quiz par un joueur : un seul par joueur et par quiz.
+model QuizReport {
+  quizId    String
+  quiz      Quiz     @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  reason    String   @default("")
+  createdAt DateTime @default(now())
+
+  @@id([quizId, userId])
+}
+
+/// Résultat d'un joueur sur un quiz : sa première partie terminée est la seule récompensée.
+model QuizPlay {
+  quizId    String
+  quiz      Quiz     @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  /// Meilleur score du joueur sur ce quiz.
+  score     Int
+  maxScore  Int
+  berrys    Int      @default(0)
+  createdAt DateTime @default(now())
+
+  @@id([quizId, userId])
+  @@index([userId, createdAt])
 }

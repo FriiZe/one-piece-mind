@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import type { PlayCharacter } from "../cards";
 import { CharacterSearch } from "../ui/CharacterSearch";
 import { GameEnd, GameStart } from "../ui/GameEnd";
+import { Portrait } from "../ui/Portrait";
 import { Button, Progress } from "../ui/primitives";
 import type { GameProps } from "../ui/types";
 import { useRun } from "../ui/useRun";
@@ -129,6 +130,7 @@ export default function ClueGame({ data, slug }: GameProps & { slug: ClueSlug })
         </>
       )}
 
+      {done && round.target.img && <Portrait img={round.target.img} />}
       {done && (
         <div className="flex flex-wrap items-center justify-between gap-3" aria-live="polite">
           <p className={`font-bold ${state.outcome ? "text-emerald-300" : "text-vest"}`}>

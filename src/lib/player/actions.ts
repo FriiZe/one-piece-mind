@@ -7,7 +7,7 @@
 import type { GameReport } from "@/games/report";
 import { accountsEnabled, db } from "@/lib/server/db";
 import { DUMMY_HASH, hashPassword, verifyPassword } from "@/lib/server/password";
-import { buyRecruitFor, sanitizeGuestState, setCrewFor, submitGame } from "@/lib/server/player";
+import { buyRecruitFor, sanitizeGuestState, sellDuplicatesFor, setCrewFor, submitGame } from "@/lib/server/player";
 import {
   allowAttempt,
   clearAttempts,
@@ -19,7 +19,7 @@ import {
 } from "@/lib/server/session";
 import type { SpoilerMode } from "@/lib/spoilers";
 import { Prisma } from "@/generated/prisma/client";
-import type { CrewResult, GameResult, RecruitResult } from "./types";
+import type { CrewResult, GameResult, RecruitResult, SellResult } from "./types";
 
 const isMode = (value: unknown): value is SpoilerMode => value === "anime" || value === "manga";
 
@@ -34,6 +34,14 @@ export async function buyRecruitAction(mode: SpoilerMode): Promise<RecruitResult
   const user = await currentUser();
   if (!user || !isMode(mode)) return { ok: false, reason: "unavailable" };
   return buyRecruitFor(user.id, mode);
+}
+
+export async function sellDuplicatesAction(mode: SpoilerMode, characterId: string | null): Promise<SellResult> {
+  const user = await currentUser();
+  if (!user || !isMode(mode) || (characterId !== null && (typeof characterId !== "string" || characterId.length > 80))) {
+    return { ok: false, reason: "unavailable" };
+  }
+  return sellDuplicatesFor(user.id, mode, characterId);
 }
 
 export async function setCrewAction(post: string, characterId: string | null): Promise<CrewResult> {

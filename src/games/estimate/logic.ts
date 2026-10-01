@@ -34,6 +34,32 @@ export function sliderToValue(question: Pick<EstimateQuestion, "min" | "max" | "
   return Math.round(raw / magnitude) * magnitude;
 }
 
+/** Position du curseur, de 0 à 1, qui désigne une valeur : l'inverse de `sliderToValue`. */
+export function valueToSlider(question: Pick<EstimateQuestion, "min" | "max" | "scale">, value: number): number {
+  const v = Math.min(question.max, Math.max(question.min, value));
+  if (question.scale === "linear") return (v - question.min) / (question.max - question.min);
+  return (Math.log(v) - Math.log(question.min)) / (Math.log(question.max) - Math.log(question.min));
+}
+
+const MULTIPLIERS: Record<string, number> = { k: 1e3, m: 1e6, million: 1e6, millions: 1e6, md: 1e9, mds: 1e9, milliard: 1e9, milliards: 1e9 };
+
+/**
+ * Nombre saisi au clavier : « 1 500 000 000 », « 1,5 md », « 320 M », « 56k ».
+ * `null` si la saisie n'est pas un nombre.
+ */
+export function parseEstimate(text: string): number | null {
+  const compact = text
+    .toLowerCase()
+    .replace(/berrys?|฿/g, "")
+    .replace(/[\s\u00a0\u202f]/g, "");
+  const short = compact.match(/^(\d+(?:[.,]\d+)?)(k|m|md|mds|millions?|milliards?)$/);
+  if (short) return Math.round(Number(short[1].replace(",", ".")) * MULTIPLIERS[short[2]]);
+  // Sans unité, points et virgules ne peuvent être que des séparateurs de milliers
+  if (!/^\d[\d.,']*$/.test(compact)) return null;
+  const value = Number(compact.replace(/\D/g, ""));
+  return Number.isSafeInteger(value) ? value : null;
+}
+
 /**
  * Points d'une estimation, de 0 à 5. Échelle logarithmique : on juge le
  * rapport entre l'estimation et la vraie valeur. Échelle linéaire : l'écart,

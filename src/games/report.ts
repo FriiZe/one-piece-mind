@@ -12,6 +12,7 @@ import * as anagramme from "./anagramme/logic";
 import * as avis from "./avis-de-recherche/logic";
 import * as chronologie from "./chronologie/logic";
 import * as clues from "./clues/logic";
+import * as dcc from "./duo-carre-cash/logic";
 import * as estimate from "./estimate/logic";
 import * as classement from "./le-classement/logic";
 import * as memo from "./memo/logic";
@@ -90,6 +91,13 @@ export const reportSchema = z.discriminatedUnion("slug", [
   z.object({ slug: z.literal("anagramme"), seed, mode, difficulty, answers: z.array(z.string().max(40)).max(anagramme.ROUNDS) }),
   z.object({ slug: z.literal("wordle"), seed, mode, difficulty, guesses: z.array(z.string().max(12)).max(wordle.MAX_TRIES) }),
   z.object({
+    slug: z.literal("duo-carre-cash"),
+    seed,
+    mode,
+    difficulty,
+    answers: z.array(z.object({ kind: z.enum(dcc.DCC_KINDS), value: z.string().max(120) })).max(dcc.DCC_LENGTH),
+  }),
+  z.object({
     slug: z.literal("memo"),
     seed,
     mode,
@@ -164,6 +172,8 @@ export function evaluateReport(report: GameReport, { data, animeCharacters, toda
     case "premiere-apparition":
     case "prime-d-equipage":
       return outcome(estimate.evaluate(report.slug, report.seed, report.difficulty, report.answers, data));
+    case "duo-carre-cash":
+      return outcome(dcc.evaluate(report.seed, report.difficulty, report.answers, data));
     case "les-indices":
     case "emojis":
       return outcome(clues.evaluate(report.slug, report.seed, report.difficulty, report.rounds, data));

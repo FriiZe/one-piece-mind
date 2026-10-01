@@ -22,7 +22,7 @@ Site de mini-jeux One Piece, gratuit, jouable dans le navigateur, dans l'esprit 
 | Pages | Génération statique pour l'accueil, le catalogue, `/jeux/[slug]`, le wiki | Le jeu lui-même est un composant client chargé dans la page |
 | Base de données | Postgres Neon (Marketplace Vercel) + Prisma | Même duo que `one-piece-league` |
 | Auth | Comptes créés sur le site (pseudo + mot de passe), et mode invité | Progression invitée en local, reprise à l'inscription. Discord et Google plus tard |
-| Temps réel | WebSockets natifs des Vercel Functions + Redis Upstash | Voir risque n°2 |
+| Temps réel | Interrogation régulière du serveur, état des salons dans Postgres | Ni WebSocket ni Redis pour l'instant, voir risque n°2 |
 | Fichiers | Vercel Blob (images, audio) | |
 | Tâches planifiées | Vercel Cron | Tirage quotidien, boss hebdo, fin de saison classée |
 | Tests | Vitest (générateurs de manches), Playwright (parcours clés) | |
@@ -51,7 +51,7 @@ Il n'existe pas d'équivalent de PokéAPI aussi complet pour One Piece. Le jeu d
 
 **Images et sons.** À constituer : portraits, silhouettes (générées par script à partir des portraits détourés), Jolly Rogers, dessins de fruits, carte du monde, extraits de rires et de voix.
 
-## 4. Catalogue : 44 mini-jeux
+## 4. Catalogue : 45 mini-jeux
 
 Lots : **A** = 10 jeux phares pour la mise en ligne, **B** = le gros du catalogue, **C** = jeux lourds (ressources ou logique spécifiques).
 
@@ -116,7 +116,7 @@ Lots : **A** = 10 jeux phares pour la mise en ligne, **B** = le gros du catalogu
 | 35 | Dans quel arc ? | Situer un personnage ou un événement | B |
 | 36 | Vrai ou faux | Affirmations générées à partir des données | B |
 
-### Défis (8)
+### Défis (9)
 
 | # | Jeu | Principe | Lot |
 |---|---|---|---|
@@ -128,6 +128,7 @@ Lots : **A** = 10 jeux phares pour la mise en ligne, **B** = le gros du catalogu
 | 42 | Grille 3×3 | Remplir une grille en croisant deux critères (« Sabreur » × « East Blue ») | C |
 | 43 | Connexions | Regrouper 16 personnages en 4 familles cachées | C |
 | 44 | Recrute ton équipage | Tirage de personnages au hasard, composer l'équipage le plus fort poste par poste | C |
+| 45 | Duo, Carré ou Cash | Avant chaque réponse, choisir son risque : deux propositions, quatre, ou aucune | B |
 
 ## 5. Méta-jeu
 
@@ -151,8 +152,8 @@ Transposition des systèmes de PokeMind.
 
 Mode salon façon Kahoot : un hôte crée une partie, partage un code, choisit les jeux et le mode spoiler ; tout le monde répond aux mêmes manches, classement en direct.
 
-- Connexion par WebSocket sur une Vercel Function, état du salon et diffusion entre instances par Redis.
-- Le serveur fait foi : il envoie la manche, reçoit les réponses, calcule les scores.
+- Chaque navigateur interroge le serveur toutes les une à deux secondes ; l'état du salon vit dans la base Postgres. Pas de WebSocket ni de Redis : rien à ajouter à l'hébergement.
+- Le serveur fait foi : il envoie la manche, reçoit les réponses, calcule les scores. La bonne réponse n'est envoyée qu'à la correction.
 - Ensuite : duel classé 1 contre 1 (« Davy Back Fight ») avec file d'attente.
 
 ## 7. Référencement
@@ -174,7 +175,7 @@ Mode salon façon Kahoot : un hôte crée une partie, partage un code, choisit l
 | 3. Lot B | Les 26 jeux du lot B, objectifs par jeu, défis hebdo | Catalogue de 36 jeux |
 | 4. Multijoueur | Salons à code, amis, classement en direct | Parties entre amis |
 | 5. Compétitif et communauté | Classé, raid hebdo, marché, boutique, quiz des joueurs + modération | Parité avec PokeMind |
-| 6. Lot C | Route de Grand Line, GeoPiece, Den Den Devin, grille, connexions, rires et voix | 44 jeux |
+| 6. Lot C | Route de Grand Line, GeoPiece, Den Den Devin, grille, connexions, rires et voix | 45 jeux |
 
 Le lot C peut s'intercaler plus tôt, jeu par jeu, selon l'envie.
 
@@ -212,6 +213,28 @@ Le lot C peut s'intercaler plus tôt, jeu par jeu, selon l'envie.
   - Silhouette QCM, Avant / après l'ellipse, Fruit du démon (au dessin) : pas d'images adaptées.
   - Qui a dit ça ? : pas de recueil de citations.
 
+**Phase 4 : salons multijoueur et amis.**
+
+- Salons : un hôte crée un salon (mode spoiler, difficulté, 5 à 15 questions, 10 à 20 secondes par question, quiz dans lesquels piocher) et partage un code de cinq caractères ou un lien. Jusqu'à 20 joueurs, avec ou sans compte.
+- Partie : tout le monde reçoit la même question en même temps ; une bonne réponse rapporte 500 points, plus jusqu'à 500 points de rapidité. Correction et classement après chaque question, podium à la fin, revanche possible dans le même salon.
+- Berrys : les joueurs connectés en gagnent selon leur score et leur place, dans la limite du plafond journalier. Une partie en solitaire ne rapporte rien.
+- Amis : demande par pseudo, acceptation, retrait, et invitation d'un ami dans un salon (affichée sur sa page « Multi » et sur son profil).
+- Changement par rapport au plan : interrogation régulière du serveur à la place des WebSockets et de Redis. Plus simple et suffisant pour un quiz ; le délai d'affichage est d'une à deux secondes.
+- Limites : les jeux de salon sont les onze quiz à choix, pas les autres jeux. Pas de chat. Le duel classé reste en phase 5.
+
+**Retours de joueurs et quiz de la communauté** (après la phase 4).
+
+- Collection : fiche détaillée de chaque avis de recherche ; les doublons se défont contre des Berrys (100 à 1 500 ฿ selon la rareté, trois fois plus pour un doré), un par un ou tous d'un coup. On garde toujours un exemplaire.
+- Équipage : les postes se composent en images, en choisissant un avis dans sa collection.
+- Jeux : portraits dans les propositions et à la correction ; Devine la prime et les autres estimations acceptent un nombre tapé au clavier (« 320 M », « 1,5 Md ») ; Anagramme reprend la main sur le champ à chaque manche ; Trouve-les tous signale les groupes déjà complétés.
+- Nouveau jeu, « Duo, Carré ou Cash » : 1, 3 ou 5 points selon le risque choisi. En Cash, la réponse est écrite ; la casse, les accents et une faute de frappe sont tolérés. Le site compte 31 jeux.
+- Quiz de la communauté (prévus en phase 5, avancés) : un joueur connecté écrit un quiz de 5 à 30 questions, les autres y jouent en Duo, Carré ou Cash.
+  - Publication immédiate, création réservée aux comptes, 20 quiz par auteur et 5 par jour.
+  - Modération : signalement par les joueurs connectés, masquage automatique au troisième signalement, suppression et remise en ligne par les administrateurs (`ADMIN_USERNAMES`).
+  - Berrys : jusqu'à 150 ฿ la première fois qu'on termine le quiz d'un autre joueur, dix quiz récompensés par jour au plus, dans le plafond journalier. Limite assumée : deux comptes suffisent à contourner la règle « pas son propre quiz », d'où la petite somme.
+  - Les quiz ne sont pas proposés aux moteurs de recherche : leur contenu n'est pas relu avant publication.
+- Reste à faire : modifier un quiz déjà publié, jouer un quiz de la communauté en salon multijoueur.
+
 **À reprendre plus tard**
 
 - Libellés français des surnoms ; les affiliations sont traduites (`src/lib/data/labels.ts`), avec un repli sur l'anglais pour les plus rares.
@@ -221,7 +244,7 @@ Le lot C peut s'intercaler plus tôt, jeu par jeu, selon l'envie.
 ## 9. Risques
 
 1. **Droits d'auteur.** One Piece appartient à Shueisha et Toei. Un site de fans gratuit est en général toléré, mais les images officielles et surtout les extraits audio (rires, voix) sont les éléments les plus exposés. Mesures : aucun revenu tiré de la licence, mention de non-affiliation, retrait rapide sur demande, version écrite des rires en premier.
-2. **WebSockets sur Vercel.** Le support natif date de juin 2026 et est encore en bêta publique : connexion limitée à 30 minutes, liée à une seule instance, sans diffusion ni présence intégrées. D'où Redis pour relier les instances. Solution de repli si la bêta pose problème : Ably ou Pusher, sans changer d'hébergeur.
+2. **Temps réel sur Vercel.** Les salons interrogent le serveur toutes les une à deux secondes : chaque joueur présent coûte donc des appels de fonction et des requêtes en base tant que le salon est ouvert. À surveiller si la fréquentation monte. Les WebSockets natifs de Vercel (bêta publique depuis juin 2026, connexion limitée à 30 minutes et liée à une seule instance, d'où un Redis pour relier les instances), Ably ou Pusher restent les solutions de rechange, sans changer d'hébergeur.
 3. **Qualité des données.** C'est le plus gros chantier caché : primes par époque, premières apparitions, marquage spoilers. Une erreur de marquage spoile un joueur. Prévoir des tests automatiques sur le jeu de données.
 4. **Économie et triche.** Un marché entre joueurs attire les abus ; d'où la correction serveur et des plafonds de gains journaliers.
 

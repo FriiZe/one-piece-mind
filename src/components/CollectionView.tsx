@@ -6,9 +6,10 @@ import type { ResolvedData } from "@/games/cards";
 import { formatNumber } from "@/games/engine/text";
 import { Button, Panel } from "@/games/ui/primitives";
 import { WithGameData } from "@/games/ui/WithGameData";
-import { crewBonuses, RARITY_LABELS, tavernCost, type Recruit } from "@/lib/economy";
+import { crewBonuses, duplicatesValue, RARITY_LABELS, spareCopies, tavernCost, type Recruit } from "@/lib/economy";
 import { usePlayer } from "@/lib/player/PlayerProvider";
 import { CharacterCard } from "./CharacterCard";
+import { CharacterDetails } from "./CharacterDetails";
 
 const TIERS = [1, 2, 3, 4];
 
@@ -60,9 +61,73 @@ function Tavern({ data }: { data: ResolvedData }) {
   );
 }
 
+/** Tous les doublons visibles, défaits d'un coup : la vente est définitive, d'où la confirmation. */
+function Duplicates({ data }: { data: ResolvedData }) {
+  const { state, sell } = usePlayer();
+  const [confirming, setConfirming] = useState(false);
+  const [busy, setBusy] = useState(false);
+  const [message, setMessage] = useState<string | null>(null);
+
+  let count = 0;
+  let value = 0;
+  for (const character of data.characters) {
+    const entry = state.collection[character.id];
+    const spare = spareCopies(entry);
+    count += spare.plain + spare.golden;
+    value += duplicatesValue(character, entry);
+  }
+
+  async function sellAll() {
+    setBusy(true);
+    const result = await sell(data.mode, null);
+    setBusy(false);
+    setConfirming(false);
+    setMessage(
+      result.ok
+        ? `${result.sold} doublon${result.sold > 1 ? "s" : ""} défait${result.sold > 1 ? "s" : ""} : +${formatNumber(result.berrys)} ฿.`
+        : "Les doublons n'ont pas pu être défaits.",
+    );
+  }
+
+  if (count === 0 && !message) return null;
+  return (
+    <Panel className="flex flex-wrap items-center justify-between gap-3">
+      <p className="text-mist" aria-live="polite">
+        {count > 0 ? (
+          <>
+            <strong className="text-foam">
+              {count} doublon{count > 1 ? "s" : ""}
+            </strong>{" "}
+            dans ta collection. Défaits, ils te rendent des Berrys ; tu gardes un exemplaire de chaque avis.
+          </>
+        ) : (
+          <strong className="text-emerald-300">{message}</strong>
+        )}
+      </p>
+      {count > 0 &&
+        (confirming ? (
+          <span className="flex flex-wrap gap-2">
+            <Button onClick={sellAll} disabled={busy}>
+              Confirmer : +{formatNumber(value)} ฿
+            </Button>
+            <Button variant="secondary" onClick={() => setConfirming(false)} disabled={busy}>
+              Annuler
+            </Button>
+          </span>
+        ) : (
+          <Button variant="secondary" onClick={() => setConfirming(true)}>
+            Défaire tous les doublons
+          </Button>
+        ))}
+    </Panel>
+  );
+}
+
 function Collection({ data }: { data: ResolvedData }) {
   const { state } = usePlayer();
   const [tier, setTier] = useState<number | null>(null);
+  const [openId, setOpenId] = useState<string | null>(null);
+  const open = openId ? data.characterById.get(openId) : undefined;
 
   const owned = useMemo(
     () =>
@@ -125,18 +190,25 @@ function Collection({ data }: { data: ResolvedData }) {
           {shown.map((character) => {
             const entry = state.collection[character.id];
             return (
-              <li key={character.id}>
+              <li key={character.id} className="relative transition-transform hover:-translate-y-0.5">
                 <CharacterCard
                   character={character}
                   golden={entry.golden > 0}
                   count={entry.count}
                   note={character.affiliation ?? undefined}
                 />
+                <button
+                  type="button"
+                  onClick={() => setOpenId(character.id)}
+                  aria-label={`Détails de l'avis de ${character.name}`}
+                  className="absolute inset-0 cursor-pointer rounded-md focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-straw"
+                />
               </li>
             );
           })}
         </ul>
       )}
+      {open && state.collection[open.id] && <CharacterDetails character={open} data={data} onClose={() => setOpenId(null)} />}
     </section>
   );
 }
@@ -147,6 +219,7 @@ export function CollectionView() {
       {({ data }) => (
         <div className="space-y-8">
           <Tavern data={data} />
+          <Duplicates data={data} />
           <Collection data={data} />
         </div>
       )}

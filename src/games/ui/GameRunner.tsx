@@ -64,6 +64,7 @@ const GAME_COMPONENTS = {
   "dans-quel-arc": qcm("dans-quel-arc"),
   "vrai-ou-faux": qcm("vrai-ou-faux"),
   "mode-aleatoire": qcm("mode-aleatoire"),
+  "duo-carre-cash": load(() => import("../duo-carre-cash/Game")),
 } satisfies Record<LiveSlug, ComponentType<GameProps>>;
 
 export function GameRunner({ slug }: { slug: LiveSlug }) {

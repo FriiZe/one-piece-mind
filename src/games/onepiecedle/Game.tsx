@@ -6,6 +6,7 @@ import { dailyNumber, isNextDay } from "../engine/daily";
 import type { Difficulty } from "../engine/difficulty";
 import { randomSeed } from "../engine/rng";
 import { CharacterSearch } from "../ui/CharacterSearch";
+import { Portrait } from "../ui/Portrait";
 import { Button, Panel, ResultPanel, ShareButton } from "../ui/primitives";
 import { StartScreen } from "../ui/StartScreen";
 import { useDailyKey, useStored } from "../ui/storage";
@@ -166,6 +167,7 @@ function Daily({ data, raw }: GameProps) {
               />
             }
           >
+            {target.img && <Portrait img={target.img} className="h-32 w-24" />}
             <p>
               Trouvé en {rows.length} essai{rows.length > 1 ? "s" : ""}. Prochain personnage à minuit.
             </p>
@@ -235,6 +237,7 @@ function Free({ data }: GameProps) {
       footer={({ won, rows }) =>
         won ? (
           <ResultPanel title={`${target.name} !`} actions={replay}>
+            {target.img && <Portrait img={target.img} className="h-32 w-24" />}
             <p>
               Trouvé en {rows.length} essai{rows.length > 1 ? "s" : ""}.
             </p>
@@ -242,6 +245,7 @@ function Free({ data }: GameProps) {
           </ResultPanel>
         ) : run.gaveUp ? (
           <ResultPanel title={`C'était ${target.name}`} actions={replay}>
+            {target.img && <Portrait img={target.img} className="h-32 w-24" />}
             <RewardSummary view={reward.view} data={data} />
           </ResultPanel>
         ) : (

@@ -1,12 +1,14 @@
 "use client";
 
 import { useState, type ReactNode } from "react";
+import { Portrait } from "./Portrait";
 import { Button, Panel, Progress } from "./primitives";
 
 export type QuizQuestion = {
   id: string;
   prompt: ReactNode;
-  options: { id: string; label: string; detail?: string }[];
+  /** `img` : portrait affiché dans la proposition (fichier dans /images/portraits). */
+  options: { id: string; label: string; detail?: string; img?: string | null }[];
   answerId: string;
   /** Complément affiché une fois la réponse donnée. */
   explanation?: ReactNode;
@@ -67,13 +69,16 @@ export function QuizFlow({
               type="button"
               disabled={answered}
               onClick={() => answer(option.id)}
-              className={`rounded-xl border-2 px-4 py-3 text-left transition-colors disabled:cursor-default ${state}`}
+              className={`flex items-center gap-3 rounded-xl border-2 px-4 py-3 text-left transition-colors disabled:cursor-default ${state}`}
             >
-              <span className="block font-bold text-foam">
-                {answered && isAnswer ? "✓ " : answered && option.id === chosen ? "✗ " : ""}
-                {option.label}
+              {option.img && <Portrait img={option.img} className="h-20 w-16 shrink-0" />}
+              <span className="min-w-0">
+                <span className="block font-bold text-foam">
+                  {answered && isAnswer ? "✓ " : answered && option.id === chosen ? "✗ " : ""}
+                  {option.label}
+                </span>
+                {option.detail && <span className="block text-sm text-mist">{option.detail}</span>}
               </span>
-              {option.detail && <span className="block text-sm text-mist">{option.detail}</span>}
             </button>
           );
         })}

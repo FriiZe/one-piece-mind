@@ -59,6 +59,7 @@ export const LIVE_SLUGS = [
   "dans-quel-arc",
   "vrai-ou-faux",
   "mode-aleatoire",
+  "duo-carre-cash",
 ] as const;
 export type LiveSlug = (typeof LIVE_SLUGS)[number];
 
@@ -117,6 +118,7 @@ export const GAMES: Game[] = [
   game("vrai-ou-faux", "Vrai ou faux", "savoir", "B", "Des affirmations à trancher, sans réfléchir trop longtemps."),
 
   game("mode-aleatoire", "Mode aléatoire", "defis", "B", "Un enchaînement de manches tirées dans tous les jeux."),
+  game("duo-carre-cash", "Duo, Carré ou Cash", "defis", "B", "Deux propositions, quatre, ou aucune : choisis ton risque à chaque question."),
   game("trouve-les-tous", "Trouve-les tous", "defis", "A", "Cite tous les membres d'un groupe avant la fin du chrono."),
   game("la-route-de-grand-line", "La Route de Grand Line", "defis", "C", "D'île en île, de plus en plus dur, un boss par arc."),
   game("den-den-devin", "Den Den Devin", "defis", "C", "Pense à un personnage : l'escargophone le devine."),

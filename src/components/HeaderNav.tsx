@@ -12,10 +12,17 @@ export function HeaderNav() {
       <Link href="/jeux" className="hover:text-foam">
         Jeux
       </Link>
-      <Link href="/defis" className="hover:text-foam">
+      <Link href="/multi" className="hover:text-foam">
+        Multi
+      </Link>
+      <Link href="/quiz" className="hover:text-foam">
+        Quiz
+      </Link>
+      {/* Sur téléphone, les défis et la collection restent accessibles depuis l'accueil et le profil */}
+      <Link href="/defis" className="hidden hover:text-foam sm:inline">
         Défis
       </Link>
-      <Link href="/collection" className="hover:text-foam">
+      <Link href="/collection" className="hidden hover:text-foam sm:inline">
         Collection
       </Link>
       <Link

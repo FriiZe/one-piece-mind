@@ -3,7 +3,7 @@ import { randomInt, type Rng } from "@/games/engine/rng";
 import type { LiveSlug } from "@/lib/games/catalog";
 import { berryBonus, crewBonuses } from "./crew";
 import { newlyMet, withGame } from "./objectives";
-import type { GameOutcome, Milestone, PlayerState, Recruit, Recruitable, Reward } from "./types";
+import type { CollectionEntry, GameOutcome, Milestone, PlayerState, Recruit, Recruitable, Reward } from "./types";
 import { currentWeek, weekKey, weeklyChallenges } from "./weekly";
 
 /** Berrys d'une partie parfaite en difficulté normale, avant bonus. */
@@ -38,6 +38,8 @@ export const BASE_BERRYS: Record<LiveSlug, number> = {
   "dans-quel-arc": 350,
   "vrai-ou-faux": 250,
   "mode-aleatoire": 400,
+  // Le maximum suppose dix réponses justes sans proposition : la barre est haute, la prime aussi
+  "duo-carre-cash": 800,
 };
 export const DAILY_CHALLENGE_BERRYS = 1500;
 
@@ -171,6 +173,58 @@ export function applyGame(
       total,
     },
   };
+}
+
+/** Berrys rendus par un doublon défait, selon la rareté (1 = légendaire). */
+export const DUPLICATE_VALUE: Record<number, number> = { 1: 1500, 2: 600, 3: 250, 4: 100 };
+/** Un doublon doré rapporte davantage. */
+export const GOLDEN_DUPLICATE_FACTOR = 3;
+
+/** Exemplaires en trop d'un avis : on en garde toujours un, le doré s'il y en a un. */
+export function spareCopies(entry: CollectionEntry | undefined): { plain: number; golden: number } {
+  if (!entry) return { plain: 0, golden: 0 };
+  const golden = Math.min(entry.golden, entry.count);
+  const plain = entry.count - golden;
+  return golden > 0 ? { plain, golden: golden - 1 } : { plain: Math.max(0, plain - 1), golden: 0 };
+}
+
+/** Ce que rapporteraient les doublons d'un avis s'ils étaient défaits. */
+export function duplicatesValue(character: Pick<Recruitable, "tier">, entry: CollectionEntry | undefined): number {
+  const spare = spareCopies(entry);
+  const value = DUPLICATE_VALUE[character.tier] ?? DUPLICATE_VALUE[4];
+  return spare.plain * value + spare.golden * value * GOLDEN_DUPLICATE_FACTOR;
+}
+
+/**
+ * Défait les doublons d'un avis (ou de tous, avec `null`) contre des Berrys.
+ * Ces Berrys ne comptent ni dans la prime du joueur ni dans le plafond du jour :
+ * ils rendent une partie de ce qui a déjà été gagné.
+ */
+export function sellDuplicates(
+  state: PlayerState,
+  characterById: ReadonlyMap<string, Recruitable>,
+  characterId: string | null,
+): { state: PlayerState; berrys: number; sold: number; changed: string[] } | "nothing" {
+  const ids = characterId === null ? Object.keys(state.collection) : [characterId];
+  const collection = { ...state.collection };
+  const changed: string[] = [];
+  let berrys = 0;
+  let sold = 0;
+
+  for (const id of ids) {
+    const entry = state.collection[id];
+    const character = characterById.get(id);
+    // Un avis masqué par le mode spoiler du joueur reste tel quel
+    if (!entry || !character) continue;
+    const spare = spareCopies(entry);
+    if (spare.plain + spare.golden === 0) continue;
+    berrys += duplicatesValue(character, entry);
+    sold += spare.plain + spare.golden;
+    collection[id] = { count: 1, golden: entry.golden > 0 ? 1 : 0 };
+    changed.push(id);
+  }
+  if (sold === 0) return "nothing";
+  return { state: { ...state, collection, berrys: state.berrys + berrys }, berrys, sold, changed };
 }
 
 export function tavernCost(discount: number): number {

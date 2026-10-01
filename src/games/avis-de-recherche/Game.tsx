@@ -1,7 +1,8 @@
 "use client";
 
+import Image from "next/image";
 import { useMemo, useState } from "react";
-import type { PlayCharacter } from "../cards";
+import { portraitUrl, type PlayCharacter } from "../cards";
 import { byDifficulty, type Difficulty } from "../engine/difficulty";
 import { createRng, randomSeed } from "../engine/rng";
 import { formatNumber } from "../engine/text";
@@ -30,12 +31,13 @@ type Run = {
   newBest: boolean;
 };
 
-function Poster({ bounty, name }: { bounty: number; name: string | null }) {
+/** `name` et `img` ne sont donnés qu'une fois l'affiche résolue. */
+function Poster({ bounty, name, img }: { bounty: number; name: string | null; img?: string | null }) {
   return (
     <div className="mx-auto w-full max-w-xs rounded-md border-4 border-parchment-dark bg-parchment p-4 text-center text-ink shadow-xl">
       <p className="font-display text-5xl tracking-widest">WANTED</p>
-      <div className="mx-auto my-3 flex aspect-[2/1] items-center sm:aspect-[4/3] justify-center bg-ink/15 font-display text-7xl text-ink/40">
-        ?
+      <div className="relative mx-auto my-3 flex aspect-[2/1] items-center justify-center overflow-hidden bg-ink/15 font-display text-7xl text-ink/40 sm:aspect-[4/3]">
+        {img ? <Image src={portraitUrl(img)} alt="" fill sizes="320px" className="object-cover object-top" /> : "?"}
       </div>
       <p className="text-xs font-bold tracking-[0.3em]">DEAD OR ALIVE</p>
       <p className="mt-1 min-h-9 font-display text-3xl tracking-wide">{name ?? "· · ·"}</p>
@@ -143,7 +145,7 @@ export default function AvisDeRecherche({ data }: GameProps) {
     <div className="space-y-4">
       <Progress current={run.index + 1} total={posters.length} score={`Score : ${run.score}`} />
       <div className="grid gap-4 sm:grid-cols-2">
-        <Poster bounty={target.bounty} name={done ? target.name : null} />
+        <Poster bounty={target.bounty} name={done ? target.name : null} img={done ? target.img : null} />
 
         <div className="space-y-3">
           <ul className="space-y-2" aria-label="Indices" aria-live="polite">

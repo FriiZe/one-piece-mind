@@ -711,4 +711,34 @@ export const GAME_CONTENT: Record<LiveSlug, GameContent> = {
       SPOILER_FAQ,
     ],
   },
+  "duo-carre-cash": {
+    metaTitle: "Duo, Carré ou Cash : le quiz One Piece où tu choisis ton risque",
+    metaDescription:
+      "Un quiz One Piece en Duo, Carré ou Cash : deux propositions pour 1 point, quatre pour 3 points, ou aucune pour 5 points. Dix questions sur les équipages, les techniques, les surnoms et les arcs.",
+    intro:
+      "Avant chaque réponse, tu choisis ton risque. Duo : deux propositions, 1 point. Carré : quatre propositions, 3 points. Cash : aucune proposition, tu écris la réponse, et elle vaut 5 points.",
+    howTo: [
+      "Choisis un niveau de difficulté.",
+      "Lis la question, puis choisis Duo, Carré ou Cash. Une fois les propositions affichées, tu ne peux plus changer.",
+      "En Cash, écris ta réponse : la casse, les accents et une petite faute de frappe ne comptent pas.",
+      "La correction s'affiche après chaque réponse. Le score maximal est de 50 points.",
+    ],
+    faq: [
+      {
+        question: "Comment est jugée une réponse en Cash ?",
+        answer:
+          "Elle est comparée à la bonne réponse sans tenir compte des majuscules, des accents ni de la ponctuation, et une faute de frappe est tolérée. Pour un personnage, son nom d'usage suffit : « Luffy » vaut « Monkey D. Luffy ». Pour un équipage, « Chapeau de paille » vaut « Équipage du Chapeau de paille ».",
+      },
+      {
+        question: "Sur quoi portent les questions ?",
+        answer: "Sur les équipages, les navires, les mers d'origine et les races, les arcs, les techniques, les armes et les surnoms.",
+      },
+      {
+        question: "Peut-on jouer à des quiz écrits par d'autres joueurs ?",
+        answer:
+          "Oui. La page « Quiz de la commu » rassemble les quiz créés par les joueurs, qui se jouent eux aussi en Duo, Carré ou Cash. Avec un compte, tu peux créer le tien.",
+      },
+      SPOILER_FAQ,
+    ],
+  },
 };
