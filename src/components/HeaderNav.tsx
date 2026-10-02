@@ -102,8 +102,13 @@ const TABS = [
   },
 ];
 
-/** Avancement des jeux du jour : toujours sous les yeux, il mène aux défis. */
-function DailyPill() {
+/**
+ * Avancement des jeux du jour : toujours sous les yeux, il mène aux défis. Quand la place manque
+ * sur téléphone, il se réduit au compte : partout sur un écran très étroit (moins de 360 px), et
+ * dès qu'il partage l'en-tête avec le bouton « Connexion » (`compact`). Les deux à la fois, il
+ * s'efface : l'onglet « Défis » de la barre du bas mène au même endroit.
+ */
+function DailyPill({ compact }: { compact: boolean }) {
   const { ready, count, total } = useDaily();
   const pathname = usePath();
   const t = useT();
@@ -115,28 +120,34 @@ function DailyPill() {
       aria-current={current ? "page" : undefined}
       className={`rounded-full border border-straw px-3 py-1.5 whitespace-nowrap transition-colors ${
         current ? "bg-straw text-ink" : "text-straw hover:bg-straw/15"
-      }`}
+      } ${compact ? "max-[360px]:hidden" : ""}`}
     >
-      {t("Jour", "Daily")} <span className={ready ? "" : "invisible"}>{count}</span>/{total}
+      <span className={compact ? "max-sm:hidden" : "max-[360px]:hidden"}>{t("Jour", "Daily")} </span>
+      <span className={ready ? "" : "invisible"}>{count}</span>/{total}
     </Link>
   );
 }
 
-/** En-tête du site. Sur téléphone, les rubriques passent dans la barre d'onglets du bas. */
+/**
+ * En-tête du site. Sur téléphone et tablette (moins de 1024 px), les rubriques passent dans la barre
+ * d'onglets du bas : en dessous de cette largeur, elles ne tiennent pas à côté du solde et du compte.
+ */
 export function SiteHeader() {
   const { status, accountsEnabled, state, username } = usePlayer();
   const pathname = usePath();
   const t = useT();
   const locale = useLocale();
   const berrys = formatNumber(state.berrys, locale);
+  const guest = status === "guest" && accountsEnabled;
 
   return (
     <header className="border-b border-sea-700/60">
-      <div className="mx-auto flex h-14 w-full max-w-6xl items-center gap-3 px-4 md:h-16 md:gap-7">
-        <Link href="/" className="font-display text-[22px] tracking-wide text-straw md:text-[26px]">
+      <div className="mx-auto flex h-14 w-full max-w-6xl items-center gap-2 px-4 lg:h-16 lg:gap-5 xl:gap-7">
+        {/* Si tout ne tient pas malgré tout (solde à rallonge), c'est le nom du site qui est coupé, pas la page qui déborde */}
+        <Link href="/" className="min-w-0 truncate font-display text-[22px] tracking-wide text-straw max-[375px]:text-[19px] lg:text-[26px]">
           {SITE_NAME}
         </Link>
-        <nav aria-label={t("Navigation principale", "Main navigation")} className="hidden items-center gap-6 text-[15px] font-bold text-mist md:flex">
+        <nav aria-label={t("Navigation principale", "Main navigation")} className="hidden items-center gap-5 text-[15px] font-bold whitespace-nowrap text-mist lg:flex xl:gap-6">
           {LINKS.map((link) => {
             const active = link.active(pathname);
             return (
@@ -152,8 +163,8 @@ export function SiteHeader() {
           })}
         </nav>
 
-        <div className="ml-auto flex items-center gap-2 text-sm font-bold md:gap-3">
-          <DailyPill />
+        <div className="ml-auto flex shrink-0 items-center gap-2 text-sm font-bold lg:gap-3">
+          <DailyPill compact={guest} />
           {/* Le solde n'est connu qu'une fois le navigateur prêt : on réserve sa place pour éviter un saut */}
           <Link
             href="/boutique"
@@ -163,22 +174,22 @@ export function SiteHeader() {
             ฿ {berrys}
           </Link>
           <NotificationBell />
-          <LanguageSwitch className="hidden md:inline-flex" />
+          <LanguageSwitch className="hidden lg:inline-flex" />
           {status === "user" && (
             <Link
               href="/profil"
               aria-current={under(pathname, "/profil") ? "page" : undefined}
-              className="hidden items-center gap-2 rounded-full border border-sea-600 px-3.5 py-1.5 hover:border-straw md:flex"
+              className="hidden items-center gap-2 rounded-full border border-sea-600 px-3.5 py-1.5 hover:border-straw lg:flex"
             >
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" className="size-4">
                 <circle cx="12" cy="8" r="4" />
                 <path d="M4 21a8 8 0 0 1 16 0" />
               </svg>
-              <span className="max-w-40 truncate">{username}</span>
+              <span className="max-w-24 truncate xl:max-w-40">{username}</span>
             </Link>
           )}
-          {status === "guest" && accountsEnabled && (
-            <Link href="/profil" className="rounded-full bg-straw px-4 py-1.5 whitespace-nowrap text-ink hover:bg-straw-dark">
+          {guest && (
+            <Link href="/profil" className="rounded-full bg-straw px-3 py-1.5 whitespace-nowrap text-ink hover:bg-straw-dark lg:px-4">
               {t("Connexion", "Log in")}
             </Link>
           )}
@@ -188,7 +199,7 @@ export function SiteHeader() {
   );
 }
 
-/** Barre d'onglets du téléphone, fixée en bas de l'écran. */
+/** Barre d'onglets du téléphone et de la tablette, fixée en bas de l'écran. */
 export function TabBar() {
   const pathname = usePath();
   const t = useT();
@@ -196,7 +207,7 @@ export function TabBar() {
   return (
     <nav
       aria-label={t("Rubriques", "Sections")}
-      className="fixed inset-x-0 bottom-0 z-30 grid grid-cols-6 border-t border-sea-700 bg-sea-900 pb-[env(safe-area-inset-bottom)] text-[11px] font-bold text-mist md:hidden"
+      className="fixed inset-x-0 bottom-0 z-30 grid grid-cols-6 border-t border-sea-700 bg-sea-900 pb-[env(safe-area-inset-bottom)] text-[11px] font-bold text-mist lg:hidden"
     >
       {TABS.map((tab) => {
         const active = tab.active(pathname);

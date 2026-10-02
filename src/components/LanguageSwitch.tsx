@@ -11,14 +11,17 @@ function rememberLocale(locale: Locale) {
 /**
  * Sélecteur de langue : la même page, dans l'autre langue. De vrais liens,
  * pour que les moteurs de recherche suivent aussi le passage d'une langue à l'autre.
+ *
+ * `className` fixe l'affichage (`inline-flex` par défaut) : écrit ici en dur, il l'emporterait
+ * sur le `hidden` de l'en-tête, et le sélecteur s'y afficherait aussi sur téléphone.
  */
-export function LanguageSwitch({ className = "" }: { className?: string }) {
+export function LanguageSwitch({ className = "inline-flex" }: { className?: string }) {
   const current = useLocale();
   const path = usePath();
   const t = useT();
 
   return (
-    <span role="group" aria-label={t("Langue du site", "Site language")} className={`inline-flex items-center gap-1 text-[13px] font-bold ${className}`}>
+    <span role="group" aria-label={t("Langue du site", "Site language")} className={`items-center gap-1 text-[13px] font-bold ${className}`}>
       {LOCALES.map((locale) => (
         // Un lien classique : la page entière est rechargée dans l'autre langue, données des jeux comprises
         <a

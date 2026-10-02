@@ -45,8 +45,8 @@ export default async function RootLayout({ children, params }: LayoutProps<"/[la
 
   return (
     <html lang={lang} className={`${display.variable} ${body.variable} h-full antialiased`}>
-      {/* Sur téléphone, la barre d'onglets est fixée en bas : on lui réserve sa hauteur */}
-      <body className="flex min-h-full flex-col pb-[calc(68px+env(safe-area-inset-bottom))] font-sans md:pb-0">
+      {/* Sur téléphone et tablette, la barre d'onglets est fixée en bas : on lui réserve sa hauteur */}
+      <body className="flex min-h-full flex-col pb-[calc(68px+env(safe-area-inset-bottom))] font-sans lg:pb-0">
         <LocaleProvider locale={lang}>
           <PlayerProvider>
             <SiteHeader />
