@@ -10,6 +10,7 @@ import * as memo from "@/games/memo/logic";
 import * as qcm from "@/games/qcm/logic";
 import { evaluateReport, reportSchema, type GameReport } from "@/games/report";
 import * as wordle from "@/games/wordle/logic";
+import { RACE_LABELS } from "@/lib/data/labels";
 import { DAILY_PASS } from "@/lib/economy/daily";
 
 const raw = buildGameData();
@@ -111,6 +112,157 @@ describe("quiz à choix", () => {
       }
     }
   });
+
+  it("Vrai ou faux : la réponse attendue dit vrai sur les tailles, les âges, les contenus rédigés et les races", () => {
+    const seen = new Set<string>();
+    const expected = (truth: boolean) => (truth ? "vrai" : "faux");
+    for (const data of modes) {
+      for (const seed of SEEDS) {
+        for (const q of qcm.generateQcm("vrai-ou-faux", seed, "expert", data)) {
+          const [kind, a, b] = q.id.split(":");
+          const [first, second] = [data.characterById.get(a), data.characterById.get(b)];
+          if (kind === "taille") expect(q.answerId, q.subject).toBe(expected(first!.height! > second!.height!));
+          else if (kind === "age") expect(q.answerId, q.subject).toBe(expected(first!.age! > second!.age!));
+          else if (kind === "avant") expect(q.answerId, q.subject).toBe(expected(first!.debut < second!.debut));
+          else if (q.id.startsWith("surnom-")) {
+            const id = q.id.slice("surnom-".length);
+            const { text } = data.extras.epithets.find((e) => e.characterId === id)!;
+            expect(q.answerId, q.subject).toBe(expected(q.subject.includes(`« ${text} »`)));
+          } else if (q.id.startsWith("technique-")) {
+            const technique = data.extras.techniques.find((t) => t.name === q.id.slice("technique-".length))!;
+            expect(q.answerId, q.subject).toBe(expected(q.subject.endsWith(` ${data.characterById.get(technique.characterId)!.name}.`)));
+          } else if (q.id.startsWith("arme-")) {
+            const weapon = data.extras.weapons.find((w) => w.name === q.id.slice("arme-".length))!;
+            expect(q.answerId, q.subject).toBe(expected(q.subject.endsWith(` ${data.characterById.get(weapon.characterId)!.name}.`)));
+          } else if (q.id.startsWith("race-")) {
+            const c = data.characterById.get(q.id.slice("race-".length))!;
+            const shown = q.subject.slice(q.subject.lastIndexOf(": ") + 2, -1);
+            expect(q.answerId, q.subject).toBe(expected(c.races.some((race) => RACE_LABELS.fr[race] === shown)));
+            expect(q.explanation).not.toContain("undefined");
+          } else if (q.id.startsWith("fruit-nom-")) {
+            const c = data.characterById.get(q.id.slice("fruit-nom-".length))!;
+            expect(q.answerId, q.subject).toBe(expected(q.subject.endsWith(`: ${data.fruitById.get(c.fruitId!)!.name}.`)));
+          } else continue;
+          seen.add(kind.split("-")[0]);
+        }
+      }
+    }
+    // Chaque nouvelle famille d'affirmations sort au moins une fois
+    expect([...seen].sort()).toEqual(["age", "arme", "avant", "fruit", "race", "surnom", "taille", "technique"]);
+  });
+
+  it("pose aussi les questions dans l'autre sens, sans leurre qui serait une bonne réponse", () => {
+    const closedSlugs = ["navires", "techniques", "armes-et-sabres", "surnoms", "dans-quel-arc", "origine-et-race", "haki"] as const;
+    for (const slug of closedSlugs) {
+      const questions = SEEDS.flatMap((seed) => modes.flatMap((data) => qcm.generateQcm(slug, seed, "normal", data).map((q) => ({ q, data }))));
+      const closed = questions.filter(({ q }) => q.closed);
+      // Les deux sens existent, le sens direct reste le plus fréquent
+      expect(closed.length, slug).toBeGreaterThan(0);
+      expect(closed.length, slug).toBeLessThan(questions.length / 2);
+
+      for (const { q, data } of closed) {
+        const decoys = q.options.filter((option) => option.id !== q.answerId);
+        expect(q.options, q.id).toHaveLength(4);
+        if (slug === "navires") {
+          const ships = data.extras.ships.filter((ship) => ship.crew === q.subject).map((ship) => ship.name);
+          expect(ships).toEqual([q.answerId]);
+        } else if (slug === "dans-quel-arc") {
+          const arc = data.characterById.get(q.answerId)!.arc;
+          for (const decoy of decoys) expect(data.characterById.get(decoy.id)!.arc, q.id).not.toBe(arc);
+        } else if (slug === "haki") {
+          expect(data.characterById.get(q.answerId)!.haki).toContain("conqueror");
+          for (const decoy of decoys) expect(data.characterById.get(decoy.id)!.haki, q.id).not.toContain("conqueror");
+        } else if (slug === "origine-et-race") {
+          const target = data.characterById.get(q.answerId)!;
+          for (const decoy of decoys) {
+            const other = data.characterById.get(decoy.id)!;
+            if (q.id.startsWith("qui-mer-")) expect(other.sea, q.id).not.toBe(target.sea);
+            else expect(other.races.map((race) => RACE_LABELS.fr[race]), q.id).not.toContain(q.subject);
+          }
+        } else {
+          // Technique, arme ou surnom : aucun leurre n'appartient au personnage affiché
+          const owner = data.characters.find((c) => c.name === q.subject)!;
+          const items =
+            slug === "techniques"
+              ? data.extras.techniques.map((t) => ({ label: t.name, characterId: t.characterId }))
+              : slug === "armes-et-sabres"
+                ? data.extras.weapons.map((w) => ({ label: w.name, characterId: w.characterId }))
+                : data.extras.epithets.map((e) => ({ label: `« ${e.text} »`, characterId: e.characterId }));
+          const own = items.filter((item) => item.characterId === owner.id).map((item) => item.label);
+          expect(own, q.id).toContain(q.answerId);
+          for (const decoy of decoys) expect(own, q.id).not.toContain(decoy.label);
+        }
+      }
+    }
+  });
+
+  it("Équipage : dans l'autre sens, aucun leurre n'a jamais appartenu à l'organisation demandée", () => {
+    let reversed = 0;
+    for (const data of modes) {
+      for (const seed of SEEDS) {
+        for (const q of qcm.generateQcm("equipage", seed, "expert", data)) {
+          if (!q.closed) continue;
+          reversed++;
+          expect(data.characterById.get(q.answerId)!.affiliation).toBe(q.subject);
+          for (const option of q.options.filter((o) => o.id !== q.answerId)) {
+            const decoy = data.characterById.get(option.id)!;
+            expect(decoy.solo, `${q.subject} / ${decoy.name}`).toBe(true);
+            expect(decoy.affiliation).not.toBe(q.subject);
+          }
+        }
+      }
+    }
+    expect(reversed).toBeGreaterThan(20);
+    // Luffy n'a qu'un équipage ; Robin, passée par Baroque Works, ne peut pas servir de leurre
+    expect(anime.characterById.get("nico-robin")!.solo).toBe(false);
+    expect(anime.characterById.get("nami")!.solo).toBe(false);
+    expect(anime.characterById.get("king")!.solo).toBe(true);
+  });
+
+  it("Orthographe : fait aussi écrire des techniques et des armes, sous le portrait de leur propriétaire", () => {
+    const kinds = new Set<string>();
+    for (const seed of SEEDS) {
+      for (const q of qcm.generateQcm("orthographe", seed, "normal", anime)) {
+        expect(q.img, q.id).toBeTruthy();
+        expect(q.options.filter((option) => option.id === q.answerId)).toHaveLength(1);
+        const item = q.id.startsWith("technique-")
+          ? anime.extras.techniques.find((technique) => `technique-${technique.name}` === q.id)
+          : q.id.startsWith("arme-")
+            ? anime.extras.weapons.find((weapon) => `arme-${weapon.name}` === q.id)
+            : undefined;
+        if (!item) continue;
+        kinds.add(q.id.split("-")[0]);
+        expect(q.answerId).toBe(item.name);
+        expect(q.subject).toBe(anime.characterById.get(item.characterId)!.name);
+      }
+    }
+    expect([...kinds].sort()).toEqual(["arme", "technique"]);
+  });
+
+  it("Grand ou vieux : demande aussi le plus petit et le plus jeune", () => {
+    let least = 0;
+    for (const seed of SEEDS) {
+      for (const q of qcm.generateQcm("grand-ou-vieux", seed, "normal", anime)) {
+        const [a, b] = q.options.map((option) => anime.characterById.get(option.id)!);
+        const criterion = q.id.replace(/^min-/, "").startsWith("height") ? "height" : "age";
+        const taller = a[criterion]! > b[criterion]! ? a : b;
+        const smaller = taller === a ? b : a;
+        if (q.id.startsWith("min-")) least++;
+        expect(q.answerId, q.title).toBe((q.id.startsWith("min-") ? smaller : taller).id);
+        expect(/petit|jeune/.test(q.title), q.title).toBe(q.id.startsWith("min-"));
+      }
+    }
+    expect(least).toBeGreaterThan(20);
+  });
+
+  it("étoffe les contenus rédigés : assez de matière pour ne pas revoir les mêmes questions", () => {
+    expect(raw.extras.techniques.length).toBeGreaterThanOrEqual(250);
+    expect(raw.extras.epithets.length).toBeGreaterThanOrEqual(115);
+    expect(raw.extras.weapons.length).toBeGreaterThanOrEqual(35);
+    expect(raw.extras.ships.length).toBeGreaterThanOrEqual(35);
+    expect(raw.extras.emojis.length).toBeGreaterThanOrEqual(170);
+    expect(new Set(raw.extras.emojis.map((entry) => entry.emojis)).size).toBe(raw.extras.emojis.length);
+  });
 });
 
 describe("estimation", () => {
@@ -138,6 +290,36 @@ describe("estimation", () => {
     expect(estimate.scoreEstimate(linear, 900)).toBe(0);
   });
 
+  it("Première apparition : 10 points au numéro exact, un point de moins tous les douze numéros, encore 2 à 99 d'écart", () => {
+    const [question] = estimate.generateEstimates("premiere-apparition", SEEDS[0], "normal", modes[1]);
+    expect(estimate.maxPoints(question)).toBe(10);
+    const at = (gap: number) => estimate.scoreEstimate(question, question.answer + gap);
+    expect([0, 1, 12, 13, 24, 25, 37, 38, 49, 50, 61, 62, 74, 75, 86, 87, 99, 100, 150, 151, 500].map(at)).toEqual([
+      10, 9, 9, 8, 8, 7, 7, 6, 6, 5, 5, 4, 4, 3, 3, 2, 2, 1, 1, 0, 0,
+    ]);
+    // L'écart compte dans les deux sens
+    if (question.answer > 5) expect(estimate.scoreEstimate(question, question.answer - 3)).toBe(9);
+    // De 9 à 2 points, les paliers suivent 10 − 8 × écart / 99, arrondi à l'entier inférieur
+    estimate.NUMBER_BANDS.slice(1, 9).forEach((limit, index) => {
+      const points = 9 - index;
+      expect(Math.floor(10 - (8 * limit) / 99 + 1e-9), `${limit}`).toBe(points);
+      expect(Math.floor(10 - (8 * (limit + 1)) / 99 + 1e-9), `${limit + 1}`).toBe(points - 1);
+    });
+    // Huit réponses à 61 numéros d'écart : la moitié des points, de quoi valider le jeu du jour
+    const questions = estimate.generateEstimates("premiere-apparition", SEEDS[2], "normal", modes[1]);
+    const near = questions.map((q) => (q.answer > 61 ? q.answer - 61 : q.answer + 61));
+    const outcome = estimate.evaluate("premiere-apparition", SEEDS[2], "normal", near, modes[1]);
+    expect(outcome.score / outcome.max).toBeGreaterThanOrEqual(DAILY_PASS);
+
+    for (const data of modes) {
+      const questions = estimate.generateEstimates("premiere-apparition", SEEDS[1], "normal", data);
+      const perfect = questions.map((q) => q.answer);
+      expect(estimate.evaluate("premiere-apparition", SEEDS[1], "normal", perfect, data)).toEqual({ score: 80, max: 80 });
+    }
+    // Les estimations de primes gardent leur barème sur 5
+    expect(estimate.evaluate("devine-la-prime", SEEDS[1], "normal", [], anime).max).toBe(40);
+  });
+
   it("fait parcourir au curseur toute l'étendue des valeurs", () => {
     expect(estimate.sliderToValue(log, 0)).toBe(1_000_000);
     expect(estimate.sliderToValue(log, 1)).toBe(6_000_000_000);
@@ -158,7 +340,8 @@ describe("estimation", () => {
           expect(q.answer, `${slug} ${q.id}`).toBeLessThanOrEqual(q.max);
         }
         const perfect = questions.map((q) => q.answer);
-        expect(estimate.evaluate(slug, seed, "normal", perfect, data)).toEqual({ score: 40, max: 40 });
+        const max = slug === "premiere-apparition" ? 80 : 40;
+        expect(estimate.evaluate(slug, seed, "normal", perfect, data)).toEqual({ score: max, max });
       }
     }
   });
@@ -225,6 +408,29 @@ describe("jeux d'indices", () => {
       const { score, max } = clues.evaluate("les-indices", seed, "normal", events, anime);
       expect(max).toBe(50);
       expect(score / max).toBeGreaterThanOrEqual(DAILY_PASS);
+    }
+  });
+
+  it("donne le surnom en dernier indice avant l'initiale, quand le personnage en a un", () => {
+    let withEpithet = 0;
+    for (const seed of SEEDS) {
+      for (const round of clues.generateRounds("les-indices", seed, "normal", anime)) {
+        const epithet = anime.extras.epithets.find((entry) => entry.characterId === round.target.id);
+        const titles = round.clues.map((clue) => clue.title);
+        expect(titles.includes("Surnom")).toBe(!!epithet);
+        if (!epithet) continue;
+        withEpithet++;
+        expect(titles.at(-2)).toBe("Surnom");
+        expect(round.clues.at(-2)!.value).toBe(`« ${epithet.text} »`);
+      }
+    }
+    expect(withEpithet).toBeGreaterThan(10);
+  });
+
+  it("emojis : la difficulté choisit des personnages plus ou moins connus", () => {
+    for (const seed of SEEDS.slice(0, 10)) {
+      for (const round of clues.generateRounds("emojis", seed, "facile", anime)) expect(round.target.tier).toBe(1);
+      for (const round of clues.generateRounds("emojis", seed, "normal", anime)) expect(round.target.tier).toBeLessThanOrEqual(2);
     }
   });
 
@@ -301,17 +507,34 @@ describe("Wordle", () => {
 });
 
 describe("Mémo", () => {
-  it("distribue huit paires personnage / fruit, toutes différentes", () => {
+  it("distribue huit paires toutes différentes : chaque personnage avec son fruit, son surnom ou son arme", () => {
+    const themes = new Set<string>();
     for (const data of modes) {
-      for (const seed of SEEDS.slice(0, 10)) {
-        const deck = memo.generateDeck(seed, "normal", data);
-        expect(deck).toHaveLength(memo.PAIRS * 2);
-        for (let pair = 0; pair < memo.PAIRS; pair++) {
-          expect(deck.filter((card) => card.pair === pair).map((card) => card.kind).sort()).toEqual(["character", "fruit"]);
+      for (const difficulty of DIFFICULTIES) {
+        for (const seed of SEEDS) {
+          const deck = memo.generateDeck(seed, difficulty, data);
+          const theme = memo.themeOf(deck);
+          themes.add(theme);
+          expect(deck).toHaveLength(memo.PAIRS * 2);
+          expect(new Set(deck.map((card) => card.label)).size).toBe(deck.length);
+          for (let pair = 0; pair < memo.PAIRS; pair++) {
+            const cards = deck.filter((card) => card.pair === pair);
+            expect(cards.map((card) => card.kind).sort()).toEqual(["character", theme].sort());
+            // La carte jumelle est bien celle du personnage
+            const character = data.characters.find((c) => c.name === cards.find((card) => card.kind === "character")!.label)!;
+            const other = cards.find((card) => card.kind !== "character")!.label;
+            const own =
+              theme === "fruit"
+                ? [data.fruitById.get(character.fruitId!)!.name]
+                : theme === "epithet"
+                  ? data.extras.epithets.filter((e) => e.characterId === character.id).map((e) => `« ${e.text} »`)
+                  : data.extras.weapons.filter((w) => w.characterId === character.id).map((w) => w.name);
+            expect(own, `${character.name} / ${other}`).toContain(other);
+          }
         }
-        expect(new Set(deck.map((card) => card.label)).size).toBe(deck.length);
       }
     }
+    expect([...themes].sort()).toEqual(["epithet", "fruit", "weapon"]);
   });
 
   it("note une partie terminée selon le nombre de coups, et rien si elle ne l'est pas", () => {

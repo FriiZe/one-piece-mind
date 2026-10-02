@@ -12,8 +12,8 @@ export const CELLS = SIZE * SIZE;
 
 export type Grid = { rows: Criterion[]; columns: Criterion[] };
 
-/** En ligne, d'où vient le personnage ; en colonne, ce qu'il est. Les croisements ont ainsi des réponses. */
-const ROW_KINDS: CriterionKind[] = ["affiliation", "group", "sea", "arc"];
+/** En ligne, d'où vient le personnage, ou l'initiale de son nom ; en colonne, ce qu'il est. Les croisements ont ainsi des réponses. */
+const ROW_KINDS: CriterionKind[] = ["affiliation", "group", "sea", "arc", "initial"];
 const COLUMN_KINDS: CriterionKind[] = ["fruit", "haki", "bounty", "gender", "size", "age", "race"];
 
 /** Nombre de réponses possibles exigé pour chaque case : plus il est bas, plus la grille est dure. */
@@ -44,7 +44,12 @@ export function generate(seed: number, difficulty: Difficulty, data: ResolvedDat
     if (new Set(chosen.map((criterion) => criterion.kind)).size < SIZE) continue;
     // Les lignes sont tirées parmi celles qui ont assez de réponses dans chacune des trois colonnes
     const fitting = rows.filter((row) => chosen.every((column) => answers(row, column) >= MIN_ANSWERS[difficulty]));
-    if (fitting.length >= SIZE) return { rows: sample(rng, fitting, SIZE), columns: chosen };
+    // L'initiale du nom ne tient qu'une ligne au plus : une grille sur quatre, ou quand il manque une autre ligne
+    const initials = fitting.filter((row) => row.kind === "initial");
+    const others = fitting.filter((row) => row.kind !== "initial");
+    const letters = others.length < SIZE || rng() < 0.25 ? Math.min(1, initials.length) : 0;
+    if (others.length + letters < SIZE) continue;
+    return { rows: [...sample(rng, others, SIZE - letters), ...sample(rng, initials, letters)], columns: chosen };
   }
   return null;
 }

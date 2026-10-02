@@ -26,6 +26,15 @@
     { "name": "Naglfar", "crew": "New Giant Warrior Pirates" },
     { "name": "Mammoth", "crew": "Beasts Pirates" },
     { "name": "Numancia Flamingo", "crew": "Donquixote Pirates" },
-    { "name": "Snapper Head", "crew": "Sun Pirates" }
+    { "name": "Snapper Head", "crew": "Sun Pirates" },
+    { "name": "Grudge Dolph", "crew": "Hawkins Pirates" },
+    { "name": "Liberal Hind", "crew": "Drake Pirates" },
+    { "name": "Stay Tune", "crew": "On Air Pirates" },
+    { "name": { "fr": "Cheval blanc des bois dormants", "en": "Sleeping White Horse of the Forest" }, "crew": "Beautiful Pirates" },
+    { "name": "Happosai", "crew": "Happo Navy" },
+    { "name": "New Witch's Tongue", "crew": "Bellamy Pirates" },
+    { "name": "Bliking", "crew": "Bliking Pirates" },
+    { "name": "Wind Granma", "crew": "Revolutionary Army" },
+    { "name": { "fr": "Arche Maxim", "en": "Ark Maxim" }, "crew": "God's Army" }
   ]
 }

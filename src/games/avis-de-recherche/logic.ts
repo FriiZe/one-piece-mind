@@ -4,26 +4,30 @@ import { createRng, sample, type Rng } from "../engine/rng";
 import { normalizeText, revealsName } from "../engine/text";
 import { SEA_LABELS } from "@/lib/data/labels";
 import { translator, type Translate } from "@/lib/i18n";
+import { epithetClue } from "../clues/logic";
 import { bountyPool, type Bountied } from "../plus-ou-moins/logic";
 
 export const MAX_POINTS = 5;
 export const POSTERS = 5;
 export const MAX_SCORE = POSTERS * MAX_POINTS;
-export type Hint = { key: "affiliation" | "sea" | "arc" | "initial"; title: string; value: string };
+export type Hint = { key: "affiliation" | "sea" | "arc" | "epithet" | "initial"; title: string; value: string };
 
 function initialOf(character: PlayCharacter, t: Translate): string {
   const letters = normalizeText(character.name).replace(/ /g, "");
   return `${character.name[0].toUpperCase()}… (${letters.length} ${t("lettres", "letters")})`;
 }
 
-/** Indices d'une affiche, du plus vague au plus précis, l'initiale en dernier ; ceux sans valeur sont omis. */
+/** Indices d'une affiche, du plus vague au plus précis, le surnom puis l'initiale en dernier ; ceux sans valeur sont omis. */
 export function hintsFor(character: PlayCharacter, data: ResolvedData): Hint[] {
   const t = translator(data.locale);
   const arc = character.arc !== null ? data.arcs.get(character.arc) : undefined;
+  const epithet = epithetClue(character, data);
   const hints: (Hint | null)[] = [
     character.affiliation ? { key: "affiliation", title: "Affiliation", value: character.affiliation } : null,
     character.sea ? { key: "sea", title: t("Mer d'origine", "Home sea"), value: SEA_LABELS[data.locale][character.sea] } : null,
     arc ? { key: "arc", title: t("Première apparition", "First appearance"), value: arc } : null,
+    // Le surnom figure sur un vrai avis de recherche : c'est le dernier indice avant l'initiale
+    epithet ? { key: "epithet", ...epithet } : null,
   ];
   // Un indice qui contient le nom du personnage (« Équipage d'Arlong ») donnerait la réponse
   const safe = hints.filter((h): h is Hint => h !== null && !revealsName(h.value, character.name));

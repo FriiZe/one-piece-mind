@@ -43,7 +43,7 @@ src/games/
 ├── ui/            éléments communs : lanceur, choix du mode spoiler, saisie assistée, quiz
 ├── engine/criteria.ts  propriétés vérifiables d'un personnage : Connexions, Grille 3×3, Den Den Devin
 ├── ui/SortableList.tsx liste à ranger par glisser-déposer : Le classement, Chronologie
-├── qcm/           quiz à choix : treize jeux, un générateur de questions chacun
+├── qcm/           quiz à choix : douze jeux, un générateur de questions chacun
 ├── estimate/      estimation d'un nombre au curseur : trois jeux
 ├── clues/         personnage à retrouver par indices successifs : deux jeux
 └── <jeu>/         logic.ts (fonctions pures, testées) et Game.tsx (affichage)

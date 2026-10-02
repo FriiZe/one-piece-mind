@@ -36,10 +36,6 @@ const INTROS: Record<QcmSlug, Localized> = {
     en: "Ten techniques. Each time, find the character who uses it.",
   },
   "armes-et-sabres": { fr: "Dix armes célèbres. Qui les manie ?", en: "Ten famous weapons. Who wields them?" },
-  rires: {
-    fr: "Dix rires, écrits comme dans le manga. À qui appartient chacun ?",
-    en: "Ten laughs, written as they are in the manga. Whose is each one?",
-  },
   surnoms: {
     fr: "Dix surnoms. Retrouve à chaque fois le personnage qui le porte.",
     en: "Ten epithets. Each time, find the character who goes by it.",

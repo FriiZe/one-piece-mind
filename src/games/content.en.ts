@@ -99,7 +99,7 @@ export const GAME_CONTENT_EN: Record<LiveSlug, GameContent> = {
       "The poster is there, but the name and the photo are gone. All that's left is the bounty. It's up to you to work out who is wanted, with as few hints as possible.",
     howTo: [
       "Read the bounty printed on the poster and guess a character.",
-      "If you're wrong, a hint is revealed: affiliation, home sea, arc of first appearance, then the initial.",
+      "If you're wrong, a hint is revealed: affiliation, home sea, arc of first appearance, epithet when the character has one, then the initial.",
       "A poster is worth 5 points with no hints, then one point less for each hint revealed.",
       "Five posters per game, for a maximum of 25 points.",
     ],
@@ -245,11 +245,11 @@ export const GAME_CONTENT_EN: Record<LiveSlug, GameContent> = {
   memo: {
     metaTitle: "One Piece Memory: match each character to their Devil Fruit",
     metaDescription:
-      "A One Piece memory game: sixteen face-down cards, eight pairs. Match each character to their Devil Fruit by flipping as few cards as you can.",
+      "A One Piece memory game: sixteen face-down cards, eight pairs. Match each character to their Devil Fruit, epithet or weapon by flipping as few cards as you can.",
     intro:
-      "Sixteen cards face down. Eight show a character, eight show a Devil Fruit. It's up to you to rebuild the pairs, from memory.",
+      "Sixteen cards face down. Eight show a character; the other eight, depending on the game, a Devil Fruit, an epithet or a weapon. It's up to you to rebuild the pairs, from memory.",
     howTo: [
-      "Flip two cards: if the character did eat that fruit, the pair stays face up.",
+      "Flip two cards: if the fruit, epithet or weapon really is that character's, the pair stays face up.",
       "If not, both cards flip back after one second: remember where they are.",
       "The game ends when all eight pairs are found. The fewer moves you make, the more you score.",
     ],
@@ -316,7 +316,7 @@ export const GAME_CONTENT_EN: Record<LiveSlug, GameContent> = {
   "les-indices": {
     metaTitle: "Clues: guess the One Piece character with the fewest clues",
     metaDescription:
-      "Guess a One Piece character from clues that get more and more precise: arc, origin, fruit, Haki, affiliation, bounty. The fewer you use, the more you score.",
+      "Guess a One Piece character from clues that get more and more precise: arc, origin, fruit, Haki, affiliation, bounty, epithet. The fewer you use, the more you score.",
     intro:
       "The first clue is vague, the last one almost gives the answer away. It's up to you to find the character as early as possible.",
     howTo: [
@@ -328,7 +328,7 @@ export const GAME_CONTENT_EN: Record<LiveSlug, GameContent> = {
       {
         question: "What order do the clues come in?",
         answer:
-          "The arc of first appearance, the origin, the Devil Fruit type, the Haki, the affiliation, the bounty, then the initial of the name.",
+          "The arc of first appearance, the origin, the Devil Fruit type, the Haki, the affiliation, the bounty, the epithet when the character has one, then the initial of the name.",
       },
       {
         question: "What happens if I get it wrong on the last clue?",
@@ -345,8 +345,8 @@ export const GAME_CONTENT_EN: Record<LiveSlug, GameContent> = {
     intro:
       "Every famous pirate has an epithet, printed on their wanted poster. Can you give each one back to its owner?",
     howTo: [
-      "Read the epithet on screen.",
-      "Pick the character who goes by it out of the four on offer.",
+      "Read the epithet on screen. One time in three, it's the other way round: a character comes up, and you find their epithet.",
+      "Pick the right answer out of the four on offer.",
       "The right answer is shown straight away. Ten epithets per game.",
     ],
     faq: [
@@ -370,7 +370,7 @@ export const GAME_CONTENT_EN: Record<LiveSlug, GameContent> = {
       "One Piece names are full of traps. The portrait tells you who it is: it's up to you to pick the right spelling out of four.",
     howTo: [
       "Look at the portrait and the affiliation: they tell you which character it is.",
-      "Pick the correct spelling of their name out of the four on offer.",
+      "Pick the correct spelling of their name out of the four on offer. One time in three, it's the name of one of their techniques or of their weapon you have to spell.",
       "The other three are only one letter off: read carefully. Ten names per game.",
     ],
     faq: [
@@ -400,7 +400,7 @@ export const GAME_CONTENT_EN: Record<LiveSlug, GameContent> = {
     faq: [
       {
         question: "How many characters have an emoji riddle?",
-        answer: "About sixty for now, among the best known in the series.",
+        answer: "More than a hundred and seventy, from the heroes to the supporting cast.",
       },
       {
         question: "The emojis don't display properly on my device. What can I do?",
@@ -440,7 +440,7 @@ export const GAME_CONTENT_EN: Record<LiveSlug, GameContent> = {
       "Ten head-to-head duels between One Piece characters: who is taller? Who is older? The official heights have a few surprises in store for you.",
     intro: "Two characters face to face. A question that only looks simple: who is taller, or older?",
     howTo: [
-      "Read the question: it's about height or age.",
+      "Read the question carefully: it's about height or age, and asks sometimes for the taller or older one, sometimes for the shorter or younger one.",
       "Pick one of the two characters.",
       "The answer gives both values. Ten duels per game.",
     ],
@@ -465,8 +465,8 @@ export const GAME_CONTENT_EN: Record<LiveSlug, GameContent> = {
       "You remember the arc, but the number? Set the slider to the chapter or episode where the character first appears.",
     howTo: [
       "Move the slider to the number you have in mind, then submit.",
-      "You score 5 points if you're within ten chapters or so, then fewer and fewer as the gap widens.",
-      "Eight characters per game, for a maximum of 40 points.",
+      "The exact number is worth 10 points. After that you lose one point for roughly every twelve numbers off: 9 up to 12, 8 up to 24, 7 up to 37, 6 up to 49, 5 up to 61, 4 up to 74, 3 up to 86, 2 up to 99 and 1 up to 150. Beyond that, nothing.",
+      "Eight characters per game, for a maximum of 80 points.",
     ],
     faq: [
       {
@@ -511,7 +511,7 @@ export const GAME_CONTENT_EN: Record<LiveSlug, GameContent> = {
     intro: "Pirate, Marine, revolutionary? Work out each character's crew or organization.",
     howTo: [
       "Read the character's name, and look at their portrait when there is one.",
-      "Pick their organization out of the four on offer.",
+      "Pick their organization out of the four on offer. One time in three, it's the other way round: an organization comes up, and you find which of the four characters belongs to it.",
       "The right answer is shown straight away. Ten characters per game.",
     ],
     faq: [
@@ -533,7 +533,7 @@ export const GAME_CONTENT_EN: Record<LiveSlug, GameContent> = {
     intro: "Some have none, others have all three. Work out each character's Haki.",
     howTo: [
       "Read the character's name.",
-      "Pick the right combination: no Haki, just one type, two, or all three.",
+      "Pick the right combination: no Haki, just one type, two, or all three. Sometimes you have to spot the Conqueror's Haki user among four characters instead.",
       "The right answer is shown straight away. Ten characters per game.",
     ],
     faq: [
@@ -555,8 +555,8 @@ export const GAME_CONTENT_EN: Record<LiveSlug, GameContent> = {
       "Gomu Gomu no Pistol, Room, Diable Jambe: a One Piece attack quiz with ten techniques and four characters to choose from each time. Who uses what?",
     intro: "The name of an attack comes up. It's up to you to find the character who shouts it in battle.",
     howTo: [
-      "Read the name of the technique.",
-      "Pick the character who uses it out of the four on offer.",
+      "Read the name of the technique. One time in three, it's the other way round: a character comes up, and you find their technique.",
+      "Pick the right answer out of the four on offer.",
       "The right answer is shown straight away. Ten techniques per game.",
     ],
     faq: [
@@ -577,8 +577,8 @@ export const GAME_CONTENT_EN: Record<LiveSlug, GameContent> = {
       "A One Piece sword and weapon quiz: ten famous weapons, legendary swords first and foremost. Find the character who wields each one out of four choices.",
     intro: "Legendary swords, a weather staff, a trident: every weapon has its wielder. Can you match them up?",
     howTo: [
-      "Read the weapon's name and what kind of weapon it is.",
-      "Pick the character who wields it out of the four on offer.",
+      "Read the weapon's name and what kind of weapon it is. One time in three, it's the other way round: a character comes up, and you find their weapon.",
+      "Pick the right answer out of the four on offer.",
       "The right answer is shown straight away. Ten weapons per game.",
     ],
     faq: [
@@ -599,8 +599,8 @@ export const GAME_CONTENT_EN: Record<LiveSlug, GameContent> = {
       "Going Merry, Moby Dick, Oro Jackson, Polar Tang: a One Piece ship quiz with ten ships to return to their crew, and four choices each time.",
     intro: "A ship's name comes up. Which crew does it belong to?",
     howTo: [
-      "Read the ship's name.",
-      "Pick its crew out of the four on offer.",
+      "Read the ship's name. Sometimes it's the other way round: a crew comes up, and you find its ship.",
+      "Pick the right answer out of the four on offer.",
       "The right answer is shown straight away. Ten ships per game.",
     ],
     faq: [
@@ -621,7 +621,7 @@ export const GAME_CONTENT_EN: Record<LiveSlug, GameContent> = {
       "East Blue, Grand Line, Sky Islands? Human, Fish-Man, Mink, Giant? Ten questions on the home sea and the race of One Piece characters.",
     intro: "Every other question is about the home sea, the rest about race. Ten characters to place.",
     howTo: [
-      "Read the question: the character's home sea or race.",
+      "Read the question: a character's home sea or race, or the character who comes from a given sea or belongs to a given race.",
       "Pick the right answer out of the four on offer.",
       "The right answer is shown straight away. Ten questions per game.",
     ],
@@ -668,7 +668,7 @@ export const GAME_CONTENT_EN: Record<LiveSlug, GameContent> = {
     intro: "You know the character, but do you remember the arc where they make their entrance?",
     howTo: [
       "Read the character's name, and look at their portrait when there is one.",
-      "Pick the arc of their first appearance out of the four on offer.",
+      "Pick the arc of their first appearance out of the four on offer. One time in three, it's the other way round: an arc comes up, and you find the character who makes their entrance there.",
       "The right answer is shown straight away. Ten characters per game.",
     ],
     faq: [
@@ -687,7 +687,7 @@ export const GAME_CONTENT_EN: Record<LiveSlug, GameContent> = {
   "vrai-ou-faux": {
     metaTitle: "One Piece True or False: ten statements to settle",
     metaDescription:
-      "Ten statements about One Piece characters: Devil Fruit, bounty, Haki, origin, affiliation. True or false? A quick quiz to play again and again.",
+      "Ten statements about One Piece characters: Devil Fruit, bounty, Haki, origin, epithet, technique, weapon, height, age. True or false? A quick quiz to play again and again.",
     intro: "One statement, two buttons. Ten times in a row, without overthinking it.",
     howTo: [
       "Read the statement.",
@@ -760,30 +760,6 @@ export const GAME_CONTENT_EN: Record<LiveSlug, GameContent> = {
       SPOILER_FAQ,
     ],
   },
-  rires: {
-    metaTitle: "One Piece Laughs: whose laugh is this?",
-    metaDescription:
-      "Shishishi, Zehahaha, Kishishishi: ten One Piece laughs written out as in the manga. Each time, find the character who laughs that way.",
-    intro:
-      "In One Piece, almost every character has a laugh of their own. Ten laughs, written out as in the manga: it's up to you to give each one back to its owner.",
-    howTo: [
-      "Read the laugh on screen.",
-      "Out of four characters, pick the one who laughs that way.",
-      "The right answer is shown after each answer. Ten questions per game.",
-    ],
-    faq: [
-      {
-        question: "Can I listen to the laughs?",
-        answer: "Not for now: the laughs are written out, as in the manga.",
-      },
-      {
-        question: "Can the same laugh point to two characters?",
-        answer:
-          "No: each laugh on the list belongs to just one character. Those shared by several characters have been left out.",
-      },
-      SPOILER_FAQ,
-    ],
-  },
   connexions: {
     metaTitle: "One Piece Connections: sixteen characters, four hidden groups",
     metaDescription:
@@ -804,7 +780,7 @@ export const GAME_CONTENT_EN: Record<LiveSlug, GameContent> = {
       {
         question: "What are the groups based on?",
         answer:
-          "An affiliation, a famous lineup (Supernovas, Warlords of the Sea…), a home sea, a race, a fruit type, Conqueror's Haki, a bounty of one billion or an arc of first appearance.",
+          "An affiliation, a famous lineup (Supernovas, Warlords of the Sea…), a home sea, a race, a fruit type, a type of Haki, a bounty tier, an arc of first appearance or, trickier, the initial of the name.",
       },
       SPOILER_FAQ,
     ],
@@ -829,7 +805,7 @@ export const GAME_CONTENT_EN: Record<LiveSlug, GameContent> = {
       {
         question: "Which criteria can come up?",
         answer:
-          "For the rows, an affiliation, a group, a home sea or an arc. For the columns, a fruit type, Haki, a bounty, a gender, a race, a height or an age.",
+          "For the rows, an affiliation, a group, a home sea, an arc or the initial of the name. For the columns, a fruit type, Haki, a bounty, a gender, a race, a height or an age.",
       },
       SPOILER_FAQ,
     ],

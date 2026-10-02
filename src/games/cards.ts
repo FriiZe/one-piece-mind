@@ -6,12 +6,11 @@
  */
 import emojisJson from "@data/curated/emojis.json";
 import epithetsJson from "@data/curated/epithets.json";
-import laughsJson from "@data/curated/laughs.json";
 import shipsJson from "@data/curated/ships.json";
 import techniquesJson from "@data/curated/techniques.json";
 import weaponsJson from "@data/curated/weapons.json";
 import { arcOfChapter, arcs, characters, fruits, groups, images, meta } from "@/lib/data";
-import { mainOrganization, translateAffiliation, type HakiType } from "@/lib/data/labels";
+import { MAIN_AFFILIATION_OVERRIDES, mainOrganization, organizationOf, translateAffiliation, type HakiType } from "@/lib/data/labels";
 import type { Character, FruitType, Race, Sea } from "@/lib/data/schema";
 import { DEFAULT_LOCALE, type Locale, type Localized } from "@/lib/i18n";
 import { currentBounty, isPlayableCharacter, isPlayableFruit, viewCharacter, type SpoilerMode } from "@/lib/spoilers";
@@ -45,6 +44,8 @@ export type CharacterCard = ModeFacts & {
   age: number | null;
   height: number | null;
   haki: HakiType[];
+  /** N'a jamais appartenu qu'à une seule organisation : il n'est membre, même ancien, d'aucune autre. */
+  solo: boolean;
   /**
    * Fichier du portrait dans /images/portraits/, sans extension ; `null` sans
    * portrait. Le nom ne dit rien du personnage : il ne donne pas la réponse.
@@ -72,8 +73,6 @@ export type Extras = {
   /** `crew` : nom de l'équipage dans la langue du joueur. */
   ships: { name: string; crew: string }[];
   emojis: { characterId: string; emojis: string }[];
-  /** Rire caractéristique, écrit. */
-  laughs: { characterId: string; text: string }[];
 };
 
 export type GameData = {
@@ -106,6 +105,12 @@ function modeFacts(character: Character, mode: SpoilerMode, locale: Locale): Mod
   };
 }
 
+/** Toutes les organisations d'un personnage, passées comprises. */
+function organizations(character: Character): Set<string> {
+  const forced = MAIN_AFFILIATION_OVERRIDES[character.id];
+  return new Set([...character.affiliations.map((a) => organizationOf(a.name)), ...(forced ? [forced] : [])]);
+}
+
 function toCard(character: Character, locale: Locale): CharacterCard {
   const manga = modeFacts(character, "manga", locale);
   const anime = modeFacts(character, "anime", locale);
@@ -132,6 +137,7 @@ function toCard(character: Character, locale: Locale): CharacterCard {
     age: character.age,
     height: character.height,
     haki: (Object.keys(haki) as HakiType[]).filter((type) => haki[type]),
+    solo: organizations(character).size === 1,
     img: images.portraits[character.id]?.file ?? null,
     ...manga,
     ...(Object.keys(diff).length ? { anime: diff } : {}),
@@ -150,7 +156,6 @@ export function buildGameData(locale: Locale = DEFAULT_LOCALE): GameData {
       weapons: weaponsJson.weapons.map((weapon) => ({ ...weapon, name: text(weapon.name, locale), kind: text(weapon.kind, locale) })),
       ships: shipsJson.ships.map((ship) => ({ name: text(ship.name, locale), crew: translateAffiliation(ship.crew, locale) })),
       emojis: Object.entries(emojisJson.emojis).map(([characterId, emojis]) => ({ characterId, emojis })),
-      laughs: Object.entries(laughsJson.laughs).map(([characterId, text]) => ({ characterId, text })),
     },
     arcs: arcs
       .filter((arc) => arc.kind === "manga")
@@ -216,7 +221,6 @@ export function resolveGameData(data: GameData, mode: SpoilerMode): ResolvedData
       weapons: known(data.extras.weapons),
       ships: data.extras.ships,
       emojis: known(data.extras.emojis),
-      laughs: known(data.extras.laughs),
     },
     arcs: new Map(data.arcs.map((arc) => [arc.number, arc.title])),
     characters: resolved,

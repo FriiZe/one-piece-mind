@@ -8,9 +8,22 @@
 import type { PlayCharacter, ResolvedData } from "../cards";
 import { RACE_LABELS, SEA_LABELS } from "@/lib/data/labels";
 import { RACES, SEAS } from "@/lib/data/schema";
+import { normalizeText } from "./text";
 import { translator } from "@/lib/i18n";
 
-export type CriterionKind = "affiliation" | "group" | "sea" | "race" | "fruit" | "haki" | "bounty" | "arc" | "gender" | "size" | "age";
+export type CriterionKind =
+  | "affiliation"
+  | "group"
+  | "sea"
+  | "race"
+  | "fruit"
+  | "haki"
+  | "bounty"
+  | "arc"
+  | "gender"
+  | "size"
+  | "age"
+  | "initial";
 
 export type Criterion = {
   id: string;
@@ -111,11 +124,46 @@ export function criteriaFor(data: ResolvedData): Criterion[] {
       test: (c) => fruitType(c) === "paramecia",
     },
     {
+      id: "fruit:zoan-mythical",
+      kind: "fruit",
+      label: t("Fruit de type Zoan mythique", "Mythical Zoan fruit"),
+      question: t("Son fruit est-il un Zoan mythique ?", "Is their fruit a Mythical Zoan?"),
+      test: (c) => fruitType(c) === "zoan-mythical",
+    },
+    {
+      id: "fruit:zoan-ancient",
+      kind: "fruit",
+      label: t("Fruit de type Zoan antique", "Ancient Zoan fruit"),
+      question: t("Son fruit est-il un Zoan antique ?", "Is their fruit an Ancient Zoan?"),
+      test: (c) => fruitType(c) === "zoan-ancient",
+    },
+    {
+      id: "fruit:none",
+      kind: "fruit",
+      label: t("N'a pas mangé de fruit du démon", "Has not eaten a Devil Fruit"),
+      question: t("Est-il dépourvu de fruit du démon ?", "Are they without a Devil Fruit?"),
+      test: (c) => !c.fruitId,
+    },
+    {
       id: "haki:conqueror",
       kind: "haki",
       label: t("Maîtrise le haki des rois", "Wields Conqueror's Haki"),
       question: t("Maîtrise-t-il le haki des rois ?", "Do they wield Conqueror's Haki?"),
       test: (c) => c.haki.includes("conqueror"),
+    },
+    {
+      id: "haki:observation",
+      kind: "haki",
+      label: t("Maîtrise le haki de l'observation", "Wields Observation Haki"),
+      question: t("Maîtrise-t-il le haki de l'observation ?", "Do they wield Observation Haki?"),
+      test: (c) => c.haki.includes("observation"),
+    },
+    {
+      id: "haki:armament",
+      kind: "haki",
+      label: t("Maîtrise le haki de l'armement", "Wields Armament Haki"),
+      question: t("Maîtrise-t-il le haki de l'armement ?", "Do they wield Armament Haki?"),
+      test: (c) => c.haki.includes("armament"),
     },
     {
       id: "haki:any",
@@ -139,6 +187,13 @@ export function criteriaFor(data: ResolvedData): Criterion[] {
       test: (c) => (c.bounty ?? 0) >= BILLION,
     },
     {
+      id: "bounty:500m",
+      kind: "bounty",
+      label: t("Prime d'au moins 500 millions", "Bounty of at least 500 million"),
+      question: t("Sa prime atteint-elle 500 millions ?", "Does their bounty reach 500 million?"),
+      test: (c) => (c.bounty ?? 0) >= 500_000_000,
+    },
+    {
       id: "bounty:100m",
       kind: "bounty",
       label: t("Prime d'au moins 100 millions", "Bounty of at least 100 million"),
@@ -160,6 +215,13 @@ export function criteriaFor(data: ResolvedData): Criterion[] {
       test: (c) => (c.height ?? 0) > 300,
     },
     {
+      id: "size:5m",
+      kind: "size",
+      label: t("Plus de cinq mètres", "Over five meters tall"),
+      question: t("Mesure-t-il plus de cinq mètres ?", "Are they over five meters tall?"),
+      test: (c) => (c.height ?? 0) > 500,
+    },
+    {
       id: "size:small",
       kind: "size",
       label: t("Moins de 1,70 m", "Under 1.70 m"),
@@ -172,6 +234,20 @@ export function criteriaFor(data: ResolvedData): Criterion[] {
       label: t("Cinquante ans ou plus", "Fifty or older"),
       question: t("A-t-il cinquante ans ou plus ?", "Are they fifty or older?"),
       test: (c) => (c.age ?? 0) >= 50,
+    },
+    {
+      id: "age:70",
+      kind: "age",
+      label: t("Soixante-dix ans ou plus", "Seventy or older"),
+      question: t("A-t-il soixante-dix ans ou plus ?", "Are they seventy or older?"),
+      test: (c) => (c.age ?? 0) >= 70,
+    },
+    {
+      id: "age:18",
+      kind: "age",
+      label: t("Moins de dix-huit ans", "Under eighteen"),
+      question: t("A-t-il moins de dix-huit ans ?", "Are they under eighteen?"),
+      test: (c) => c.age !== null && c.age < 18,
     },
     {
       id: "age:25",
@@ -189,6 +265,18 @@ export function criteriaFor(data: ResolvedData): Criterion[] {
       label: t(`Première apparition : arc ${title}`, `First appearance: ${title} arc`),
       question: t(`Apparaît-il pour la première fois dans l'arc ${title} ?`, `Do they first appear in the ${title} arc?`),
       test: (c) => c.arc === number,
+    });
+  }
+
+  // L'initiale du nom, tel qu'il s'affiche dans la langue du joueur
+  const initialOf = (c: PlayCharacter) => normalizeText(c.name)[0]?.toUpperCase();
+  for (const letter of [...new Set(data.characters.map(initialOf))].filter((l): l is string => !!l && /[A-Z]/.test(l)).sort()) {
+    all.push({
+      id: `initial:${letter}`,
+      kind: "initial",
+      label: t(`Nom commençant par ${letter}`, `Name starting with ${letter}`),
+      question: t(`Son nom commence-t-il par la lettre ${letter} ?`, `Does their name start with the letter ${letter}?`),
+      test: (c) => initialOf(c) === letter,
     });
   }
 

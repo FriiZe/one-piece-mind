@@ -9,7 +9,7 @@ import { Button, Panel, ResultPanel } from "../ui/primitives";
 import type { GameProps } from "../ui/types";
 import type { Localized } from "@/lib/i18n";
 import { useLocale, useT } from "@/lib/i18n/client";
-import { disagreements, MAX_GUESSES, MAX_QUESTIONS, think, type Reply, type Step } from "./logic";
+import { askable, disagreements, MAX_GUESSES, MAX_QUESTIONS, think, type Reply, type Step } from "./logic";
 
 const REPLIES: { reply: Reply; label: Localized }[] = [
   { reply: "yes", label: { fr: "Oui", en: "Yes" } },
@@ -33,7 +33,7 @@ export default function DenDenDevin({ data }: GameProps) {
   const [rejected, setRejected] = useState<string[]>([]);
   const [outcome, setOutcome] = useState<Outcome | null>(null);
 
-  const criteria = useMemo(() => criteriaFor(data), [data]);
+  const criteria = useMemo(() => criteriaFor(data).filter(askable), [data]);
   const thinking = useMemo(() => think(data.characters, criteria, steps, new Set(rejected)), [data.characters, criteria, steps, rejected]);
 
   function start() {

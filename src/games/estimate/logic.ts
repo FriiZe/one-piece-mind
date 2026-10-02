@@ -9,7 +9,17 @@ import { translator } from "@/lib/i18n";
 
 export const ESTIMATE_LENGTH = 8;
 export const POINTS_PER_QUESTION = 5;
-export const MAX_SCORE = ESTIMATE_LENGTH * POINTS_PER_QUESTION;
+
+/**
+ * Barème au numéro près, pour un chapitre ou un épisode : écart maximal toléré
+ * à chaque palier, de 10 points (le numéro exact) à 1 point. Les points baissent
+ * régulièrement, d'un point tous les douze numéros environ (10 − 8 × écart / 99,
+ * arrondi à l'entier inférieur) : encore 2 points à 99 numéros d'écart, puis un
+ * dernier point jusqu'à 150. La moitié des points se garde jusqu'à 61 d'écart :
+ * qui situe à peu près l'arc valide le jeu du jour. Une courbe exponentielle
+ * passant par les mêmes repères ne laissait la moitié des points que jusqu'à 42.
+ */
+export const NUMBER_BANDS = [0, 12, 24, 37, 49, 61, 74, 86, 99, 150] as const;
 
 export type EstimateQuestion = {
   id: string;
@@ -22,6 +32,8 @@ export type EstimateQuestion = {
   max: number;
   /** `log` : les valeurs s'étalent sur plusieurs ordres de grandeur (primes). */
   scale: "log" | "linear";
+  /** Barème à l'écart près (voir `NUMBER_BANDS`), à la place du barème proportionnel de l'échelle. */
+  bands?: readonly number[];
   unit: "berrys" | "chapitre" | "épisode";
 };
 
@@ -75,13 +87,23 @@ export function parseEstimate(text: string): number | null {
   return Number.isSafeInteger(value) ? value : null;
 }
 
+/** Points d'une estimation parfaite : 5, ou autant que de paliers quand la question a son barème. */
+export function maxPoints(question: Pick<EstimateQuestion, "bands">): number {
+  return question.bands?.length ?? POINTS_PER_QUESTION;
+}
+
 /**
- * Points d'une estimation, de 0 à 5. Échelle logarithmique : on juge le
- * rapport entre l'estimation et la vraie valeur. Échelle linéaire : l'écart,
- * rapporté à l'étendue des valeurs possibles.
+ * Points d'une estimation, de 0 à `maxPoints`. Barème à l'écart près s'il y en
+ * a un. Sinon, échelle logarithmique : on juge le rapport entre l'estimation et
+ * la vraie valeur ; échelle linéaire : l'écart, rapporté à l'étendue des valeurs possibles.
  */
-export function scoreEstimate(question: Pick<EstimateQuestion, "answer" | "min" | "max" | "scale">, guess: number): number {
+export function scoreEstimate(question: Pick<EstimateQuestion, "answer" | "min" | "max" | "scale" | "bands">, guess: number): number {
   if (!Number.isFinite(guess) || guess < 0) return 0;
+  if (question.bands) {
+    const gap = Math.abs(Math.round(guess) - question.answer);
+    const index = question.bands.findIndex((limit) => gap <= limit);
+    return index === -1 ? 0 : question.bands.length - index;
+  }
   if (question.scale === "log") {
     if (guess <= 0) return 0;
     const ratio = Math.max(guess / question.answer, question.answer / guess);
@@ -130,6 +152,7 @@ const premiereApparition: Generator = (rng, data, pool, count) => {
     min: 1,
     max: byEpisode ? data.latestEpisode : data.latestChapter,
     scale: "linear" as const,
+    bands: NUMBER_BANDS,
     unit: byEpisode ? ("épisode" as const) : ("chapitre" as const),
   }));
 };
@@ -184,5 +207,5 @@ export function evaluate(slug: EstimateSlug, seed: number, difficulty: Difficult
     (sum, question, index) => sum + (index in answers ? scoreEstimate(question, answers[index]) : 0),
     0,
   );
-  return { score, max: questions.length * POINTS_PER_QUESTION };
+  return { score, max: questions.reduce((sum, question) => sum + maxPoints(question), 0) };
 }

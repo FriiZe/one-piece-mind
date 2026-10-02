@@ -70,7 +70,6 @@ const GAME_COMPONENTS = {
   "vrai-ou-faux": qcm("vrai-ou-faux"),
   "mode-aleatoire": qcm("mode-aleatoire"),
   "duo-carre-cash": load(() => import("../duo-carre-cash/Game")),
-  rires: qcm("rires"),
   connexions: load(() => import("../connexions/Game")),
   grille: load(() => import("../grille/Game")),
   "recrute-ton-equipage": load(() => import("../recrute-ton-equipage/Game")),

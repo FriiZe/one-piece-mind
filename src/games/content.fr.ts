@@ -94,7 +94,7 @@ export const GAME_CONTENT_FR: Record<LiveSlug, GameContent> = {
       "L'affiche est là, mais le nom et la photo ont disparu. Il te reste la prime. À toi de retrouver qui est recherché, avec le moins d'indices possible.",
     howTo: [
       "Lis la prime inscrite sur l'affiche et propose un personnage.",
-      "Si tu te trompes, un indice se dévoile : affiliation, mer d'origine, arc de première apparition, puis initiale.",
+      "Si tu te trompes, un indice se dévoile : affiliation, mer d'origine, arc de première apparition, surnom quand le personnage en a un, puis initiale.",
       "Une affiche vaut 5 points sans indice, puis un point de moins par indice dévoilé.",
       "Cinq affiches par partie, pour un maximum de 25 points.",
     ],
@@ -236,11 +236,11 @@ export const GAME_CONTENT_FR: Record<LiveSlug, GameContent> = {
   memo: {
     metaTitle: "Mémo One Piece : associe chaque personnage à son fruit du démon",
     metaDescription:
-      "Un jeu de mémoire One Piece : seize cartes, huit paires. Retrouve le fruit du démon de chaque personnage en retournant le moins de cartes possible.",
+      "Un jeu de mémoire One Piece : seize cartes, huit paires. Retrouve le fruit du démon, le surnom ou l'arme de chaque personnage en retournant le moins de cartes possible.",
     intro:
-      "Seize cartes face cachée. Huit portent un personnage, huit portent un fruit du démon. À toi de reformer les paires, de mémoire.",
+      "Seize cartes face cachée. Huit portent un personnage ; les huit autres, selon la partie, un fruit du démon, un surnom ou une arme. À toi de reformer les paires, de mémoire.",
     howTo: [
-      "Retourne deux cartes : si le personnage a bien mangé ce fruit, la paire reste visible.",
+      "Retourne deux cartes : si le fruit, le surnom ou l'arme est bien celui du personnage, la paire reste visible.",
       "Sinon, les deux cartes se retournent au bout d'une seconde : retiens où elles sont.",
       "La partie se termine quand les huit paires sont trouvées. Moins tu joues de coups, plus tu marques.",
     ],
@@ -304,7 +304,7 @@ export const GAME_CONTENT_FR: Record<LiveSlug, GameContent> = {
   "les-indices": {
     metaTitle: "Les indices : devine le personnage One Piece avec le moins d'indices",
     metaDescription:
-      "Un personnage One Piece à deviner à partir d'indices de plus en plus précis : arc, origine, fruit, haki, affiliation, prime. Moins tu en utilises, plus tu marques.",
+      "Un personnage One Piece à deviner à partir d'indices de plus en plus précis : arc, origine, fruit, haki, affiliation, prime, surnom. Moins tu en utilises, plus tu marques.",
     intro:
       "Le premier indice est vague, le dernier donne presque la réponse. À toi de trouver le personnage le plus tôt possible.",
     howTo: [
@@ -315,7 +315,7 @@ export const GAME_CONTENT_FR: Record<LiveSlug, GameContent> = {
     faq: [
       {
         question: "Dans quel ordre viennent les indices ?",
-        answer: "L'arc de première apparition, l'origine, le type de fruit du démon, les hakis, l'affiliation, la prime, puis l'initiale du nom.",
+        answer: "L'arc de première apparition, l'origine, le type de fruit du démon, les hakis, l'affiliation, la prime, le surnom quand le personnage en a un, puis l'initiale du nom.",
       },
       {
         question: "Que se passe-t-il si je me trompe au dernier indice ?",
@@ -330,8 +330,8 @@ export const GAME_CONTENT_FR: Record<LiveSlug, GameContent> = {
       "Dix surnoms de One Piece, quatre personnages proposés à chaque fois : retrouve qui se cache derrière « la chatte voleuse » ou « le paladin des mers ».",
     intro: "Chaque pirate célèbre a son surnom, inscrit sur son avis de recherche. Sauras-tu les rendre à leur propriétaire ?",
     howTo: [
-      "Lis le surnom affiché.",
-      "Choisis le personnage qui le porte parmi les quatre proposés.",
+      "Lis le surnom affiché. Une fois sur trois, c'est l'inverse : un personnage s'affiche, à toi de retrouver son surnom.",
+      "Choisis la bonne réponse parmi les quatre proposées.",
       "La correction s'affiche tout de suite. Dix surnoms par partie.",
     ],
     faq: [
@@ -354,7 +354,7 @@ export const GAME_CONTENT_FR: Record<LiveSlug, GameContent> = {
       "Les noms de One Piece sont pleins de pièges. Le portrait te dit de qui il s'agit : à toi de retrouver la bonne graphie parmi quatre.",
     howTo: [
       "Regarde le portrait et l'affiliation : ils désignent le personnage.",
-      "Choisis la bonne orthographe de son nom parmi les quatre proposées.",
+      "Choisis la bonne orthographe de son nom parmi les quatre proposées. Une fois sur trois, c'est le nom d'une de ses techniques ou de son arme qu'il faut écrire.",
       "Les trois autres ne diffèrent que d'une lettre : lis bien. Dix noms par partie.",
     ],
     faq: [
@@ -382,7 +382,7 @@ export const GAME_CONTENT_FR: Record<LiveSlug, GameContent> = {
     faq: [
       {
         question: "Combien de personnages ont leur devinette ?",
-        answer: "Une soixantaine pour l'instant, parmi les plus connus de la série.",
+        answer: "Plus de cent soixante-dix, des héros aux seconds rôles.",
       },
       {
         question: "Les emojis s'affichent mal sur mon appareil, que faire ?",
@@ -419,7 +419,7 @@ export const GAME_CONTENT_FR: Record<LiveSlug, GameContent> = {
       "Dix duels entre personnages One Piece : lequel est le plus grand ? Lequel est le plus âgé ? Les tailles officielles réservent des surprises.",
     intro: "Deux personnages face à face. Une question simple, en apparence : qui est le plus grand, ou le plus âgé ?",
     howTo: [
-      "Lis la question : elle porte sur la taille ou sur l'âge.",
+      "Lis bien la question : elle porte sur la taille ou sur l'âge, et demande tantôt le plus grand ou le plus âgé, tantôt le plus petit ou le plus jeune.",
       "Choisis l'un des deux personnages.",
       "La correction donne les deux valeurs. Dix duels par partie.",
     ],
@@ -438,13 +438,13 @@ export const GAME_CONTENT_FR: Record<LiveSlug, GameContent> = {
   "premiere-apparition": {
     metaTitle: "Première apparition : dans quel chapitre ce personnage arrive-t-il ?",
     metaDescription:
-      "Huit personnages One Piece : estime le chapitre, ou l'épisode, de leur première apparition. Plus tu es proche, plus tu marques de points.",
+      "Huit personnages One Piece : retrouve le chapitre, ou l'épisode, de leur première apparition. Dix points pour le numéro exact, puis un de moins tous les douze numéros d'écart.",
     intro:
       "Tu te souviens de l'arc, mais du numéro ? Place le curseur sur le chapitre ou l'épisode où le personnage apparaît pour la première fois.",
     howTo: [
       "Déplace le curseur jusqu'au numéro que tu estimes, puis valide.",
-      "Tu marques 5 points à une dizaine de chapitres près, puis de moins en moins à mesure que l'écart grandit.",
-      "Huit personnages par partie, pour un maximum de 40 points.",
+      "Le numéro exact vaut 10 points. Ensuite, tu perds un point tous les douze numéros d'écart environ : 9 jusqu'à 12, 8 jusqu'à 24, 7 jusqu'à 37, 6 jusqu'à 49, 5 jusqu'à 61, 4 jusqu'à 74, 3 jusqu'à 86, 2 jusqu'à 99 et 1 jusqu'à 150. Au-delà, rien.",
+      "Huit personnages par partie, pour un maximum de 80 points.",
     ],
     faq: [
       {
@@ -487,7 +487,7 @@ export const GAME_CONTENT_FR: Record<LiveSlug, GameContent> = {
     intro: "Pirate, marine, révolutionnaire ? Retrouve l'équipage ou l'organisation de chaque personnage.",
     howTo: [
       "Lis le nom du personnage, et regarde son portrait quand il y en a un.",
-      "Choisis son organisation parmi les quatre proposées.",
+      "Choisis son organisation parmi les quatre proposées. Une fois sur trois, c'est l'inverse : une organisation s'affiche, à toi de retrouver lequel des quatre personnages en fait partie.",
       "La correction s'affiche tout de suite. Dix personnages par partie.",
     ],
     faq: [
@@ -509,7 +509,7 @@ export const GAME_CONTENT_FR: Record<LiveSlug, GameContent> = {
     intro: "Certains n'en maîtrisent aucun, d'autres les trois. Retrouve les hakis de chaque personnage.",
     howTo: [
       "Lis le nom du personnage.",
-      "Choisis la bonne combinaison : aucun haki, un seul, deux, ou les trois.",
+      "Choisis la bonne combinaison : aucun haki, un seul, deux, ou les trois. Parfois, c'est le détenteur du haki des rois qu'il faut retrouver parmi quatre personnages.",
       "La correction s'affiche tout de suite. Dix personnages par partie.",
     ],
     faq: [
@@ -530,8 +530,8 @@ export const GAME_CONTENT_FR: Record<LiveSlug, GameContent> = {
       "Gomu Gomu no Pistol, Room, Diable Jambe : dix techniques de One Piece, et quatre personnages proposés à chaque fois. Qui utilise quoi ?",
     intro: "Le nom d'une attaque s'affiche. À toi de retrouver le personnage qui la crie en combat.",
     howTo: [
-      "Lis le nom de la technique.",
-      "Choisis le personnage qui l'utilise parmi les quatre proposés.",
+      "Lis le nom de la technique. Une fois sur trois, c'est l'inverse : un personnage s'affiche, à toi de retrouver sa technique.",
+      "Choisis la bonne réponse parmi les quatre proposées.",
       "La correction s'affiche tout de suite. Dix techniques par partie.",
     ],
     faq: [
@@ -552,8 +552,8 @@ export const GAME_CONTENT_FR: Record<LiveSlug, GameContent> = {
       "Dix armes célèbres de One Piece, sabres de légende en tête. Retrouve le personnage qui manie chacune parmi quatre propositions.",
     intro: "Sabres de légende, bâton climatique, trident : chaque arme a son porteur. Sauras-tu les associer ?",
     howTo: [
-      "Lis le nom de l'arme et sa nature.",
-      "Choisis le personnage qui la manie parmi les quatre proposés.",
+      "Lis le nom de l'arme et sa nature. Une fois sur trois, c'est l'inverse : un personnage s'affiche, à toi de retrouver son arme.",
+      "Choisis la bonne réponse parmi les quatre proposées.",
       "La correction s'affiche tout de suite. Dix armes par partie.",
     ],
     faq: [
@@ -574,8 +574,8 @@ export const GAME_CONTENT_FR: Record<LiveSlug, GameContent> = {
       "Vogue Merry, Moby Dick, Oro Jackson, Polar Tang : dix navires de One Piece à rendre à leur équipage, avec quatre propositions à chaque fois.",
     intro: "Un nom de navire s'affiche. À quel équipage appartient-il ?",
     howTo: [
-      "Lis le nom du navire.",
-      "Choisis son équipage parmi les quatre proposés.",
+      "Lis le nom du navire. Parfois, c'est l'inverse : un équipage s'affiche, à toi de retrouver son navire.",
+      "Choisis la bonne réponse parmi les quatre proposées.",
       "La correction s'affiche tout de suite. Dix navires par partie.",
     ],
     faq: [
@@ -596,7 +596,7 @@ export const GAME_CONTENT_FR: Record<LiveSlug, GameContent> = {
       "East Blue, Grand Line, îles célestes ? Humain, homme-poisson, mink, géant ? Dix questions sur la mer d'origine et la race des personnages One Piece.",
     intro: "Une question sur deux porte sur la mer d'origine, l'autre sur la race. Dix personnages à situer.",
     howTo: [
-      "Lis la question : mer d'origine ou race du personnage.",
+      "Lis la question : la mer d'origine ou la race d'un personnage, ou le personnage qui vient d'une mer ou appartient à une race.",
       "Choisis la bonne réponse parmi les quatre proposées.",
       "La correction s'affiche tout de suite. Dix questions par partie.",
     ],
@@ -641,7 +641,7 @@ export const GAME_CONTENT_FR: Record<LiveSlug, GameContent> = {
     intro: "Tu connais le personnage, mais te souviens-tu de l'arc où il entre en scène ?",
     howTo: [
       "Lis le nom du personnage, et regarde son portrait quand il y en a un.",
-      "Choisis l'arc de sa première apparition parmi les quatre proposés.",
+      "Choisis l'arc de sa première apparition parmi les quatre proposés. Une fois sur trois, c'est l'inverse : un arc s'affiche, à toi de retrouver le personnage qui y fait son entrée.",
       "La correction s'affiche tout de suite. Dix personnages par partie.",
     ],
     faq: [
@@ -659,7 +659,7 @@ export const GAME_CONTENT_FR: Record<LiveSlug, GameContent> = {
   "vrai-ou-faux": {
     metaTitle: "Vrai ou faux One Piece : dix affirmations à trancher",
     metaDescription:
-      "Dix affirmations sur les personnages de One Piece : fruit du démon, prime, haki, origine, affiliation. Vrai ou faux ? Un quiz rapide à enchaîner.",
+      "Dix affirmations sur les personnages de One Piece : fruit du démon, prime, haki, origine, surnom, technique, arme, taille, âge. Vrai ou faux ? Un quiz rapide à enchaîner.",
     intro: "Une affirmation, deux boutons. Dix fois de suite, sans réfléchir trop longtemps.",
     howTo: [
       "Lis l'affirmation.",
@@ -731,29 +731,6 @@ export const GAME_CONTENT_FR: Record<LiveSlug, GameContent> = {
       SPOILER_FAQ,
     ],
   },
-  rires: {
-    metaTitle: "Rires One Piece : à qui appartient ce rire ?",
-    metaDescription:
-      "Shishishi, Zehahaha, Kishishishi : dix rires de One Piece écrits comme dans le manga. Retrouve à chaque fois le personnage qui rit ainsi.",
-    intro:
-      "Dans One Piece, presque chaque personnage a son rire. Dix rires, écrits comme dans le manga : à toi de rendre chacun à son propriétaire.",
-    howTo: [
-      "Lis le rire affiché.",
-      "Choisis, parmi quatre personnages, celui qui rit ainsi.",
-      "La correction s'affiche après chaque réponse. Dix questions par partie.",
-    ],
-    faq: [
-      {
-        question: "Peut-on écouter les rires ?",
-        answer: "Pas pour l'instant : les rires sont écrits, comme dans le manga.",
-      },
-      {
-        question: "Un même rire peut-il désigner deux personnages ?",
-        answer: "Non : chaque rire de la liste n'appartient qu'à un personnage. Ceux que plusieurs personnages partagent ont été écartés.",
-      },
-      SPOILER_FAQ,
-    ],
-  },
   connexions: {
     metaTitle: "Connexions One Piece : seize personnages, quatre familles cachées",
     metaDescription:
@@ -773,7 +750,7 @@ export const GAME_CONTENT_FR: Record<LiveSlug, GameContent> = {
       },
       {
         question: "De quoi sont faites les familles ?",
-        answer: "D'une affiliation, d'un groupe (Supernovas, Grands Corsaires…), d'une mer d'origine, d'une race, d'un type de fruit, du haki des rois, d'une prime d'un milliard ou d'un arc de première apparition.",
+        answer: "D'une affiliation, d'un groupe (Supernovas, Grands Corsaires…), d'une mer d'origine, d'une race, d'un type de fruit, d'un haki, d'un palier de prime, d'un arc de première apparition ou, plus retors, de l'initiale du nom.",
       },
       SPOILER_FAQ,
     ],
@@ -796,7 +773,7 @@ export const GAME_CONTENT_FR: Record<LiveSlug, GameContent> = {
       },
       {
         question: "Quels critères peut-on rencontrer ?",
-        answer: "En ligne, une affiliation, un groupe, une mer d'origine ou un arc. En colonne, un type de fruit, un haki, une prime, un genre, une race, une taille ou un âge.",
+        answer: "En ligne, une affiliation, un groupe, une mer d'origine, un arc ou l'initiale du nom. En colonne, un type de fruit, un haki, une prime, un genre, une race, une taille ou un âge.",
       },
       SPOILER_FAQ,
     ],

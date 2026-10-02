@@ -42,7 +42,6 @@ export const BASE_BERRYS: Record<LiveSlug, number> = {
   "mode-aleatoire": 400,
   // Le maximum suppose dix réponses justes sans proposition : la barre est haute, la prime aussi
   "duo-carre-cash": 800,
-  rires: 350,
   connexions: 500,
   grille: 600,
   "recrute-ton-equipage": 500,

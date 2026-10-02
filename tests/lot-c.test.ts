@@ -41,47 +41,47 @@ describe("critères", () => {
   });
 });
 
-describe("Rires", () => {
-  it("ne cite que des personnages connus, chacun avec un rire différent", () => {
-    const ids = raw.extras.laughs.map((laugh) => laugh.characterId);
-    expect(ids.filter((id) => !manga.characterById.has(id))).toEqual([]);
-    expect(new Set(raw.extras.laughs.map((laugh) => laugh.text)).size).toBe(raw.extras.laughs.length);
-    expect(raw.extras.laughs.length).toBeGreaterThanOrEqual(30);
+describe("critères et groupes ajoutés", () => {
+  it("proposent de nouveaux paliers, les hakis un à un et l'initiale du nom", () => {
+    const ids = new Set(criteriaFor(manga).map((criterion) => criterion.id));
+    for (const id of ["fruit:zoan-mythical", "fruit:zoan-ancient", "fruit:none", "haki:observation", "haki:armament", "bounty:500m", "size:5m", "age:70", "age:18", "initial:M"]) {
+      expect(ids, id).toContain(id);
+    }
+    const initial = criteriaFor(manga).find((criterion) => criterion.id === "initial:M")!;
+    expect(initial.test(manga.characterById.get("monkey-d-luffy")!)).toBe(true);
+    expect(initial.test(manga.characterById.get("nami")!)).toBe(false);
   });
 
-  it("pose dix questions à quatre personnages, la bonne réponse parmi eux", () => {
-    for (const data of modes) {
-      const questions = qcm.generateQcm("rires", SEEDS[0], "normal", data);
-      expect(questions).toHaveLength(qcm.QCM_LENGTH);
-      for (const question of questions) {
-        expect(question.options).toHaveLength(4);
-        expect(question.options.map((o) => o.id)).toContain(question.answerId);
-      }
+  it("Den Den Devin ne demande jamais l'initiale", () => {
+    const criteria = criteriaFor(anime).filter(devin.askable);
+    expect(criteria.some((criterion) => criterion.kind === "initial")).toBe(false);
+    expect(criteria.length).toBeGreaterThan(40);
+  });
+
+  it("comptent sept groupes de plus, tous jouables en mode manga", () => {
+    expect(raw.groups).toHaveLength(22);
+    for (const id of ["pretres-d-enel", "contremaitres-galley-la", "mysterieux-thriller-bark", "officiers-hommes-poissons", "grande-flotte", "commandants-revolutionnaires", "satellites-vegapunk"]) {
+      const group = manga.groups.find((g) => g.id === id);
+      expect(group, id).toBeDefined();
+      expect(group!.memberIds.length).toBeGreaterThanOrEqual(4);
     }
   });
+});
 
-  it("est en pause : hors des jeux en ligne, et une partie n'y rapporte rien", () => {
-    expect(PAUSED_SLUGS).toContain("rires");
-    expect(LIVE_SLUGS).not.toContain("rires");
-    expect(getGame("rires")?.status).toBe("soon");
-    expect(run({ slug: "rires", seed: SEEDS[0], mode: "anime", difficulty: "normal", answers: [] })).toBeNull();
-    expect(run({ slug: "surnoms", seed: SEEDS[0], mode: "anime", difficulty: "normal", answers: [] })).not.toBeNull();
+describe("Rires, jeu abandonné", () => {
+  it("n'existe plus : ni au catalogue, ni dans les récompenses, ni dans les comptes rendus", () => {
+    expect(getGame("rires")).toBeUndefined();
+    expect(GAMES.some((game) => game.slug === "rires")).toBe(false);
+    expect(LIVE_SLUGS as readonly string[]).not.toContain("rires");
+    expect(PAUSED_SLUGS).toEqual([]);
+    expect(Object.keys(BASE_BERRYS)).not.toContain("rires");
+    expect(reportSchema.safeParse({ slug: "rires", seed: SEEDS[0], mode: "anime", difficulty: "normal", answers: [] }).success).toBe(false);
   });
 
-  it("en pause, ne pose plus de question dans le mode aléatoire ni en multijoueur", () => {
-    const laughTitle = qcm.generateQcm("rires", SEEDS[0], "normal", anime)[0].title;
-    expect(qcm.MIX_SLUGS).not.toContain("rires");
+  it("un salon qui le cite encore tire ses questions dans les autres quiz", () => {
     expect(validGames(["surnoms", "rires"])).toBeNull();
-    for (const seed of SEEDS) {
-      const questions = [
-        ...qcm.generateQcm("mode-aleatoire", seed, "normal", anime),
-        // Un salon ouvert avant la pause cite encore le jeu
-        ...qcm.generateMixed(seed, ["rires", "surnoms"], 10, "normal", anime),
-        ...qcm.generateMixed(seed, ["rires"], 10, "normal", anime),
-      ];
-      expect(questions).toHaveLength(30);
-      expect(questions.map((question) => question.title)).not.toContain(laughTitle);
-    }
+    const stale = ["rires"] as unknown as qcm.MixSlug[];
+    expect(qcm.generateMixed(SEEDS[0], stale, 10, "normal", anime)).toHaveLength(10);
   });
 });
 

@@ -233,6 +233,8 @@ describe("Duo, Carré ou Cash", () => {
         const questions = dcc.generate(seed, "normal", data);
         expect(questions).toHaveLength(dcc.DCC_LENGTH);
         expect(new Set(questions.map((q) => q.id)).size).toBe(dcc.DCC_LENGTH);
+        // En cash, la réponse s'écrit : aucune question qui ne se comprend qu'avec ses propositions
+        expect(questions.filter((q) => "closed" in q)).toEqual([]);
         for (const question of questions) {
           const ids = question.options.map((option) => option.id);
           expect(new Set(ids).size).toBe(4);

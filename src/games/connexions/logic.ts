@@ -15,8 +15,8 @@ export type ConnexionGroup = { id: string; label: string; memberIds: string[] };
 export type Puzzle = { groups: ConnexionGroup[]; tiles: PlayCharacter[] };
 
 /** Familles qui font de bonnes énigmes : précises, et pas devinables d'un coup d'œil sur le portrait. */
-const KINDS: CriterionKind[] = ["affiliation", "group", "sea", "race", "fruit", "haki", "bounty", "arc"];
-const TOO_BROAD = new Set(["fruit:any", "haki:any", "bounty:any", "bounty:100m", "race:human"]);
+const KINDS: CriterionKind[] = ["affiliation", "group", "sea", "race", "fruit", "haki", "bounty", "arc", "initial"];
+const TOO_BROAD = new Set(["fruit:any", "fruit:none", "haki:any", "bounty:any", "bounty:100m", "race:human"]);
 
 function usable(criterion: Criterion): boolean {
   return KINDS.includes(criterion.kind) && !TOO_BROAD.has(criterion.id);
@@ -36,6 +36,9 @@ export function generate(seed: number, difficulty: Difficulty, data: ResolvedDat
     // Pas plus de deux familles du même genre : quatre équipages feraient une énigme trop facile à lire
     const kinds = chosen.map((family) => family.criterion.kind);
     if (kinds.some((kind) => kinds.filter((k) => k === kind).length > 2)) continue;
+    // L'initiale du nom est un piège : une seule famille de ce genre au plus, et dans une minorité d'énigmes
+    const initials = kinds.filter((kind) => kind === "initial").length;
+    if (initials > 1 || (initials === 1 && rng() < 0.6)) continue;
 
     // Un personnage ne doit entrer que dans une seule des quatre familles
     const groups: ConnexionGroup[] = [];

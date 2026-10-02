@@ -21,6 +21,23 @@
     { "name": "Mogura", "kind": { "fr": "trident", "en": "trident" }, "characterId": "charlotte-katakuri" },
     { "name": "Funkfreed", "kind": { "fr": "épée-éléphant", "en": "elephant sword" }, "characterId": "spandam" },
     { "name": "Raiu", "kind": { "fr": "sabre", "en": "sword" }, "characterId": "shiryu" },
-    { "name": "Pretzel", "kind": { "fr": "épée", "en": "sword" }, "characterId": "charlotte-cracker" }
+    { "name": "Pretzel", "kind": { "fr": "épée", "en": "sword" }, "characterId": "charlotte-cracker" },
+    { "name": "Shusui", "kind": { "fr": "sabre noir", "en": "black blade" }, "characterId": "roronoa-zoro" },
+    { "name": "Soto Muso", "kind": { "fr": "sabre", "en": "sword" }, "characterId": "kawamatsu" },
+    { "name": "Shirauo", "kind": { "fr": "sabre", "en": "sword" }, "characterId": "charlotte-amande" },
+    { "name": "Karakuri Rasento", "kind": { "fr": "sabre à ressort", "en": "wind-up sword" }, "characterId": "sasaki" },
+    { "name": "Kogarashi", "kind": { "fr": "sabre", "en": "sword" }, "characterId": "shiki" },
+    { "name": "Takeru", "kind": { "fr": "massue", "en": "club" }, "characterId": "yamato" },
+    { "name": "Kessui", "kind": { "fr": "naginata", "en": "naginata" }, "characterId": "hannyabal" },
+    { "name": "Nanashaku Jitte", "kind": { "fr": "jitte en granit marin", "en": "seastone jitte" }, "characterId": "smoker" },
+    { "name": "Punisher", "kind": { "fr": "lames rotatives", "en": "rotating blades" }, "characterId": "killer" },
+    { "name": "Senriku", "kind": { "fr": "fusil", "en": "rifle" }, "characterId": "van-augur" },
+    { "name": "Burn Bazooka", "kind": { "fr": "bazooka", "en": "bazooka" }, "characterId": "wyper" },
+    { "name": "Nonosama Bo", "kind": { "fr": "bâton en or", "en": "golden staff" }, "characterId": "enel" },
+    { "name": "Lassoo", "kind": { "fr": "bazooka-chien", "en": "dog bazooka" }, "characterId": "babe" },
+    { "name": "Daisenso", "kind": { "fr": "lance explosive", "en": "explosive spear" }, "characterId": "krieg" },
+    { "name": { "fr": "Griffes de chat", "en": "Cat Claws" }, "kind": { "fr": "gants à lames", "en": "bladed gloves" }, "characterId": "kuro" },
+    { "name": "Terry Sword", "kind": { "fr": "épée de géant", "en": "giant's sword" }, "characterId": "dorry" },
+    { "name": "Bruiser Axe", "kind": { "fr": "hache de géant", "en": "giant's axe" }, "characterId": "brogy" }
   ]
 }

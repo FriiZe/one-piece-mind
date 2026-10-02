@@ -6,8 +6,16 @@ import { Portrait } from "../ui/Portrait";
 import { Panel } from "../ui/primitives";
 import type { GameProps } from "../ui/types";
 import { useRun } from "../ui/useRun";
-import { useT } from "@/lib/i18n/client";
-import { generateDeck, MAX_SCORE, scoreFor } from "./logic";
+import { useLocale, useT } from "@/lib/i18n/client";
+import type { Localized } from "@/lib/i18n";
+import { generateDeck, MAX_SCORE, scoreFor, themeOf, type MemoTheme } from "./logic";
+
+/** Ce qu'il faut associer à chaque personnage, rappelé pendant la partie. */
+const THEMES: Record<MemoTheme, Localized> = {
+  fruit: { fr: "Chaque personnage va avec son fruit du démon.", en: "Each character goes with their Devil Fruit." },
+  epithet: { fr: "Chaque personnage va avec son surnom.", en: "Each character goes with their epithet." },
+  weapon: { fr: "Chaque personnage va avec son arme.", en: "Each character goes with their weapon." },
+};
 
 /** Temps pendant lequel deux cartes qui ne vont pas ensemble restent visibles. */
 const FLIP_BACK_MS = 1000;
@@ -22,6 +30,7 @@ const START: Progression = { matched: [], open: [], flips: [] };
 
 export default function Memo({ data }: GameProps) {
   const t = useT();
+  const locale = useLocale();
   const base = useRun("memo");
   const [state, setState] = useState<Progression>(START);
   const game = {
@@ -40,8 +49,8 @@ export default function Memo({ data }: GameProps) {
       <GameStart game={game}>
         <p className="text-mist">
           {t(
-            "Seize cartes, huit paires : chaque personnage va avec son fruit du démon. Retrouve-les en un minimum de coups.",
-            "Sixteen cards, eight pairs: each character goes with their Devil Fruit. Match them all in as few moves as you can.",
+            "Seize cartes, huit paires : selon la partie, chaque personnage va avec son fruit du démon, son surnom ou son arme. Retrouve-les en un minimum de coups.",
+            "Sixteen cards, eight pairs: depending on the game, each character goes with their Devil Fruit, their epithet or their weapon. Match them all in as few moves as you can.",
           )}
         </p>
       </GameStart>
@@ -83,6 +92,7 @@ export default function Memo({ data }: GameProps) {
 
   return (
     <Panel className="space-y-4">
+      <p className="text-foam">{THEMES[themeOf(deck)][locale]}</p>
       <p className="text-sm font-semibold text-mist" aria-live="polite">
         {t(
           `${state.matched.length / 2} paire${state.matched.length / 2 > 1 ? "s" : ""} sur ${deck.length / 2} · ${state.flips.length} coup${state.flips.length > 1 ? "s" : ""}`,

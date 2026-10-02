@@ -82,9 +82,10 @@ export function characterForms(character: PlayCharacter, data: ResolvedData): st
 }
 
 export function generate(seed: number, difficulty: Difficulty, data: ResolvedData): DccQuestion[] {
-  // Quelques questions de plus que nécessaire : celles qui n'ont pas quatre propositions sont écartées
-  return generateMixed(seed, SOURCES, DCC_LENGTH + 6, difficulty, data)
-    .filter((question) => question.options.length === 4)
+  // Bien plus de questions que nécessaire : celles qui n'ont pas quatre propositions sont écartées, comme
+  // celles qui ne se comprennent qu'avec leurs propositions (en cash, plusieurs réponses seraient justes)
+  return generateMixed(seed, SOURCES, DCC_LENGTH * 3, difficulty, data)
+    .filter((question) => question.options.length === 4 && !question.closed)
     .slice(0, DCC_LENGTH)
     .map((question) => {
       const owner = data.characterById.get(question.answerId);

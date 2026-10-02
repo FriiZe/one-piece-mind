@@ -12,7 +12,7 @@ import { useLocale, useT } from "@/lib/i18n/client";
 import {
   generateEstimates,
   parseEstimate,
-  POINTS_PER_QUESTION,
+  maxPoints,
   scoreEstimate,
   sliderToValue,
   usesDifficulty,
@@ -42,6 +42,7 @@ const UNIT_LABELS: Record<Exclude<EstimateQuestion["unit"], "berrys">, Localized
   épisode: { fr: "Épisode", en: "Episode" },
 };
 
+/** Crans du curseur sur une échelle logarithmique ; sur une échelle linéaire, il y en a un par valeur. */
 const SLIDER_STEPS = 1000;
 const NOT_TYPED = { text: "", value: null };
 
@@ -55,7 +56,8 @@ export default function EstimateGame({ data, slug }: GameProps & { slug: Estimat
   const locale = useLocale();
   const base = useRun(slug);
   const [index, setIndex] = useState(0);
-  const [position, setPosition] = useState(SLIDER_STEPS / 2);
+  /** Position du curseur, de 0 à 1. */
+  const [position, setPosition] = useState(0.5);
   // Valeur tapée au clavier : elle prime sur le curseur tant qu'il n'est pas déplacé
   const [typed, setTyped] = useState<{ text: string; value: number | null }>(NOT_TYPED);
   const [answers, setAnswers] = useState<number[]>([]);
@@ -64,7 +66,7 @@ export default function EstimateGame({ data, slug }: GameProps & { slug: Estimat
     ...base,
     start: (difficulty: Parameters<typeof base.start>[0]) => {
       setIndex(0);
-      setPosition(SLIDER_STEPS / 2);
+      setPosition(0.5);
       setTyped(NOT_TYPED);
       setAnswers([]);
       setScore(0);
@@ -78,7 +80,7 @@ export default function EstimateGame({ data, slug }: GameProps & { slug: Estimat
     () => (run ? generateEstimates(slug, run.seed, run.difficulty, data) : []),
     [slug, run, data],
   );
-  const max = questions.length * POINTS_PER_QUESTION;
+  const max = questions.reduce((sum, question) => sum + maxPoints(question), 0);
 
   if (!run || !questions.length) {
     return (
@@ -90,7 +92,9 @@ export default function EstimateGame({ data, slug }: GameProps & { slug: Estimat
   if (finished) return <GameEnd game={game} data={data} max={max} withDifficulty={withDifficulty} />;
 
   const question = questions[index];
-  const guess = typed.value ?? sliderToValue(question, position / SLIDER_STEPS);
+  // Un cran par chapitre ou par épisode : le barème se joue au numéro près
+  const steps = question.scale === "linear" ? question.max - question.min : SLIDER_STEPS;
+  const guess = typed.value ?? sliderToValue(question, position);
   const answered = answers.length > index;
   const points = answered ? scoreEstimate(question, answers[index]) : 0;
   const last = index === questions.length - 1;
@@ -108,7 +112,7 @@ export default function EstimateGame({ data, slug }: GameProps & { slug: Estimat
       return;
     }
     setIndex(index + 1);
-    setPosition(SLIDER_STEPS / 2);
+    setPosition(0.5);
     setTyped(NOT_TYPED);
   }
 
@@ -116,7 +120,7 @@ export default function EstimateGame({ data, slug }: GameProps & { slug: Estimat
     const parsed = parseEstimate(text);
     const value = parsed === null ? null : Math.min(question.max, Math.max(question.min, parsed));
     setTyped({ text, value });
-    if (value !== null) setPosition(Math.round(valueToSlider(question, value) * SLIDER_STEPS));
+    if (value !== null) setPosition(valueToSlider(question, value));
   }
 
   return (
@@ -145,12 +149,12 @@ export default function EstimateGame({ data, slug }: GameProps & { slug: Estimat
             <input
               type="range"
               min={0}
-              max={SLIDER_STEPS}
+              max={steps}
               step={1}
-              value={position}
+              value={Math.round(position * steps)}
               disabled={answered}
               onChange={(event) => {
-                setPosition(Number(event.target.value));
+                setPosition(Number(event.target.value) / steps);
                 setTyped(NOT_TYPED);
               }}
               aria-valuetext={format(question, guess, locale)}
@@ -167,7 +171,7 @@ export default function EstimateGame({ data, slug }: GameProps & { slug: Estimat
         {answered ? (
           <div key="correction" className="flex flex-wrap items-center justify-between gap-3" aria-live="polite">
             <p className="text-mist">
-              <strong className={points >= 3 ? "text-emerald-300" : points > 0 ? "text-straw" : "text-vest"}>
+              <strong className={points >= maxPoints(question) * 0.6 ? "text-emerald-300" : points > 0 ? "text-straw" : "text-vest"}>
                 {points > 0
                   ? t(`+${points} point${points > 1 ? "s" : ""}.`, `+${points} point${points === 1 ? "" : "s"}.`)
                   : t("Trop loin.", "Too far off.")}

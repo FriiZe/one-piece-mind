@@ -332,13 +332,18 @@ describe.skipIf(!accountsEnabled)("langue côté serveur", () => {
 
     const english = await view("en");
     expect(english.settings.lang).toBe("en");
-    expect(english.question!.title).toBe("Which organization does this character belong to?");
+    // Le quiz se pose dans les deux sens : l'une ou l'autre de ses consignes
+    expect(["Which organization does this character belong to?", "Which of these characters belongs to this organization?"]).toContain(
+      english.question!.title,
+    );
 
     // Sans langue (ancien client), ou avec une langue inconnue : le français
     for (const lang of [undefined, "de"]) {
       const french = await view(lang);
       expect(french.settings.lang).toBe("fr");
-      expect(french.question!.title).toBe("À quelle organisation appartient ce personnage ?");
+      expect(["À quelle organisation appartient ce personnage ?", "Lequel de ces personnages appartient à cette organisation ?"]).toContain(
+        french.question!.title,
+      );
     }
   });
 });

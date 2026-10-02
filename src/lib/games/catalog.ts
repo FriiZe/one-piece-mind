@@ -32,7 +32,7 @@ export const GAME_CATEGORIES: GameCategory[] = [
   {
     id: "oreille",
     title: { fr: "À l'oreille", en: "By Ear" },
-    description: { fr: "Un rire, une voix : qui est-ce ?", en: "A laugh, a voice: who is it?" },
+    description: { fr: "Une voix, une réplique : qui parle ?", en: "A voice, a line: who is speaking?" },
   },
   {
     id: "mots",
@@ -97,7 +97,6 @@ const BUILT_SLUGS = [
   "mode-aleatoire",
   "duo-carre-cash",
   // Lot C : les jeux qui n'ont besoin ni d'images ni de sons nouveaux
-  "rires",
   "connexions",
   "grille",
   "recrute-ton-equipage",
@@ -109,9 +108,9 @@ export type LiveSlug = (typeof BUILT_SLUGS)[number];
 /**
  * Jeux construits mais retirés du site pour l'instant : ni page, ni sélection
  * du jour, ni récompense, ni questions dans le mode aléatoire et le multijoueur.
- * Rires attend ses extraits audio.
+ * Aucun pour l'instant.
  */
-export const PAUSED_SLUGS: readonly LiveSlug[] = ["rires"];
+export const PAUSED_SLUGS: readonly LiveSlug[] = [];
 
 /** Jeux jouables. */
 export const LIVE_SLUGS = BUILT_SLUGS.filter((slug) => !PAUSED_SLUGS.includes(slug));
@@ -192,13 +191,6 @@ export const GAMES: Game[] = [
     { fr: "Des paires à retrouver : personnage et fruit, personnage et pavillon.", en: "Find the pairs: character and fruit, character and flag." },
   ),
 
-  game(
-    "rires",
-    "oreille",
-    "C",
-    { fr: "Rires", en: "Laughs" },
-    { fr: "Shishishi, Zehahaha, Kishishishi : à qui appartient ce rire ?", en: "Shishishi, Zehahaha, Kishishishi: whose laugh is it?" },
-  ),
   game(
     "voix-et-repliques",
     "oreille",

@@ -5,6 +5,7 @@ import { portraitUrl, type PlayCharacter } from "../cards";
 import { byDifficulty, type Difficulty } from "../engine/difficulty";
 import { createRng, randomSeed } from "../engine/rng";
 import { CharacterSearch } from "../ui/CharacterSearch";
+import { GuessHistory } from "../ui/GuessHistory";
 import { Button, Progress, ResultPanel } from "../ui/primitives";
 import { StartScreen } from "../ui/StartScreen";
 import { useBest } from "../ui/storage";
@@ -271,6 +272,8 @@ export function RevealGame({ data, variant }: GameProps & { variant: Variant }) 
           </p>
         </>
       )}
+
+      <GuessHistory ids={run.wrong} characterById={data.characterById} />
 
       {done && (
         <div className="flex flex-wrap items-center justify-between gap-3" aria-live="polite">

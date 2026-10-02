@@ -50,7 +50,14 @@ function usable(target: PlayCharacter, clues: (Clue | null)[]): Clue[] {
   return clues.filter((clue): clue is Clue => clue !== null && !revealsName(clue.value, target.name));
 }
 
-/** Du plus vague au plus précis : l'arc, l'origine, le fruit, le haki, l'affiliation, la prime, l'initiale. */
+/** Le surnom d'un personnage, entre guillemets, s'il en a un : il se lit sur son avis de recherche. */
+export function epithetClue(target: PlayCharacter, data: ResolvedData): Clue | null {
+  const t = translator(data.locale);
+  const epithet = data.extras.epithets.find((entry) => entry.characterId === target.id);
+  return epithet ? { title: t("Surnom", "Epithet"), value: t(`« ${epithet.text} »`, `“${epithet.text}”`) } : null;
+}
+
+/** Du plus vague au plus précis : l'arc, l'origine, le fruit, le haki, l'affiliation, la prime, le surnom, l'initiale. */
 const lesIndices: Generator = (rng, data, pool, count) => {
   const { locale } = data;
   const t = translator(locale);
@@ -67,16 +74,18 @@ const lesIndices: Generator = (rng, data, pool, count) => {
       { title: "Haki", value: hakiLabel(target.haki, locale) },
       { title: "Affiliation", value: target.affiliation! },
       { title: t("Prime", "Bounty"), value: formatBounty(target.bounty, locale) },
+      epithetClue(target, data),
     ];
     // L'initiale vient toujours en dernier, hors filtre : elle ne peut pas contenir le nom
     return { target, clues: [...usable(target, clues), { title: t("Initiale", "Initial"), value: initialOf(target, t) }] };
   });
 };
 
-const emojis: Generator = (rng, data, _pool, count) => {
+const emojis: Generator = (rng, data, pool, count) => {
   const { locale } = data;
   const t = translator(locale);
-  return sample(rng, data.extras.emojis, count).map((entry) => {
+  const drawn = new Set(pool.map((c) => c.id));
+  return sample(rng, data.extras.emojis.filter((entry) => drawn.has(entry.characterId)), count).map((entry) => {
     const target = data.characterById.get(entry.characterId)!;
     const arc = target.arc !== null ? data.arcs.get(target.arc) : undefined;
     const clues: (Clue | null)[] = [
@@ -93,7 +102,6 @@ const GENERATORS = { "les-indices": lesIndices, emojis } satisfies Record<string
 
 export type ClueSlug = keyof typeof GENERATORS;
 export const CLUE_SLUGS = Object.keys(GENERATORS) as [ClueSlug, ...ClueSlug[]];
-export const usesDifficulty = (slug: ClueSlug) => slug !== "emojis";
 
 export function generateRounds(slug: ClueSlug, seed: number, difficulty: Difficulty, data: ResolvedData): ClueRound[] {
   return GENERATORS[slug](createRng(seed), data, byDifficulty(data.characters, difficulty), CLUE_ROUNDS);

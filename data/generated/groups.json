@@ -274,5 +274,112 @@
       "jaguar-d-saul",
       "rocks-d-xebec"
     ]
+  },
+  {
+    "id": "pretres-d-enel",
+    "title": {
+      "fr": "Les quatre prêtres d'Ener",
+      "en": "Enel's four priests"
+    },
+    "since": 250,
+    "memberIds": [
+      "satori",
+      "shura",
+      "gedatsu",
+      "ohm"
+    ]
+  },
+  {
+    "id": "contremaitres-galley-la",
+    "title": {
+      "fr": "Les cinq contremaîtres du Dock n° 1 de la Galley-La",
+      "en": "The five foremen of Galley-La's Dock One"
+    },
+    "since": 330,
+    "memberIds": [
+      "paulie",
+      "peepley-lulu",
+      "tilestone",
+      "kaku",
+      "rob-lucci"
+    ]
+  },
+  {
+    "id": "mysterieux-thriller-bark",
+    "title": {
+      "fr": "Les quatre Mystérieux de Thriller Bark",
+      "en": "Thriller Bark's Mysterious Four"
+    },
+    "since": 449,
+    "memberIds": [
+      "gecko-moria",
+      "hogback",
+      "absalom",
+      "perona"
+    ]
+  },
+  {
+    "id": "officiers-hommes-poissons",
+    "title": {
+      "fr": "Hody Jones et ses cinq officiers",
+      "en": "Hody Jones and his five officers"
+    },
+    "since": 617,
+    "memberIds": [
+      "hody-jones",
+      "dosun",
+      "zeo",
+      "daruma",
+      "ikaros-much",
+      "hyouzou"
+    ]
+  },
+  {
+    "id": "grande-flotte",
+    "title": {
+      "fr": "Les sept capitaines de la Grande Flotte du Chapeau de paille",
+      "en": "The seven captains of the Straw Hat Grand Fleet"
+    },
+    "since": 800,
+    "memberIds": [
+      "cavendish",
+      "bartolomeo",
+      "sai",
+      "ideo",
+      "leo",
+      "hajrudin",
+      "orlumbus"
+    ]
+  },
+  {
+    "id": "commandants-revolutionnaires",
+    "title": {
+      "fr": "Les cinq commandants de l'Armée révolutionnaire",
+      "en": "The five commanders of the Revolutionary Army"
+    },
+    "since": 904,
+    "memberIds": [
+      "belo-betty",
+      "morley",
+      "lindbergh",
+      "karasu",
+      "emporio-ivankov"
+    ]
+  },
+  {
+    "id": "satellites-vegapunk",
+    "title": {
+      "fr": "Les six satellites de Vegapunk",
+      "en": "Vegapunk's six satellites"
+    },
+    "since": 1065,
+    "memberIds": [
+      "vegapunk-shaka",
+      "vegapunk-lilith",
+      "vegapunk-edison",
+      "vegapunk-pythagoras",
+      "vegapunk-atlas",
+      "vegapunk-york"
+    ]
   }
 ]

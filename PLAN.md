@@ -73,7 +73,7 @@ Lots : **A** = 10 jeux phares pour la mise en ligne, **B** = le gros du catalogu
 
 | # | Jeu | Principe | Lot |
 |---|---|---|---|
-| 10 | Rires | Reconnaître un personnage à son rire. Version écrite d'abord (« Zehahaha »), version audio ensuite | C |
+| 10 | Rires | Reconnaître un personnage à son rire. Abandonné : la version écrite a été retirée, la version audio ne se fera pas | C |
 | 11 | Voix et répliques | Extrait audio court, deviner qui parle | C |
 
 ### Mots et indices (8)
@@ -264,6 +264,17 @@ Le lot C peut s'intercaler plus tôt, jeu par jeu, selon l'envie.
   - En raid, le chrono de chaque question n'est tenu que par le navigateur ; le serveur contrôle la durée totale de l'assaut.
   - Les prix bornés et la taxe limitent le transfert de Berrys entre comptes par une vente arrangée, sans l'empêcher.
 - Reste à faire : le chat (prévu en dernier, il impose de la modération), l'historique des saisons passées, des annonces qui expirent.
+
+**Retours après la phase 5.**
+
+- Les indices : barème sur 10 points par manche, jamais moins de 5 avant l'initiale, 2 avec l'initiale. Trouver avant l'initiale valide le jeu du jour.
+- Rires est abandonné : le jeu, ses données et ses textes sont retirés. Le site compte 36 jeux.
+- Quiz à choix : la plupart posent aussi leur question dans l'autre sens (du personnage vers sa technique, son arme, son surnom ; de l'organisation, de l'arc, de la mer ou de la race vers le personnage). Vrai ou faux a huit familles d'affirmations de plus. Orthographe fait aussi écrire des techniques et des armes, Grand ou vieux demande aussi le plus petit et le plus jeune.
+- Contenus rédigés étoffés (`data/curated`) : techniques, surnoms, armes, navires, devinettes en emojis. Écrits de mémoire : à relire.
+- Le surnom sert d'indice, juste avant l'initiale, dans Les indices et Avis de recherche. Emojis se joue désormais par difficulté. Mémo associe selon la partie le fruit, le surnom ou l'arme.
+- Critères partagés par Connexions, Grille et Den Den Devin : hakis un à un, Zoan antique et mythique, paliers de prime, de taille et d'âge, initiale du nom (jamais demandée par Den Den Devin). Sept groupes de plus pour Trouve-les tous.
+- Historique des propositions : Les indices, Emojis, Avis de recherche, Révélation et Zoom extrême listent sous le champ de saisie les noms déjà écartés sur la manche.
+- Première apparition : barème au numéro près, sur 10 par personnage. Le numéro exact vaut 10, puis un point de moins tous les douze numéros d'écart environ ; encore 2 points à 99, 1 jusqu'à 150. La moitié des points se garde jusqu'à 61 d'écart, pour que le jeu du jour reste gagnable. Le curseur avance d'un numéro par cran.
 
 **À reprendre plus tard**
 

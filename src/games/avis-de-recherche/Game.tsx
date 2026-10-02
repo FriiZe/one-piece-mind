@@ -7,6 +7,7 @@ import { byDifficulty, type Difficulty } from "../engine/difficulty";
 import { createRng, randomSeed } from "../engine/rng";
 import { formatNumber } from "../engine/text";
 import { CharacterSearch } from "../ui/CharacterSearch";
+import { GuessHistory } from "../ui/GuessHistory";
 import { Button, Progress, ResultPanel } from "../ui/primitives";
 import { StartScreen } from "../ui/StartScreen";
 import { useBest } from "../ui/storage";
@@ -208,6 +209,8 @@ export default function AvisDeRecherche({ data }: GameProps) {
               </div>
             </>
           )}
+
+          <GuessHistory ids={run.wrong} characterById={data.characterById} />
 
           {done && (
             <div className="space-y-3" aria-live="polite">

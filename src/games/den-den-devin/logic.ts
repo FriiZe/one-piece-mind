@@ -10,6 +10,9 @@ import type { Criterion } from "../engine/criteria";
 export const MAX_QUESTIONS = 20;
 export const MAX_GUESSES = 3;
 
+/** Questions que l'escargophone peut poser : demander l'initiale du nom reviendrait à le faire épeler. */
+export const askable = (criterion: Criterion) => criterion.kind !== "initial";
+
 export type Reply = "yes" | "no" | "unknown";
 export type Step = { criterionId: string; reply: Reply };
 

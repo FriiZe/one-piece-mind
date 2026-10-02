@@ -278,6 +278,14 @@ describe("Avis de recherche", () => {
     expect(hints.some((h) => h.value.includes("Zoro"))).toBe(false);
   });
 
+  it("donne le surnom juste avant l'initiale, comme sur une vraie affiche", () => {
+    const hints = avis.hintsFor(get("roronoa-zoro"), manga);
+    expect(hints.at(-2)).toEqual({ key: "epithet", title: "Surnom", value: "« Le chasseur de pirates »" });
+    // Un personnage sans surnom connu garde ses indices habituels
+    const plain = manga.characters.find((c) => c.bounty !== null && !manga.extras.epithets.some((e) => e.characterId === c.id))!;
+    expect(avis.hintsFor(plain, manga).map((h) => h.key)).not.toContain("epithet");
+  });
+
   it("ne tire que des personnages primés, tous différents", () => {
     const posters = avis.generatePosters(createRng(11), byDifficulty(anime.characters, "facile"));
     expect(posters).toHaveLength(5);

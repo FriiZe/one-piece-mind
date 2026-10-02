@@ -4,13 +4,14 @@ import { useMemo, useState } from "react";
 import type { PlayCharacter } from "../cards";
 import { CharacterSearch } from "../ui/CharacterSearch";
 import { GameEnd, GameStart } from "../ui/GameEnd";
+import { GuessHistory } from "../ui/GuessHistory";
 import { Portrait } from "../ui/Portrait";
 import { Button, Progress } from "../ui/primitives";
 import type { GameProps } from "../ui/types";
 import { useRun } from "../ui/useRun";
 import type { Localized } from "@/lib/i18n";
 import { useLocale, useT } from "@/lib/i18n/client";
-import { generateRounds, maxPoints, pointsFor, usesDifficulty, type ClueEvent, type ClueSlug } from "./logic";
+import { generateRounds, maxPoints, pointsFor, type ClueEvent, type ClueSlug } from "./logic";
 
 const INTROS: Record<ClueSlug, Localized> = {
   "les-indices": {
@@ -47,18 +48,17 @@ export default function ClueGame({ data, slug }: GameProps & { slug: ClueSlug })
     },
   };
   const { run, finished } = base;
-  const withDifficulty = usesDifficulty(slug);
 
   const rounds = useMemo(() => (run ? generateRounds(slug, run.seed, run.difficulty, data) : []), [slug, run, data]);
 
   if (!run || !rounds.length) {
     return (
-      <GameStart game={game} withDifficulty={withDifficulty}>
+      <GameStart game={game}>
         <p className="text-mist">{INTROS[slug][locale]}</p>
       </GameStart>
     );
   }
-  if (finished) return <GameEnd game={game} data={data} max={rounds.length * maxPoints(slug)} withDifficulty={withDifficulty} />;
+  if (finished) return <GameEnd game={game} data={data} max={rounds.length * maxPoints(slug)} />;
 
   const round = rounds[state.index];
   const worth = pointsFor(slug, state.revealed, round.clues.length);
@@ -146,6 +146,8 @@ export default function ClueGame({ data, slug }: GameProps & { slug: ClueSlug })
           </div>
         </>
       )}
+
+      <GuessHistory ids={state.wrong} characterById={data.characterById} />
 
       {done && round.target.img && <Portrait img={round.target.img} />}
       {done && (
