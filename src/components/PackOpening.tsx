@@ -17,6 +17,9 @@ const GLOWS: Record<number, string> = {
   4: "rgb(157 178 200 / 0.4)",
 };
 
+/** Une face de carte : elle apparaît ou disparaît d'un coup, à la moitié du demi-tour (700 ms). */
+const FACE = "transition-[visibility] delay-[350ms] duration-0";
+
 /** Le paquet scellé : il sert aussi d'illustration à l'offre, dans la boutique. */
 export function PackArt({ className = "" }: { className?: string }) {
   const t = useT();
@@ -131,10 +134,18 @@ export function PackOpening({
                     data-strong={!!character && character.tier <= 2}
                     style={{ "--glow": glow } as CSSProperties}
                   >
-                    <div className={`relative transition-transform duration-700 transform-3d ${shown ? "rotate-y-180" : ""}`}>
-                      {/* Face avant : le personnage n'est écrit dans la page qu'une fois la carte retournée */}
-                      <div className="rotate-y-180 rounded-md backface-hidden">
-                        <CharacterCard character={shown ? character : null} golden={shown && recruit.golden} />
+                    {/*
+                      La carte fait un demi-tour, et ses deux faces s'échangent à mi-course, quand elle est
+                      de profil. Rien ne repose sur `backface-visibility` ni sur `preserve-3d` : Firefox et
+                      Chrome ne les traitent pas pareil, et les cartes ne s'affichaient pas sous Firefox.
+                    */}
+                    <div className={`relative transition-transform duration-700 ease-in-out ${shown ? "rotate-y-180" : ""}`}>
+                      {/*
+                        Face avant, en miroir : le demi-tour du conteneur la remet à l'endroit. Le personnage
+                        n'est écrit dans la page qu'une fois la carte retournée.
+                      */}
+                      <div className={`${FACE} -scale-x-100 rounded-md ${shown ? "visible" : "invisible"}`}>
+                        <CharacterCard character={shown ? character : null} golden={shown && recruit.golden} eager />
                         {shown && recruit.golden && (
                           <span
                             aria-hidden="true"
@@ -142,7 +153,7 @@ export function PackOpening({
                           />
                         )}
                       </div>
-                      <div className="absolute inset-0 backface-hidden" aria-hidden="true">
+                      <div className={`${FACE} absolute inset-0 ${shown ? "invisible" : "visible"}`} aria-hidden="true">
                         <CardBack />
                       </div>
                     </div>

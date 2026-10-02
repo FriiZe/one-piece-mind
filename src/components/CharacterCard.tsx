@@ -18,11 +18,14 @@ export function CharacterCard({
   golden = false,
   count,
   note,
+  eager = false,
 }: {
   character: PlayCharacter | null;
   golden?: boolean;
   count?: number;
   note?: string;
+  /** Charge le portrait tout de suite : une carte qui se retourne ne doit pas attendre d'être « visible ». */
+  eager?: boolean;
 }) {
   const locale = useLocale();
   return (
@@ -38,6 +41,7 @@ export function CharacterCard({
             alt=""
             fill
             sizes="(min-width: 640px) 180px, 45vw"
+            loading={eager ? "eager" : "lazy"}
             className="object-cover object-top"
           />
         ) : (
