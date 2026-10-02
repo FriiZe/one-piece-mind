@@ -1,4 +1,4 @@
-import type { Localized } from "@/lib/i18n";
+import type { Locale, Localized } from "@/lib/i18n";
 import type { SpoilerMode } from "@/lib/spoilers";
 import type { QuizQuestion } from "./rules";
 
@@ -8,6 +8,10 @@ export type QuizSummary = {
   description: string;
   /** Ce qu'il faut avoir vu pour jouer sans être spoilé. */
   spoiler: SpoilerMode;
+  /** Langue dans laquelle le quiz est rédigé. */
+  language: Locale;
+  /** Le quiz a une vignette, servie par `/api/quizzes/<id>/thumbnail`. */
+  hasThumbnail: boolean;
   author: string;
   questionCount: number;
   /** Nombre de comptes qui l'ont terminé. */

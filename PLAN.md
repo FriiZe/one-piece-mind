@@ -234,6 +234,9 @@ Le lot C peut s'intercaler plus tôt, jeu par jeu, selon l'envie.
   - Berrys : jusqu'à 150 ฿ la première fois qu'on termine le quiz d'un autre joueur, dix quiz récompensés par jour au plus, dans le plafond journalier. Limite assumée : deux comptes suffisent à contourner la règle « pas son propre quiz », d'où la petite somme.
   - Les quiz ne sont pas proposés aux moteurs de recherche : leur contenu n'est pas relu avant publication.
 - Reste à faire : modifier un quiz déjà publié, jouer un quiz de la communauté en salon multijoueur.
+- Vignette et langue d'un quiz : à la création, l'auteur peut joindre une image et indique si le quiz est rédigé en français ou en anglais. La liste affiche la vignette et une étiquette de langue, et se filtre par langue.
+  - L'image est recadrée en 16:9 et réduite à 640 × 360 dans le navigateur, puis gardée en base (table `QuizThumbnail`) et servie par `/api/quizzes/<id>/thumbnail`. Vercel Blob n'est pas utilisé.
+  - Les quiz publiés avant ce champ sont marqués en français. Une vignette n'est pas relue avant publication : comme le texte, elle relève des signalements.
 - Notifications : une cloche dans l'en-tête compte les demandes d'ami, les invitations dans un salon et, pour un administrateur, les quiz masqués. Le compte est mis en avant : bouton « Connexion » pour les visiteurs, pseudo et icône une fois connecté.
 - Révélation et Zoom extrême : l'image n'avance plus avec le temps, seulement après une proposition (ou une demande d'en voir plus, qui coûte autant qu'une erreur). Le palier est déduit par le serveur du nombre d'erreurs.
 - Boutique (prévue en phase 5, avancée) : elle remplace la taverne. Une recrue pour 1 500 ฿, ou un booster de cinq avis pour 6 000 ฿, ouvert carte par carte : trois communes ou peu communes, une quatrième parfois rare, une dernière rare ou légendaire. Le halo de rareté d'une carte n'apparaît qu'au survol.

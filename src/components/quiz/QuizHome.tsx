@@ -1,12 +1,15 @@
 "use client";
 
+import Image from "next/image";
 import Link from "@/components/Link";
 import { useState } from "react";
 import { CheckIcon } from "@/components/GameBadge";
 import { DCC_POINTS } from "@/games/duo-carre-cash/logic";
 import { formatNumber } from "@/games/engine/text";
 import { Button, Panel } from "@/games/ui/primitives";
+import { useStored } from "@/games/ui/storage";
 import { LoadingPanel } from "@/games/ui/WithGameData";
+import { LOCALE_NAMES, LOCALES, type Locale } from "@/lib/i18n";
 import { useLocale, useT } from "@/lib/i18n/client";
 import { deleteQuizAction, restoreQuizAction } from "@/lib/player/quiz-actions";
 import { usePlayer } from "@/lib/player/PlayerProvider";
@@ -18,63 +21,81 @@ function QuizCard({ quiz, mine = false, children }: { quiz: QuizSummary; mine?: 
   const t = useT();
   const locale = useLocale();
   return (
-    <li className={`flex flex-col gap-2.5 rounded-2xl border border-sea-700 p-4 ${quiz.yourBest || mine ? "" : "bg-sea-800"}`}>
-      <div className="flex items-baseline justify-between gap-3">
-        <h3 className="text-lg leading-snug font-extrabold text-foam">
-          <Link href={`/quiz/${quiz.id}`} className="hover:text-straw">
-            {quiz.title}
-          </Link>
-        </h3>
-        {mine ? (
-          <span className="shrink-0 rounded-full bg-sea-700 px-2.5 py-0.5 text-[13px] font-extrabold text-mist">
-            {t("Le tien", "Yours")}
-          </span>
-        ) : quiz.yourBest ? (
-          <span className="flex shrink-0 items-center gap-1 text-sm font-extrabold text-emerald-300">
-            <CheckIcon className="size-3.5" />
-            {quiz.yourBest.score} / {quiz.yourBest.max}
-          </span>
+    <li className={`flex flex-col overflow-hidden rounded-2xl border border-sea-700 ${quiz.yourBest || mine ? "" : "bg-sea-800"}`}>
+      {/* La vignette choisie par l'auteur ; à défaut, l'initiale du titre tient sa place pour que les cartes s'alignent */}
+      <div className="relative flex aspect-video items-center justify-center bg-sea-700">
+        {quiz.hasThumbnail ? (
+          <Image src={`/api/quizzes/${quiz.id}/thumbnail`} alt="" fill sizes="(min-width: 1024px) 360px, (min-width: 640px) 50vw, 100vw" className="object-cover" />
         ) : (
-          <span className="shrink-0 text-sm font-extrabold text-straw">
-            {t("jusqu'à", "up to")} {COMMUNITY_BERRYS} ฿
+          <span aria-hidden="true" className="font-display text-7xl text-mist/40">
+            {quiz.title.charAt(0).toUpperCase()}
           </span>
         )}
+        <span className="absolute top-2 right-2 rounded-md bg-sea-950/85 px-2 py-0.5 text-xs font-extrabold tracking-wide text-foam uppercase">
+          <span aria-hidden="true">{quiz.language}</span>
+          <span className="sr-only">
+            {t(`Quiz rédigé en ${LOCALE_NAMES[quiz.language].toLowerCase()}`, `Quiz written in ${LOCALE_NAMES[quiz.language]}`)}
+          </span>
+        </span>
       </div>
-      {quiz.description && <p className="line-clamp-3 text-sm text-mist">{quiz.description}</p>}
-      {(quiz.spoiler === "manga" || quiz.status === "hidden" || !!quiz.reports) && (
-        <p className="flex flex-wrap items-center gap-2 text-xs font-bold">
-          {quiz.spoiler === "manga" && (
-            <span className="rounded-full bg-vest/20 px-2 py-0.5 text-vest">{t("Spoilers manga", "Manga spoilers")}</span>
-          )}
-          {quiz.status === "hidden" && (
-            <span className="rounded-full bg-vest px-2 py-0.5 text-white">{t("Masqué", "Hidden")}</span>
-          )}
-          {!!quiz.reports && (
-            <span className="text-mist">
-              {quiz.reports} {t(`signalement${quiz.reports > 1 ? "s" : ""}`, quiz.reports === 1 ? "report" : "reports")}
+      <div className="flex flex-1 flex-col gap-2.5 p-4">
+        <div className="flex items-baseline justify-between gap-3">
+          <h3 className="text-lg leading-snug font-extrabold text-foam">
+            <Link href={`/quiz/${quiz.id}`} className="hover:text-straw">
+              {quiz.title}
+            </Link>
+          </h3>
+          {mine ? (
+            <span className="shrink-0 rounded-full bg-sea-700 px-2.5 py-0.5 text-[13px] font-extrabold text-mist">
+              {t("Le tien", "Yours")}
+            </span>
+          ) : quiz.yourBest ? (
+            <span className="flex shrink-0 items-center gap-1 text-sm font-extrabold text-emerald-300">
+              <CheckIcon className="size-3.5" />
+              {quiz.yourBest.score} / {quiz.yourBest.max}
+            </span>
+          ) : (
+            <span className="shrink-0 text-sm font-extrabold text-straw">
+              {t("jusqu'à", "up to")} {COMMUNITY_BERRYS} ฿
             </span>
           )}
+        </div>
+        {quiz.description && <p className="line-clamp-3 text-sm text-mist">{quiz.description}</p>}
+        {(quiz.spoiler === "manga" || quiz.status === "hidden" || !!quiz.reports) && (
+          <p className="flex flex-wrap items-center gap-2 text-xs font-bold">
+            {quiz.spoiler === "manga" && (
+              <span className="rounded-full bg-vest/20 px-2 py-0.5 text-vest">{t("Spoilers manga", "Manga spoilers")}</span>
+            )}
+            {quiz.status === "hidden" && (
+              <span className="rounded-full bg-vest px-2 py-0.5 text-white">{t("Masqué", "Hidden")}</span>
+            )}
+            {!!quiz.reports && (
+              <span className="text-mist">
+                {quiz.reports} {t(`signalement${quiz.reports > 1 ? "s" : ""}`, quiz.reports === 1 ? "report" : "reports")}
+              </span>
+            )}
+          </p>
+        )}
+        <p className="mt-auto flex flex-wrap justify-between gap-x-3 pt-1 text-[13px] text-mist">
+          <span>
+            {t("par", "by")} {mine ? t("toi", "you") : quiz.author} · {quiz.questionCount} questions
+          </span>
+          <span>
+            {formatNumber(quiz.plays, locale)}{" "}
+            {t(`partie${quiz.plays > 1 ? "s" : ""}`, quiz.plays === 1 ? "play" : "plays")}
+          </span>
         </p>
-      )}
-      <p className="mt-auto flex flex-wrap justify-between gap-x-3 pt-1 text-[13px] text-mist">
-        <span>
-          {t("par", "by")} {mine ? t("toi", "you") : quiz.author} · {quiz.questionCount} questions
-        </span>
-        <span>
-          {formatNumber(quiz.plays, locale)}{" "}
-          {t(`partie${quiz.plays > 1 ? "s" : ""}`, quiz.plays === 1 ? "play" : "plays")}
-        </span>
-      </p>
-      <div className="flex flex-wrap items-center gap-2">
-        <Link
-          href={`/quiz/${quiz.id}`}
-          className={`flex min-h-11 items-center rounded-[10px] px-4 text-sm font-extrabold transition-colors ${
-            quiz.yourBest || mine ? "border border-sea-600 text-foam hover:border-straw" : "bg-straw text-ink hover:bg-straw-dark"
-          }`}
-        >
-          {quiz.yourBest ? t("Rejouer", "Play again") : mine ? t("Voir", "View") : t("Jouer", "Play")}
-        </Link>
-        {children}
+        <div className="flex flex-wrap items-center gap-2">
+          <Link
+            href={`/quiz/${quiz.id}`}
+            className={`flex min-h-11 items-center rounded-[10px] px-4 text-sm font-extrabold transition-colors ${
+              quiz.yourBest || mine ? "border border-sea-600 text-foam hover:border-straw" : "bg-straw text-ink hover:bg-straw-dark"
+            }`}
+          >
+            {quiz.yourBest ? t("Rejouer", "Play again") : mine ? t("Voir", "View") : t("Jouer", "Play")}
+          </Link>
+          {children}
+        </div>
       </div>
     </li>
   );
@@ -116,7 +137,9 @@ export function QuizHome() {
   const locale = useLocale();
   const { status, accountsEnabled } = usePlayer();
   const [sort, setSort] = useState<"recent" | "top">("recent");
-  const { list, reload } = useQuizList(sort);
+  // Le filtre de langue est retenu : qui ne lit que le français n'a pas à le remettre à chaque visite
+  const [language, setLanguage] = useStored<Locale | "all">("opm.quiz.language", "all");
+  const { list, reload } = useQuizList(sort, language === "all" ? null : language);
   const [error, setError] = useState<string | null>(null);
 
   if (!list) return <LoadingPanel label={t("Chargement des quiz…", "Loading quizzes…")} />;
@@ -236,6 +259,21 @@ export function QuizHome() {
               </button>
             ))}
           </div>
+          <div className="flex gap-2" role="group" aria-label={t("Filtrer par langue", "Filter by language")}>
+            {(["all", ...LOCALES] as const).map((value) => (
+              <button
+                key={value}
+                type="button"
+                aria-pressed={language === value}
+                onClick={() => setLanguage(value)}
+                className={`min-h-11 cursor-pointer rounded-full px-4 text-sm font-bold transition-colors ${
+                  language === value ? "bg-sea-600 text-foam" : "border border-sea-700 text-mist hover:text-foam"
+                }`}
+              >
+                {value === "all" ? t("Toutes les langues", "All languages") : LOCALE_NAMES[value]}
+              </button>
+            ))}
+          </div>
           {list.mine.length > 0 && (
             <a href="#mes-quiz" className="flex min-h-11 items-center rounded-full border border-sea-700 px-4 text-sm font-bold text-mist hover:text-foam">
               {t("Les miens", "Mine")} · {list.mine.length}
@@ -271,13 +309,15 @@ export function QuizHome() {
             </li>
           )}
         </ul>
-        {list.quizzes.length === 0 && status !== "user" && (
+        {list.quizzes.length === 0 && (status !== "user" || language !== "all") && (
           <Panel>
             <p className="text-mist">
-              {t(
-                "Aucun quiz pour l'instant. Le premier sera peut-être le tien.",
-                "No quizzes yet. The first one might be yours.",
-              )}
+              {language === "all"
+                ? t("Aucun quiz pour l'instant. Le premier sera peut-être le tien.", "No quizzes yet. The first one might be yours.")
+                : t(
+                    `Aucun quiz rédigé en ${LOCALE_NAMES[language].toLowerCase()} pour l'instant.`,
+                    `No quizzes written in ${LOCALE_NAMES[language]} yet.`,
+                  )}
             </p>
           </Panel>
         )}

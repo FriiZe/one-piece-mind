@@ -267,6 +267,8 @@ model Quiz {
   description String    @default("")
   /// anime ou manga : ce qu'il faut avoir vu pour ne pas être spoilé.
   spoiler     String
+  /// Langue dans laquelle le quiz est rédigé : fr ou en. Les quiz d'avant ce champ sont en français.
+  language    String    @default("fr")
   /// Questions ({ prompt, answer, wrong, alternatives }), validées à l'écriture et à la lecture.
   questions   Json
   /// public, ou hidden après plusieurs signalements.
@@ -277,11 +279,20 @@ model Quiz {
   plays       Int       @default(0)
   createdAt   DateTime  @default(now())
 
-  reports QuizReport[]
-  results QuizPlay[]
+  reports   QuizReport[]
+  results   QuizPlay[]
+  thumbnail QuizThumbnail?
 
   @@index([status, createdAt])
   @@index([authorId])
+}
+
+/// Vignette d'un quiz, à part : la liste des quiz ne charge pas les images.
+model QuizThumbnail {
+  quizId String @id
+  quiz   Quiz   @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  /// Image JPEG, réduite par le navigateur avant l'envoi et vérifiée à l'écriture.
+  data   Bytes
 }
 
 /// Signalement d'un quiz par un joueur : un seul par joueur et par quiz.

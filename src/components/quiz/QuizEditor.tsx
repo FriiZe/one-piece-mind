@@ -1,17 +1,20 @@
 "use client";
 
+import Image from "next/image";
 import Link from "@/components/Link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, type ChangeEvent } from "react";
 import { CheckIcon } from "@/components/GameBadge";
 import { DCC_POINTS } from "@/games/duo-carre-cash/logic";
 import { Button, Panel } from "@/games/ui/primitives";
 import { useStored } from "@/games/ui/storage";
 import { LoadingPanel } from "@/games/ui/WithGameData";
+import { LOCALE_NAMES, LOCALES } from "@/lib/i18n";
 import { useLocale, useLocalePath, useT } from "@/lib/i18n/client";
 import { createQuizAction } from "@/lib/player/quiz-actions";
 import { usePlayer } from "@/lib/player/PlayerProvider";
 import { draftProblems, draftToInput, QUIZ_LIMITS, REPORTS_TO_HIDE, type QuizDraft } from "@/lib/quiz/rules";
+import { toThumbnail } from "@/lib/quiz/thumbnail";
 import { QUIZ_ERRORS } from "@/lib/quiz/types";
 
 const emptyQuestion = () => ({ prompt: "", answer: "", wrong: ["", "", ""], alternatives: "" });
@@ -42,6 +45,7 @@ export function QuizEditor() {
   const [error, setError] = useState<string | null>(null);
   const [checked, setChecked] = useState(false);
   const [current, setCurrent] = useState(0);
+  const [imageError, setImageError] = useState(false);
 
   if (status === "loading") return <LoadingPanel />;
   if (status !== "user") {
@@ -72,6 +76,8 @@ export function QuizEditor() {
   const index = Math.min(current, draft.questions.length - 1);
   const question = draft.questions[index];
   const ready = draft.questions.filter(isComplete).length;
+  // Tant que l'auteur n'a rien choisi, le quiz est supposé écrit dans la langue où il lit le site
+  const language = draft.language ?? locale;
   const { min, max } = QUIZ_LIMITS.questions;
 
   async function publish() {
@@ -79,7 +85,7 @@ export function QuizEditor() {
     setError(null);
     if (problems.length) return;
     setBusy(true);
-    const result = await createQuizAction(draftToInput(draft)).catch(() => ({ ok: false, error: "unavailable" }) as const);
+    const result = await createQuizAction(draftToInput(draft, locale)).catch(() => ({ ok: false, error: "unavailable" }) as const);
     setBusy(false);
     if (!result.ok) {
       setError(QUIZ_ERRORS[locale][result.error]);
@@ -87,6 +93,16 @@ export function QuizEditor() {
     }
     setDraft(EMPTY_DRAFT);
     router.push(path(`/quiz/${result.id}`));
+  }
+
+  async function pickThumbnail(event: ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0];
+    // Le champ est vidé : choisir deux fois le même fichier doit déclencher deux fois l'événement
+    event.target.value = "";
+    if (!file) return;
+    const thumbnail = await toThumbnail(file);
+    setImageError(!thumbnail);
+    if (thumbnail) setDraft({ ...draft, thumbnail });
   }
 
   function addQuestion() {
@@ -171,6 +187,72 @@ export function QuizEditor() {
                     )}
               </p>
             </fieldset>
+            <fieldset>
+              <legend className={LABEL}>{t("Le quiz est rédigé en", "The quiz is written in")}</legend>
+              <div className="grid grid-cols-2 rounded-xl bg-sea-900 p-1">
+                {LOCALES.map((value) => (
+                  <label
+                    key={value}
+                    className={`flex min-h-11 cursor-pointer items-center justify-center rounded-[9px] text-[15px] font-extrabold transition-colors has-focus-visible:outline-2 has-focus-visible:outline-straw ${
+                      language === value ? "bg-straw text-ink" : "text-mist hover:text-foam"
+                    }`}
+                  >
+                    <input
+                      type="radio"
+                      name="language"
+                      value={value}
+                      checked={language === value}
+                      onChange={() => setDraft({ ...draft, language: value })}
+                      className="sr-only"
+                    />
+                    {LOCALE_NAMES[value]}
+                  </label>
+                ))}
+              </div>
+              <p className="mt-2 text-[13px] text-mist">
+                {t(
+                  "Une étiquette l'indique dans la liste des quiz, où l'on peut filtrer par langue.",
+                  "A tag shows it in the quiz list, where players can filter by language.",
+                )}
+              </p>
+            </fieldset>
+            <div>
+              <p className={LABEL}>
+                {t("Vignette", "Thumbnail")} <span className="font-normal text-mist">{t("(facultatif)", "(optional)")}</span>
+              </p>
+              {draft.thumbnail && (
+                <span className="relative mb-2 block aspect-video overflow-hidden rounded-[10px] border border-sea-600">
+                  <Image src={draft.thumbnail} alt={t("Vignette du quiz", "Quiz thumbnail")} fill unoptimized className="object-cover" />
+                </span>
+              )}
+              <div className="flex flex-wrap items-center gap-2">
+                <label className="flex min-h-11 cursor-pointer items-center rounded-[10px] border border-dashed border-sea-600 px-4 text-sm font-extrabold text-foam transition-colors hover:border-straw has-focus-visible:outline-2 has-focus-visible:outline-straw">
+                  <input type="file" accept="image/jpeg,image/png,image/webp" onChange={pickThumbnail} className="sr-only" />
+                  {draft.thumbnail ? t("Changer d'image", "Change the image") : t("Choisir une image", "Choose an image")}
+                </label>
+                {draft.thumbnail && (
+                  <button
+                    type="button"
+                    onClick={() => setDraft({ ...draft, thumbnail: null })}
+                    className="min-h-11 cursor-pointer px-2 text-sm font-bold text-[#f5a88a] hover:underline"
+                  >
+                    {t("Retirer", "Remove")}
+                  </button>
+                )}
+              </div>
+              {imageError ? (
+                <p role="alert" className="mt-2 text-[13px] font-semibold text-vest">
+                  {t("Cette image n'a pas pu être lue. Essaie un fichier JPEG, PNG ou WebP.", "This image couldn't be read. Try a JPEG, PNG or WebP file.")}
+                </p>
+              ) : (
+                <p className="mt-2 text-[13px] text-mist">
+                  {t(
+                    "Affichée dans la liste des quiz. Elle est recadrée au format 16:9 et réduite avant l'envoi.",
+                    "Shown in the quiz list. It's cropped to 16:9 and shrunk before it's sent.",
+                  )}
+                </p>
+              )}
+            </div>
           </div>
 
           <div className="space-y-1.5 rounded-2xl border border-sea-700 p-3">
@@ -356,8 +438,8 @@ export function QuizEditor() {
         </div>
         <p className="min-w-0 flex-1 text-sm text-mist">
           {t(
-            `Visible de tous, sous ton pseudo. Pas d'insultes ni de spoilers au-delà de ce que tu as indiqué : un quiz signalé par ${REPORTS_TO_HIDE} joueurs est masqué. Ton brouillon est gardé dans ce navigateur.`,
-            `Visible to everyone, under your username. No insults, and no spoilers beyond what you've indicated: a quiz reported by ${REPORTS_TO_HIDE} players gets hidden. Your draft is kept in this browser.`,
+            `Visible de tous, sous ton pseudo. Pas d'insultes, pas d'image déplacée, pas de spoilers au-delà de ce que tu as indiqué : un quiz signalé par ${REPORTS_TO_HIDE} joueurs est masqué. Ton brouillon est gardé dans ce navigateur.`,
+            `Visible to everyone, under your username. No insults, no inappropriate image, and no spoilers beyond what you've indicated: a quiz reported by ${REPORTS_TO_HIDE} players gets hidden. Your draft is kept in this browser.`,
           )}
         </p>
         <Button type="submit" disabled={busy} className="min-h-12 px-6">

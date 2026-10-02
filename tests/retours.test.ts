@@ -31,6 +31,7 @@ import {
   COMMUNITY_BERRYS,
   draftProblems,
   draftToInput,
+  QUIZ_THUMBNAIL,
   quizInputSchema,
   REPORTS_TO_HIDE,
   scoreQuiz,
@@ -42,7 +43,7 @@ import { pendingCounts } from "@/lib/server/friends";
 import { DUMMY_HASH } from "@/lib/server/password";
 import { answerTrade, cancelTrade, friendCollection, proposeTrade, tradesOverview } from "@/lib/server/trades";
 import { buyBoosterFor, loadState, sellDuplicatesFor } from "@/lib/server/player";
-import { createQuiz, deleteQuiz, getQuiz, listQuizzes, reportQuiz, restoreQuiz, submitQuizPlay } from "@/lib/server/quizzes";
+import { createQuiz, deleteQuiz, getQuiz, getQuizThumbnail, listQuizzes, reportQuiz, restoreQuiz, submitQuizPlay } from "@/lib/server/quizzes";
 
 const raw = buildGameData();
 const anime = resolveGameData(raw, "anime");
@@ -346,6 +347,9 @@ describe("Duo, Carré ou Cash", () => {
   });
 });
 
+/** Le plus petit fichier qui commence et finit comme un JPEG, en URL de données. */
+const JPEG = QUIZ_THUMBNAIL.prefix + Buffer.from([0xff, 0xd8, 0xff, 0xe0, 0x00, 0x10, 0xff, 0xd9]).toString("base64");
+
 const draft = (questions = 5): QuizDraft => ({
   title: "  Les   sabres de Wano ",
   description: "",
@@ -362,9 +366,22 @@ describe("règles des quiz de la communauté", () => {
   it("nettoie ce que les joueurs écrivent", () => {
     expect(cleanText("  deux   espaces\n\tet un saut ")).toBe("deux espaces et un saut");
     expect(cleanText("nom\u202epiégé")).toBe("nom piégé");
-    const parsed = quizInputSchema.parse(draftToInput(draft()));
+    const parsed = quizInputSchema.parse(draftToInput(draft(), "fr"));
     expect(parsed.title).toBe("Les sabres de Wano");
     expect(parsed.questions[0].alternatives).toEqual(["La bonne", "bonne réponse"]);
+  });
+
+  it("retient la langue du quiz, et n'accepte en vignette qu'un JPEG de taille raisonnable", () => {
+    // Sans choix de l'auteur, le quiz est supposé écrit dans la langue où il lit le site
+    expect(quizInputSchema.parse(draftToInput(draft(), "en"))).toMatchObject({ language: "en", thumbnail: null });
+    expect(quizInputSchema.parse(draftToInput({ ...draft(), language: "fr" }, "en")).language).toBe("fr");
+    expect(quizInputSchema.safeParse({ ...draftToInput(draft(), "fr"), language: "es" }).success).toBe(false);
+
+    const withThumbnail = (thumbnail: string) => quizInputSchema.safeParse({ ...draftToInput(draft(), "fr"), thumbnail }).success;
+    expect(withThumbnail(JPEG)).toBe(true);
+    expect(withThumbnail(JPEG.replace("image/jpeg", "image/svg+xml"))).toBe(false);
+    expect(withThumbnail("https://exemple.com/image.jpg")).toBe(false);
+    expect(withThumbnail(QUIZ_THUMBNAIL.prefix + "A".repeat(QUIZ_THUMBNAIL.maxBytes * 2))).toBe(false);
   });
 
   it("dit en clair ce qui manque à un brouillon", () => {
@@ -379,11 +396,11 @@ describe("règles des quiz de la communauté", () => {
     expect(problems).toContain("Le titre doit faire 4 à 60 caractères.");
     expect(problems).toContain("Question 2 : les quatre réponses doivent être différentes.");
     expect(problems).toContain("Question 3 : il faut une bonne réponse et trois mauvaises.");
-    expect(quizInputSchema.safeParse(draftToInput(bad)).success).toBe(false);
+    expect(quizInputSchema.safeParse(draftToInput(bad, "fr")).success).toBe(false);
   });
 
   it("mélange les propositions sans perdre la bonne réponse, et note comme le jeu", () => {
-    const { questions } = quizInputSchema.parse(draftToInput(draft()));
+    const { questions } = quizInputSchema.parse(draftToInput(draft(), "fr"));
     const played = toDccQuestions("Titre", questions, 42, "fr");
     expect(played).toHaveLength(5);
     for (const [index, question] of played.entries()) {
@@ -454,7 +471,7 @@ describe.skipIf(!accountsEnabled)("quiz et doublons, en base", () => {
   it("publie un quiz valide et refuse le reste", async () => {
     const [author] = users;
     expect(await createQuiz(author, { title: "x" })).toEqual({ ok: false, error: "invalid" });
-    const created = await createQuiz(author, draftToInput(draft()));
+    const created = await createQuiz(author, draftToInput(draft(), "fr"));
     if (!created.ok) throw new Error(created.error);
     quizId = created.id;
 
@@ -463,6 +480,42 @@ describe.skipIf(!accountsEnabled)("quiz et doublons, en base", () => {
     expect(list.mine.map((quiz) => quiz.id)).toContain(quizId);
     expect(list.isAdmin).toBe(false);
     expect((await listQuizzes(users[2], "top")).isAdmin).toBe(true);
+  });
+
+  it("garde la langue et la vignette d'un quiz, et filtre la liste par langue", async () => {
+    const [author, player, admin] = users;
+    // Un fichier qui se dit JPEG sans en être un est refusé
+    const fake = QUIZ_THUMBNAIL.prefix + Buffer.from("<svg onload=alert(1)>").toString("base64");
+    expect(await createQuiz(author, { ...draftToInput(draft(), "en"), thumbnail: fake })).toEqual({ ok: false, error: "invalid" });
+
+    const created = await createQuiz(author, { ...draftToInput(draft(), "en"), thumbnail: JPEG });
+    if (!created.ok) throw new Error(created.error);
+    const ids = async (language: "fr" | "en" | null) => (await listQuizzes(player, "recent", language)).quizzes.map((quiz) => quiz.id);
+    expect(await ids("en")).toContain(created.id);
+    expect(await ids("en")).not.toContain(quizId);
+    expect(await ids("fr")).toContain(quizId);
+    expect(await ids("fr")).not.toContain(created.id);
+    expect(await ids(null)).toEqual(expect.arrayContaining([quizId, created.id]));
+
+    const all = (await listQuizzes(player, "recent")).quizzes;
+    expect(all.find((quiz) => quiz.id === created.id)).toMatchObject({ language: "en", hasThumbnail: true });
+    expect(all.find((quiz) => quiz.id === quizId)).toMatchObject({ language: "fr", hasThumbnail: false });
+
+    // La vignette d'un quiz public se sert sans lire la session ; celle d'un quiz masqué, à son auteur et aux administrateurs
+    const nobody = async () => null;
+    const served = await getQuizThumbnail(created.id, nobody);
+    expect(served?.public).toBe(true);
+    expect(Buffer.from(served!.data).toString("base64")).toBe(JPEG.slice(QUIZ_THUMBNAIL.prefix.length));
+    expect(await getQuizThumbnail(quizId, nobody)).toBeNull();
+    await db().quiz.update({ where: { id: created.id }, data: { status: "hidden" } });
+    expect(await getQuizThumbnail(created.id, nobody)).toBeNull();
+    expect(await getQuizThumbnail(created.id, async () => player)).toBeNull();
+    expect((await getQuizThumbnail(created.id, async () => author))?.public).toBe(false);
+    expect((await getQuizThumbnail(created.id, async () => admin))?.public).toBe(false);
+
+    // Supprimer le quiz emporte sa vignette
+    expect(await deleteQuiz(author, created.id)).toEqual({ ok: true });
+    expect(await db().quizThumbnail.count({ where: { quizId: created.id } })).toBe(0);
   });
 
   it("paie la première partie d'un autre joueur, une seule fois, et jamais l'auteur", async () => {
@@ -573,7 +626,7 @@ describe.skipIf(!accountsEnabled)("quiz et doublons, en base", () => {
   it("ne laisse supprimer un quiz qu'à son auteur ou à un administrateur", async () => {
     const [author, player, admin] = users;
     expect(await deleteQuiz(player, quizId)).toEqual({ ok: false, error: "forbidden" });
-    const second = await createQuiz(author, draftToInput(draft(6)));
+    const second = await createQuiz(author, draftToInput(draft(6), "fr"));
     if (!second.ok) throw new Error(second.error);
     expect(await deleteQuiz(admin, second.id)).toEqual({ ok: true });
     expect(await deleteQuiz(author, quizId)).toEqual({ ok: true });

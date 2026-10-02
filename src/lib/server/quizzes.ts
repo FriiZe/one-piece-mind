@@ -5,6 +5,7 @@ import {
   COMMUNITY_REWARDS_PER_DAY,
   communityBerrys,
   QUIZ_LIMITS,
+  QUIZ_THUMBNAIL,
   quizAnswersSchema,
   quizInputSchema,
   quizQuestionsSchema,
@@ -13,6 +14,7 @@ import {
   type QuizQuestion,
 } from "@/lib/quiz/rules";
 import type { QuizDetail, QuizList, QuizPlayResult, QuizResult, QuizSummary } from "@/lib/quiz/types";
+import type { Locale } from "@/lib/i18n";
 import type { SpoilerMode } from "@/lib/spoilers";
 import { Prisma } from "@/generated/prisma/client";
 import { db } from "./db";
@@ -38,12 +40,15 @@ const summarySelect = {
   title: true,
   description: true,
   spoiler: true,
+  language: true,
   questions: true,
   status: true,
   plays: true,
   createdAt: true,
   authorId: true,
   author: { select: { username: true } },
+  // Sa seule présence suffit : l'image n'est lue que par la route qui la sert
+  thumbnail: { select: { quizId: true } },
   _count: { select: { reports: true } },
 } satisfies Prisma.QuizSelect;
 type QuizRow = Prisma.QuizGetPayload<{ select: typeof summarySelect }>;
@@ -54,6 +59,8 @@ function toSummary(row: QuizRow, best: Map<string, { score: number; max: number 
     title: row.title,
     description: row.description,
     spoiler: row.spoiler as SpoilerMode,
+    language: row.language === "en" ? "en" : "fr",
+    hasThumbnail: !!row.thumbnail,
     author: row.author.username,
     questionCount: Array.isArray(row.questions) ? row.questions.length : 0,
     plays: row.plays,
@@ -73,12 +80,15 @@ async function bestScores(userId: string | undefined, quizIds: string[]) {
   return new Map(plays.map((play) => [play.quizId, { score: play.score, max: play.maxScore }]));
 }
 
-/** Quiz publics, les plus récents ou les plus joués d'abord, et ceux du joueur connecté. */
-export async function listQuizzes(user: SessionUser | null, sort: "recent" | "top"): Promise<QuizList> {
+/**
+ * Quiz publics, les plus récents ou les plus joués d'abord, et ceux du joueur connecté.
+ * `language` ne garde, parmi les quiz publics, que ceux rédigés dans cette langue.
+ */
+export async function listQuizzes(user: SessionUser | null, sort: "recent" | "top", language: Locale | null = null): Promise<QuizList> {
   const admin = isAdmin(user);
   const [publicRows, mineRows, hiddenRows] = await Promise.all([
     db().quiz.findMany({
-      where: { status: "public" },
+      where: { status: "public", ...(language ? { language } : {}) },
       orderBy: sort === "top" ? [{ plays: "desc" }, { createdAt: "desc" }] : { createdAt: "desc" },
       take: LIST_SIZE,
       select: summarySelect,
@@ -132,11 +142,38 @@ export async function createQuiz(user: SessionUser, input: unknown): Promise<Qui
   ]);
   if (online >= QUIZ_LIMITS.perAuthor || today >= QUIZ_LIMITS.perDay) return { ok: false, error: "limit" };
 
+  const { thumbnail, ...fields } = parsed.data;
+  const image = thumbnail ? decodeThumbnail(thumbnail) : null;
+  if (thumbnail && !image) return { ok: false, error: "invalid" };
+
   const quiz = await db().quiz.create({
-    data: { authorId: user.id, ...parsed.data },
+    data: { authorId: user.id, ...fields, ...(image ? { thumbnail: { create: { data: image } } } : {}) },
     select: { id: true },
   });
   return { ok: true, id: quiz.id };
+}
+
+/**
+ * Octets d'une vignette envoyée en URL de données ; `null` si ce n'est pas un JPEG de taille
+ * raisonnable. On ne se fie pas au type annoncé : le fichier doit commencer et finir comme un JPEG.
+ */
+function decodeThumbnail(dataUrl: string): Uint8Array<ArrayBuffer> | null {
+  const bytes = new Uint8Array(Buffer.from(dataUrl.slice(QUIZ_THUMBNAIL.prefix.length), "base64"));
+  const jpeg = bytes.length > 4 && bytes[0] === 0xff && bytes[1] === 0xd8 && bytes[2] === 0xff && bytes.at(-2) === 0xff && bytes.at(-1) === 0xd9;
+  return jpeg && bytes.length <= QUIZ_THUMBNAIL.maxBytes ? bytes : null;
+}
+
+/** Vignette d'un quiz. Celle d'un quiz masqué n'est rendue qu'à son auteur et aux administrateurs. */
+export async function getQuizThumbnail(
+  id: string,
+  currentUser: () => Promise<SessionUser | null>,
+): Promise<{ data: Uint8Array<ArrayBuffer>; public: boolean } | null> {
+  const row = await db().quizThumbnail.findUnique({ where: { quizId: id }, select: { data: true, quiz: { select: { status: true, authorId: true } } } });
+  if (!row) return null;
+  if (row.quiz.status === "public") return { data: row.data, public: true };
+  // La session n'est lue que pour un quiz masqué : la vignette d'un quiz public se sert sans elle
+  const user = await currentUser();
+  return user && (row.quiz.authorId === user.id || isAdmin(user)) ? { data: row.data, public: false } : null;
 }
 
 export async function deleteQuiz(user: SessionUser, id: string): Promise<QuizResult> {

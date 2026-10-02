@@ -7,7 +7,7 @@ import { z } from "zod";
 import { DCC_KINDS, scoreAnswers, type DccAnswer, type DccQuestion } from "@/games/duo-carre-cash/logic";
 import { createRng, shuffle } from "@/games/engine/rng";
 import { normalizeText } from "@/games/engine/text";
-import { translator, type Locale } from "@/lib/i18n";
+import { LOCALES, translator, type Locale } from "@/lib/i18n";
 
 export const QUIZ_LIMITS = {
   title: { min: 4, max: 60 },
@@ -21,6 +21,12 @@ export const QUIZ_LIMITS = {
   /** Quiz qu'un joueur peut créer par jour. */
   perDay: 5,
 };
+
+/**
+ * Vignette d'un quiz : le navigateur la recadre et la réduit à ces dimensions avant l'envoi, en JPEG.
+ * `maxBytes` laisse de la marge : à cette taille, une image pèse d'ordinaire 30 à 80 ko.
+ */
+export const QUIZ_THUMBNAIL = { width: 640, height: 360, maxBytes: 200_000, prefix: "data:image/jpeg;base64," } as const;
 
 /** Signalements de joueurs différents au bout desquels un quiz est masqué. */
 export const REPORTS_TO_HIDE = 3;
@@ -66,6 +72,16 @@ export const quizInputSchema = z.object({
     .transform(cleanText)
     .pipe(z.string().max(QUIZ_LIMITS.description)),
   spoiler: z.enum(["anime", "manga"]),
+  /** Langue dans laquelle le quiz est rédigé. */
+  language: z.enum(LOCALES),
+  /** Vignette en JPEG, sous forme d'URL de données ; le serveur en vérifie le contenu avant de l'enregistrer. */
+  thumbnail: z
+    .string()
+    // En base 64, quatre caractères portent trois octets
+    .max(QUIZ_THUMBNAIL.prefix.length + Math.ceil(QUIZ_THUMBNAIL.maxBytes / 3) * 4)
+    .regex(/^data:image\/jpeg;base64,[A-Za-z0-9+/]+={0,2}$/)
+    .nullable()
+    .default(null),
   questions: quizQuestionsSchema,
 });
 export type QuizInput = z.infer<typeof quizInputSchema>;
@@ -79,14 +95,21 @@ export type QuizDraft = {
   title: string;
   description: string;
   spoiler: "anime" | "manga";
+  /** Absente d'un brouillon commencé avant ce champ, ou pas encore choisie : c'est alors la langue du site. */
+  language?: Locale;
+  /** Vignette déjà réduite, en URL de données. */
+  thumbnail?: string | null;
   questions: { prompt: string; answer: string; wrong: string[]; alternatives: string }[];
 };
 
-export function draftToInput(draft: QuizDraft) {
+/** `locale` : langue du site, retenue quand le brouillon n'en précise pas. */
+export function draftToInput(draft: QuizDraft, locale: Locale) {
   return {
     title: draft.title,
     description: draft.description,
     spoiler: draft.spoiler,
+    language: draft.language ?? locale,
+    thumbnail: draft.thumbnail ?? null,
     questions: draft.questions.map((question) => ({
       prompt: question.prompt,
       answer: question.answer,
@@ -127,7 +150,7 @@ export function draftProblems(draft: QuizDraft, locale: Locale): string[] {
     problems.push(t(`Pas plus de ${QUIZ_LIMITS.questions.max} questions.`, `No more than ${QUIZ_LIMITS.questions.max} questions.`));
   }
 
-  draftToInput(draft).questions.forEach((question, index) => {
+  draftToInput(draft, locale).questions.forEach((question, index) => {
     const label = `Question ${index + 1}`;
     const prompt = cleanText(question.prompt);
     const choices = [question.answer, ...question.wrong].map(cleanText);
