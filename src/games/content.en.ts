@@ -322,7 +322,7 @@ export const GAME_CONTENT_EN: Record<LiveSlug, GameContent> = {
     howTo: [
       "Read the first clue and guess a character.",
       "Each wrong guess reveals the next clue; you can also ask for one without guessing a name.",
-      "A round is worth 5 points with a single clue, then one point less for each clue revealed. Five rounds per game.",
+      "A round is worth 10 points with a single clue, then one point less for each clue revealed, never dropping below 5. Once the initial is shown, it's only worth 2. Five rounds per game.",
     ],
     faq: [
       {

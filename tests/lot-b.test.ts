@@ -10,6 +10,7 @@ import * as memo from "@/games/memo/logic";
 import * as qcm from "@/games/qcm/logic";
 import { evaluateReport, reportSchema, type GameReport } from "@/games/report";
 import * as wordle from "@/games/wordle/logic";
+import { DAILY_PASS } from "@/lib/economy/daily";
 
 const raw = buildGameData();
 const modes: ResolvedData[] = [resolveGameData(raw, "anime"), resolveGameData(raw, "manga")];
@@ -201,15 +202,34 @@ describe("jeux d'indices", () => {
     const [round] = clues.generateRounds("les-indices", 4, "normal", anime);
     const found = { type: "guess", id: round.target.id } as const;
     const miss = { type: "guess", id: "personne" } as const;
-    expect(clues.scoreRound(round, [found])).toBe(5);
-    expect(clues.scoreRound(round, [miss, found])).toBe(4);
-    expect(clues.scoreRound(round, [{ type: "hint" }, { type: "hint" }, found])).toBe(3);
-    expect(clues.scoreRound(round, [{ type: "pass" }, found])).toBe(0);
-    expect(clues.scoreRound(round, [])).toBe(0);
+    const score = (events: clues.ClueEvent[]) => clues.scoreRound("les-indices", round, events);
+    expect(score([found])).toBe(10);
+    expect(score([miss, found])).toBe(9);
+    expect(score([{ type: "hint" }, { type: "hint" }, found])).toBe(8);
+    expect(score([{ type: "pass" }, found])).toBe(0);
+    expect(score([])).toBe(0);
     // Trop d'erreurs : plus d'indice à dévoiler, la manche est perdue
-    expect(clues.scoreRound(round, [...Array(round.clues.length).fill(miss), found])).toBe(0);
-    // Le dernier indice vaut encore un point
-    expect(clues.scoreRound(round, [...Array(round.clues.length - 1).fill(miss), found])).toBe(1);
+    expect(score([...Array(round.clues.length).fill(miss), found])).toBe(0);
+    // Avec l'initiale, la manche ne vaut plus que deux points
+    expect(score([...Array(round.clues.length - 1).fill(miss), found])).toBe(2);
+  });
+
+  it("les-indices : trouver avant l'initiale garde au moins la moitié des points", () => {
+    expect([1, 2, 3, 4, 5, 6, 7].map((revealed) => clues.pointsFor("les-indices", revealed, 7))).toEqual([10, 9, 8, 7, 6, 5, 2]);
+    // Un indice en moins (pas de mer d'origine) : l'initiale reste le dernier palier
+    expect([4, 5, 6].map((revealed) => clues.pointsFor("les-indices", revealed, 6))).toEqual([7, 6, 2]);
+    for (const seed of SEEDS.slice(0, 10)) {
+      const rounds = clues.generateRounds("les-indices", seed, "normal", anime);
+      // Chaque personnage trouvé au dernier indice avant l'initiale : le jeu du jour est validé
+      const events = rounds.map((round) => [...Array(round.clues.length - 2).fill({ type: "hint" }), { type: "guess", id: round.target.id }]);
+      const { score, max } = clues.evaluate("les-indices", seed, "normal", events, anime);
+      expect(max).toBe(50);
+      expect(score / max).toBeGreaterThanOrEqual(DAILY_PASS);
+    }
+  });
+
+  it("emojis : un point de moins par indice, de 5 à 1", () => {
+    expect([1, 2, 3, 4, 5].map((revealed) => clues.pointsFor("emojis", revealed, 5))).toEqual([5, 4, 3, 2, 1]);
   });
 });
 

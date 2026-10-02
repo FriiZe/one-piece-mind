@@ -10,16 +10,31 @@ import { FRUIT_TYPE_LABELS, hakiLabel, RACE_LABELS, SEA_LABELS } from "@/lib/dat
 import { translator, type Translate } from "@/lib/i18n";
 
 export const CLUE_ROUNDS = 5;
-export const MAX_POINTS = 5;
-export const MAX_SCORE = CLUE_ROUNDS * MAX_POINTS;
 
 export type Clue = { title: string; value: string; /** Indice principal, affiché en grand. */ big?: boolean };
 export type ClueRound = { target: PlayCharacter; clues: Clue[] };
 export type ClueEvent = { type: "guess"; id: string } | { type: "hint" } | { type: "pass" };
 
-/** Points selon le nombre d'indices affichés (le premier est offert) : de 5 à 1. */
-export function pointsFor(revealed: number): number {
-  return Math.max(1, MAX_POINTS - (revealed - 1));
+/**
+ * Barème d'une manche : `max` avec un seul indice, puis un point de moins par
+ * indice dévoilé, sans descendre sous `floor`. `initial` : ce que vaut la
+ * manche une fois l'initiale (toujours le dernier indice) affichée.
+ */
+type Scale = { max: number; floor: number; initial?: number };
+const SCALES: Record<ClueSlug, Scale> = {
+  // Les premiers indices ne suffisent presque jamais : tant que l'initiale n'est pas
+  // affichée, la manche garde au moins la moitié des points, de quoi valider le jeu du jour
+  "les-indices": { max: 10, floor: 5, initial: 2 },
+  emojis: { max: 5, floor: 1 },
+};
+
+export const maxPoints = (slug: ClueSlug) => SCALES[slug].max;
+
+/** Points selon le nombre d'indices affichés (le premier est offert), sur les `total` de la manche. */
+export function pointsFor(slug: ClueSlug, revealed: number, total: number): number {
+  const { max, floor, initial } = SCALES[slug];
+  if (initial !== undefined && revealed >= total) return initial;
+  return Math.max(floor, max - (revealed - 1));
 }
 
 const initialOf = (c: PlayCharacter, t: Translate) =>
@@ -85,7 +100,7 @@ export function generateRounds(slug: ClueSlug, seed: number, difficulty: Difficu
 }
 
 /** Points d'une manche, en rejouant les actions du joueur dans l'ordre. */
-export function scoreRound(round: ClueRound, events: readonly ClueEvent[]): number {
+export function scoreRound(slug: ClueSlug, round: ClueRound, events: readonly ClueEvent[]): number {
   let revealed = 1;
   for (const event of events) {
     if (event.type === "pass") return 0;
@@ -93,7 +108,7 @@ export function scoreRound(round: ClueRound, events: readonly ClueEvent[]): numb
       revealed = Math.min(round.clues.length, revealed + 1);
       continue;
     }
-    if (event.id === round.target.id) return pointsFor(revealed);
+    if (event.id === round.target.id) return pointsFor(slug, revealed, round.clues.length);
     // Une erreur dévoile l'indice suivant ; sans indice restant, la manche est perdue
     if (revealed >= round.clues.length) return 0;
     revealed++;
@@ -104,6 +119,6 @@ export function scoreRound(round: ClueRound, events: readonly ClueEvent[]): numb
 /** Rejoue une partie à partir de sa graine et des actions du joueur, manche par manche. */
 export function evaluate(slug: ClueSlug, seed: number, difficulty: Difficulty, rounds: readonly (readonly ClueEvent[])[], data: ResolvedData) {
   const generated = generateRounds(slug, seed, difficulty, data);
-  const score = generated.reduce((sum, round, index) => sum + scoreRound(round, rounds[index] ?? []), 0);
-  return { score, max: generated.length * MAX_POINTS };
+  const score = generated.reduce((sum, round, index) => sum + scoreRound(slug, round, rounds[index] ?? []), 0);
+  return { score, max: generated.length * maxPoints(slug) };
 }

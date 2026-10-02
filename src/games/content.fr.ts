@@ -310,7 +310,7 @@ export const GAME_CONTENT_FR: Record<LiveSlug, GameContent> = {
     howTo: [
       "Lis le premier indice et propose un personnage.",
       "Chaque erreur dévoile l'indice suivant ; tu peux aussi en demander un sans proposer de nom.",
-      "Une manche vaut 5 points avec un seul indice, puis un point de moins par indice dévoilé. Cinq manches par partie.",
+      "Une manche vaut 10 points avec un seul indice, puis un point de moins par indice dévoilé, sans descendre sous 5. Une fois l'initiale affichée, elle n'en vaut plus que 2. Cinq manches par partie.",
     ],
     faq: [
       {

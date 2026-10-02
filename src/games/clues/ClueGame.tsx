@@ -10,7 +10,7 @@ import type { GameProps } from "../ui/types";
 import { useRun } from "../ui/useRun";
 import type { Localized } from "@/lib/i18n";
 import { useLocale, useT } from "@/lib/i18n/client";
-import { generateRounds, MAX_POINTS, pointsFor, usesDifficulty, type ClueEvent, type ClueSlug } from "./logic";
+import { generateRounds, maxPoints, pointsFor, usesDifficulty, type ClueEvent, type ClueSlug } from "./logic";
 
 const INTROS: Record<ClueSlug, Localized> = {
   "les-indices": {
@@ -58,9 +58,10 @@ export default function ClueGame({ data, slug }: GameProps & { slug: ClueSlug })
       </GameStart>
     );
   }
-  if (finished) return <GameEnd game={game} data={data} max={rounds.length * MAX_POINTS} withDifficulty={withDifficulty} />;
+  if (finished) return <GameEnd game={game} data={data} max={rounds.length * maxPoints(slug)} withDifficulty={withDifficulty} />;
 
   const round = rounds[state.index];
+  const worth = pointsFor(slug, state.revealed, round.clues.length);
   const done = state.outcome !== null;
   const last = state.index === rounds.length - 1;
   const logged = (event: ClueEvent) => state.log.map((events, i) => (i === state.index ? [...events, event] : events));
@@ -69,8 +70,7 @@ export default function ClueGame({ data, slug }: GameProps & { slug: ClueSlug })
     if (done) return;
     const log = logged({ type: "guess", id: character.id });
     if (character.id === round.target.id) {
-      const points = pointsFor(state.revealed);
-      setState({ ...state, log, outcome: points, score: state.score + points });
+      setState({ ...state, log, outcome: worth, score: state.score + worth });
       return;
     }
     const wrong = [...state.wrong, character.id];
@@ -121,8 +121,8 @@ export default function ClueGame({ data, slug }: GameProps & { slug: ClueSlug })
           <div className="flex flex-wrap items-center justify-between gap-2 text-sm text-mist">
             <span>
               {t(
-                `Cette manche vaut encore ${pointsFor(state.revealed)} point${pointsFor(state.revealed) > 1 ? "s" : ""}.`,
-                `This round is still worth ${pointsFor(state.revealed)} point${pointsFor(state.revealed) === 1 ? "" : "s"}.`,
+                `Cette manche vaut encore ${worth} point${worth > 1 ? "s" : ""}.`,
+                `This round is still worth ${worth} point${worth === 1 ? "" : "s"}.`,
               )}
             </span>
             <span className="flex gap-4">
