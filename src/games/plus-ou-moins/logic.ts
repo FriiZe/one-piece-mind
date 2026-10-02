@@ -9,11 +9,20 @@ export function bountyPool(characters: readonly PlayCharacter[]): Bountied[] {
   return characters.filter((c): c is Bountied => c.bounty !== null);
 }
 
-/** Adversaire suivant : une prime différente, et pas un personnage déjà vu récemment. */
-export function nextOpponent(rng: Rng, pool: readonly Bountied[], current: Bountied, recentIds: readonly string[]): Bountied {
+/** Quand tous les personnages sont déjà passés, ceux des dernières manches restent écartés. */
+const RECENT = 12;
+
+/**
+ * Adversaire suivant : une prime différente, et un personnage pas encore vu dans la partie (`seenIds`,
+ * du plus ancien au plus récent). Une série assez longue pour les épuiser reprend les plus anciens.
+ */
+export function nextOpponent(rng: Rng, pool: readonly Bountied[], current: Bountied, seenIds: readonly string[]): Bountied {
   const different = pool.filter((c) => c.id !== current.id && c.bounty !== current.bounty);
-  const fresh = different.filter((c) => !recentIds.includes(c.id));
-  return pick(rng, fresh.length ? fresh : different);
+  const unseen = different.filter((c) => !seenIds.includes(c.id));
+  if (unseen.length) return pick(rng, unseen);
+  const recent = seenIds.slice(-RECENT);
+  const rested = different.filter((c) => !recent.includes(c.id));
+  return pick(rng, rested.length ? rested : different);
 }
 
 export function isCorrect(current: Bountied, next: Bountied, answer: Answer): boolean {
@@ -32,7 +41,7 @@ export function startChain(seed: number, pool: readonly Bountied[]): Chain {
 
 /** Paire suivante, après `streak` bonnes réponses : un tirage par manche, dérivé de la graine. */
 export function advanceChain(seed: number, streak: number, pool: readonly Bountied[], chain: Chain): Chain {
-  const next = nextOpponent(createRng(seed + streak), pool, chain.next, chain.seen.slice(-12));
+  const next = nextOpponent(createRng(seed + streak), pool, chain.next, chain.seen);
   return { current: chain.next, next, seen: [...chain.seen, next.id] };
 }
 

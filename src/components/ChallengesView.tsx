@@ -4,8 +4,10 @@ import Link from "@/components/Link";
 import { formatNumber } from "@/games/engine/text";
 import { useUntilMidnight } from "@/games/ui/storage";
 import {
+  bestLabel,
   DAILY_BERRY_CAP,
   isMet,
+  objectiveLabel,
   objectiveLevel,
   objectiveProgress,
   OBJECTIVES,
@@ -185,7 +187,7 @@ function remaining(game: Game, stats: GameStats | undefined): number {
   );
 }
 
-type Reachable = { game: Game; objective: Objective; progress: number; caption: string };
+type Reachable = { game: Game; objective: Objective; label: string; progress: number; caption: string };
 
 /** Les objectifs les plus avancés du joueur, un par jeu : ce qu'il peut décrocher en une partie ou deux. */
 function Objectives() {
@@ -204,6 +206,7 @@ function Objectives() {
     candidates.push({
       game,
       objective,
+      label: objectiveLabel(objective, game.slug)[locale],
       progress: objectiveProgress(objective, stats),
       caption: !stats?.games
         ? t("Jamais essayé", "Never tried")
@@ -212,10 +215,7 @@ function Objectives() {
               `${formatNumber(stats.games, locale)} partie${stats.games > 1 ? "s" : ""} jouée${stats.games > 1 ? "s" : ""}`,
               `${formatNumber(stats.games, locale)} ${stats.games === 1 ? "game" : "games"} played`,
             )
-          : t(
-              `Ton record : ${Math.round(stats.best * 100)} % des points`,
-              `Your best: ${Math.round(stats.best * 100)}% of the points`,
-            ),
+          : t(`Ton record : ${bestLabel(game.slug, stats.best).fr}`, `Your best: ${bestLabel(game.slug, stats.best).en}`),
     });
   }
   const shown = candidates.sort((a, b) => b.progress - a.progress).slice(0, WITHIN_REACH);
@@ -235,14 +235,14 @@ function Objectives() {
       </div>
       <h3 className="text-sm font-extrabold tracking-wide text-mist uppercase">{t("À portée de main", "Within reach")}</h3>
       <ul className="overflow-hidden rounded-2xl border border-sea-700">
-        {shown.map(({ game, objective, progress, caption }) => (
+        {shown.map(({ game, objective, label, progress, caption }) => (
           <li key={game.slug} className="border-b border-sea-700 last:border-b-0">
             <Link href={`/jeux/${game.slug}`} className="flex min-h-[60px] flex-wrap items-center gap-x-4 gap-y-2 px-4 py-2.5 transition-colors hover:bg-sea-800 sm:px-5">
               <GameBadge title={game.title[locale]} category={game.category} className="size-9 text-lg" />
               <span className="min-w-0 flex-1 sm:w-80 sm:flex-none">
                 <span className="block text-[15px] font-extrabold text-foam">
                   {game.title[locale]} ·{" "}
-                  {objective.label[locale].charAt(0).toLowerCase() + objective.label[locale].slice(1)}
+                  {label.charAt(0).toLowerCase() + label.slice(1)}
                 </span>
                 <span className={`block text-[13px] text-mist ${status === "loading" ? "invisible" : ""}`}>{caption}</span>
               </span>

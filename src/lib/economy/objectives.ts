@@ -1,4 +1,7 @@
 import type { Difficulty } from "@/games/engine/difficulty";
+import { FULL_STREAK } from "@/games/plus-ou-moins/logic";
+import type { LiveSlug } from "@/lib/games/catalog";
+import type { Localized } from "@/lib/i18n";
 import type { GameStats } from "./types";
 
 /**
@@ -16,6 +19,29 @@ export const OBJECTIVES = [
 ] as const;
 
 export type Objective = (typeof OBJECTIVES)[number];
+
+/**
+ * Jeux où l'on enchaîne les bonnes réponses jusqu'à la première erreur, avec la série qui vaut
+ * tous les points : « la moitié des points » n'y veut rien dire, on y parle de séries.
+ */
+const FULL_STREAKS: Partial<Record<LiveSlug, number>> = { "plus-ou-moins": FULL_STREAK };
+const fullStreak = (slug: string) => (FULL_STREAKS as Record<string, number | undefined>)[slug];
+
+/** Libellé d'un objectif pour un jeu donné : un objectif de score devient une série à atteindre dans un jeu à séries. */
+export function objectiveLabel(objective: Objective, slug: string): Localized {
+  const full = fullStreak(slug);
+  if (objective.kind !== "best" || !full) return objective.label;
+  const streak = Math.ceil(objective.target * full);
+  return { fr: `Atteindre une série de ${streak}`, en: `Reach a streak of ${streak}` };
+}
+
+/** Record d'un joueur sur un jeu, en clair : une part des points, ou une série (le parcours ne retient rien au-delà de la série complète). */
+export function bestLabel(slug: string, best: number): Localized {
+  const full = fullStreak(slug);
+  if (!full) return { fr: `${Math.round(best * 100)} % des points`, en: `${Math.round(best * 100)}% of the points` };
+  const streak = Math.round(best * full);
+  return best >= 1 ? { fr: `série de ${streak} ou plus`, en: `streak of ${streak} or more` } : { fr: `série de ${streak}`, en: `streak of ${streak}` };
+}
 
 /**
  * Ce que vaut un objectif ou un défi de score selon la difficulté de la partie :

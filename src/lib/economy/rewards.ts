@@ -5,7 +5,7 @@ import { isRewardless, type LiveSlug } from "@/lib/games/catalog";
 import { berryBonus, crewBonuses } from "./crew";
 import { currentDay, dailyChallenges } from "./dailies";
 import { DAILY_CHALLENGE, DAILY_PASS, dailyStatus } from "./daily";
-import { newlyMet, withGame } from "./objectives";
+import { newlyMet, objectiveLabel, withGame } from "./objectives";
 import type { CollectionEntry, GameOutcome, Milestone, PlayerState, Recruit, Recruitable, Reward } from "./types";
 import { advanceChallenges, currentWeek, weekKey, weeklyChallenges } from "./weekly";
 
@@ -177,7 +177,7 @@ export function applyGame(
   // Objectifs du jeu atteints avec cette partie, ou réussis à une difficulté plus haute
   const stats = withGame(state.stats[outcome.slug], outcome.performance, outcome.difficulty);
   const objectives: Milestone[] = newlyMet(state.stats[outcome.slug], stats).map(({ objective, berrys: prize }) => ({
-    label: objective.label,
+    label: objectiveLabel(objective, outcome.slug),
     berrys: prize,
   }));
 

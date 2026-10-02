@@ -11,6 +11,7 @@ import {
   SIGNUP_BERRYS,
   assignPost,
   BASE_BERRYS,
+  bestLabel,
   buyRecruit,
   bonusLabel,
   crewBonuses,
@@ -362,6 +363,18 @@ describe("objectifs par jeu", () => {
     ]);
     expect(sum(first.reward.objectives)).toBe(100 + 200 + 500 + 1500);
     expect(first.state.stats["le-classement"]).toEqual({ games: 1, best: 1, bestBy: { normal: 1 } });
+
+    // Dans un jeu à séries, les objectifs de score s'énoncent en séries : 6, 10 et 12 sur 12
+    const streaks = applyGame(EMPTY_PLAYER, outcome({ slug: "plus-ou-moins" }), pool, DAY, never);
+    expect(streaks.reward.objectives.map((o) => o.label)).toEqual([
+      { fr: "Jouer une première partie", en: "Play your first game" },
+      { fr: "Atteindre une série de 6", en: "Reach a streak of 6" },
+      { fr: "Atteindre une série de 10", en: "Reach a streak of 10" },
+      { fr: "Atteindre une série de 12", en: "Reach a streak of 12" },
+    ]);
+    expect(bestLabel("plus-ou-moins", 7 / 12).fr).toBe("série de 7");
+    expect(bestLabel("plus-ou-moins", 1).en).toBe("streak of 12 or more");
+    expect(bestLabel("le-classement", 0.8).fr).toBe("80 % des points");
 
     const second = applyGame(first.state, outcome(), pool, DAY, never);
     expect(second.reward.objectives).toEqual([]);

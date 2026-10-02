@@ -2,7 +2,7 @@
 
 import { DIFFICULTIES } from "@/games/engine/difficulty";
 import { formatNumber } from "@/games/engine/text";
-import { isMet, objectiveLevel, objectiveProgress, OBJECTIVES, SKILL_FACTOR } from "@/lib/economy";
+import { bestLabel, isMet, objectiveLabel, objectiveLevel, objectiveProgress, OBJECTIVES, SKILL_FACTOR } from "@/lib/economy";
 import { hasDifficulty, type LiveSlug } from "@/lib/games/catalog";
 import { useLocale, useT } from "@/lib/i18n/client";
 import { usePlayer } from "@/lib/player/PlayerProvider";
@@ -37,13 +37,14 @@ export function GameObjectives({ slug }: { slug: LiveSlug }) {
           const tiered = levels && objective.kind === "best";
           // Tout est gagné quand l'objectif est atteint, et au plus haut niveau s'il en a
           const complete = met && (!tiered || level >= top);
+          const label = objectiveLabel(objective, slug)[locale];
           return (
             <li key={objective.id} className="space-y-1.5">
               <p className="flex items-center justify-between gap-3">
                 <span className={`flex items-center gap-2 ${met ? "text-emerald-300" : "text-foam"}`}>
                   {met && <CheckIcon className="size-3.5 shrink-0" />}
-                  {objective.label[locale]}
-                  {met && <span className="sr-only">{t(" (atteint)", " (reached)")}</span>}
+                  {label}
+                  {met &&<span className="sr-only">{t(" (atteint)", " (reached)")}</span>}
                 </span>
                 <span className={`shrink-0 font-extrabold ${complete ? "text-emerald-300" : "text-straw"}`}>
                   {tiered
@@ -77,7 +78,7 @@ export function GameObjectives({ slug }: { slug: LiveSlug }) {
               {!met && progress > 0 && (
                 <div
                   role="progressbar"
-                  aria-label={objective.label[locale]}
+                  aria-label={label}
                   aria-valuemin={0}
                   aria-valuemax={100}
                   aria-valuenow={Math.round(progress * 100)}
@@ -109,11 +110,12 @@ export function GameRecord({ slug }: { slug: LiveSlug }) {
   const locale = useLocale();
   const stats = state.stats[slug];
   if (status === "loading" || !stats || stats.games === 0) return null;
+  const best = bestLabel(slug, stats.best);
   return (
     <span className="inline-flex min-h-9 items-center text-sm font-bold text-mist">
       {t(
-        `Ton record : ${Math.round(stats.best * 100)} % des points · ${formatNumber(stats.games, locale)} partie${stats.games > 1 ? "s" : ""}`,
-        `Your best: ${Math.round(stats.best * 100)}% of the points · ${formatNumber(stats.games, locale)} ${stats.games === 1 ? "game" : "games"}`,
+        `Ton record : ${best.fr} · ${formatNumber(stats.games, locale)} partie${stats.games > 1 ? "s" : ""}`,
+        `Your best: ${best.en} · ${formatNumber(stats.games, locale)} ${stats.games === 1 ? "game" : "games"}`,
       )}
     </span>
   );

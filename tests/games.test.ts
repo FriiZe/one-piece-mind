@@ -162,6 +162,31 @@ describe("Plus ou moins", () => {
       current = next;
     }
   });
+
+  it("ne repasse aucun personnage dans une même partie, tant qu'il en reste à voir", () => {
+    for (const level of ["facile", "normal", "expert"] as const) {
+      const levelPool = plusOuMoins.bountyPool(byDifficulty(manga.characters, level));
+      // Les dernières primes peuvent toutes égaler la précédente : une marge couvre ce cas
+      const rounds = levelPool.length - 5;
+      for (const seed of [1, 2, 3]) {
+        let chain = plusOuMoins.startChain(seed, levelPool);
+        for (let streak = 1; streak <= rounds; streak++) chain = plusOuMoins.advanceChain(seed, streak, levelPool, chain);
+        expect(new Set(chain.seen).size).toBe(chain.seen.length);
+      }
+    }
+  });
+
+  it("reprend les plus anciens une fois tous les personnages passés", () => {
+    const few = pool.slice(0, 20);
+    let chain = plusOuMoins.startChain(4, few);
+    for (let streak = 1; streak <= 60; streak++) {
+      const recent = chain.seen.slice(-12);
+      chain = plusOuMoins.advanceChain(4, streak, few, chain);
+      expect(chain.next.bounty).not.toBe(chain.current.bounty);
+      expect(recent).not.toContain(chain.next.id);
+    }
+    expect(new Set(chain.seen).size).toBe(few.length);
+  });
 });
 
 describe("Le classement", () => {
