@@ -8,7 +8,7 @@ import { createRng, randomSeed } from "../engine/rng";
 import { formatNumber } from "../engine/text";
 import { CharacterSearch } from "../ui/CharacterSearch";
 import { GuessHistory } from "../ui/GuessHistory";
-import { Button, Progress, ResultPanel } from "../ui/primitives";
+import { Button, Correction, Progress, ResultPanel } from "../ui/primitives";
 import { StartScreen } from "../ui/StartScreen";
 import { useBest } from "../ui/storage";
 import type { GameProps } from "../ui/types";
@@ -213,7 +213,15 @@ export default function AvisDeRecherche({ data }: GameProps) {
           <GuessHistory ids={run.wrong} characterById={data.characterById} />
 
           {done && (
-            <div className="space-y-3" aria-live="polite">
+            <Correction
+              action={
+                <Button autoFocus onClick={next}>
+                  {run.index === posters.length - 1
+                    ? t("Voir mon score", "See my score")
+                    : t("Affiche suivante", "Next poster")}
+                </Button>
+              }
+            >
               <p className={`font-bold ${run.outcome ? "text-emerald-300" : "text-vest"}`}>
                 {run.outcome
                   ? t(
@@ -222,12 +230,7 @@ export default function AvisDeRecherche({ data }: GameProps) {
                     )
                   : t(`C'était ${target.name}.`, `It was ${target.name}.`)}
               </p>
-              <Button autoFocus onClick={next}>
-                {run.index === posters.length - 1
-                  ? t("Voir mon score", "See my score")
-                  : t("Affiche suivante", "Next poster")}
-              </Button>
-            </div>
+            </Correction>
           )}
         </div>
       </div>

@@ -25,6 +25,21 @@ export function Button({
   );
 }
 
+/**
+ * Correction d'une manche et bouton pour passer à la suite. Sur téléphone, le
+ * bouton occupe toute la largeur, au-dessus du texte : il reste au même endroit,
+ * que la correction tienne sur une ligne ou sur trois. Sur grand écran, il se
+ * tient à droite du texte.
+ */
+export function Correction({ children, action, live = true }: { children: ReactNode; action: ReactNode; live?: boolean }) {
+  return (
+    <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between" aria-live={live ? "polite" : undefined}>
+      <div className="min-w-0 sm:flex-1">{children}</div>
+      <div className="order-first grid sm:order-none sm:block sm:shrink-0">{action}</div>
+    </div>
+  );
+}
+
 export function Panel({ children, className = "" }: { children: ReactNode; className?: string }) {
   return <div className={`rounded-2xl border border-sea-700 bg-sea-800/70 p-4 sm:p-6 ${className}`}>{children}</div>;
 }

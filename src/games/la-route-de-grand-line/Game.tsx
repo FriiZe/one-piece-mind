@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import { GameEnd, GameStart } from "../ui/GameEnd";
 import { Portrait } from "../ui/Portrait";
-import { Button, Panel } from "../ui/primitives";
+import { Button, Correction, Panel } from "../ui/primitives";
 import type { GameProps } from "../ui/types";
 import { useRun } from "../ui/useRun";
 import { useT } from "@/lib/i18n/client";
@@ -144,7 +144,13 @@ export default function RouteDeGrandLine({ data }: GameProps) {
       </div>
 
       {given !== null && (
-        <div className="flex flex-wrap items-center justify-between gap-3" aria-live="polite">
+        <Correction
+          action={
+            <Button autoFocus onClick={next}>
+              {after.over ? t("Voir mon score", "See my score") : t("Reprendre la mer", "Set sail again")}
+            </Button>
+          }
+        >
           <p className="text-mist">
             <strong className={right ? "text-emerald-300" : "text-vest"}>
               {right
@@ -157,10 +163,7 @@ export default function RouteDeGrandLine({ data }: GameProps) {
             </strong>{" "}
             {question.explanation}
           </p>
-          <Button autoFocus onClick={next}>
-            {after.over ? t("Voir mon score", "See my score") : t("Reprendre la mer", "Set sail again")}
-          </Button>
-        </div>
+        </Correction>
       )}
     </Panel>
   );

@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import { GameEnd, GameStart } from "../ui/GameEnd";
 import { Portrait } from "../ui/Portrait";
-import { Button, Panel, Progress } from "../ui/primitives";
+import { Button, Correction, Panel, Progress } from "../ui/primitives";
 import type { GameProps } from "../ui/types";
 import { useRun } from "../ui/useRun";
 import { useT } from "@/lib/i18n/client";
@@ -142,17 +142,21 @@ export default function Anagramme({ data }: GameProps) {
       ) : (
         <div className="space-y-3">
           {round.target.img && <Portrait img={round.target.img} />}
-          <div className="flex flex-wrap items-center justify-between gap-3">
+          {/* Entrée valide une réponse, puis passe à la manche suivante */}
+          <Correction
+            live={false}
+            action={
+              <Button autoFocus onClick={next}>
+                {last ? t("Voir mon score", "See my score") : t("Suivant", "Next")}
+              </Button>
+            }
+          >
             <p className={`font-bold ${found ? "text-emerald-300" : "text-vest"}`}>
               {found
                 ? t(`${round.target.name} : +1 point.`, `${round.target.name}: +1 point.`)
                 : t(`C'était ${round.target.name}.`, `It was ${round.target.name}.`)}
             </p>
-            {/* Entrée valide une réponse, puis passe à la manche suivante */}
-            <Button autoFocus onClick={next}>
-              {last ? t("Voir mon score", "See my score") : t("Suivant", "Next")}
-            </Button>
-          </div>
+          </Correction>
         </div>
       )}
       <p className="min-h-6 text-sm font-semibold text-vest" aria-live="polite">

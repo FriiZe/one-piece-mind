@@ -6,7 +6,7 @@ import { CharacterSearch } from "../ui/CharacterSearch";
 import { GameEnd, GameStart } from "../ui/GameEnd";
 import { GuessHistory } from "../ui/GuessHistory";
 import { Portrait } from "../ui/Portrait";
-import { Button, Progress } from "../ui/primitives";
+import { Button, Correction, Progress } from "../ui/primitives";
 import type { GameProps } from "../ui/types";
 import { useRun } from "../ui/useRun";
 import type { Localized } from "@/lib/i18n";
@@ -151,7 +151,13 @@ export default function ClueGame({ data, slug }: GameProps & { slug: ClueSlug })
 
       {done && round.target.img && <Portrait img={round.target.img} />}
       {done && (
-        <div className="flex flex-wrap items-center justify-between gap-3" aria-live="polite">
+        <Correction
+          action={
+            <Button autoFocus onClick={next}>
+              {last ? t("Voir mon score", "See my score") : t("Manche suivante", "Next round")}
+            </Button>
+          }
+        >
           <p className={`font-bold ${state.outcome ? "text-emerald-300" : "text-vest"}`}>
             {state.outcome
               ? t(
@@ -160,10 +166,7 @@ export default function ClueGame({ data, slug }: GameProps & { slug: ClueSlug })
                 )
               : t(`C'était ${round.target.name}.`, `It was ${round.target.name}.`)}
           </p>
-          <Button autoFocus onClick={next}>
-            {last ? t("Voir mon score", "See my score") : t("Manche suivante", "Next round")}
-          </Button>
-        </div>
+        </Correction>
       )}
     </div>
   );

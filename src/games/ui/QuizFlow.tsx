@@ -3,7 +3,7 @@
 import { useState, type ReactNode } from "react";
 import { useT } from "@/lib/i18n/client";
 import { Portrait } from "./Portrait";
-import { Button, Panel, Progress } from "./primitives";
+import { Button, Correction, Panel, Progress } from "./primitives";
 
 export type QuizQuestion = {
   id: string;
@@ -86,17 +86,20 @@ export function QuizFlow({
         })}
       </div>
       {answered && (
-        <div className="flex flex-wrap items-center justify-between gap-3" aria-live="polite">
+        <Correction
+          action={
+            <Button autoFocus onClick={next}>
+              {last ? t("Voir mon score", "See my score") : t("Suivant", "Next")}
+            </Button>
+          }
+        >
           <p className="text-mist">
             <strong className={chosen === question.answerId ? "text-emerald-300" : "text-vest"}>
               {chosen === question.answerId ? t("Bonne réponse.", "Correct.") : t("Raté.", "Wrong.")}
             </strong>{" "}
             {question.explanation}
           </p>
-          <Button autoFocus onClick={next}>
-            {last ? t("Voir mon score", "See my score") : t("Suivant", "Next")}
-          </Button>
-        </div>
+        </Correction>
       )}
     </Panel>
   );

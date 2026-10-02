@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Portrait } from "../ui/Portrait";
-import { Button, Panel, Progress } from "../ui/primitives";
+import { Button, Correction, Panel, Progress } from "../ui/primitives";
 import type { Locale, Localized } from "@/lib/i18n";
 import { useLocale, useT } from "@/lib/i18n/client";
 import { DCC_KINDS, DCC_POINTS, isRight, type DccAnswer, type DccKind, type DccQuestion } from "./logic";
@@ -166,7 +166,14 @@ export function DccFlow({
         <div className="space-y-3" aria-live="polite">
           {/* En cash, ou quand la question n'a pas d'image, le portrait de la bonne réponse vient avec la correction */}
           {answerOption?.img && (kind === "cash" || !question.img) && <Portrait img={answerOption.img} />}
-          <div className="flex flex-wrap items-center justify-between gap-3">
+          <Correction
+            live={false}
+            action={
+              <Button autoFocus onClick={next}>
+                {last ? t("Voir mon score", "See my score") : t("Suivant", "Next")}
+              </Button>
+            }
+          >
             <p className="text-mist">
               <strong className={right ? "text-emerald-300" : "text-vest"}>
                 {right
@@ -182,10 +189,7 @@ export function DccFlow({
                 t(`Tu as répondu « ${given.value.trim()} ». `, `You answered “${given.value.trim()}”. `)}
               {question.explanation}
             </p>
-            <Button autoFocus onClick={next}>
-              {last ? t("Voir mon score", "See my score") : t("Suivant", "Next")}
-            </Button>
-          </div>
+          </Correction>
         </div>
       )}
     </Panel>

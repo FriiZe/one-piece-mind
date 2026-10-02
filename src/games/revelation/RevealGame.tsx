@@ -6,7 +6,7 @@ import { byDifficulty, type Difficulty } from "../engine/difficulty";
 import { createRng, randomSeed } from "../engine/rng";
 import { CharacterSearch } from "../ui/CharacterSearch";
 import { GuessHistory } from "../ui/GuessHistory";
-import { Button, Progress, ResultPanel } from "../ui/primitives";
+import { Button, Correction, Progress, ResultPanel } from "../ui/primitives";
 import { StartScreen } from "../ui/StartScreen";
 import { useBest } from "../ui/storage";
 import type { GameProps } from "../ui/types";
@@ -276,7 +276,13 @@ export function RevealGame({ data, variant }: GameProps & { variant: Variant }) 
       <GuessHistory ids={run.wrong} characterById={data.characterById} />
 
       {done && (
-        <div className="flex flex-wrap items-center justify-between gap-3" aria-live="polite">
+        <Correction
+          action={
+            <Button autoFocus onClick={next}>
+              {last ? t("Voir mon score", "See my score") : t("Image suivante", "Next picture")}
+            </Button>
+          }
+        >
           <p className={`font-bold ${run.outcome ? "text-emerald-300" : "text-vest"}`}>
             {run.outcome
               ? t(
@@ -285,10 +291,7 @@ export function RevealGame({ data, variant }: GameProps & { variant: Variant }) 
                 )
               : t(`C'était ${target.name}.`, `It was ${target.name}.`)}
           </p>
-          <Button autoFocus onClick={next}>
-            {last ? t("Voir mon score", "See my score") : t("Image suivante", "Next picture")}
-          </Button>
-        </div>
+        </Correction>
       )}
     </div>
   );

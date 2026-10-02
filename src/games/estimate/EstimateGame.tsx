@@ -4,7 +4,7 @@ import { useMemo, useState } from "react";
 import { formatBounty, formatNumber } from "../engine/text";
 import { GameEnd, GameStart } from "../ui/GameEnd";
 import { Portrait } from "../ui/Portrait";
-import { Button, Panel, Progress } from "../ui/primitives";
+import { Button, Correction, Panel, Progress } from "../ui/primitives";
 import type { GameProps } from "../ui/types";
 import { useRun } from "../ui/useRun";
 import type { Locale, Localized } from "@/lib/i18n";
@@ -169,7 +169,14 @@ export default function EstimateGame({ data, slug }: GameProps & { slug: Estimat
 
         {/* Deux blocs distincts (clés) : le bouton « Suivant » doit apparaître, et non remplacer « Valider », pour prendre la main */}
         {answered ? (
-          <div key="correction" className="flex flex-wrap items-center justify-between gap-3" aria-live="polite">
+          <Correction
+            key="correction"
+            action={
+              <Button autoFocus onClick={next}>
+                {last ? t("Voir mon score", "See my score") : t("Suivant", "Next")}
+              </Button>
+            }
+          >
             <p className="text-mist">
               <strong className={points >= maxPoints(question) * 0.6 ? "text-emerald-300" : points > 0 ? "text-straw" : "text-vest"}>
                 {points > 0
@@ -179,10 +186,7 @@ export default function EstimateGame({ data, slug }: GameProps & { slug: Estimat
               {t("La bonne réponse : ", "The correct answer: ")}
               {format(question, question.answer, locale)}.
             </p>
-            <Button autoFocus onClick={next}>
-              {last ? t("Voir mon score", "See my score") : t("Suivant", "Next")}
-            </Button>
-          </div>
+          </Correction>
         ) : (
           <div key="saisie" className="flex flex-wrap items-start gap-2">
             <label className="min-w-0 flex-1">
