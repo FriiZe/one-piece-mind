@@ -55,7 +55,7 @@ export default function PlusOuMoins({ data }: GameProps) {
 
   function start(level: Difficulty) {
     const seed = randomSeed();
-    const chain = startChain(seed, bountyPool(byDifficulty(data.characters, level)));
+    const chain = startChain(seed, bountyPool(byDifficulty(data.characters, level)), level);
     reward.reset();
     setRun({ ...chain, seed, difficulty: level, streak: 0, answers: [], answer: null, lost: false, newBest: false });
   }
@@ -73,7 +73,7 @@ export default function PlusOuMoins({ data }: GameProps) {
 
   function advance() {
     if (!run) return;
-    setRun({ ...run, ...advanceChain(run.seed, run.streak, pool, run), answer: null });
+    setRun({ ...run, ...advanceChain(run.seed, run.streak, pool, run, run.difficulty), answer: null });
   }
 
   if (!run) {
@@ -81,8 +81,8 @@ export default function PlusOuMoins({ data }: GameProps) {
       <StartScreen onStart={start}>
         <p className="text-mist">
           {t(
-            "Deux avis de recherche. La prime du second est-elle plus haute ou plus basse que celle du premier ? Une seule erreur et la série s'arrête.",
-            "Two wanted posters. Is the bounty on the second one higher or lower than on the first? One mistake and the streak is over.",
+            "Deux avis de recherche. La prime du second est-elle plus haute ou plus basse que celle du premier ? Une seule erreur et la série s'arrête. Plus le niveau monte, plus les deux primes sont proches.",
+            "Two wanted posters. Is the bounty on the second one higher or lower than on the first? One mistake and the streak is over. The higher the level, the closer the two bounties.",
           )}
         </p>
       </StartScreen>

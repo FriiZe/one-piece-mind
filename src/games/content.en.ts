@@ -136,7 +136,7 @@ export const GAME_CONTENT_EN: Record<LiveSlug, GameContent> = {
       {
         question: "What does the difficulty change?",
         answer:
-          "Easy only draws major characters. Expert adds supporting characters and extras, whose bounties are far less well known.",
+          "Two things. The characters: easy only draws major characters, expert adds supporting characters and extras. And the gap between the two bounties: on easy, one is at least twice the other; on expert, they are within a third of each other.",
       },
       SPOILER_FAQ,
     ],
@@ -453,6 +453,11 @@ export const GAME_CONTENT_EN: Record<LiveSlug, GameContent> = {
       {
         question: "Can two characters be the same height?",
         answer: "No, the two characters in a duel always have different values.",
+      },
+      {
+        question: "What does the difficulty change?",
+        answer:
+          "The characters drawn and, above all, the gap between the two. On easy, it's obvious: at least a quarter taller, or fifteen years apart. On expert, it comes down to a few centimeters, or four years at most.",
       },
       SPOILER_FAQ,
     ],

@@ -131,7 +131,7 @@ export const GAME_CONTENT_FR: Record<LiveSlug, GameContent> = {
       {
         question: "Que change la difficulté ?",
         answer:
-          "Le niveau facile ne tire que des personnages majeurs. Le niveau expert ajoute les seconds rôles et les figurants, dont les primes sont bien moins connues.",
+          "Deux choses. Les personnages : le niveau facile ne tire que des personnages majeurs, le niveau expert ajoute les seconds rôles et les figurants. Et l'écart entre les deux primes : en facile, l'une vaut au moins le double de l'autre ; en expert, elles se tiennent à moins d'un tiers près.",
       },
       SPOILER_FAQ,
     ],
@@ -431,6 +431,11 @@ export const GAME_CONTENT_FR: Record<LiveSlug, GameContent> = {
       {
         question: "Peut-on tomber sur deux personnages de même taille ?",
         answer: "Non, les deux personnages d'un duel ont toujours des valeurs différentes.",
+      },
+      {
+        question: "Que change la difficulté ?",
+        answer:
+          "Les personnages tirés, et surtout l'écart entre les deux. En facile, il saute aux yeux : au moins un quart de taille en plus, ou quinze ans d'écart. En expert, il se joue à quelques centimètres ou à quatre ans au plus.",
       },
       SPOILER_FAQ,
     ],

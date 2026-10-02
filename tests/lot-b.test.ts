@@ -256,6 +256,27 @@ describe("quiz à choix", () => {
     expect(least).toBeGreaterThan(20);
   });
 
+  it("Grand ou vieux : l'écart d'un duel suit la difficulté", () => {
+    // Écart médian des duels d'un niveau : en proportion pour les tailles, en années pour les âges
+    const median = (level: "facile" | "normal" | "expert", criterion: "height" | "age") => {
+      const gaps: number[] = [];
+      for (const seed of SEEDS) {
+        for (const q of qcm.generateQcm("grand-ou-vieux", seed, level, anime)) {
+          if (q.id.replace(/^min-/, "").startsWith(criterion) === false) continue;
+          const [a, b] = q.options.map((option) => anime.characterById.get(option.id)!);
+          gaps.push(criterion === "height" ? Math.max(a.height!, b.height!) / Math.min(a.height!, b.height!) : Math.abs(a.age! - b.age!));
+        }
+      }
+      return gaps.sort((x, y) => x - y)[Math.floor(gaps.length / 2)];
+    };
+    expect(median("facile", "age")).toBeGreaterThanOrEqual(15);
+    expect(median("normal", "age")).toBeGreaterThanOrEqual(5);
+    expect(median("normal", "age")).toBeLessThanOrEqual(14);
+    expect(median("expert", "age")).toBeLessThanOrEqual(4);
+    expect(median("facile", "height")).toBeGreaterThanOrEqual(1.25);
+    expect(median("expert", "height")).toBeLessThanOrEqual(1.08);
+  });
+
   it("étoffe les contenus rédigés : assez de matière pour ne pas revoir les mêmes questions", () => {
     expect(raw.extras.techniques.length).toBeGreaterThanOrEqual(250);
     expect(raw.extras.epithets.length).toBeGreaterThanOrEqual(115);

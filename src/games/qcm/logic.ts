@@ -4,6 +4,7 @@
  */
 import type { PlayCharacter, ResolvedData } from "../cards";
 import { byDifficulty, type Difficulty } from "../engine/difficulty";
+import { withinGap, type GapBand } from "../engine/gap";
 import { createRng, pick, randomInt, sample, shuffle, type Rng } from "../engine/rng";
 import { formatBounty, formatHeight } from "../engine/text";
 import { FRUIT_TYPE_LABELS, hakiLabel, RACE_LABELS, SEA_LABELS, translateAffiliation, type HakiType } from "@/lib/data/labels";
@@ -35,7 +36,8 @@ export type QcmQuestion = {
   accepted?: string[];
 };
 
-type Generator = (rng: Rng, data: ResolvedData, pool: readonly PlayCharacter[], count: number) => QcmQuestion[];
+/** `difficulty` : absente quand les questions portent sur un petit groupe imposé (voir `questionFor`). */
+type Generator = (rng: Rng, data: ResolvedData, pool: readonly PlayCharacter[], count: number, difficulty?: Difficulty) => QcmQuestion[];
 
 /** Part des questions posées dans l'autre sens : de la réponse vers le sujet (« quel est le navire de cet équipage ? »). */
 const REVERSE_SHARE = 1 / 3;
@@ -667,7 +669,17 @@ const orthographe: Generator = (rng, data, pool, count) => {
   return questions;
 };
 
-const grandOuVieux: Generator = (rng, data, pool, count) => {
+/**
+ * Écart entre les deux personnages d'un duel : en facile, il saute aux yeux ; en expert, il se joue
+ * à quelques centimètres ou à quelques années. Les tailles se comparent en proportion (un géant
+ * fausserait tout écart en centimètres), les âges en années.
+ */
+const DUEL_GAPS: Record<"height" | "age", Record<Difficulty, GapBand>> = {
+  height: { facile: { min: 1.25, max: Infinity }, normal: { min: 1.08, max: 1.25 }, expert: { min: 1, max: 1.08 } },
+  age: { facile: { min: 15, max: Infinity }, normal: { min: 5, max: 14 }, expert: { min: 1, max: 4 } },
+};
+
+const grandOuVieux: Generator = (rng, data, pool, count, difficulty) => {
   const { locale } = data;
   const t = translator(locale);
   const questions: QcmQuestion[] = [];
@@ -679,7 +691,9 @@ const grandOuVieux: Generator = (rng, data, pool, count) => {
     const a = pick(rng, measured);
     const rivals = measured.filter((c) => c.id !== a.id && c[criterion] !== a[criterion]);
     if (!rivals.length) continue;
-    const b = pick(rng, rivals);
+    const gap = (c: PlayCharacter) =>
+      criterion === "height" ? Math.max(c.height!, a.height!) / Math.min(c.height!, a.height!) : Math.abs(c.age! - a.age!);
+    const b = pick(rng, difficulty ? withinGap(rivals, gap, DUEL_GAPS[criterion][difficulty]) : rivals);
     const pair = `${criterion}-${[a.id, b.id].sort().join("-")}`;
     if (pairs.has(pair)) continue;
     pairs.add(pair);
@@ -765,10 +779,10 @@ export type MixSlug = keyof typeof BASE_GENERATORS;
 export const MIX_SLUGS = (Object.keys(BASE_GENERATORS) as MixSlug[]).filter((slug) => isLiveSlug(slug));
 
 /** Une question de chaque jeu, tirée au hasard. */
-const modeAleatoire: Generator = (rng, data, pool, count) => {
+const modeAleatoire: Generator = (rng, data, pool, count, difficulty) => {
   const questions: QcmQuestion[] = [];
   for (let attempt = 0; questions.length < count && attempt < count * 5; attempt++) {
-    const [question] = BASE_GENERATORS[pick(rng, MIX_SLUGS)](rng, data, pool, 1);
+    const [question] = BASE_GENERATORS[pick(rng, MIX_SLUGS)](rng, data, pool, 1, difficulty);
     if (question && !questions.some((q) => q.id === question.id)) questions.push(question);
   }
   return questions;
@@ -790,7 +804,7 @@ export function generateMixed(
   const questions: QcmQuestion[] = [];
   for (let attempt = 0; questions.length < count && attempt < count * 8; attempt++) {
     const slug = pick(rng, sources);
-    const [question] = BASE_GENERATORS[slug](rng, data, pool, 1);
+    const [question] = BASE_GENERATORS[slug](rng, data, pool, 1, difficulty);
     // L'identifiant est préfixé par le jeu : deux quiz peuvent porter sur le même personnage
     const id = `${slug}:${question?.id}`;
     if (question && !questions.some((q) => q.id === id)) questions.push({ ...question, id });
@@ -819,7 +833,7 @@ export const QCM_SLUGS = Object.keys(GENERATORS) as [QcmSlug, ...QcmSlug[]];
 export const usesDifficulty = (slug: QcmSlug) => hasDifficulty(slug);
 
 export function generateQcm(slug: QcmSlug, seed: number, difficulty: Difficulty, data: ResolvedData): QcmQuestion[] {
-  return GENERATORS[slug](createRng(seed), data, byDifficulty(data.characters, difficulty), QCM_LENGTH);
+  return GENERATORS[slug](createRng(seed), data, byDifficulty(data.characters, difficulty), QCM_LENGTH, difficulty);
 }
 
 /** Rejoue une partie à partir de sa graine et des réponses données. */

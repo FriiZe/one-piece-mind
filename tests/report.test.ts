@@ -51,10 +51,10 @@ describe("recalcul d'une partie à partir de son compte rendu", () => {
   it("Plus ou moins : la série s'arrête à la première erreur", () => {
     const pool = plusOuMoins.bountyPool(normal);
     const answers: plusOuMoins.Answer[] = [];
-    let chain = plusOuMoins.startChain(SEED, pool);
+    let chain = plusOuMoins.startChain(SEED, pool, "normal");
     for (let streak = 1; streak <= 6; streak++) {
       answers.push(chain.next.bounty > chain.current.bounty ? "higher" : "lower");
-      chain = plusOuMoins.advanceChain(SEED, streak, pool, chain);
+      chain = plusOuMoins.advanceChain(SEED, streak, pool, chain, "normal");
     }
     const wrong: plusOuMoins.Answer = chain.next.bounty > chain.current.bounty ? "lower" : "higher";
     const report = { slug: "plus-ou-moins", seed: SEED, mode: "anime", difficulty: "normal" } as const;

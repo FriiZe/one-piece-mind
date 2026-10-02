@@ -45,8 +45,8 @@ const INTROS: Record<QcmSlug, Localized> = {
     en: "Ten characters. For each one, four spellings of their name: only one is right.",
   },
   "grand-ou-vieux": {
-    fr: "Dix duels : qui est le plus grand, qui est le plus âgé ?",
-    en: "Ten face-offs: who is taller, who is older?",
+    fr: "Dix duels : qui est le plus grand, qui est le plus âgé ? Plus le niveau monte, plus l'écart entre les deux est mince.",
+    en: "Ten face-offs: who is taller, who is older? The higher the level, the thinner the gap between the two.",
   },
   haki: {
     fr: "Dix personnages. Quels hakis chacun maîtrise-t-il ?",

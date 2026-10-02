@@ -155,7 +155,7 @@ describe("Plus ou moins", () => {
     let current = pool[0];
     const recent: string[] = [current.id];
     for (let i = 0; i < 200; i++) {
-      const next = plusOuMoins.nextOpponent(rng, pool, current, recent.slice(-10));
+      const next = plusOuMoins.nextOpponent(rng, pool, current, recent.slice(-10), "normal");
       expect(next.bounty).not.toBe(current.bounty);
       expect(recent.slice(-10)).not.toContain(next.id);
       recent.push(next.id);
@@ -169,8 +169,8 @@ describe("Plus ou moins", () => {
       // Les dernières primes peuvent toutes égaler la précédente : une marge couvre ce cas
       const rounds = levelPool.length - 5;
       for (const seed of [1, 2, 3]) {
-        let chain = plusOuMoins.startChain(seed, levelPool);
-        for (let streak = 1; streak <= rounds; streak++) chain = plusOuMoins.advanceChain(seed, streak, levelPool, chain);
+        let chain = plusOuMoins.startChain(seed, levelPool, level);
+        for (let streak = 1; streak <= rounds; streak++) chain = plusOuMoins.advanceChain(seed, streak, levelPool, chain, level);
         expect(new Set(chain.seen).size).toBe(chain.seen.length);
       }
     }
@@ -178,14 +178,38 @@ describe("Plus ou moins", () => {
 
   it("reprend les plus anciens une fois tous les personnages passés", () => {
     const few = pool.slice(0, 20);
-    let chain = plusOuMoins.startChain(4, few);
+    let chain = plusOuMoins.startChain(4, few, "normal");
     for (let streak = 1; streak <= 60; streak++) {
       const recent = chain.seen.slice(-12);
-      chain = plusOuMoins.advanceChain(4, streak, few, chain);
+      chain = plusOuMoins.advanceChain(4, streak, few, chain, "normal");
       expect(chain.next.bounty).not.toBe(chain.current.bounty);
       expect(recent).not.toContain(chain.next.id);
     }
     expect(new Set(chain.seen).size).toBe(few.length);
+  });
+
+  it("règle l'écart entre les deux primes sur la difficulté : large en facile, serré en expert", () => {
+    // Part des manches où l'écart est dans la fourchette du niveau, sur les douze premières de chaque partie
+    const share = (level: "facile" | "normal" | "expert") => {
+      const levelPool = plusOuMoins.bountyPool(byDifficulty(manga.characters, level));
+      const { min, max } = plusOuMoins.BOUNTY_GAPS[level];
+      let inBand = 0;
+      let total = 0;
+      for (let seed = 1; seed <= 40; seed++) {
+        let chain = plusOuMoins.startChain(seed, levelPool, level);
+        for (let streak = 1; streak <= 12; streak++) {
+          const ratio = plusOuMoins.bountyRatio(chain.current, chain.next);
+          expect(ratio).toBeGreaterThan(1);
+          if (ratio >= min && ratio <= max) inBand++;
+          total++;
+          chain = plusOuMoins.advanceChain(seed, streak, levelPool, chain, level);
+        }
+      }
+      return inBand / total;
+    };
+    expect(share("facile")).toBe(1);
+    expect(share("normal")).toBeGreaterThan(0.95);
+    expect(share("expert")).toBeGreaterThan(0.9);
   });
 });
 
