@@ -311,8 +311,8 @@ function Crew({ data }: { data: ResolvedData }) {
           <p className="text-mist">
             {POSTS[picking].effect[locale]}.{" "}
             {t(
-              "Choisis le personnage qui tiendra ce poste ; s'il en occupe déjà un autre, il le quitte.",
-              "Choose the character who will hold this post; if they already hold another one, they leave it.",
+              "Choisis le personnage qui tiendra ce poste ; s'il en occupe déjà un autre, il échange sa place avec l'occupant actuel.",
+              "Choose the character who will hold this post; if they already hold another one, they swap places with whoever holds this one.",
             )}
           </p>
           {state.crew[picking] && (
@@ -320,46 +320,59 @@ function Crew({ data }: { data: ResolvedData }) {
               {t("Libérer le poste", "Vacate the post")}
             </Button>
           )}
-          <ul className="grid grid-cols-3 gap-3 sm:grid-cols-4 md:grid-cols-5">
-            {owned.map((character) => {
-              const entry = state.collection[character.id];
-              const current = state.crew[picking] === character.id;
-              const other = postOf(character.id);
-              return (
-                <li key={character.id} className={`relative rounded-md ${current ? "ring-4 ring-emerald-400" : ""}`}>
-                  <CharacterCard
-                    character={character}
-                    golden={entry.golden > 0}
-                    note={`${percent(postStrength(character, entry, picking), locale)}${
-                      current ? t(" · en poste", " · in this post") : other ? ` · ${POSTS[other].label[locale]}` : ""
-                    }`}
-                  />
-                  {/* Pour composer un trait : l'affiliation, et le nombre de ses membres déjà à bord */}
-                  {character.affiliation && (
-                    <p className="mt-1 truncate text-center text-xs text-mist" title={character.affiliation}>
-                      {character.affiliation}
-                      {aboard.get(character.affiliation)
-                        ? t(
-                            ` · ${aboard.get(character.affiliation)} à bord`,
-                            ` · ${aboard.get(character.affiliation)} aboard`,
-                          )
-                        : ""}
-                    </p>
-                  )}
-                  <button
-                    type="button"
-                    onClick={() => change(picking, character.id)}
-                    aria-label={t(
-                      `Placer ${character.name} au poste de ${POSTS[picking].label.fr}`,
-                      `Assign ${character.name} to the ${POSTS[picking].label.en} post`,
-                    )}
-                    aria-pressed={current}
-                    className="absolute inset-0 cursor-pointer rounded-md focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-straw"
-                  />
-                </li>
-              );
-            })}
-          </ul>
+          {/* Ceux qui tiennent déjà un poste d'abord, à part : les placer ici déplace quelqu'un */}
+          {[
+            { title: t("Déjà en poste", "Already in a post"), members: owned.filter((character) => postOf(character.id)) },
+            { title: t("Disponibles", "Available"), members: owned.filter((character) => !postOf(character.id)) },
+          ]
+            .filter((group) => group.members.length > 0)
+            .map((group) => (
+              <section key={group.title} className="space-y-2">
+                <h3 className="text-sm font-extrabold tracking-wide text-mist uppercase">
+                  {group.title} · {group.members.length}
+                </h3>
+                <ul className="grid grid-cols-3 gap-3 sm:grid-cols-4 md:grid-cols-5">
+                  {group.members.map((character) => {
+                    const entry = state.collection[character.id];
+                    const current = state.crew[picking] === character.id;
+                    const other = postOf(character.id);
+                    return (
+                      <li key={character.id} className={`relative rounded-md ${current ? "ring-4 ring-emerald-400" : ""}`}>
+                        <CharacterCard
+                          character={character}
+                          golden={entry.golden > 0}
+                          note={`${percent(postStrength(character, entry, picking), locale)}${
+                            current ? t(" · en poste", " · in this post") : other ? ` · ${POSTS[other].label[locale]}` : ""
+                          }`}
+                        />
+                        {/* Pour composer un trait : l'affiliation, et le nombre de ses membres déjà à bord */}
+                        {character.affiliation && (
+                          <p className="mt-1 truncate text-center text-xs text-mist" title={character.affiliation}>
+                            {character.affiliation}
+                            {aboard.get(character.affiliation)
+                              ? t(
+                                  ` · ${aboard.get(character.affiliation)} à bord`,
+                                  ` · ${aboard.get(character.affiliation)} aboard`,
+                                )
+                              : ""}
+                          </p>
+                        )}
+                        <button
+                          type="button"
+                          onClick={() => change(picking, character.id)}
+                          aria-label={t(
+                            `Placer ${character.name} au poste de ${POSTS[picking].label.fr}`,
+                            `Assign ${character.name} to the ${POSTS[picking].label.en} post`,
+                          )}
+                          aria-pressed={current}
+                          className="absolute inset-0 cursor-pointer rounded-md focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-straw"
+                        />
+                      </li>
+                    );
+                  })}
+                </ul>
+              </section>
+            ))}
         </Modal>
       )}
     </div>

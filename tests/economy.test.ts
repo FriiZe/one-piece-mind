@@ -266,6 +266,18 @@ describe("équipage", () => {
     expect((assignPost(moved, "navigateur", null) as PlayerState).crew).toEqual({});
   });
 
+  it("échange deux occupants quand l'un prend le poste de l'autre", () => {
+    const crew = { capitaine: "luffy", navigateur: "nami", cuisinier: "zoro" } as const;
+    const state: PlayerState = { ...owning("luffy", "nami", "zoro", "vergo"), crew };
+    // Nami tenait un poste : elle prend celui de Luffy, qui reprend le sien
+    expect((assignPost(state, "capitaine", "nami") as PlayerState).crew).toEqual({ capitaine: "nami", navigateur: "luffy", cuisinier: "zoro" });
+    // Vergo n'en tenait aucun : il remplace Luffy, qui n'a plus de poste
+    expect((assignPost(state, "capitaine", "vergo") as PlayerState).crew).toEqual({ capitaine: "vergo", navigateur: "nami", cuisinier: "zoro" });
+    // Vers un poste libre, ou vers le sien : rien d'autre ne bouge
+    expect((assignPost(state, "medecin", "zoro") as PlayerState).crew).toEqual({ capitaine: "luffy", navigateur: "nami", medecin: "zoro" });
+    expect((assignPost(state, "capitaine", "luffy") as PlayerState).crew).toEqual(crew);
+  });
+
   it("donne un bonus selon le poste et la rareté, renforcé par un avis doré", () => {
     const state = assignPost(assignPost(owning("vergo", "pell"), "charpentier", "vergo") as PlayerState, "navigateur", "pell");
     const bonuses = crewBonuses(state as PlayerState, byId);

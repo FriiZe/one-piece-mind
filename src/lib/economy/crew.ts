@@ -213,7 +213,10 @@ export function berryBonus(bonuses: CrewBonuses, category: GameCategoryId, daily
 
 export type CrewError = "not-owned" | "unknown-post";
 
-/** Place un personnage à un poste (ou le libère avec `null`). Un personnage n'occupe qu'un poste. */
+/**
+ * Place un personnage à un poste (ou le libère avec `null`). Un personnage n'occupe qu'un poste :
+ * s'il en tenait déjà un et que le nouveau est pris, les deux occupants échangent leurs places.
+ */
 export function assignPost(state: PlayerState, post: string, characterId: string | null): PlayerState | CrewError {
   if (!(POST_IDS as readonly string[]).includes(post)) return "unknown-post";
   const crew = { ...state.crew };
@@ -222,7 +225,12 @@ export function assignPost(state: PlayerState, post: string, characterId: string
     return { ...state, crew };
   }
   if (!state.collection[characterId]) return "not-owned";
-  for (const other of POST_IDS) if (crew[other] === characterId) delete crew[other];
+  const displaced = crew[post as PostId];
+  for (const other of POST_IDS) {
+    if (crew[other] !== characterId || other === post) continue;
+    if (displaced) crew[other] = displaced;
+    else delete crew[other];
+  }
   crew[post as PostId] = characterId;
   return { ...state, crew };
 }
