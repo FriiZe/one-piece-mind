@@ -5,7 +5,7 @@
  * qu'à ce recalcul.
  */
 import { z } from "zod";
-import { getGame, isLiveSlug } from "@/lib/games/catalog";
+import { getGame, hasDifficulty, isLiveSlug } from "@/lib/games/catalog";
 import type { GameOutcome } from "@/lib/economy/types";
 import type { ResolvedData } from "./cards";
 import * as anagramme from "./anagramme/logic";
@@ -154,7 +154,8 @@ export function evaluateReport(report: GameReport, { data, animeCharacters, toda
     score: result.score,
     max: result.max,
     performance: result.max > 0 ? Math.min(1, result.score / result.max) : 0,
-    difficulty: "difficulty" in report ? report.difficulty : null,
+    // Un jeu sans niveau reçoit quand même une difficulté dans son compte rendu : elle ne doit rien moduler
+    difficulty: "difficulty" in report && hasDifficulty(slug) ? report.difficulty : null,
     daily,
   });
 

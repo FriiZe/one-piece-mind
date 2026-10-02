@@ -46,9 +46,17 @@ function BountyCard() {
   );
 }
 
-/** Sous les jeux du jour : les trois défis de la semaine et la prime du joueur. */
+/** Défis de la semaine montrés sur l'accueil : la page Défis les liste tous. */
+const HOME_CHALLENGES = 3;
+
+/** Sous les jeux du jour : trois défis de la semaine, ceux qui restent à faire d'abord, et la prime du joueur. */
 export function HomeStrip() {
-  const { ready, challenges } = useWeekly();
+  const weekly = useWeekly();
+  const { ready } = weekly;
+  const challenges = [...weekly.challenges.filter((challenge) => !challenge.done), ...weekly.challenges.filter((challenge) => challenge.done)].slice(
+    0,
+    HOME_CHALLENGES,
+  );
   const t = useT();
   const locale = useLocale();
 

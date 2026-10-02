@@ -9,10 +9,10 @@ export async function generateMetadata(): Promise<Metadata> {
   const t = translator(locale);
   return pageMetadata({
     locale,
-    title: t("Défis One Piece du jour et de la semaine", "Daily and weekly One Piece challenges"),
+    title: t("Défis One Piece : quotidiens, de la semaine et objectifs", "One Piece challenges: daily, weekly and goals"),
     description: t(
-      "Le défi One Piece du jour, identique pour tous les joueurs, et trois défis qui changent chaque lundi : des Berrys et des personnages à gagner.",
-      "The daily One Piece challenge, the same for every player, and three challenges that change every Monday: Berries and characters to win.",
+      "Les jeux One Piece du jour, quatre défis quotidiens, six défis qui changent chaque lundi et les objectifs de chaque jeu : des Berrys et des personnages à gagner.",
+      "Today's One Piece games, four daily challenges, six challenges that change every Monday and the goals of every game: Berries and characters to win.",
     ),
     path: "/defis",
   });

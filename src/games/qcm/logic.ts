@@ -8,7 +8,7 @@ import { createRng, pick, randomInt, sample, shuffle, type Rng } from "../engine
 import { formatBounty, formatHeight } from "../engine/text";
 import { FRUIT_TYPE_LABELS, hakiLabel, RACE_LABELS, SEA_LABELS, type HakiType } from "@/lib/data/labels";
 import { RACES, SEAS } from "@/lib/data/schema";
-import { isLiveSlug } from "@/lib/games/catalog";
+import { hasDifficulty, isLiveSlug } from "@/lib/games/catalog";
 import { translator, type Localized } from "@/lib/i18n";
 
 export const QCM_LENGTH = 10;
@@ -800,9 +800,8 @@ const GENERATORS = { ...BASE_GENERATORS, "mode-aleatoire": modeAleatoire } satis
 export type QcmSlug = keyof typeof GENERATORS;
 export const QCM_SLUGS = Object.keys(GENERATORS) as [QcmSlug, ...QcmSlug[]];
 
-/** Jeux dont les questions viennent d'un contenu rédigé : la difficulté n'y change rien. */
-const FIXED_DIFFICULTY: readonly QcmSlug[] = ["navires", "techniques", "armes-et-sabres", "surnoms"];
-export const usesDifficulty = (slug: QcmSlug) => !FIXED_DIFFICULTY.includes(slug);
+/** Faux pour les jeux dont les questions viennent d'un contenu rédigé : la difficulté n'y change rien. */
+export const usesDifficulty = (slug: QcmSlug) => hasDifficulty(slug);
 
 export function generateQcm(slug: QcmSlug, seed: number, difficulty: Difficulty, data: ResolvedData): QcmQuestion[] {
   return GENERATORS[slug](createRng(seed), data, byDifficulty(data.characters, difficulty), QCM_LENGTH);

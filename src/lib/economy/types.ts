@@ -35,14 +35,21 @@ export type GameStats = {
   games: number;
   /** Meilleure réussite, de 0 à 1. */
   best: number;
+  /**
+   * Meilleure réussite à chaque difficulté, pour les jeux qui en ont : elle
+   * fixe la prime des objectifs de score. Absente d'un parcours enregistré
+   * avant son ajout, et des jeux sans niveau de difficulté.
+   */
+  bestBy?: Partial<Record<Difficulty, number>>;
 };
 
+/** Avancement d'une série de défis : un compteur et un état par défi, dans l'ordre. */
+export type ChallengeProgress = { progress: number[]; done: boolean[] };
+
 /** Avancement des défis de la semaine (voir weekly.ts). */
-export type WeekProgress = {
+export type WeekProgress = ChallengeProgress & {
   /** Semaine concernée, au format « 2026-S40 ». */
   key: string;
-  progress: number[];
-  done: boolean[];
 };
 
 export type PlayerState = {
@@ -52,8 +59,11 @@ export type PlayerState = {
   games: number;
   collection: Record<string, CollectionEntry>;
   crew: Partial<Record<PostId, string>>;
-  /** Gains du jour (date de Paris), pour le plafond journalier, et jeux du jour déjà validés. */
-  day: { key: string; earned: number; done: string[] };
+  /**
+   * Gains du jour (date de Paris), pour le plafond journalier, jeux du jour
+   * déjà validés, et avancement des défis quotidiens (voir dailies.ts).
+   */
+  day: { key: string; earned: number; done: string[]; challenges: ChallengeProgress };
   /** Par jeu. */
   stats: Record<string, GameStats>;
   week: WeekProgress;
@@ -67,7 +77,7 @@ export const EMPTY_PLAYER: PlayerState = {
   games: 0,
   collection: {},
   crew: {},
-  day: { key: "", earned: 0, done: [] },
+  day: { key: "", earned: 0, done: [], challenges: { progress: [], done: [] } },
   stats: {},
   week: { key: "", progress: [], done: [] },
   cosmetics: NO_COSMETICS,
@@ -123,8 +133,10 @@ export type Reward = {
   /** Le plafond journalier a réduit les gains. */
   capped: boolean;
   recruit: Recruit | null;
-  /** Objectifs du jeu atteints avec cette partie. */
+  /** Objectifs du jeu atteints avec cette partie, ou réussis à une difficulté plus haute. */
   objectives: Milestone[];
+  /** Défis quotidiens terminés avec cette partie. */
+  dailies: Milestone[];
   /** Défis de la semaine terminés avec cette partie. */
   weekly: Milestone[];
   /** Tout ce que la partie a rapporté : gains, objectifs et défis. */

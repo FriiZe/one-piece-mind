@@ -54,8 +54,17 @@ export const isUniqueViolation = (error: unknown) =>
 
 export type Tx = Prisma.TransactionClient;
 
-const statsSchema = z.record(z.string(), z.object({ games: z.number().int().nonnegative(), best: z.number().min(0).max(1) }));
-const weekSchema = z.object({ key: z.string(), progress: z.array(z.number()), done: z.array(z.boolean()) });
+const ratio = z.number().min(0).max(1);
+const statsSchema = z.record(
+  z.string(),
+  z.object({
+    games: z.number().int().nonnegative(),
+    best: ratio,
+    bestBy: z.object({ facile: ratio, normal: ratio, expert: ratio }).partial().optional(),
+  }),
+);
+const challengeSchema = z.object({ progress: z.array(z.number()), done: z.array(z.boolean()) });
+const weekSchema = challengeSchema.extend({ key: z.string() });
 
 export async function loadState(userId: string, client: Tx = db()): Promise<PlayerState> {
   const user = await client.user.findUniqueOrThrow({
@@ -67,6 +76,7 @@ export async function loadState(userId: string, client: Tx = db()): Promise<Play
       dayKey: true,
       dayEarned: true,
       dayDone: true,
+      dayChallenges: true,
       stats: true,
       week: true,
       cosmetics: true,
@@ -79,7 +89,12 @@ export async function loadState(userId: string, client: Tx = db()): Promise<Play
     berrys: user.berrys,
     lifetimeBerrys: user.lifetimeBerrys,
     games: user.games,
-    day: { key: user.dayKey, earned: user.dayEarned, done: z.array(z.string()).safeParse(user.dayDone).data ?? [] },
+    day: {
+      key: user.dayKey,
+      earned: user.dayEarned,
+      done: z.array(z.string()).safeParse(user.dayDone).data ?? [],
+      challenges: challengeSchema.safeParse(user.dayChallenges).data ?? EMPTY_PLAYER.day.challenges,
+    },
     // Colonnes JSON : on ne se fie à leur contenu qu'après validation
     stats: statsSchema.safeParse(user.stats).data ?? {},
     week: weekSchema.safeParse(user.week).data ?? EMPTY_PLAYER.week,
@@ -114,8 +129,8 @@ export async function creditPlay(tx: Tx, userId: string, wanted: number, today =
       lifetimeBerrys: { increment: berrys },
       dayKey: today,
       dayEarned: earnedToday + berrys,
-      // Premier gain de la journée : les jeux du jour validés la veille ne comptent plus
-      ...(user.dayKey === today ? {} : { dayDone: [] }),
+      // Premier gain de la journée : les jeux du jour validés la veille et les défis quotidiens ne comptent plus
+      ...(user.dayKey === today ? {} : { dayDone: [], dayChallenges: {} }),
     },
   });
   return berrys;
@@ -179,6 +194,7 @@ export async function submitGame(userId: string, input: unknown, today = dailyKe
           dayKey: applied.state.day.key,
           dayEarned: applied.state.day.earned,
           dayDone: applied.state.day.done,
+          dayChallenges: applied.state.day.challenges,
           stats: applied.state.stats,
           week: applied.state.week,
         },

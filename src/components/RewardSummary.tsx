@@ -145,12 +145,18 @@ export function RewardSummary({ view, data }: { view: RewardView | null; data: R
           {reward.capped && (
             <p className="text-sm font-semibold">{t("Plafond de gains du jour atteint.", "Daily earnings cap reached.")}</p>
           )}
-          {(reward.objectives.length > 0 || reward.weekly.length > 0) && (
+          {(reward.objectives.length > 0 || reward.dailies.length > 0 || reward.weekly.length > 0) && (
             <ul className="mt-1 space-y-0.5 text-sm font-semibold">
               {reward.objectives.map((objective) => (
                 <li key={objective.label.fr}>
                   {t("Objectif atteint : ", "Goal reached: ")}
                   {objective.label[locale]} (+{formatNumber(objective.berrys, locale)} ฿)
+                </li>
+              ))}
+              {reward.dailies.map((challenge) => (
+                <li key={challenge.label.fr}>
+                  {t("Défi quotidien réussi : ", "Daily challenge completed: ")}
+                  {challenge.label[locale]} (+{formatNumber(challenge.berrys, locale)} ฿)
                 </li>
               ))}
               {reward.weekly.map((challenge) => (

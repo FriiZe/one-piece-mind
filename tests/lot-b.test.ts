@@ -11,6 +11,7 @@ import * as qcm from "@/games/qcm/logic";
 import { evaluateReport, reportSchema, type GameReport } from "@/games/report";
 import * as wordle from "@/games/wordle/logic";
 import { RACE_LABELS } from "@/lib/data/labels";
+import { hasDifficulty } from "@/lib/games/catalog";
 import { DAILY_PASS } from "@/lib/economy/daily";
 
 const raw = buildGameData();
@@ -567,6 +568,15 @@ describe("comptes rendus des nouveaux jeux", () => {
     expect(run({ slug: "anagramme", ...base, answers: [] })).toMatchObject({ score: 0, max: 8 });
     expect(run({ slug: "memo", ...base, flips: [] })).toMatchObject({ score: 0, category: "oeil" });
     expect(run({ slug: "chronologie", ...base, orders: [] })).toMatchObject({ score: 0, max: 25 });
+  });
+
+  it("ignore la difficulté annoncée par un jeu qui n'a pas de niveaux", () => {
+    // Sans cela, annoncer « expert » sur un quiz au contenu fixe triplerait les primes de score
+    expect(run({ slug: "navires", ...base, difficulty: "expert", answers: [] })!.difficulty).toBeNull();
+    expect(run({ slug: "prime-d-equipage", ...base, difficulty: "expert", answers: [] })!.difficulty).toBeNull();
+    expect(run({ slug: "haki", ...base, difficulty: "expert", answers: [] })!.difficulty).toBe("expert");
+    for (const slug of qcm.QCM_SLUGS) expect(qcm.usesDifficulty(slug), slug).toBe(hasDifficulty(slug));
+    for (const slug of estimate.ESTIMATE_SLUGS) expect(estimate.usesDifficulty(slug), slug).toBe(hasDifficulty(slug));
   });
 
   it("refuse des réponses hors format", () => {

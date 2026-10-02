@@ -2,8 +2,11 @@ import { describe, expect, it } from "vitest";
 import { createRng } from "@/games/engine/rng";
 import {
   applyGame,
+  currentDay,
+  currentWeek,
   DAILY_CHALLENGE,
   DAILY_GAMES,
+  dailyChallenges,
   dailyGames,
   SIGNUP_BERRYS,
   assignPost,
@@ -19,8 +22,13 @@ import {
   EMPTY_PLAYER,
   isMet,
   normalizePlayer,
+  objectiveLevel,
   objectiveProgress,
   OBJECTIVES,
+  playChallenge,
+  SCORE_CHALLENGE_SLUGS,
+  scoreChallenge,
+  SKILL_FACTOR,
   playerBounty,
   POST_IDS,
   postStrength,
@@ -36,7 +44,7 @@ import {
   type PlayerState,
   type Recruitable,
 } from "@/lib/economy";
-import { isRewardless, type LiveSlug } from "@/lib/games/catalog";
+import { getGame, isRewardless, LIVE_SLUGS, type LiveSlug } from "@/lib/games/catalog";
 
 const pool: Recruitable[] = [
   { id: "luffy", tier: 1, org: "Chapeau de paille", affiliation: "Chapeau de paille" },
@@ -110,14 +118,14 @@ describe("gains d'une partie", () => {
   });
 
   it("plafonne les gains de la journée, puis repart le lendemain", () => {
-    const almost: PlayerState = { ...EMPTY_PLAYER, day: { key: DAY, earned: DAILY_BERRY_CAP - 120, done: [] } };
+    const almost: PlayerState = { ...EMPTY_PLAYER, day: { ...EMPTY_PLAYER.day, key: DAY, earned: DAILY_BERRY_CAP - 120 } };
     const sameDay = applyGame(almost, outcome(), pool, DAY, never);
     expect(sameDay.reward).toMatchObject({ berrys: 120, capped: true });
     expect(applyGame(sameDay.state, outcome(), pool, DAY, never).reward.berrys).toBe(0);
 
     const nextDay = applyGame(sameDay.state, outcome(), pool, LATER, never);
     expect(nextDay.reward).toMatchObject({ berrys: 500, capped: false });
-    expect(nextDay.state.day).toEqual({ key: LATER, earned: 500, done: ["le-classement"] });
+    expect(nextDay.state.day).toMatchObject({ key: LATER, earned: 500, done: ["le-classement"] });
   });
 });
 
@@ -141,10 +149,10 @@ describe("jeux du jour", () => {
   it("ne verse pas de Berrys pour un jeu hors sélection, mais compte la partie", () => {
     const played = applyGame(EMPTY_PLAYER, outcome(), pool, OFF_DAY, never);
     expect(played.reward).toMatchObject({ daily: "off", berrys: 0, recruit: null });
-    expect(played.state.day).toEqual({ key: OFF_DAY, earned: 0, done: [] });
+    expect(played.state.day).toMatchObject({ key: OFF_DAY, earned: 0, done: [] });
     // Les objectifs du jeu restent dus : ils ne dépendent pas de la sélection du jour
     expect(played.reward.objectives.length).toBeGreaterThan(0);
-    expect(played.state.stats["le-classement"]).toEqual({ games: 1, best: 1 });
+    expect(played.state.stats["le-classement"]).toEqual({ games: 1, best: 1, bestBy: { normal: 1 } });
     expect(played.state.games).toBe(1);
   });
 
@@ -353,21 +361,63 @@ describe("objectifs par jeu", () => {
       "Réussir un sans-faute",
     ]);
     expect(sum(first.reward.objectives)).toBe(100 + 200 + 500 + 1500);
-    expect(first.state.stats["le-classement"]).toEqual({ games: 1, best: 1 });
+    expect(first.state.stats["le-classement"]).toEqual({ games: 1, best: 1, bestBy: { normal: 1 } });
 
     const second = applyGame(first.state, outcome(), pool, DAY, never);
     expect(second.reward.objectives).toEqual([]);
-    expect(second.reward.total).toBe(second.reward.berrys + sum(second.reward.weekly));
+    expect(second.reward.total).toBe(second.reward.berrys + sum(second.reward.dailies) + sum(second.reward.weekly));
+  });
+
+  it("module la prime des objectifs de score selon la difficulté, et verse la différence plus haut", () => {
+    expect(SKILL_FACTOR).toEqual({ facile: 0.5, normal: 1, expert: 3 });
+    const scores = (reward: { objectives: { label: { fr: string }; berrys: number }[] }) =>
+      Object.fromEntries(reward.objectives.filter((o) => !o.label.fr.startsWith("Jouer")).map((o) => [o.label.fr, o.berrys]));
+
+    // En facile, un sans-faute ne vaut que la moitié
+    const easy = applyGame(EMPTY_PLAYER, outcome({ difficulty: "facile" }), pool, OFF_DAY, never);
+    expect(scores(easy.reward)).toEqual({ "Marquer la moitié des points": 100, "Marquer 80 % des points": 250, "Réussir un sans-faute": 750 });
+    // Le refaire en facile ne rapporte plus rien
+    expect(scores(applyGame(easy.state, outcome({ difficulty: "facile" }), pool, OFF_DAY, never).reward)).toEqual({});
+
+    // En normal, 80 % des points : la différence entre ×0,5 et ×1, sauf pour le sans-faute, pas atteint à ce niveau
+    const normal = applyGame(easy.state, outcome({ performance: 0.8, difficulty: "normal" }), pool, OFF_DAY, never);
+    expect(scores(normal.reward)).toEqual({ "Marquer la moitié des points": 100, "Marquer 80 % des points": 250 });
+
+    // En expert, le sans-faute : tout monte à ×3
+    const expert = applyGame(normal.state, outcome({ difficulty: "expert" }), pool, OFF_DAY, never);
+    expect(scores(expert.reward)).toEqual({ "Marquer la moitié des points": 400, "Marquer 80 % des points": 1000, "Réussir un sans-faute": 3750 });
+    expect(expert.state.stats["le-classement"]).toEqual({ games: 3, best: 1, bestBy: { facile: 1, normal: 0.8, expert: 1 } });
+    for (const objective of OBJECTIVES.filter((o) => o.kind === "best")) expect(objectiveLevel(objective, expert.state.stats["le-classement"])).toBe(3);
+
+    // D'emblée en expert : la prime entière, en une fois
+    const direct = applyGame(EMPTY_PLAYER, outcome({ difficulty: "expert" }), pool, OFF_DAY, never);
+    expect(scores(direct.reward)).toEqual({ "Marquer la moitié des points": 600, "Marquer 80 % des points": 1500, "Réussir un sans-faute": 4500 });
+  });
+
+  it("garde entière la prime d'un jeu sans difficulté, et celle d'un record d'avant", () => {
+    // Un jeu sans niveau : pas de coefficient
+    const plain = applyGame(EMPTY_PLAYER, outcome({ slug: "navires", category: "savoir", difficulty: null }), pool, OFF_DAY, never);
+    expect(plain.state.stats.navires).toEqual({ games: 1, best: 1 });
+    expect(plain.reward.objectives.map((o) => o.berrys)).toEqual([100, 200, 500, 1500]);
+
+    // Un record enregistré avant que la difficulté compte : déjà payé en entier, il vaut un normal
+    const before: PlayerState = { ...EMPTY_PLAYER, stats: { "le-classement": { games: 3, best: 0.85 } } };
+    expect(objectiveLevel(OBJECTIVES[4], before.stats["le-classement"])).toBe(1);
+    const again = applyGame(before, outcome({ performance: 0.9, difficulty: "facile" }), pool, OFF_DAY, never);
+    expect(again.reward.objectives).toEqual([]);
+    expect(again.state.stats["le-classement"]).toEqual({ games: 4, best: 0.9, bestBy: { normal: 0.85, facile: 0.9 } });
+    const harder = applyGame(again.state, outcome({ performance: 0.8, difficulty: "expert" }), pool, OFF_DAY, never);
+    expect(harder.reward.objectives.map((o) => o.berrys)).toEqual([400, 1000]);
   });
 
   it("suit chaque jeu séparément et garde la meilleure réussite", () => {
     let state = applyGame(EMPTY_PLAYER, outcome({ performance: 0.6 }), pool, "2026-10-01", never).state;
     state = applyGame(state, outcome({ performance: 0.3 }), pool, "2026-10-01", never).state;
-    expect(state.stats["le-classement"]).toEqual({ games: 2, best: 0.6 });
+    expect(state.stats["le-classement"]).toEqual({ games: 2, best: 0.6, bestBy: { normal: 0.6 } });
 
     const other = applyGame(state, outcome({ slug: "haki", category: "savoir", performance: 0.9 }), pool, "2026-10-01", never);
     expect(other.reward.objectives.map((o) => o.label.fr)).toContain("Jouer une première partie");
-    expect(other.state.stats.haki).toEqual({ games: 1, best: 0.9 });
+    expect(other.state.stats.haki).toEqual({ games: 1, best: 0.9, bestBy: { normal: 0.9 } });
   });
 
   it("récompense la régularité à la dixième partie", () => {
@@ -380,6 +430,120 @@ describe("objectifs par jeu", () => {
     expect(tenth!.reward.objectives).toEqual([{ label: { fr: "Jouer 10 parties", en: "Play 10 games" }, berrys: 500 }]);
     expect(isMet(OBJECTIVES[1], state.stats["le-classement"])).toBe(true);
     expect(objectiveProgress(OBJECTIVES[2], state.stats["le-classement"])).toBeCloseTo(0.2);
+  });
+});
+
+describe("défis quotidiens", () => {
+  const days = Array.from({ length: 30 }, (_, i) => new Date(Date.parse("2026-10-01T00:00:00Z") + i * 86_400_000).toISOString().slice(0, 10));
+
+  it("propose quatre défis par jour, les mêmes pour tous, dont un sur un jeu du jour et un sur un autre jeu", () => {
+    const anonymous = (label: string) => label.replace(/« .* »/, "« … »");
+    const first = new Set<string>();
+    const fourth = new Set<string>();
+    for (const day of days) {
+      const challenges = dailyChallenges(day);
+      expect(challenges).toHaveLength(4);
+      expect(dailyChallenges(day).map((c) => c.label)).toEqual(challenges.map((c) => c.label));
+      expect(new Set(challenges.map((c) => c.label.fr)).size).toBe(4);
+      expect(challenges[1].label.fr).toBe("Valider 3 jeux du jour");
+      // Le troisième porte sur un jeu de la sélection du jour, le quatrième sur un jeu qui n'y est pas
+      expect(dailyGames(day)).toContain(challenges[2].slug);
+      expect(challenges[2].scaled).toBe(true);
+      expect(dailyGames(day)).not.toContain(challenges[3].slug);
+      // Un défi de score ne porte que sur un jeu où il se joue vraiment
+      for (const challenge of challenges.filter((c) => /80 %|sans-faute/.test(c.label.fr))) {
+        expect(SCORE_CHALLENGE_SLUGS, challenge.label.fr).toContain(challenge.slug);
+      }
+      first.add(anonymous(challenges[0].label.fr));
+      fourth.add(anonymous(challenges[3].label.fr));
+    }
+    // Le premier défi alterne entre jouer tout court et jouer dans une catégorie
+    expect([...first].sort()).toEqual(["Jouer 2 parties dans la catégorie « … »", "Jouer 3 parties"]);
+    // Le quatrième reprend un objectif d'un jeu : y jouer, y marquer 80 %, y réussir un sans-faute
+    expect([...fourth].sort()).toEqual(["Jouer 2 parties de « … »", "Marquer 80 % des points dans « … »", "Réussir un sans-faute dans « … »"]);
+  });
+
+  it("ne demande un sans-faute, ou 80 % des points, que là où c'est jouable", () => {
+    for (const slug of SCORE_CHALLENGE_SLUGS) expect(LIVE_SLUGS, slug).toContain(slug);
+    // Les jeux d'indices, d'estimation, d'image ou de lettres supposent de trouver du premier coup
+    for (const slug of ["les-indices", "premiere-apparition", "wordle", "revelation", "onepiecedle", "memo"]) {
+      expect(SCORE_CHALLENGE_SLUGS).not.toContain(slug);
+    }
+    for (let week = 1; week <= 52; week++) {
+      const [, skilled] = weeklyChallenges(`2026-S${String(week).padStart(2, "0")}`);
+      expect(SCORE_CHALLENGE_SLUGS, skilled.label.fr).toContain(skilled.slug);
+      expect(skilled.label.fr.startsWith("Réussir un sans-faute")).toBe(week % 3 === 0);
+      expect(skilled.berrys).toBe(week % 3 === 0 ? 3000 : 2000);
+    }
+  });
+
+  it("valide un sans-faute seulement à 100 %, dans une partie libre du jeu", () => {
+    const game = getGame("haki")!;
+    const perfect = scoreChallenge(game, 1, 800);
+    const context = { earned: 0, paid: false, dailies: 0 };
+    expect(perfect.label.fr).toBe("Réussir un sans-faute dans « Haki »");
+    expect(perfect.advance(outcome({ slug: "haki", performance: 1 }), context)).toBe(1);
+    expect(perfect.advance(outcome({ slug: "haki", performance: 0.9 }), context)).toBe(0);
+    expect(perfect.advance(outcome({ slug: "equipage", performance: 1 }), context)).toBe(0);
+    expect(scoreChallenge(game, 0.5, 300).label.fr).toBe("Marquer la moitié des points dans « Haki »");
+    expect(playChallenge(game, 2, 200).advance(outcome({ slug: "haki", performance: 0 }), context)).toBe(1);
+  });
+
+  it("avance partie après partie, paie une fois, et repart de zéro le lendemain", () => {
+    const day = days.find((d) => dailyChallenges(d)[0].label.fr === "Jouer 3 parties")!;
+    const next = days[days.indexOf(day) + 1];
+    let state = EMPTY_PLAYER;
+    const paid: number[] = [];
+    for (let i = 0; i < 4; i++) {
+      // Un jeu sans récompense du jour, joué mal : seul « Jouer 3 parties » avance
+      const applied = applyGame(state, outcome({ slug: "onepiecedle", category: "mots", performance: 0.1 }), pool, day, never);
+      state = applied.state;
+      paid.push(applied.reward.dailies.reduce((sum, d) => sum + d.berrys, 0));
+    }
+    expect(paid[2]).toBeGreaterThanOrEqual(300);
+    expect(paid[3]).toBe(0);
+    expect(state.day.challenges.progress.slice(0, 3)).toEqual([3, 0, 0]);
+    expect(state.day.challenges.done.slice(0, 3)).toEqual([true, false, false]);
+    expect(currentDay(state.day, day)).toBe(state.day.challenges);
+    // Le lendemain, tout repart de zéro
+    expect(currentDay(state.day, next)).toEqual({ progress: [0, 0, 0, 0], done: [false, false, false, false] });
+    const tomorrow = applyGame(state, outcome({ slug: "onepiecedle", category: "mots", performance: 0.1 }), pool, next, never);
+    expect(tomorrow.state.day.challenges.done.slice(0, 3)).toEqual([false, false, false]);
+    expect(tomorrow.state.day.challenges.progress[1]).toBe(0);
+  });
+
+  it("compte les jeux du jour validés, et s'ajoute aux gains hors plafond", () => {
+    const day = days[0];
+    let state = EMPTY_PLAYER;
+    let last: ReturnType<typeof applyGame> | undefined;
+    for (const slug of dailyGames(day).slice(0, 3)) {
+      last = applyGame(state, outcome({ slug, performance: 0.6, difficulty: null }), pool, day, never);
+      state = last.state;
+    }
+    expect(state.day.challenges.progress[1]).toBe(3);
+    expect(last!.reward.dailies.map((d) => d.label.fr)).toContain("Valider 3 jeux du jour");
+    expect(last!.reward.total).toBe(
+      last!.reward.berrys + [...last!.reward.objectives, ...last!.reward.dailies, ...last!.reward.weekly].reduce((sum, m) => sum + m.berrys, 0),
+    );
+    // Une partie ratée ne valide rien : le défi n'avance pas
+    const missed = applyGame(EMPTY_PLAYER, outcome({ slug: dailyGames(day)[0], performance: 0.2 }), pool, day, never);
+    expect(missed.state.day.challenges.progress[1]).toBe(0);
+  });
+
+  it("paie le défi de score selon la difficulté de la partie qui le réussit", () => {
+    const day = days[0];
+    const skill = dailyChallenges(day)[2];
+    expect(skill.label.fr.startsWith("Marquer 80 %")).toBe(true);
+    const reward = (difficulty: GameOutcome["difficulty"], performance = 0.8) =>
+      applyGame(EMPTY_PLAYER, outcome({ slug: skill.slug!, performance, difficulty }), pool, day, never)
+        .reward.dailies.filter((d) => d.label.fr === skill.label.fr)
+        .map((d) => d.berrys);
+    expect(reward("facile")).toEqual([250]);
+    expect(reward("normal")).toEqual([500]);
+    expect(reward("expert")).toEqual([1500]);
+    // Un jeu sans niveau de difficulté : la prime telle quelle
+    expect(reward(null)).toEqual([500]);
+    expect(reward("expert", 0.79)).toEqual([]);
   });
 });
 
@@ -396,13 +560,47 @@ describe("défis de la semaine", () => {
     expect(daysLeftInWeek("2026-10-04")).toBe(1);
   });
 
-  it("propose trois défis, les mêmes pour tous pendant une semaine", () => {
+  it("propose six défis, les mêmes pour tous pendant une semaine", () => {
     const challenges = weeklyChallenges("2026-S40");
-    expect(challenges).toHaveLength(3);
+    expect(challenges).toHaveLength(6);
     expect(weeklyChallenges("2026-S40").map((c) => c.label)).toEqual(challenges.map((c) => c.label));
+    expect(new Set(challenges.map((c) => c.label.fr)).size).toBe(6);
     expect(challenges[0].slug).not.toBe(challenges[1].slug);
-    expect(challenges[2].label).toEqual({ fr: "Réussir 3 défis du jour", en: "Win 3 daily challenges" });
+    expect(challenges[2].label).toEqual({
+      fr: "Réussir 3 fois le défi du jour (OnePiecedle)",
+      en: "Win the daily challenge (OnePiecedle) 3 times",
+    });
     expect(weeklyChallenges("2026-S41")[2].label.fr).toBe("Gagner 5 000 Berrys en jouant");
+    expect(challenges[3].label.fr).toMatch(/^Jouer 10 parties dans la catégorie « .+ »$/);
+    expect(challenges.slice(4).map((c) => c.label.fr)).toEqual(["Valider 12 jeux du jour", "Terminer 10 défis quotidiens"]);
+  });
+
+  it("compte pour la semaine les jeux du jour validés et les défis quotidiens terminés", () => {
+    const day = "2026-10-01";
+    let state = EMPTY_PLAYER;
+    let finished = 0;
+    for (const slug of dailyGames(day).slice(0, 3)) {
+      const applied = applyGame(state, outcome({ slug, performance: 0.6, difficulty: null }), pool, day, never);
+      state = applied.state;
+      finished += applied.reward.dailies.length;
+    }
+    // Trois jeux du jour validés ; chaque défi quotidien terminé en chemin avance celui de la semaine
+    expect(state.week.progress[4]).toBe(3);
+    expect(finished).toBeGreaterThan(0);
+    expect(state.week.progress[5]).toBe(finished);
+  });
+
+  it("garde l'avancement d'une semaine entamée quand des défis s'ajoutent", () => {
+    // Trois défis avant, six maintenant : celui qui était payé le reste
+    const before = { key: "2026-S40", progress: [5, 0, 2], done: [true, false, false] };
+    expect(currentWeek(before, "2026-S40")).toEqual({
+      key: "2026-S40",
+      progress: [5, 0, 2, 0, 0, 0],
+      done: [true, false, false, false, false, false],
+    });
+    const [regular] = weeklyChallenges("2026-S40");
+    const again = applyGame({ ...EMPTY_PLAYER, week: before }, outcome({ slug: regular.slug!, performance: 0.1 }), pool, "2026-10-01", never);
+    expect(again.reward.weekly).toEqual([]);
   });
 
   it("fait avancer un défi partie après partie et le paie une fois terminé", () => {
@@ -421,18 +619,35 @@ describe("défis de la semaine", () => {
     expect(state.week.done[0]).toBe(true);
   });
 
+  it("paie le défi de score de la semaine selon la difficulté", () => {
+    const [, skilled] = weeklyChallenges("2026-S40");
+    expect(skilled.scaled).toBe(true);
+    const reward = (difficulty: GameOutcome["difficulty"]) =>
+      applyGame(EMPTY_PLAYER, outcome({ slug: skilled.slug!, performance: 0.8, difficulty }), pool, "2026-10-01", never)
+        .reward.weekly.filter((w) => w.label.fr === skilled.label.fr)
+        .map((w) => w.berrys);
+    expect(reward("facile")).toEqual([1000]);
+    expect(reward("normal")).toEqual([2000]);
+    expect(reward("expert")).toEqual([6000]);
+  });
+
   it("repart de zéro la semaine suivante", () => {
     const played = applyGame(EMPTY_PLAYER, outcome(), pool, "2026-10-01", never).state;
     const nextWeek = applyGame(played, outcome({ performance: 0 }), pool, "2026-10-05", never).state;
     expect(nextWeek.week.key).toBe("2026-S41");
-    expect(nextWeek.week.done).toEqual([false, false, false]);
+    expect(nextWeek.week.done).toEqual([false, false, false, false, false, false]);
   });
 
   it("complète une progression enregistrée avant l'ajout des objectifs", () => {
     const old = { berrys: 40, lifetimeBerrys: 40, games: 1, collection: {}, crew: {}, day: { key: "2026-10-01", earned: 40 } };
     const state = normalizePlayer(old as unknown as Partial<PlayerState>);
     // Les champs ajoutés depuis, y compris à l'intérieur de `day`, prennent leur valeur de départ
-    expect(state).toMatchObject({ berrys: 40, stats: {}, week: { key: "" }, day: { key: "2026-10-01", earned: 40, done: [] } });
+    expect(state).toMatchObject({
+      berrys: 40,
+      stats: {},
+      week: { key: "" },
+      day: { key: "2026-10-01", earned: 40, done: [], challenges: { progress: [], done: [] } },
+    });
     expect(() => applyGame(state, outcome(), pool, "2026-10-02", never)).not.toThrow();
   });
 });

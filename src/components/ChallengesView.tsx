@@ -2,11 +2,22 @@
 
 import Link from "@/components/Link";
 import { formatNumber } from "@/games/engine/text";
-import { DAILY_BERRY_CAP, isMet, objectiveProgress, OBJECTIVES, type Objective } from "@/lib/economy";
-import { GAMES, isRewardless, type Game } from "@/lib/games/catalog";
+import { useUntilMidnight } from "@/games/ui/storage";
+import {
+  DAILY_BERRY_CAP,
+  isMet,
+  objectiveLevel,
+  objectiveProgress,
+  OBJECTIVES,
+  SKILL_FACTOR,
+  type GameStats,
+  type Objective,
+} from "@/lib/economy";
+import { GAMES, hasDifficulty, isRewardless, type Game } from "@/lib/games/catalog";
+import type { Locale } from "@/lib/i18n";
 import { useLocale, useT } from "@/lib/i18n/client";
 import { usePlayer } from "@/lib/player/PlayerProvider";
-import { useDaily, useWeekly } from "@/lib/player/useDaily";
+import { useDaily, useDailyChallenges, useWeekly, type ChallengeView } from "@/lib/player/useDaily";
 import { DailyStrip } from "./DailyGames";
 import { CheckIcon, GameBadge } from "./GameBadge";
 
@@ -42,15 +53,110 @@ function DailyCap() {
   );
 }
 
+/** « ×0,5 » en français, « ×0.5 » en anglais. */
+const times = (factor: number, locale: Locale) => `×${formatNumber(factor, locale)}`;
+
+/** Une série de défis à durée limitée : libellé, prime, avancement, et de quoi aller jouer. */
+function ChallengeCards({ ready, challenges, columns }: { ready: boolean; challenges: ChallengeView[]; columns: string }) {
+  const t = useT();
+  const locale = useLocale();
+  return (
+    <ul className={`grid gap-4 ${columns}`}>
+      {challenges.map((challenge, index) =>
+        !ready ? (
+          <li key={index} className="h-40 rounded-2xl border border-sea-700 bg-sea-800/50" aria-hidden="true" />
+        ) : (
+          <li
+            key={challenge.label.fr}
+            className={`flex flex-col gap-3 rounded-2xl border p-4 ${
+              challenge.done ? "border-emerald-400/40 bg-emerald-600/15" : "border-sea-700 bg-sea-800"
+            }`}
+          >
+            <p className="flex items-baseline justify-between gap-3">
+              <span className="font-extrabold text-foam">{challenge.label[locale]}</span>
+              <span className={`shrink-0 font-display text-[22px] tracking-wide ${challenge.done ? "text-emerald-300" : "text-straw"}`}>
+                {formatNumber(challenge.berrys, locale)} ฿
+              </span>
+            </p>
+            {challenge.scaled && !challenge.done && (
+              <p className="text-[13px] text-mist">
+                {t(
+                  `Prime ${times(SKILL_FACTOR.facile, locale)} en facile, ${times(SKILL_FACTOR.expert, locale)} en expert.`,
+                  `Reward ${times(SKILL_FACTOR.facile, locale)} on easy, ${times(SKILL_FACTOR.expert, locale)} on expert.`,
+                )}
+              </p>
+            )}
+            <div
+              role="progressbar"
+              aria-label={challenge.label[locale]}
+              aria-valuemin={0}
+              aria-valuemax={challenge.target}
+              aria-valuenow={challenge.value}
+              className="mt-auto h-2.5 overflow-hidden rounded-full bg-sea-700"
+            >
+              <div
+                className={`h-full ${challenge.done ? "bg-emerald-300" : "bg-straw"}`}
+                style={{ width: `${(challenge.value / challenge.target) * 100}%` }}
+              />
+            </div>
+            <p className="flex min-h-11 items-center justify-between gap-3 text-sm">
+              <span className="text-mist">
+                {formatNumber(challenge.value, locale)} {t("sur", "of")} {formatNumber(challenge.target, locale)}
+              </span>
+              {challenge.done ? (
+                <span className="flex items-center gap-1.5 font-extrabold text-emerald-300">
+                  <CheckIcon />
+                  {t("Récompense touchée", "Reward earned")}
+                </span>
+              ) : (
+                <Link
+                  href={challenge.slug ? `/jeux/${challenge.slug}` : "/jeux"}
+                  className="flex min-h-11 items-center rounded-[10px] border border-straw px-4 font-extrabold text-straw transition-colors hover:bg-straw/10"
+                >
+                  {t("Jouer", "Play")}
+                </Link>
+              )}
+            </p>
+          </li>
+        ),
+      )}
+    </ul>
+  );
+}
+
+function Daily() {
+  const { ready, challenges } = useDailyChallenges();
+  const countdown = useUntilMidnight();
+  const t = useT();
+  return (
+    <section aria-labelledby="quotidiens" className="space-y-3">
+      <div className="flex flex-wrap items-baseline justify-between gap-2">
+        <h2 id="quotidiens" className="text-xl font-extrabold text-foam">
+          {t("Défis quotidiens", "Daily challenges")}
+        </h2>
+        <p className={`text-sm text-mist ${ready && countdown ? "" : "invisible"}`}>
+          {t(`Nouveaux défis dans ${countdown}`, `New challenges in ${countdown}`)}
+        </p>
+      </div>
+      <ChallengeCards ready={ready} challenges={challenges} columns="sm:grid-cols-2 lg:grid-cols-4" />
+      <p className="text-sm text-mist">
+        {t(
+          "Quatre défis par jour, les mêmes pour tous, remis à zéro à minuit. La prime est versée à la fin de la partie qui termine le défi.",
+          "Four challenges a day, the same for everyone, reset at midnight. The reward is paid out at the end of the game that completes the challenge.",
+        )}
+      </p>
+    </section>
+  );
+}
+
 function Weekly() {
   const { ready, challenges, daysLeft } = useWeekly();
   const t = useT();
-  const locale = useLocale();
   return (
     <section aria-labelledby="semaine" className="space-y-3">
       <div className="flex flex-wrap items-baseline justify-between gap-2">
         <h2 id="semaine" className="text-xl font-extrabold text-foam">
-          {t("Cette semaine", "This week")}
+          {t("Défis de la semaine", "Weekly challenges")}
         </h2>
         <p className={`text-sm text-mist ${ready ? "" : "invisible"}`}>
           {t(
@@ -59,67 +165,23 @@ function Weekly() {
           )}
         </p>
       </div>
-      <ul className="grid gap-4 md:grid-cols-3">
-        {challenges.map((challenge, index) =>
-          !ready ? (
-            <li key={index} className="h-40 rounded-2xl border border-sea-700 bg-sea-800/50" aria-hidden="true" />
-          ) : (
-            <li
-              key={challenge.label.fr}
-              className={`flex flex-col gap-3 rounded-2xl border p-4 ${
-                challenge.done ? "border-emerald-400/40 bg-emerald-600/15" : "border-sea-700 bg-sea-800"
-              }`}
-            >
-              <p className="flex items-baseline justify-between gap-3">
-                <span className="font-extrabold text-foam">{challenge.label[locale]}</span>
-                <span className={`shrink-0 font-display text-[22px] tracking-wide ${challenge.done ? "text-emerald-300" : "text-straw"}`}>
-                  {formatNumber(challenge.berrys, locale)} ฿
-                </span>
-              </p>
-              <div
-                role="progressbar"
-                aria-label={challenge.label[locale]}
-                aria-valuemin={0}
-                aria-valuemax={challenge.target}
-                aria-valuenow={challenge.value}
-                className="mt-auto h-2.5 overflow-hidden rounded-full bg-sea-700"
-              >
-                <div
-                  className={`h-full ${challenge.done ? "bg-emerald-300" : "bg-straw"}`}
-                  style={{ width: `${(challenge.value / challenge.target) * 100}%` }}
-                />
-              </div>
-              <p className="flex min-h-11 items-center justify-between gap-3 text-sm">
-                <span className="text-mist">
-                  {formatNumber(challenge.value, locale)} {t("sur", "of")} {formatNumber(challenge.target, locale)}
-                </span>
-                {challenge.done ? (
-                  <span className="flex items-center gap-1.5 font-extrabold text-emerald-300">
-                    <CheckIcon />
-                    {t("Récompense touchée", "Reward earned")}
-                  </span>
-                ) : (
-                  challenge.slug && (
-                    <Link
-                      href={`/jeux/${challenge.slug}`}
-                      className="flex min-h-11 items-center rounded-[10px] border border-straw px-4 font-extrabold text-straw transition-colors hover:bg-straw/10"
-                    >
-                      {t("Jouer", "Play")}
-                    </Link>
-                  )
-                )}
-              </p>
-            </li>
-          ),
-        )}
-      </ul>
+      <ChallengeCards ready={ready} challenges={challenges} columns="md:grid-cols-3" />
       <p className="text-sm text-mist">
         {t(
-          "Trois défis, les mêmes pour tous. La prime est versée à la fin de la partie qui termine le défi.",
-          "Three challenges, the same for everyone. The reward is paid out at the end of the game that completes the challenge.",
+          "Six défis, les mêmes pour tous. La prime est versée à la fin de la partie qui termine le défi.",
+          "Six challenges, the same for everyone. The reward is paid out at the end of the game that completes the challenge.",
         )}
       </p>
     </section>
+  );
+}
+
+/** Ce qu'un joueur peut encore gagner sur les objectifs d'un jeu, en comptant les primes des difficultés plus hautes. */
+function remaining(game: Game, stats: GameStats | undefined): number {
+  const top = hasDifficulty(game.slug) ? Math.max(...Object.values(SKILL_FACTOR)) : 1;
+  return OBJECTIVES.reduce(
+    (sum, objective) => sum + Math.round(objective.berrys * ((objective.kind === "best" ? top : 1) - objectiveLevel(objective, stats))),
+    0,
   );
 }
 
@@ -162,7 +224,7 @@ function Objectives() {
     <section aria-labelledby="objectifs" className="space-y-3">
       <div className="flex flex-wrap items-baseline justify-between gap-2">
         <h2 id="objectifs" className="text-xl font-extrabold text-foam">
-          {t("Objectifs à portée de main", "Goals within reach")}
+          {t("Objectifs, une fois pour toutes", "Goals, once and for all")}
         </h2>
         <p className={`text-sm font-bold text-mist ${status === "loading" ? "invisible" : ""}`}>
           {t(
@@ -171,6 +233,7 @@ function Objectives() {
           )}
         </p>
       </div>
+      <h3 className="text-sm font-extrabold tracking-wide text-mist uppercase">{t("À portée de main", "Within reach")}</h3>
       <ul className="overflow-hidden rounded-2xl border border-sea-700">
         {shown.map(({ game, objective, progress, caption }) => (
           <li key={game.slug} className="border-b border-sea-700 last:border-b-0">
@@ -195,10 +258,47 @@ function Objectives() {
       </ul>
       <p className="text-sm text-mist">
         {t(
-          "Les objectifs paient une seule fois, même un jour où le jeu n'est pas à l'affiche.",
-          "Goals pay out only once, even on a day when the game isn't in the daily selection.",
+          `Les objectifs paient une seule fois, même un jour où le jeu n'est pas à l'affiche. Ceux de score suivent la difficulté : ${times(SKILL_FACTOR.facile, locale)} en facile, ${times(SKILL_FACTOR.expert, locale)} en expert. Les réussir plus haut verse la différence.`,
+          `Goals pay out only once, even on a day when the game isn't in the daily selection. Score goals follow the difficulty: ${times(SKILL_FACTOR.facile, locale)} on easy, ${times(SKILL_FACTOR.expert, locale)} on expert. Beating them at a higher level pays the difference.`,
         )}
       </p>
+
+      <details className="group rounded-2xl border border-sea-700">
+        <summary className="flex min-h-[52px] cursor-pointer items-center justify-between gap-3 px-4 font-extrabold text-foam sm:px-5">
+          {t("Tous les objectifs, jeu par jeu", "All goals, game by game")}
+          <span className="text-sm text-straw group-open:hidden">{t("Afficher", "Show")}</span>
+          <span className="hidden text-sm text-straw group-open:inline">{t("Masquer", "Hide")}</span>
+        </summary>
+        <ul className="border-t border-sea-700">
+          {PLAYABLE.map((game) => {
+            const stats = state.stats[game.slug];
+            const left = remaining(game, stats);
+            return (
+              <li key={game.slug} className="border-b border-sea-700 last:border-b-0">
+                <Link href={`/jeux/${game.slug}`} className="flex min-h-[56px] items-center gap-3 px-4 py-2 transition-colors hover:bg-sea-800 sm:px-5">
+                  <GameBadge title={game.title[locale]} category={game.category} className="size-8 text-base" />
+                  <span className="min-w-0 flex-1 truncate text-[15px] font-extrabold text-foam">{game.title[locale]}</span>
+                  <span
+                    className={`flex shrink-0 gap-1 ${status === "loading" ? "invisible" : ""}`}
+                    role="img"
+                    aria-label={t(
+                      `${OBJECTIVES.filter((objective) => isMet(objective, stats)).length} objectifs atteints sur ${OBJECTIVES.length}`,
+                      `${OBJECTIVES.filter((objective) => isMet(objective, stats)).length} of ${OBJECTIVES.length} goals reached`,
+                    )}
+                  >
+                    {OBJECTIVES.map((objective) => (
+                      <span key={objective.id} className={`size-2.5 rounded-full ${isMet(objective, stats) ? "bg-emerald-300" : "bg-sea-600"}`} />
+                    ))}
+                  </span>
+                  <span className={`w-24 shrink-0 text-right text-sm font-extrabold ${left > 0 ? "text-straw" : "text-emerald-300"} ${status === "loading" ? "invisible" : ""}`}>
+                    {left > 0 ? `${formatNumber(left, locale)} ฿` : t("Complet", "Complete")}
+                  </span>
+                </Link>
+              </li>
+            );
+          })}
+        </ul>
+      </details>
     </section>
   );
 }
@@ -221,6 +321,7 @@ export function ChallengesView() {
         <DailyCap />
       </div>
       <DailyStrip segments />
+      <Daily />
       <Weekly />
       <Objectives />
     </div>

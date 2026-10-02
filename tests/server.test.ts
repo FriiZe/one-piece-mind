@@ -116,6 +116,9 @@ describe.skipIf(!accountsEnabled)("récompenses enregistrées en base", () => {
     const reloaded = await loadState(userId);
     expect(reloaded.berrys).toBe(first.reward.total + again.reward.total);
     expect(reloaded.day).toEqual(again.state.day);
+    // Les défis quotidiens aussi : un jeu du jour validé, deux parties jouées
+    expect(reloaded.day.challenges.progress[1]).toBe(1);
+    expect(reloaded.day.challenges.done).toHaveLength(4);
     // Le parcours par jeu et les défis de la semaine sont bien relus depuis la base
     expect(reloaded.stats).toEqual(again.state.stats);
     expect(reloaded.week).toEqual(again.state.week);

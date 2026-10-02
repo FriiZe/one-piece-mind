@@ -18,6 +18,7 @@ const under = (pathname: string, ...roots: string[]) => roots.some((root) => pat
 
 const LINKS = [
   { href: "/jeux", label: { fr: "Jeux", en: "Games" }, active: (pathname: string) => under(pathname, "/jeux") },
+  { href: "/defis", label: { fr: "Défis", en: "Challenges" }, active: (pathname: string) => under(pathname, "/defis") },
   { href: "/multi", label: { fr: "Multi", en: "Multi" }, active: (pathname: string) => under(pathname, ...MULTI_PATHS) },
   { href: "/quiz", label: { fr: "Quiz", en: "Quizzes" }, active: (pathname: string) => under(pathname, "/quiz") },
   { href: "/navire", label: { fr: "Mon navire", en: "My ship" }, active: (pathname: string) => under(pathname, ...SHIP_PATHS) },
@@ -34,8 +35,8 @@ function Icon({ children }: { children: ReactNode }) {
 const TABS = [
   {
     href: "/",
-    label: { fr: "Aujourd'hui", en: "Today" },
-    active: (pathname: string) => pathname === "/" || under(pathname, "/defis"),
+    label: { fr: "Accueil", en: "Home" },
+    active: (pathname: string) => pathname === "/",
     icon: (
       <>
         <circle cx="12" cy="12" r="4" />
@@ -55,6 +56,18 @@ const TABS = [
     ),
   },
   {
+    href: "/defis",
+    label: { fr: "Défis", en: "Goals" },
+    active: (pathname: string) => under(pathname, "/defis"),
+    icon: (
+      <>
+        <circle cx="12" cy="12" r="9" />
+        <circle cx="12" cy="12" r="5" />
+        <circle cx="12" cy="12" r="1" />
+      </>
+    ),
+  },
+  {
     href: "/navire",
     label: { fr: "Navire", en: "Ship" },
     active: (pathname: string) => under(pathname, ...SHIP_PATHS),
@@ -67,7 +80,7 @@ const TABS = [
   },
   {
     href: "/multi",
-    label: { fr: "À plusieurs", en: "Together" },
+    label: { fr: "Multi", en: "Multi" },
     active: (pathname: string) => under(pathname, ...MULTI_PATHS, "/quiz"),
     icon: (
       <>
@@ -183,7 +196,7 @@ export function TabBar() {
   return (
     <nav
       aria-label={t("Rubriques", "Sections")}
-      className="fixed inset-x-0 bottom-0 z-30 grid grid-cols-5 border-t border-sea-700 bg-sea-900 pb-[env(safe-area-inset-bottom)] text-[11px] font-bold text-mist md:hidden"
+      className="fixed inset-x-0 bottom-0 z-30 grid grid-cols-6 border-t border-sea-700 bg-sea-900 pb-[env(safe-area-inset-bottom)] text-[11px] font-bold text-mist md:hidden"
     >
       {TABS.map((tab) => {
         const active = tab.active(pathname);

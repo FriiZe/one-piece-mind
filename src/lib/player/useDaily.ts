@@ -3,15 +3,19 @@
 import { useDailyKey, useIsClient } from "@/games/ui/storage";
 import {
   BASE_BERRYS,
+  currentDay,
   currentWeek,
   DAILY_CHALLENGE,
+  dailyChallenges,
   DAILY_CHALLENGE_BERRYS,
   dailyGames,
   daysLeftInWeek,
   weekKey,
   weeklyChallenges,
+  type Challenge,
+  type ChallengeProgress,
 } from "@/lib/economy";
-import { getGame, type GameCategoryId, type LiveSlug } from "@/lib/games/catalog";
+import { getGame, hasDifficulty, type GameCategoryId, type LiveSlug } from "@/lib/games/catalog";
 import type { Localized } from "@/lib/i18n";
 import { usePlayer } from "./PlayerProvider";
 
@@ -78,24 +82,51 @@ export function useDaily() {
   };
 }
 
-/** Les trois défis de la semaine, avec l'avancement du joueur. */
+/** Un défi tel qu'il s'affiche : son avancement, et si sa prime suit la difficulté. */
+export type ChallengeView = {
+  label: Localized;
+  target: number;
+  berrys: number;
+  slug?: LiveSlug;
+  /** Défi de score sur un jeu qui a des niveaux : la prime dépend de la difficulté de la partie. */
+  scaled: boolean;
+  value: number;
+  done: boolean;
+};
+
+function views(challenges: Challenge[], progress: ChallengeProgress): ChallengeView[] {
+  return challenges.map((challenge, index) => ({
+    label: challenge.label,
+    target: challenge.target,
+    berrys: challenge.berrys,
+    slug: challenge.slug,
+    scaled: !!challenge.scaled && !!challenge.slug && hasDifficulty(challenge.slug),
+    value: Math.min(challenge.target, progress.progress[index] ?? 0),
+    done: !!progress.done[index],
+  }));
+}
+
+/** Les quatre défis quotidiens, avec l'avancement du joueur. */
+export function useDailyChallenges() {
+  const { state, status } = usePlayer();
+  const isClient = useIsClient();
+  const today = useDailyKey();
+  return {
+    ready: isClient && status !== "loading",
+    challenges: views(dailyChallenges(today), currentDay(state.day, today)),
+  };
+}
+
+/** Les six défis de la semaine, avec l'avancement du joueur. */
 export function useWeekly() {
   const { state, status } = usePlayer();
   const isClient = useIsClient();
   const today = useDailyKey();
   const week = weekKey(today);
-  const progress = currentWeek(state.week, week);
 
   return {
     ready: isClient && status !== "loading",
     daysLeft: daysLeftInWeek(today),
-    challenges: weeklyChallenges(week).map((challenge, index) => ({
-      label: challenge.label,
-      target: challenge.target,
-      berrys: challenge.berrys,
-      slug: challenge.slug,
-      value: Math.min(challenge.target, progress.progress[index] ?? 0),
-      done: !!progress.done[index],
-    })),
+    challenges: views(weeklyChallenges(week), currentWeek(state.week, week)),
   };
 }

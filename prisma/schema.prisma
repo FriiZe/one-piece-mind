@@ -30,7 +30,9 @@ model User {
   dayEarned      Int    @default(0)
   /// Jeux du jour déjà validés à cette date (liste d'identifiants).
   dayDone        Json   @default("[]")
-  /// Parcours par jeu ({ jeu: { games, best } }), pour les objectifs.
+  /// Avancement des défis quotidiens à cette date ({ progress, done }).
+  dayChallenges  Json   @default("{}")
+  /// Parcours par jeu ({ jeu: { games, best, bestBy } }), pour les objectifs.
   stats          Json   @default("{}")
   /// Avancement des défis de la semaine ({ key, progress, done }).
   week           Json   @default("{}")

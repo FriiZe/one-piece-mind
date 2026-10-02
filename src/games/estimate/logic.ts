@@ -5,6 +5,7 @@
 import type { PlayCharacter, ResolvedData } from "../cards";
 import { byDifficulty, type Difficulty } from "../engine/difficulty";
 import { createRng, sample, type Rng } from "../engine/rng";
+import { hasDifficulty } from "@/lib/games/catalog";
 import { translator } from "@/lib/i18n";
 
 export const ESTIMATE_LENGTH = 8;
@@ -193,7 +194,7 @@ const GENERATORS = {
 
 export type EstimateSlug = keyof typeof GENERATORS;
 export const ESTIMATE_SLUGS = Object.keys(GENERATORS) as [EstimateSlug, ...EstimateSlug[]];
-export const usesDifficulty = (slug: EstimateSlug) => slug !== "prime-d-equipage";
+export const usesDifficulty = (slug: EstimateSlug) => hasDifficulty(slug);
 
 export function generateEstimates(slug: EstimateSlug, seed: number, difficulty: Difficulty, data: ResolvedData): EstimateQuestion[] {
   return GENERATORS[slug](createRng(seed), data, byDifficulty(data.characters, difficulty), ESTIMATE_LENGTH);

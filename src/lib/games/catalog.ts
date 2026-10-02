@@ -123,6 +123,24 @@ export const LIVE_SLUGS = BUILT_SLUGS.filter((slug) => !PAUSED_SLUGS.includes(sl
 export const REWARDLESS_SLUGS: readonly LiveSlug[] = ["den-den-devin"];
 export const isRewardless = (slug: string) => (REWARDLESS_SLUGS as readonly string[]).includes(slug);
 
+/**
+ * Jeux sans niveau de difficulté : le contenu est rédigé à la main, ou la
+ * partie ne dépend pas d'un tirage de personnages. Leurs primes ne sont pas
+ * modulées par la difficulté.
+ */
+export const FIXED_DIFFICULTY_SLUGS: readonly LiveSlug[] = [
+  "type-de-fruit",
+  "trouve-les-tous",
+  "la-route-de-grand-line",
+  "navires",
+  "techniques",
+  "armes-et-sabres",
+  "surnoms",
+  "prime-d-equipage",
+  "den-den-devin",
+];
+export const hasDifficulty = (slug: string) => !(FIXED_DIFFICULTY_SLUGS as readonly string[]).includes(slug);
+
 export function isLiveSlug(slug: string): slug is LiveSlug {
   return (LIVE_SLUGS as readonly string[]).includes(slug);
 }
