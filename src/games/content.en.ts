@@ -465,7 +465,7 @@ export const GAME_CONTENT_EN: Record<LiveSlug, GameContent> = {
       "You remember the arc, but the number? Set the slider to the chapter or episode where the character first appears.",
     howTo: [
       "Move the slider to the number you have in mind, then submit.",
-      "The exact number is worth 10 points. After that you lose one point for roughly every twelve numbers off: 9 up to 12, 8 up to 24, 7 up to 37, 6 up to 49, 5 up to 61, 4 up to 74, 3 up to 86, 2 up to 99 and 1 up to 150. Beyond that, nothing.",
+      "The exact number is worth 10 points. After that, depending on how far off you are: 9 points up to 5 numbers, 8 up to 10, 7 up to 25, 6 up to 42, 5 up to 61, 4 up to 74, 3 up to 86, 2 up to 99 and 1 up to 150. Beyond that, nothing.",
       "Eight characters per game, for a maximum of 80 points.",
     ],
     faq: [

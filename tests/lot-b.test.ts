@@ -290,21 +290,15 @@ describe("estimation", () => {
     expect(estimate.scoreEstimate(linear, 900)).toBe(0);
   });
 
-  it("Première apparition : 10 points au numéro exact, un point de moins tous les douze numéros, encore 2 à 99 d'écart", () => {
+  it("Première apparition : 10 points au numéro exact, un haut de barème serré, encore 2 points à 99 d'écart", () => {
     const [question] = estimate.generateEstimates("premiere-apparition", SEEDS[0], "normal", modes[1]);
     expect(estimate.maxPoints(question)).toBe(10);
     const at = (gap: number) => estimate.scoreEstimate(question, question.answer + gap);
-    expect([0, 1, 12, 13, 24, 25, 37, 38, 49, 50, 61, 62, 74, 75, 86, 87, 99, 100, 150, 151, 500].map(at)).toEqual([
+    expect([0, 1, 5, 6, 10, 11, 25, 26, 42, 43, 61, 62, 74, 75, 86, 87, 99, 100, 150, 151, 500].map(at)).toEqual([
       10, 9, 9, 8, 8, 7, 7, 6, 6, 5, 5, 4, 4, 3, 3, 2, 2, 1, 1, 0, 0,
     ]);
     // L'écart compte dans les deux sens
     if (question.answer > 5) expect(estimate.scoreEstimate(question, question.answer - 3)).toBe(9);
-    // De 9 à 2 points, les paliers suivent 10 − 8 × écart / 99, arrondi à l'entier inférieur
-    estimate.NUMBER_BANDS.slice(1, 9).forEach((limit, index) => {
-      const points = 9 - index;
-      expect(Math.floor(10 - (8 * limit) / 99 + 1e-9), `${limit}`).toBe(points);
-      expect(Math.floor(10 - (8 * (limit + 1)) / 99 + 1e-9), `${limit + 1}`).toBe(points - 1);
-    });
     // Huit réponses à 61 numéros d'écart : la moitié des points, de quoi valider le jeu du jour
     const questions = estimate.generateEstimates("premiere-apparition", SEEDS[2], "normal", modes[1]);
     const near = questions.map((q) => (q.answer > 61 ? q.answer - 61 : q.answer + 61));

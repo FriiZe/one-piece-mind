@@ -12,14 +12,13 @@ export const POINTS_PER_QUESTION = 5;
 
 /**
  * Barème au numéro près, pour un chapitre ou un épisode : écart maximal toléré
- * à chaque palier, de 10 points (le numéro exact) à 1 point. Les points baissent
- * régulièrement, d'un point tous les douze numéros environ (10 − 8 × écart / 99,
- * arrondi à l'entier inférieur) : encore 2 points à 99 numéros d'écart, puis un
- * dernier point jusqu'à 150. La moitié des points se garde jusqu'à 61 d'écart :
- * qui situe à peu près l'arc valide le jeu du jour. Une courbe exponentielle
- * passant par les mêmes repères ne laissait la moitié des points que jusqu'à 42.
+ * à chaque palier, de 10 points (le numéro exact) à 1 point. Le haut du barème
+ * est serré, pour récompenser la précision : 9 points jusqu'à 5 numéros d'écart,
+ * 8 jusqu'à 10. Il s'élargit ensuite : la moitié des points se garde jusqu'à 61
+ * d'écart, pour que celui qui situe à peu près l'arc valide le jeu du jour ;
+ * encore 2 points à 99 numéros d'écart, et un dernier jusqu'à 150.
  */
-export const NUMBER_BANDS = [0, 12, 24, 37, 49, 61, 74, 86, 99, 150] as const;
+export const NUMBER_BANDS = [0, 5, 10, 25, 42, 61, 74, 86, 99, 150] as const;
 
 export type EstimateQuestion = {
   id: string;

@@ -274,7 +274,7 @@ Le lot C peut s'intercaler plus tôt, jeu par jeu, selon l'envie.
 - Le surnom sert d'indice, juste avant l'initiale, dans Les indices et Avis de recherche. Emojis se joue désormais par difficulté. Mémo associe selon la partie le fruit, le surnom ou l'arme.
 - Critères partagés par Connexions, Grille et Den Den Devin : hakis un à un, Zoan antique et mythique, paliers de prime, de taille et d'âge, initiale du nom (jamais demandée par Den Den Devin). Sept groupes de plus pour Trouve-les tous.
 - Historique des propositions : Les indices, Emojis, Avis de recherche, Révélation et Zoom extrême listent sous le champ de saisie les noms déjà écartés sur la manche.
-- Première apparition : barème au numéro près, sur 10 par personnage. Le numéro exact vaut 10, puis un point de moins tous les douze numéros d'écart environ ; encore 2 points à 99, 1 jusqu'à 150. La moitié des points se garde jusqu'à 61 d'écart, pour que le jeu du jour reste gagnable. Le curseur avance d'un numéro par cran.
+- Première apparition : barème au numéro près, sur 10 par personnage. Le numéro exact vaut 10, puis 9 jusqu'à 5 numéros d'écart, 8 jusqu'à 10, 7 jusqu'à 25, 6 jusqu'à 42, 5 jusqu'à 61 ; encore 2 points à 99, 1 jusqu'à 150. La moitié des points se garde jusqu'à 61 d'écart, pour que le jeu du jour reste gagnable. Le curseur avance d'un numéro par cran.
 
 **À reprendre plus tard**
 

@@ -438,12 +438,12 @@ export const GAME_CONTENT_FR: Record<LiveSlug, GameContent> = {
   "premiere-apparition": {
     metaTitle: "Première apparition : dans quel chapitre ce personnage arrive-t-il ?",
     metaDescription:
-      "Huit personnages One Piece : retrouve le chapitre, ou l'épisode, de leur première apparition. Dix points pour le numéro exact, puis un de moins tous les douze numéros d'écart.",
+      "Huit personnages One Piece : retrouve le chapitre, ou l'épisode, de leur première apparition. Dix points pour le numéro exact, neuf à cinq numéros près, encore deux à 99 d'écart.",
     intro:
       "Tu te souviens de l'arc, mais du numéro ? Place le curseur sur le chapitre ou l'épisode où le personnage apparaît pour la première fois.",
     howTo: [
       "Déplace le curseur jusqu'au numéro que tu estimes, puis valide.",
-      "Le numéro exact vaut 10 points. Ensuite, tu perds un point tous les douze numéros d'écart environ : 9 jusqu'à 12, 8 jusqu'à 24, 7 jusqu'à 37, 6 jusqu'à 49, 5 jusqu'à 61, 4 jusqu'à 74, 3 jusqu'à 86, 2 jusqu'à 99 et 1 jusqu'à 150. Au-delà, rien.",
+      "Le numéro exact vaut 10 points. Ensuite, selon l'écart : 9 points jusqu'à 5 numéros, 8 jusqu'à 10, 7 jusqu'à 25, 6 jusqu'à 42, 5 jusqu'à 61, 4 jusqu'à 74, 3 jusqu'à 86, 2 jusqu'à 99 et 1 jusqu'à 150. Au-delà, rien.",
       "Huit personnages par partie, pour un maximum de 80 points.",
     ],
     faq: [
