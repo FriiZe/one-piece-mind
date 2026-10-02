@@ -6,7 +6,7 @@ import type { PlayCharacter, ResolvedData } from "../cards";
 import { byDifficulty, type Difficulty } from "../engine/difficulty";
 import { createRng, pick, randomInt, sample, shuffle, type Rng } from "../engine/rng";
 import { formatBounty, formatHeight } from "../engine/text";
-import { FRUIT_TYPE_LABELS, hakiLabel, RACE_LABELS, SEA_LABELS, type HakiType } from "@/lib/data/labels";
+import { FRUIT_TYPE_LABELS, hakiLabel, RACE_LABELS, SEA_LABELS, translateAffiliation, type HakiType } from "@/lib/data/labels";
 import { RACES, SEAS } from "@/lib/data/schema";
 import { hasDifficulty, isLiveSlug } from "@/lib/games/catalog";
 import { translator, type Localized } from "@/lib/i18n";
@@ -31,6 +31,8 @@ export type QcmQuestion = {
   explanation: string;
   /** La question ne se comprend qu'avec ses propositions : sans elles, plusieurs réponses seraient justes. */
   closed?: true;
+  /** Autres réponses justes quand la réponse s'écrit (Duo, Carré ou Cash) : l'autre équipage d'un personnage qui en a deux. */
+  accepted?: string[];
 };
 
 type Generator = (rng: Rng, data: ResolvedData, pool: readonly PlayCharacter[], count: number) => QcmQuestion[];
@@ -46,6 +48,11 @@ function choices<T>(rng: Rng, answer: T, others: readonly T[], key: (item: T) =>
   const distinct = new Map<string, T>();
   for (const item of others) if (key(item) !== key(answer)) distinct.set(key(item), item);
   return shuffle(rng, [answer, ...sample(rng, [...distinct.values()], CHOICES - 1)]);
+}
+
+/** Toutes les organisations d'un personnage, actuelles ou passées, telles qu'elles s'affichent. */
+function memberships(c: PlayCharacter, data: ResolvedData): Set<string> {
+  return new Set([c.org, ...c.also, ...c.past].filter((key): key is string => !!key).map((key) => translateAffiliation(key, data.locale)));
 }
 
 const equipage: Generator = (rng, data, pool, count) => {
@@ -78,9 +85,13 @@ const equipage: Generator = (rng, data, pool, count) => {
       subject: c.name,
       detail: c.altName ?? undefined,
       img: c.img,
-      options: choices(rng, c.affiliation!, common, (label) => label).map(asOption),
+      // Un personnage a parfois plusieurs organisations (la famille Charlotte et l'équipage de Big Mom) :
+      // aucune des siennes ne sert de leurre, et les autres comptent quand la réponse s'écrit
+      options: choices(rng, c.affiliation!, common.filter((label) => !memberships(c, data).has(label)), (label) => label).map(asOption),
       answerId: c.affiliation!,
       explanation,
+      // Les libellés dans la langue du joueur, et les noms d'origine (« Kuja Pirates »)
+      accepted: [...new Set([c.org!, ...c.also.flatMap((key) => [translateAffiliation(key, data.locale), key])])],
     };
   });
 };
@@ -300,7 +311,11 @@ const vraiOuFaux: Generator = (rng, data, pool, count) => {
       if (!members.length || affiliations.length < 2) return null;
       const c = pick(rng, members);
       const truth = rng() < 0.5;
-      const shown = truth ? c.affiliation! : other(affiliations, c.affiliation!);
+      // Une autre de ses organisations ne ferait pas une affirmation fausse
+      const own = memberships(c, data);
+      const foreign = affiliations.filter((label) => !own.has(label));
+      if (!truth && !foreign.length) return null;
+      const shown = truth ? c.affiliation! : pick(rng, foreign);
       return {
         key: `affiliation-${c.id}`,
         text: t(`${c.name} fait partie de : ${shown}.`, `${c.name} belongs to: ${shown}.`),

@@ -52,6 +52,15 @@ describe("critères et groupes ajoutés", () => {
     expect(initial.test(manga.characterById.get("nami")!)).toBe(false);
   });
 
+  it("comptent un personnage dans chacune de ses organisations actuelles", () => {
+    const criteria = new Map(criteriaFor(manga).map((criterion) => [criterion.id, criterion]));
+    const katakuri = manga.characterById.get("charlotte-katakuri")!;
+    expect(criteria.get("affiliation:Famille Charlotte")!.test(katakuri)).toBe(true);
+    expect(criteria.get("affiliation:Équipage de Big Mom")!.test(katakuri)).toBe(true);
+    // Une organisation quittée ne compte plus
+    expect(criteria.get("affiliation:Baroque Works")!.test(manga.characterById.get("nico-robin")!)).toBe(false);
+  });
+
   it("Den Den Devin ne demande jamais l'initiale", () => {
     const criteria = criteriaFor(anime).filter(devin.askable);
     expect(criteria.some((criterion) => criterion.kind === "initial")).toBe(false);

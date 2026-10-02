@@ -6,6 +6,7 @@ import { createRng } from "@/games/engine/rng";
 import { editDistance, matchesAnswer } from "@/games/engine/text";
 import { parseEstimate, sliderToValue, valueToSlider } from "@/games/estimate/logic";
 import { evaluateReport, reportSchema } from "@/games/report";
+import { translateAffiliation } from "@/lib/data/labels";
 import {
   BOOSTER_COST,
   BOOSTER_SIZE,
@@ -259,6 +260,55 @@ describe("Duo, Carré ou Cash", () => {
         }
       }
     }
+  });
+
+  it("accepte un équipage écrit à sa façon : « Kuja pirates », « les Kuja », « équipage Kuja »", () => {
+    expect(dcc.answerCore("Équipage des Kuja")).toBe("kuja");
+    expect(dcc.answerCore("Kuja Pirates")).toBe("kuja");
+    expect(dcc.answerCore("les Kuja")).toBe("kuja");
+    // Les mots de l'intérieur restent, et une réponse faite d'un seul mot générique n'est pas vidée
+    expect(dcc.answerCore("Équipage du Chapeau de paille")).toBe("chapeau de paille");
+    expect(dcc.answerCore("Pirates")).toBe("pirates");
+
+    const kuja = { answerId: "Équipage des Kuja", accepted: ["Équipage des Kuja", "Kuja", "kuja", "Kuja Pirates"], rejected: ["Équipage du Heart", "heart"] };
+    for (const typed of ["Kuja pirate", "kuja pirates", "les Kuja", "équipage Kuja", "Equipage des Kuja", "Kuja"]) {
+      expect(dcc.isRight(kuja, { kind: "cash", value: typed }), typed).toBe(true);
+    }
+    for (const typed of ["Heart", "équipage du Heart", "pirates", ""]) expect(dcc.isRight(kuja, { kind: "cash", value: typed }), typed).toBe(false);
+  });
+
+  it("accepte l'autre organisation d'un personnage qui en a deux, et ne la propose jamais comme leurre", () => {
+    const katakuri = manga.characterById.get("charlotte-katakuri")!;
+    expect(katakuri.affiliation).toBe("Famille Charlotte");
+    expect(katakuri.also).toContain("Big Mom Pirates");
+    // Une organisation quittée n'est pas une bonne réponse, mais ne sert pas de leurre non plus
+    expect(manga.characterById.get("nico-robin")!.past).toContain("Baroque Works");
+
+    let seen = 0;
+    for (const data of [anime, manga]) {
+      for (let seed = 1; seed <= 400; seed++) {
+        for (const question of dcc.generate(seed, "normal", data)) {
+          const character = data.characters.find((c) => c.name === question.subject && c.affiliation === question.answerId);
+          if (!character || !question.title.includes("organisation")) continue;
+          const own = [character.org, ...character.also, ...character.past].map((key) => translateAffiliation(key!, "fr"));
+          for (const option of question.options.filter((o) => o.id !== question.answerId)) {
+            expect(own, `${character.name} : ${option.label}`).not.toContain(option.label);
+          }
+          // Chacune de ses organisations actuelles est acceptée en cash, sous son libellé comme sous sa forme courte
+          for (const key of character.also) {
+            const label = translateAffiliation(key, "fr");
+            expect(dcc.isRight(question, { kind: "cash", value: label }), `${character.name} → ${label}`).toBe(true);
+            seen++;
+          }
+          if (character.id === "charlotte-katakuri") {
+            for (const typed of ["Équipage de Big Mom", "big mom", "Big Mom Pirates", "famille Charlotte", "Charlotte"]) {
+              expect(dcc.isRight(question, { kind: "cash", value: typed }), typed).toBe(true);
+            }
+          }
+        }
+      }
+    }
+    expect(seen).toBeGreaterThan(50);
   });
 
   it("accepte le nom d'usage d'un personnage et la forme courte d'un équipage", () => {

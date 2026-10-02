@@ -6,7 +6,7 @@
  * peut révéler ce qu'il n'a pas encore vu.
  */
 import type { PlayCharacter, ResolvedData } from "../cards";
-import { RACE_LABELS, SEA_LABELS } from "@/lib/data/labels";
+import { RACE_LABELS, SEA_LABELS, translateAffiliation } from "@/lib/data/labels";
 import { RACES, SEAS } from "@/lib/data/schema";
 import { normalizeText } from "./text";
 import { translator } from "@/lib/i18n";
@@ -53,13 +53,18 @@ export function criteriaFor(data: ResolvedData): Criterion[] {
 
   const affiliations = new Map<string, number>();
   for (const c of data.characters) if (c.affiliation) affiliations.set(c.affiliation, (affiliations.get(c.affiliation) ?? 0) + 1);
+  // Un personnage compte dans chacune de ses organisations actuelles : Katakuri est de la famille
+  // Charlotte, et de l'équipage de Big Mom
+  const current = new Map(
+    data.characters.map((c) => [c.id, new Set(c.also.map((key) => translateAffiliation(key, data.locale)))] as const),
+  );
   for (const [affiliation] of affiliations) {
     all.push({
       id: `affiliation:${affiliation}`,
       kind: "affiliation",
       label: affiliation,
-      question: t(`Son affiliation principale est-elle : ${affiliation} ?`, `Is their main affiliation: ${affiliation}?`),
-      test: (c) => c.affiliation === affiliation,
+      question: t(`Fait-il partie de : ${affiliation} ?`, `Do they belong to: ${affiliation}?`),
+      test: (c) => c.affiliation === affiliation || !!current.get(c.id)?.has(affiliation),
     });
   }
 

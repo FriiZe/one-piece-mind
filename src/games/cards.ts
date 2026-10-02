@@ -22,6 +22,10 @@ type ModeFacts = {
   org: string | null;
   /** La même, telle qu'elle s'affiche dans la langue du joueur. */
   affiliation: string | null;
+  /** Ses autres organisations actuelles, sous leur nom du wiki : y répondre n'est pas une erreur. */
+  also: string[];
+  /** Celles qu'il a quittées, sous leur nom du wiki : elles ne servent pas de leurres. */
+  past: string[];
   sea: Sea | null;
   fruitId: string | null;
 };
@@ -96,10 +100,14 @@ function modeFacts(character: Character, mode: SpoilerMode, locale: Locale): Mod
   const view = viewCharacter(character, mode);
   const fruit = view.fruitId ? fruitsById.get(view.fruitId) : undefined;
   const org = mainOrganization(view);
+  const others = view.affiliations.map((a) => ({ key: organizationOf(a.name), former: a.former })).filter((a) => a.key !== org);
+  const also = [...new Set(others.filter((a) => !a.former).map((a) => a.key))];
   return {
     bounty: currentBounty(view),
     org,
     affiliation: org && translateAffiliation(org, locale),
+    also,
+    past: [...new Set(others.filter((a) => a.former && !also.includes(a.key)).map((a) => a.key))],
     sea: view.origin?.sea ?? null,
     fruitId: fruit && isPlayableFruit(fruit, mode) ? fruit.id : null,
   };
@@ -116,7 +124,8 @@ function toCard(character: Character, locale: Locale): CharacterCard {
   const anime = modeFacts(character, "anime", locale);
   const diff: Partial<ModeFacts> = {};
   for (const key of Object.keys(manga) as (keyof ModeFacts)[]) {
-    if (manga[key] !== anime[key]) Object.assign(diff, { [key]: anime[key] });
+    // Les listes se comparent par leur contenu
+    if (JSON.stringify(manga[key]) !== JSON.stringify(anime[key])) Object.assign(diff, { [key]: anime[key] });
   }
 
   const debut = character.debut!.chapter!;

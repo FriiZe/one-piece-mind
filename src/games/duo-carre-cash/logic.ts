@@ -53,6 +53,31 @@ export function labelForms(label: string): string[] {
   return short && short !== label ? [label, short] : [label];
 }
 
+/** Mots qui ne désignent rien à eux seuls, au début ou à la fin d'une réponse : « équipage des Kuja », « Kuja pirates », « les Kuja ». */
+const GENERIC_WORDS = new Set([
+  ...["equipage", "pirates", "pirate", "crew", "famille", "family", "royaume", "kingdom", "duche", "dukedom", "pays", "country", "flotte", "arc"],
+  ...["le", "la", "les", "l", "de", "des", "du", "d", "aux", "au", "the", "of"],
+]);
+
+/**
+ * Le cœur d'une réponse tapée : sans les mots génériques qui l'entourent, pour
+ * qu'« équipage des Kuja », « Kuja pirates » et « Kuja » reviennent au même.
+ * Les mots de l'intérieur restent (« chapeau de paille »).
+ */
+export function answerCore(text: string): string {
+  const words = normalizeText(text).split(" ").filter(Boolean);
+  let start = 0;
+  let end = words.length;
+  while (start < end && GENERIC_WORDS.has(words[start])) start++;
+  while (end > start && GENERIC_WORDS.has(words[end - 1])) end--;
+  return start < end ? words.slice(start, end).join(" ") : words.join(" ");
+}
+
+/** Graphies d'une organisation, d'une mer ou d'un arc acceptées en cash : le libellé, sa forme courte, son cœur. */
+function answerForms(label: string): string[] {
+  return [...new Set([...labelForms(label), answerCore(label)])];
+}
+
 const wordCounts = new WeakMap<ResolvedData, Map<string, number>>();
 
 /** Nombre de personnages dont le nom contient chaque mot : « Luffy » n'en désigne qu'un, « Monkey » plusieurs. */
@@ -93,18 +118,21 @@ export function generate(seed: number, difficulty: Difficulty, data: ResolvedDat
       return {
         ...question,
         duoIds: [question.answerId, decoy.id],
-        accepted: owner ? characterForms(owner, data) : labelForms(question.answerId),
+        accepted: owner ? characterForms(owner, data) : [question.answerId, ...(question.accepted ?? [])].flatMap(answerForms),
         rejected: question.options
           .filter((option) => option.id !== question.answerId)
-          .flatMap((option) => (owner ? [option.label] : labelForms(option.label))),
+          .flatMap((option) => (owner ? [option.label] : answerForms(option.label))),
       };
     });
 }
 
 export function isRight(question: DccKey, answer: DccAnswer): boolean {
-  return answer.kind === "cash"
-    ? matchesAnswer(answer.value, question.accepted, question.rejected)
-    : answer.value === question.answerId;
+  if (answer.kind !== "cash") return answer.value === question.answerId;
+  // La saisie telle quelle, puis sans les mots génériques qui l'entourent (« Kuja pirates » pour « Équipage des Kuja »)
+  return (
+    matchesAnswer(answer.value, question.accepted, question.rejected) ||
+    matchesAnswer(answerCore(answer.value), question.accepted, question.rejected)
+  );
 }
 
 export function pointsFor(question: DccKey, answer: DccAnswer): number {
