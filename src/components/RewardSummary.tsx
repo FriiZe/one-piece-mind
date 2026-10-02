@@ -118,7 +118,7 @@ export function RewardSummary({ view, data }: { view: RewardView | null; data: R
   return (
     <div className="mt-3 space-y-4" aria-live="polite">
       <div className="flex flex-wrap items-center gap-4 rounded-xl border-2 border-ink/15 bg-white/50 p-3">
-        <div className="min-w-0 flex-1">
+        <div className="min-w-0 flex-1 basis-52">
           {reward.daily === "paid" ? (
             <p className="text-xs font-extrabold tracking-[0.15em] uppercase">{t("Jeu du jour validé", "Daily game cleared")}</p>
           ) : (
@@ -167,8 +167,21 @@ export function RewardSummary({ view, data }: { view: RewardView | null; data: R
               ))}
             </ul>
           )}
-          {recruit && (
-            <p className="mt-1 font-semibold">
+          {status === "guest" && accountsEnabled && (
+            <p className="mt-1 text-sm">
+              <Link href="/profil" className="underline underline-offset-4">
+                {t("Créer un compte pour tout garder", "Create an account to keep everything")}
+              </Link>
+            </p>
+          )}
+        </div>
+        {/* La recrue a sa colonne : l'avis, puis son nom en entier (la carte le coupe) et ce qu'on peut en faire */}
+        {recruit && (
+          <div className="mx-auto flex w-40 shrink-0 flex-col items-center gap-2 text-center sm:w-44">
+            <div className="w-28">
+              <CharacterCard character={character} golden={recruit.golden} />
+            </div>
+            <p className="text-sm font-semibold">
               {recruit.duplicate
                 ? t(
                     `Nouvel avis de ${character?.name ?? "ce personnage"} : tu l'avais déjà.`,
@@ -180,31 +193,12 @@ export function RewardSummary({ view, data }: { view: RewardView | null; data: R
                   )}
               {recruit.golden && t(" Avis doré !", " Golden poster!")}
             </p>
-          )}
-          {(recruit || (status === "guest" && accountsEnabled)) && (
-            <p className="mt-1 text-sm">
-              {recruit &&
-                (recruit.duplicate ? (
-                  <Link href="/collection" className="underline underline-offset-4">
-                    {t("Voir ma collection", "View my collection")}
-                  </Link>
-                ) : (
-                  <Link href="/navire" className="underline underline-offset-4">
-                    {t("Lui confier un poste", "Give them a post")}
-                  </Link>
-                ))}
-              {recruit && status === "guest" && accountsEnabled && " · "}
-              {status === "guest" && accountsEnabled && (
-                <Link href="/profil" className="underline underline-offset-4">
-                  {t("Créer un compte pour tout garder", "Create an account to keep everything")}
-                </Link>
-              )}
-            </p>
-          )}
-        </div>
-        {recruit && (
-          <div className="w-24 shrink-0 sm:w-28">
-            <CharacterCard character={character} golden={recruit.golden} />
+            <Link
+              href={recruit.duplicate ? "/collection" : "/navire"}
+              className="inline-flex min-h-9 items-center rounded-lg bg-ink px-3 text-sm font-bold text-parchment transition-colors hover:bg-ink/85"
+            >
+              {recruit.duplicate ? t("Voir ma collection", "View my collection") : t("Lui confier un poste", "Give them a post")}
+            </Link>
           </div>
         )}
       </div>

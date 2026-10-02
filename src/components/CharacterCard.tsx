@@ -61,7 +61,10 @@ export function CharacterCard({
         )}
       </div>
       <div className="px-2 py-1.5">
-        <p className="truncate font-display text-lg leading-tight tracking-wide">{character?.name ?? "· · ·"}</p>
+        {/* Le nom est coupé quand la carte est étroite : le survol le donne en entier */}
+        <p className="truncate font-display text-lg leading-tight tracking-wide" title={character?.name}>
+          {character?.name ?? "· · ·"}
+        </p>
         {note && <p className="truncate text-xs font-semibold">{note}</p>}
       </div>
     </div>
