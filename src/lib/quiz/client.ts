@@ -19,7 +19,7 @@ export function useQuizList(sort: "recent" | "top", language: Locale | null): { 
       .then((response) => (response.ok ? (response.json() as Promise<QuizList>) : null))
       .catch(() => null)
       .then((list) => {
-        if (!cancelled) setLoaded({ list: list ?? { enabled: false, quizzes: [], mine: [], hidden: [], isAdmin: false } });
+        if (!cancelled) setLoaded({ list: list ?? { enabled: false, quizzes: [], mine: [], drafts: [], hidden: [], isAdmin: false } });
       });
     return () => {
       cancelled = true;

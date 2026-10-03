@@ -25,12 +25,23 @@ export type QuizSummary = {
   yourBest: { score: number; max: number } | null;
 };
 
+/** Un brouillon enregistré dans le compte du joueur. */
+export type QuizDraftSummary = {
+  id: string;
+  /** Vide tant que l'auteur n'a pas donné de titre. */
+  title: string;
+  questionCount: number;
+  updatedAt: number;
+};
+
 export type QuizList = {
   /** Faux sans base de données : les quiz de la communauté sont alors fermés. */
   enabled: boolean;
   quizzes: QuizSummary[];
   /** Quiz du joueur connecté, masqués compris. */
   mine: QuizSummary[];
+  /** Brouillons du joueur connecté, le plus récemment enregistré d'abord. */
+  drafts: QuizDraftSummary[];
   /** Quiz masqués, pour les administrateurs. */
   hidden: QuizSummary[];
   isAdmin: boolean;
@@ -46,7 +57,7 @@ export type QuizDetail = QuizSummary & {
   reported: boolean;
 };
 
-export type QuizError = "unavailable" | "invalid" | "limit" | "not-found" | "forbidden" | "own" | "already";
+export type QuizError = "unavailable" | "invalid" | "limit" | "drafts" | "not-found" | "forbidden" | "own" | "already";
 export type QuizResult<T = object> = ({ ok: true } & T) | { ok: false; error: QuizError };
 
 export type QuizPlayResult = {
@@ -67,6 +78,7 @@ export const QUIZ_ERRORS: Localized<Record<QuizError, string>> = {
     unavailable: "Connecte-toi pour faire ça.",
     invalid: "Ce quiz n'est pas valide. Vérifie les questions et réessaie.",
     limit: "Tu as atteint la limite pour aujourd'hui. Réessaie plus tard.",
+    drafts: "Tu as déjà trop de brouillons enregistrés : publie-en un ou supprime-en un.",
     "not-found": "Ce quiz n'existe pas, ou plus.",
     forbidden: "Tu n'as pas le droit de faire ça.",
     own: "C'est ton propre quiz.",
@@ -76,6 +88,7 @@ export const QUIZ_ERRORS: Localized<Record<QuizError, string>> = {
     unavailable: "Log in to do that.",
     invalid: "This quiz isn't valid. Check the questions and try again.",
     limit: "You've hit today's limit. Try again later.",
+    drafts: "You already have too many saved drafts: publish one or delete one.",
     "not-found": "This quiz doesn't exist, or no longer does.",
     forbidden: "You're not allowed to do that.",
     own: "That's your own quiz.",

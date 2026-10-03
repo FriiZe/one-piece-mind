@@ -31,7 +31,13 @@ import {
   COMMUNITY_BERRYS,
   draftProblems,
   draftToInput,
+  EMPTY_DRAFT,
+  isBlankDraft,
+  moveQuestion,
+  playableQuestions,
+  QUIZ_LIMITS,
   QUIZ_THUMBNAIL,
+  quizDraftSchema,
   quizInputSchema,
   REPORTS_TO_HIDE,
   scoreQuiz,
@@ -43,7 +49,19 @@ import { pendingCounts } from "@/lib/server/friends";
 import { DUMMY_HASH } from "@/lib/server/password";
 import { answerTrade, cancelTrade, friendCollection, proposeTrade, tradesOverview } from "@/lib/server/trades";
 import { buyBoosterFor, loadState, sellDuplicatesFor } from "@/lib/server/player";
-import { createQuiz, deleteQuiz, getQuiz, getQuizThumbnail, listQuizzes, reportQuiz, restoreQuiz, submitQuizPlay } from "@/lib/server/quizzes";
+import {
+  createQuiz,
+  deleteQuiz,
+  deleteQuizDraft,
+  getQuiz,
+  getQuizDraft,
+  getQuizThumbnail,
+  listQuizzes,
+  reportQuiz,
+  restoreQuiz,
+  saveQuizDraft,
+  submitQuizPlay,
+} from "@/lib/server/quizzes";
 
 const raw = buildGameData();
 const anime = resolveGameData(raw, "anime");
@@ -384,6 +402,32 @@ describe("règles des quiz de la communauté", () => {
     expect(withThumbnail(QUIZ_THUMBNAIL.prefix + "A".repeat(QUIZ_THUMBNAIL.maxBytes * 2))).toBe(false);
   });
 
+  it("déplace une question d'un rang, et sait lesquelles sont prêtes à être essayées", () => {
+    const prompts = (d: QuizDraft) => d.questions.map((question) => question.prompt.match(/\d+/)![0]).join("");
+    const base = draft();
+    expect(prompts(moveQuestion(base, 3, 1))).toBe("12354");
+    expect(prompts(moveQuestion(base, 3, -1))).toBe("12435");
+    // Aux deux bouts, rien ne bouge ; le brouillon de départ n'est jamais modifié
+    expect(moveQuestion(base, 0, -1)).toBe(base);
+    expect(moveQuestion(base, 4, 1)).toBe(base);
+    expect(prompts(base)).toBe("12345");
+
+    const unfinished = draft();
+    unfinished.questions[1].answer = "";
+    unfinished.questions[3].wrong[2] = unfinished.questions[3].answer;
+    expect(playableQuestions(unfinished, "fr").map((question) => question.answer)).toEqual(["Bonne 0", "Bonne 2", "Bonne 4"]);
+    expect(playableQuestions(EMPTY_DRAFT, "fr")).toEqual([]);
+
+    expect(isBlankDraft(EMPTY_DRAFT)).toBe(true);
+    expect(isBlankDraft({ ...EMPTY_DRAFT, language: "en" })).toBe(true);
+    expect(isBlankDraft({ ...EMPTY_DRAFT, title: " x " })).toBe(false);
+    expect(isBlankDraft({ ...EMPTY_DRAFT, thumbnail: JPEG })).toBe(false);
+    // Un brouillon s'enregistre inachevé, mais pas démesuré
+    expect(quizDraftSchema.safeParse(EMPTY_DRAFT).success).toBe(true);
+    expect(quizDraftSchema.safeParse({ ...EMPTY_DRAFT, title: "x".repeat(5000) }).success).toBe(false);
+    expect(quizDraftSchema.safeParse({ ...EMPTY_DRAFT, questions: [] }).success).toBe(false);
+  });
+
   it("dit en clair ce qui manque à un brouillon", () => {
     expect(draftProblems(draft(), "fr")).toEqual([]);
     expect(draftProblems(draft(2), "fr")).toContain("Il faut au moins 5 questions.");
@@ -516,6 +560,49 @@ describe.skipIf(!accountsEnabled)("quiz et doublons, en base", () => {
     // Supprimer le quiz emporte sa vignette
     expect(await deleteQuiz(author, created.id)).toEqual({ ok: true });
     expect(await db().quizThumbnail.count({ where: { quizId: created.id } })).toBe(0);
+  });
+
+  it("enregistre des brouillons dans le compte, visibles de leur seul auteur, et les retire à la publication", async () => {
+    const [author, player] = users;
+    const unfinished: QuizDraft = { ...draft(), title: "  En cours ", thumbnail: JPEG };
+    unfinished.questions[2].answer = "";
+    expect(await saveQuizDraft(author, null, { title: 3 })).toEqual({ ok: false, error: "invalid" });
+    const saved = await saveQuizDraft(author, null, unfinished);
+    if (!saved.ok) throw new Error(saved.error);
+
+    expect((await listQuizzes(author, "recent")).drafts).toMatchObject([{ id: saved.id, title: "En cours", questionCount: 5 }]);
+    expect((await listQuizzes(player, "recent")).drafts).toEqual([]);
+    expect((await listQuizzes(null, "recent")).drafts).toEqual([]);
+    expect(await getQuizDraft(player, saved.id)).toEqual({ ok: false, error: "not-found" });
+    expect(await deleteQuizDraft(player, saved.id)).toEqual({ ok: false, error: "not-found" });
+    // Un brouillon n'est pas un quiz : il n'apparaît dans aucune liste de quiz
+    const lists = await listQuizzes(author, "recent");
+    expect([...lists.quizzes, ...lists.mine].map((quiz) => quiz.id)).not.toContain(saved.id);
+
+    // Le réenregistrer le met à jour, sans en créer un second ; celui d'un autre joueur ne se met pas à jour
+    expect(await saveQuizDraft(author, saved.id, { ...unfinished, title: "Renommé" })).toEqual({ ok: true, id: saved.id });
+    const loaded = await getQuizDraft(author, saved.id);
+    expect(loaded).toMatchObject({ ok: true, draft: { title: "Renommé", thumbnail: JPEG } });
+    const stolen = await saveQuizDraft(player, saved.id, unfinished);
+    if (!stolen.ok) throw new Error(stolen.error);
+    expect(stolen.id).not.toBe(saved.id);
+    expect(await deleteQuizDraft(player, stolen.id)).toEqual({ ok: true });
+
+    // Pas plus de brouillons que la limite
+    const extra: string[] = [];
+    for (let i = 1; i < QUIZ_LIMITS.drafts; i++) {
+      const more = await saveQuizDraft(author, null, EMPTY_DRAFT);
+      if (!more.ok) throw new Error(more.error);
+      extra.push(more.id);
+    }
+    expect(await saveQuizDraft(author, null, EMPTY_DRAFT)).toEqual({ ok: false, error: "drafts" });
+    for (const id of extra) expect(await deleteQuizDraft(author, id)).toEqual({ ok: true });
+
+    // Publier depuis un brouillon le retire du compte
+    const published = await createQuiz(author, draftToInput(draft(), "fr"), saved.id);
+    if (!published.ok) throw new Error(published.error);
+    expect((await listQuizzes(author, "recent")).drafts).toEqual([]);
+    expect(await deleteQuiz(author, published.id)).toEqual({ ok: true });
   });
 
   it("paie la première partie d'un autre joueur, une seule fois, et jamais l'auteur", async () => {

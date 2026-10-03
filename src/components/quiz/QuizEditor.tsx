@@ -3,27 +3,38 @@
 import Image from "next/image";
 import Link from "@/components/Link";
 import { useRouter } from "next/navigation";
-import { useState, type ChangeEvent } from "react";
+import { useMemo, useState, type ChangeEvent } from "react";
 import { CheckIcon } from "@/components/GameBadge";
+import { DccFlow } from "@/games/duo-carre-cash/DccFlow";
 import { DCC_POINTS } from "@/games/duo-carre-cash/logic";
-import { Button, Panel } from "@/games/ui/primitives";
+import { randomSeed } from "@/games/engine/rng";
+import { Button, Panel, ResultPanel } from "@/games/ui/primitives";
 import { useStored } from "@/games/ui/storage";
 import { LoadingPanel } from "@/games/ui/WithGameData";
 import { LOCALE_NAMES, LOCALES } from "@/lib/i18n";
 import { useLocale, useLocalePath, useT } from "@/lib/i18n/client";
-import { createQuizAction } from "@/lib/player/quiz-actions";
+import { createQuizAction, saveQuizDraftAction } from "@/lib/player/quiz-actions";
 import { usePlayer } from "@/lib/player/PlayerProvider";
-import { draftProblems, draftToInput, QUIZ_LIMITS, REPORTS_TO_HIDE, type QuizDraft } from "@/lib/quiz/rules";
+import {
+  cleanText,
+  DRAFT_ID_KEY,
+  DRAFT_KEY,
+  draftProblems,
+  draftToInput,
+  EMPTY_DRAFT,
+  moveQuestion,
+  playableQuestions,
+  QUIZ_LIMITS,
+  REPORTS_TO_HIDE,
+  scoreQuiz,
+  toDccQuestions,
+  type QuizDraft,
+  type QuizQuestion,
+} from "@/lib/quiz/rules";
 import { toThumbnail } from "@/lib/quiz/thumbnail";
 import { QUIZ_ERRORS } from "@/lib/quiz/types";
 
 const emptyQuestion = () => ({ prompt: "", answer: "", wrong: ["", "", ""], alternatives: "" });
-const EMPTY_DRAFT: QuizDraft = {
-  title: "",
-  description: "",
-  spoiler: "anime",
-  questions: Array.from({ length: QUIZ_LIMITS.questions.min }, emptyQuestion),
-};
 
 const FIELD =
   "h-12 w-full rounded-[10px] border border-sea-600 bg-sea-900 px-3.5 text-foam placeholder:text-mist/60 focus:border-straw focus:outline-none";
@@ -33,14 +44,72 @@ const LABEL = "mb-1.5 block text-sm font-bold text-foam";
 const isComplete = (question: QuizDraft["questions"][number]) =>
   question.prompt.trim().length >= QUIZ_LIMITS.prompt.min && !!question.answer.trim() && question.wrong.every((wrong) => wrong.trim());
 
-/** Formulaire de création d'un quiz. Le brouillon est gardé dans le navigateur tant qu'il n'est pas publié. */
+/** Essai du quiz en cours d'écriture, tel qu'un joueur le verra. Rien n'est envoyé : ni partie, ni Berrys. */
+function TestRun({ title, questions, onClose }: { title: string; questions: QuizQuestion[]; onClose: () => void }) {
+  const t = useT();
+  const locale = useLocale();
+  const [seed, setSeed] = useState(randomSeed);
+  const [result, setResult] = useState<{ score: number; max: number } | null>(null);
+  const dcc = useMemo(() => toDccQuestions(title, questions, seed, locale), [title, questions, seed, locale]);
+
+  return (
+    <div className="space-y-4">
+      <Panel className="flex flex-wrap items-center justify-between gap-3">
+        <p className="text-mist">
+          <strong className="text-foam">{t("Essai du quiz.", "Trial run.")}</strong>{" "}
+          {t(
+            `Tu joues les ${questions.length} questions déjà prêtes, comme un joueur les verra. Rien n'est enregistré.`,
+            `You're playing the ${questions.length} questions that are ready, the way a player will see them. Nothing is saved.`,
+          )}
+        </p>
+        <Button variant="secondary" onClick={onClose}>
+          {t("Revenir au formulaire", "Back to the form")}
+        </Button>
+      </Panel>
+      {result ? (
+        <ResultPanel
+          title={`${result.score} / ${result.max}`}
+          actions={
+            <>
+              <Button
+                onClick={() => {
+                  setResult(null);
+                  setSeed(randomSeed());
+                }}
+              >
+                {t("Refaire l'essai", "Run it again")}
+              </Button>
+              <Button variant="secondary" onClick={onClose}>
+                {t("Revenir au formulaire", "Back to the form")}
+              </Button>
+            </>
+          }
+        >
+          <p>{t("Un essai ne rapporte rien et ne compte dans aucun score.", "A trial run earns nothing and doesn't count towards any score.")}</p>
+        </ResultPanel>
+      ) : (
+        <DccFlow key={seed} questions={dcc} onFinish={(_score, answers) => setResult(scoreQuiz(questions, answers))} />
+      )}
+    </div>
+  );
+}
+
+/**
+ * Formulaire de création d'un quiz. Ce qui s'écrit est gardé dans le navigateur ; « Enregistrer le
+ * brouillon » en dépose une copie dans le compte, reprenable depuis la liste des quiz.
+ */
 export function QuizEditor() {
   const t = useT();
   const locale = useLocale();
   const path = useLocalePath();
   const router = useRouter();
   const { status, accountsEnabled } = usePlayer();
-  const [draft, setDraft] = useStored<QuizDraft>("opm.quiz.draft", EMPTY_DRAFT);
+  const [draft, setDraft] = useStored<QuizDraft>(DRAFT_KEY, EMPTY_DRAFT);
+  // Le brouillon enregistré dans le compte auquel correspond ce formulaire : l'enregistrer de nouveau le met à jour
+  const [draftId, setDraftId] = useStored<string | null>(DRAFT_ID_KEY, null);
+  const [saving, setSaving] = useState<"idle" | "busy" | "saved">("idle");
+  const [testing, setTesting] = useState<QuizQuestion[] | null>(null);
+  const [restarting, setRestarting] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [checked, setChecked] = useState(false);
@@ -70,7 +139,7 @@ export function QuizEditor() {
 
   const problems = draftProblems(draft, locale);
   const setQuestion = (index: number, change: Partial<QuizDraft["questions"][number]>) =>
-    setDraft({ ...draft, questions: draft.questions.map((question, i) => (i === index ? { ...question, ...change } : question)) });
+    edit({ ...draft, questions: draft.questions.map((question, i) => (i === index ? { ...question, ...change } : question)) });
 
   // Une question retirée ailleurs peut laisser la sélection au-delà de la liste
   const index = Math.min(current, draft.questions.length - 1);
@@ -85,14 +154,42 @@ export function QuizEditor() {
     setError(null);
     if (problems.length) return;
     setBusy(true);
-    const result = await createQuizAction(draftToInput(draft, locale)).catch(() => ({ ok: false, error: "unavailable" }) as const);
+    const result = await createQuizAction(draftToInput(draft, locale), draftId).catch(() => ({ ok: false, error: "unavailable" }) as const);
     setBusy(false);
     if (!result.ok) {
       setError(QUIZ_ERRORS[locale][result.error]);
       return;
     }
     setDraft(EMPTY_DRAFT);
+    setDraftId(null);
     router.push(path(`/quiz/${result.id}`));
+  }
+
+  async function save() {
+    setError(null);
+    setSaving("busy");
+    const result = await saveQuizDraftAction(draftId, draft).catch(() => ({ ok: false, error: "unavailable" }) as const);
+    setSaving(result.ok ? "saved" : "idle");
+    if (result.ok) setDraftId(result.id);
+    else setError(QUIZ_ERRORS[locale][result.error]);
+  }
+
+  /** Toute modification du formulaire : le brouillon enregistré n'est plus à jour. */
+  function edit(next: QuizDraft) {
+    setSaving("idle");
+    setDraft(next);
+  }
+
+  function test() {
+    setError(null);
+    const questions = playableQuestions(draft, locale);
+    if (questions.length) setTesting(questions);
+    else setError(t("Aucune question n'est encore prête à être essayée.", "No question is ready to be tried yet."));
+  }
+
+  function move(step: -1 | 1) {
+    edit(moveQuestion(draft, index, step));
+    setCurrent(Math.min(draft.questions.length - 1, Math.max(0, index + step)));
   }
 
   async function pickThumbnail(event: ChangeEvent<HTMLInputElement>) {
@@ -102,18 +199,20 @@ export function QuizEditor() {
     if (!file) return;
     const thumbnail = await toThumbnail(file);
     setImageError(!thumbnail);
-    if (thumbnail) setDraft({ ...draft, thumbnail });
+    if (thumbnail) edit({ ...draft, thumbnail });
   }
 
   function addQuestion() {
-    setDraft({ ...draft, questions: [...draft.questions, emptyQuestion()] });
+    edit({ ...draft, questions: [...draft.questions, emptyQuestion()] });
     setCurrent(draft.questions.length);
   }
 
   function removeQuestion() {
-    setDraft({ ...draft, questions: draft.questions.filter((_, i) => i !== index) });
+    edit({ ...draft, questions: draft.questions.filter((_, i) => i !== index) });
     setCurrent(Math.max(0, index - 1));
   }
+
+  if (testing) return <TestRun title={cleanText(draft.title) || t("Quiz sans titre", "Untitled quiz")} questions={testing} onClose={() => setTesting(null)} />;
 
   return (
     <form
@@ -131,7 +230,7 @@ export function QuizEditor() {
               <input
                 type="text"
                 value={draft.title}
-                onChange={(event) => setDraft({ ...draft, title: event.target.value })}
+                onChange={(event) => edit({ ...draft, title: event.target.value })}
                 maxLength={QUIZ_LIMITS.title.max}
                 placeholder={t("Les sabres de Wano", "The swords of Wano")}
                 className={FIELD}
@@ -144,7 +243,7 @@ export function QuizEditor() {
               </span>
               <textarea
                 value={draft.description}
-                onChange={(event) => setDraft({ ...draft, description: event.target.value })}
+                onChange={(event) => edit({ ...draft, description: event.target.value })}
                 maxLength={QUIZ_LIMITS.description}
                 rows={2}
                 placeholder={t("De quoi parle ton quiz, et pour qui.", "What your quiz is about, and who it's for.")}
@@ -168,7 +267,7 @@ export function QuizEditor() {
                       name="spoiler"
                       value={value}
                       checked={draft.spoiler === value}
-                      onChange={() => setDraft({ ...draft, spoiler: value })}
+                      onChange={() => edit({ ...draft, spoiler: value })}
                       className="sr-only"
                     />
                     {value === "anime" ? t("l'anime", "the anime") : t("le manga", "the manga")}
@@ -202,7 +301,7 @@ export function QuizEditor() {
                       name="language"
                       value={value}
                       checked={language === value}
-                      onChange={() => setDraft({ ...draft, language: value })}
+                      onChange={() => edit({ ...draft, language: value })}
                       className="sr-only"
                     />
                     {LOCALE_NAMES[value]}
@@ -233,7 +332,7 @@ export function QuizEditor() {
                 {draft.thumbnail && (
                   <button
                     type="button"
-                    onClick={() => setDraft({ ...draft, thumbnail: null })}
+                    onClick={() => edit({ ...draft, thumbnail: null })}
                     className="min-h-11 cursor-pointer px-2 text-sm font-bold text-[#f5a88a] hover:underline"
                   >
                     {t("Retirer", "Remove")}
@@ -267,12 +366,12 @@ export function QuizEditor() {
                 const complete = isComplete(q);
                 const selected = i === index;
                 return (
-                  <li key={i}>
+                  <li key={i} className="flex items-center gap-1">
                     <button
                       type="button"
                       aria-pressed={selected}
                       onClick={() => setCurrent(i)}
-                      className={`flex min-h-11 w-full cursor-pointer items-center gap-2.5 rounded-[10px] px-2.5 text-left text-sm transition-colors ${
+                      className={`flex min-h-11 min-w-0 flex-1 cursor-pointer items-center gap-2.5 rounded-[10px] px-2.5 text-left text-sm transition-colors ${
                         selected ? "border-2 border-straw bg-sea-800 font-extrabold text-foam" : "border-2 border-transparent text-foam hover:bg-sea-800"
                       }`}
                     >
@@ -288,6 +387,26 @@ export function QuizEditor() {
                         </span>
                       )}
                     </button>
+                    {/* La question choisie se déplace d'un rang : plus besoin de tout recopier pour changer l'ordre */}
+                    {selected &&
+                      ([-1, 1] as const).map((step) => (
+                        <button
+                          key={step}
+                          type="button"
+                          onClick={() => move(step)}
+                          disabled={step === -1 ? i === 0 : i === draft.questions.length - 1}
+                          aria-label={
+                            step === -1
+                              ? t(`Monter la question ${i + 1}`, `Move question ${i + 1} up`)
+                              : t(`Descendre la question ${i + 1}`, `Move question ${i + 1} down`)
+                          }
+                          className="flex size-9 shrink-0 cursor-pointer items-center justify-center rounded-lg border border-sea-600 text-foam transition-colors hover:border-straw disabled:cursor-not-allowed disabled:opacity-35"
+                        >
+                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" className="size-4">
+                            <path d={step === -1 ? "M12 19V5M6 11l6-6 6 6" : "M12 5v14M6 13l6 6 6-6"} />
+                          </svg>
+                        </button>
+                      ))}
                   </li>
                 );
               })}
@@ -436,15 +555,74 @@ export function QuizEditor() {
             <div className={`h-full ${ready >= min ? "bg-emerald-300" : "bg-straw"}`} style={{ width: `${Math.min(1, ready / min) * 100}%` }} />
           </div>
         </div>
-        <p className="min-w-0 flex-1 text-sm text-mist">
+        <p className="min-w-0 flex-1 basis-64 text-sm text-mist">
           {t(
-            `Visible de tous, sous ton pseudo. Pas d'insultes, pas d'image déplacée, pas de spoilers au-delà de ce que tu as indiqué : un quiz signalé par ${REPORTS_TO_HIDE} joueurs est masqué. Ton brouillon est gardé dans ce navigateur.`,
-            `Visible to everyone, under your username. No insults, no inappropriate image, and no spoilers beyond what you've indicated: a quiz reported by ${REPORTS_TO_HIDE} players gets hidden. Your draft is kept in this browser.`,
+            `Une fois publié : visible de tous, sous ton pseudo. Pas d'insultes, pas d'image déplacée, pas de spoilers au-delà de ce que tu as indiqué : un quiz signalé par ${REPORTS_TO_HIDE} joueurs est masqué.`,
+            `Once published: visible to everyone, under your username. No insults, no inappropriate image, and no spoilers beyond what you've indicated: a quiz reported by ${REPORTS_TO_HIDE} players gets hidden.`,
           )}
         </p>
-        <Button type="submit" disabled={busy} className="min-h-12 px-6">
-          {busy ? t("Publication…", "Publishing…") : t("Publier le quiz", "Publish the quiz")}
-        </Button>
+        <div className="flex flex-wrap items-center gap-2">
+          <Button variant="secondary" onClick={test} className="min-h-12">
+            {t("Tester", "Try it")}
+          </Button>
+          <Button variant="secondary" onClick={save} disabled={saving === "busy"} className="min-h-12">
+            {saving === "busy" ? t("Enregistrement…", "Saving…") : t("Enregistrer le brouillon", "Save the draft")}
+          </Button>
+          <Button type="submit" disabled={busy} className="min-h-12 px-6">
+            {busy ? t("Publication…", "Publishing…") : t("Publier le quiz", "Publish the quiz")}
+          </Button>
+        </div>
+        <p className="flex w-full flex-wrap items-center gap-x-4 gap-y-1 text-[13px] text-mist" aria-live="polite">
+          <span className={saving === "saved" ? "font-bold text-emerald-300" : ""}>
+            {saving === "saved"
+              ? t(
+                  "Brouillon enregistré dans ton compte : tu le retrouveras dans « Mes brouillons », sur la page des quiz.",
+                  "Draft saved to your account: you'll find it under “My drafts”, on the quizzes page.",
+                )
+              : draftId
+                ? t(
+                    "Ce quiz vient d'un brouillon de ton compte. Ce que tu écris est gardé dans ce navigateur ; enregistre pour mettre le brouillon à jour.",
+                    "This quiz comes from a draft in your account. What you write is kept in this browser; save to update the draft.",
+                  )
+                : t(
+                    "Ce que tu écris est gardé dans ce navigateur. Enregistre le brouillon pour le retrouver dans ton compte, sur un autre appareil.",
+                    "What you write is kept in this browser. Save the draft to find it in your account, on another device.",
+                  )}
+          </span>
+          {draftId &&
+            (restarting ? (
+              <>
+                <button
+                  type="button"
+                  className="cursor-pointer font-bold text-[#f5a88a] underline underline-offset-4"
+                  onClick={() => {
+                    setDraft(EMPTY_DRAFT);
+                    setDraftId(null);
+                    setSaving("idle");
+                    setRestarting(false);
+                    setCurrent(0);
+                  }}
+                >
+                  {t("Oui, vider le formulaire", "Yes, clear the form")}
+                </button>
+                <button type="button" className="cursor-pointer underline underline-offset-4 hover:text-foam" onClick={() => setRestarting(false)}>
+                  {t("Annuler", "Cancel")}
+                </button>
+              </>
+            ) : (
+              <button type="button" className="cursor-pointer underline underline-offset-4 hover:text-foam" onClick={() => setRestarting(true)}>
+                {t("Commencer un autre quiz", "Start another quiz")}
+              </button>
+            ))}
+          {restarting && (
+            <span>
+              {t(
+                "Le brouillon reste dans ton compte tel qu'il a été enregistré la dernière fois.",
+                "The draft stays in your account as it was last saved.",
+              )}
+            </span>
+          )}
+        </p>
       </div>
     </form>
   );

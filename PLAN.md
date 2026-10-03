@@ -234,6 +234,7 @@ Le lot C peut s'intercaler plus tôt, jeu par jeu, selon l'envie.
   - Berrys : jusqu'à 150 ฿ la première fois qu'on termine le quiz d'un autre joueur, dix quiz récompensés par jour au plus, dans le plafond journalier. Limite assumée : deux comptes suffisent à contourner la règle « pas son propre quiz », d'où la petite somme.
   - Les quiz ne sont pas proposés aux moteurs de recherche : leur contenu n'est pas relu avant publication.
 - Reste à faire : modifier un quiz déjà publié, jouer un quiz de la communauté en salon multijoueur.
+- Écriture d'un quiz : « Enregistrer le brouillon » en dépose une copie dans le compte (dix au plus, table `QuizDraft`), reprenable depuis « Mes brouillons » sur n'importe quel appareil et retirée à la publication ; ce qui s'écrit reste aussi gardé dans le navigateur. Deux flèches déplacent la question choisie d'un rang. « Tester » fait jouer les questions déjà prêtes, sans rien enregistrer.
 - Vignette et langue d'un quiz : à la création, l'auteur peut joindre une image et indique si le quiz est rédigé en français ou en anglais. La liste affiche la vignette et une étiquette de langue, et se filtre par langue.
   - L'image est recadrée en 16:9 et réduite à 640 × 360 dans le navigateur, puis gardée en base (table `QuizThumbnail`) et servie par `/api/quizzes/<id>/thumbnail`. Vercel Blob n'est pas utilisé.
   - Les quiz publiés avant ce champ sont marqués en français. Une vignette n'est pas relue avant publication : comme le texte, elle relève des signalements.

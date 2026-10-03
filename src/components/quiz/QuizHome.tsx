@@ -2,20 +2,22 @@
 
 import Image from "next/image";
 import Link from "@/components/Link";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { CheckIcon } from "@/components/GameBadge";
 import { DCC_POINTS } from "@/games/duo-carre-cash/logic";
 import { formatNumber } from "@/games/engine/text";
 import { Button, Panel } from "@/games/ui/primitives";
-import { useStored } from "@/games/ui/storage";
+import { readStored, useStored, writeStored } from "@/games/ui/storage";
 import { LoadingPanel } from "@/games/ui/WithGameData";
+import { formatAgo } from "@/lib/admin/format";
 import { LOCALE_NAMES, LOCALES, type Locale } from "@/lib/i18n";
-import { useLocale, useT } from "@/lib/i18n/client";
-import { deleteQuizAction, restoreQuizAction } from "@/lib/player/quiz-actions";
+import { useLocale, useLocalePath, useT } from "@/lib/i18n/client";
+import { deleteQuizAction, deleteQuizDraftAction, getQuizDraftAction, restoreQuizAction } from "@/lib/player/quiz-actions";
 import { usePlayer } from "@/lib/player/PlayerProvider";
 import { useQuizList } from "@/lib/quiz/client";
-import { COMMUNITY_BERRYS, QUIZ_LIMITS, REPORTS_TO_HIDE } from "@/lib/quiz/rules";
-import { QUIZ_ERRORS, type QuizSummary } from "@/lib/quiz/types";
+import { COMMUNITY_BERRYS, DRAFT_ID_KEY, DRAFT_KEY, EMPTY_DRAFT, isBlankDraft, QUIZ_LIMITS, REPORTS_TO_HIDE, type QuizDraft } from "@/lib/quiz/rules";
+import { QUIZ_ERRORS, type QuizDraftSummary, type QuizResult, type QuizSummary } from "@/lib/quiz/types";
 
 function QuizCard({ quiz, mine = false, children }: { quiz: QuizSummary; mine?: boolean; children?: React.ReactNode }) {
   const t = useT();
@@ -101,8 +103,92 @@ function QuizCard({ quiz, mine = false, children }: { quiz: QuizSummary; mine?: 
   );
 }
 
+/**
+ * Un brouillon du compte. Le reprendre le charge dans le formulaire, à la place de ce qui s'y écrivait :
+ * si un autre quiz y est en cours, on le dit avant de le remplacer.
+ */
+function DraftCard({ draft, onDone }: { draft: QuizDraftSummary; onDone: (error: string | null) => void }) {
+  const t = useT();
+  const locale = useLocale();
+  const path = useLocalePath();
+  const router = useRouter();
+  const [replacing, setReplacing] = useState(false);
+  const [busy, setBusy] = useState(false);
+
+  async function resume(force: boolean) {
+    const current = readStored<QuizDraft>(DRAFT_KEY, EMPTY_DRAFT);
+    const other = readStored<string | null>(DRAFT_ID_KEY, null) !== draft.id && !isBlankDraft(current);
+    if (other && !force) {
+      setReplacing(true);
+      return;
+    }
+    setBusy(true);
+    const result = await getQuizDraftAction(draft.id).catch(() => ({ ok: false, error: "unavailable" }) as const);
+    setBusy(false);
+    if (!result.ok) {
+      onDone(QUIZ_ERRORS[locale][result.error]);
+      return;
+    }
+    writeStored(DRAFT_KEY, result.draft);
+    writeStored(DRAFT_ID_KEY, draft.id);
+    router.push(path("/quiz/creer"));
+  }
+
+  return (
+    <li className="flex flex-col gap-2.5 rounded-2xl border border-dashed border-sea-600 p-4">
+      <div className="flex items-baseline justify-between gap-3">
+        <h3 className={`text-lg leading-snug font-extrabold ${draft.title ? "text-foam" : "text-mist"}`}>
+          {draft.title || t("Quiz sans titre", "Untitled quiz")}
+        </h3>
+        <span className="shrink-0 rounded-full bg-sea-700 px-2.5 py-0.5 text-[13px] font-extrabold text-mist">{t("Brouillon", "Draft")}</span>
+      </div>
+      <p className="text-[13px] text-mist">
+        {draft.questionCount} question{draft.questionCount > 1 ? "s" : ""} · {t("enregistré", "saved")}{" "}
+        {formatAgo(new Date(draft.updatedAt), locale)}
+      </p>
+      {replacing && (
+        <p className="text-sm font-semibold text-straw">
+          {t(
+            "Un autre quiz est en cours d'écriture dans ce navigateur : le reprendre ici le remplacera.",
+            "Another quiz is being written in this browser: resuming this one will replace it.",
+          )}
+        </p>
+      )}
+      <div className="mt-auto flex flex-wrap items-center gap-2">
+        <Button onClick={() => resume(replacing)} disabled={busy} className="min-h-11 py-0 text-sm">
+          {replacing ? t("Remplacer et reprendre", "Replace and resume") : t("Reprendre", "Resume")}
+        </Button>
+        {replacing ? (
+          <Button variant="ghost" onClick={() => setReplacing(false)}>
+            {t("Annuler", "Cancel")}
+          </Button>
+        ) : (
+          <DeleteButton
+            id={draft.id}
+            action={deleteQuizDraftAction}
+            onDone={(error) => {
+              // Le formulaire ne doit plus se croire lié à un brouillon qui n'existe plus
+              if (!error && readStored<string | null>(DRAFT_ID_KEY, null) === draft.id) writeStored(DRAFT_ID_KEY, null);
+              onDone(error);
+            }}
+          />
+        )}
+      </div>
+    </li>
+  );
+}
+
 /** Bouton de suppression en deux temps : la suppression est définitive. */
-function DeleteButton({ id, onDone }: { id: string; onDone: (error: string | null) => void }) {
+function DeleteButton({
+  id,
+  onDone,
+  action = deleteQuizAction,
+}: {
+  id: string;
+  onDone: (error: string | null) => void;
+  /** Ce qui supprime : un quiz par défaut, ou un brouillon. */
+  action?: (id: string) => Promise<QuizResult>;
+}) {
   const t = useT();
   const locale = useLocale();
   const [confirming, setConfirming] = useState(false);
@@ -110,7 +196,7 @@ function DeleteButton({ id, onDone }: { id: string; onDone: (error: string | nul
 
   async function remove() {
     setBusy(true);
-    const result = await deleteQuizAction(id).catch(() => ({ ok: false, error: "unavailable" }) as const);
+    const result = await action(id).catch(() => ({ ok: false, error: "unavailable" }) as const);
     setBusy(false);
     setConfirming(false);
     onDone(result.ok ? null : QUIZ_ERRORS[locale][result.error]);
@@ -274,9 +360,12 @@ export function QuizHome() {
               </button>
             ))}
           </div>
-          {list.mine.length > 0 && (
-            <a href="#mes-quiz" className="flex min-h-11 items-center rounded-full border border-sea-700 px-4 text-sm font-bold text-mist hover:text-foam">
-              {t("Les miens", "Mine")} · {list.mine.length}
+          {list.mine.length + list.drafts.length > 0 && (
+            <a
+              href={list.drafts.length > 0 ? "#mes-brouillons" : "#mes-quiz"}
+              className="flex min-h-11 items-center rounded-full border border-sea-700 px-4 text-sm font-bold text-mist hover:text-foam"
+            >
+              {t("Les miens", "Mine")} · {list.mine.length + list.drafts.length}
             </a>
           )}
           {create}
@@ -322,6 +411,25 @@ export function QuizHome() {
           </Panel>
         )}
       </section>
+
+      {list.drafts.length > 0 && (
+        <section aria-labelledby="mes-brouillons" className="scroll-mt-6 space-y-3">
+          <h2 id="mes-brouillons" className="text-xl font-extrabold text-foam">
+            {t("Mes brouillons", "My drafts")}{" "}
+            <span className="text-base font-semibold text-mist">
+              · {list.drafts.length} {t("sur", "of")} {QUIZ_LIMITS.drafts}
+            </span>
+          </h2>
+          <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {list.drafts.map((draft) => (
+              <DraftCard key={draft.id} draft={draft} onDone={done} />
+            ))}
+          </ul>
+          <p className="text-sm text-mist">
+            {t("Toi seul vois tes brouillons. Ils ne sont pas publiés.", "Only you can see your drafts. They aren't published.")}
+          </p>
+        </section>
+      )}
 
       {list.mine.length > 0 && (
         <section aria-labelledby="mes-quiz" className="scroll-mt-6 space-y-3">

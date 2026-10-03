@@ -58,6 +58,7 @@ model User {
   invitesReceived  RoomInvite[] @relation("inviteTo")
 
   quizzes     Quiz[]
+  quizDrafts  QuizDraft[]
   quizReports QuizReport[]
   quizPlays   QuizPlay[]
 
@@ -285,6 +286,20 @@ model Quiz {
 
   @@index([status, createdAt])
   @@index([authorId])
+}
+
+/// Brouillon de quiz, visible de son seul auteur. Ce n'est pas encore un quiz : rien n'y est exigé.
+model QuizDraft {
+  id        String   @id @default(cuid())
+  authorId  String
+  author    User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  /// Le formulaire tel qu'il a été enregistré ({ title, description, spoiler, language, thumbnail, questions }) :
+  /// borné à l'écriture, validé pour de bon à la publication seulement.
+  data      Json
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([authorId, updatedAt])
 }
 
 /// Vignette d'un quiz, à part : la liste des quiz ne charge pas les images.

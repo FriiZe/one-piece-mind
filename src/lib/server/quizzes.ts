@@ -7,13 +7,15 @@ import {
   QUIZ_LIMITS,
   QUIZ_THUMBNAIL,
   quizAnswersSchema,
+  quizDraftSchema,
   quizInputSchema,
   quizQuestionsSchema,
   REPORTS_TO_HIDE,
   scoreQuiz,
+  type QuizDraft,
   type QuizQuestion,
 } from "@/lib/quiz/rules";
-import type { QuizDetail, QuizList, QuizPlayResult, QuizResult, QuizSummary } from "@/lib/quiz/types";
+import type { QuizDetail, QuizDraftSummary, QuizList, QuizPlayResult, QuizResult, QuizSummary } from "@/lib/quiz/types";
 import type { Locale } from "@/lib/i18n";
 import type { SpoilerMode } from "@/lib/spoilers";
 import { Prisma } from "@/generated/prisma/client";
@@ -86,7 +88,7 @@ async function bestScores(userId: string | undefined, quizIds: string[]) {
  */
 export async function listQuizzes(user: SessionUser | null, sort: "recent" | "top", language: Locale | null = null): Promise<QuizList> {
   const admin = isAdmin(user);
-  const [publicRows, mineRows, hiddenRows] = await Promise.all([
+  const [publicRows, mineRows, hiddenRows, drafts] = await Promise.all([
     db().quiz.findMany({
       where: { status: "public", ...(language ? { language } : {}) },
       orderBy: sort === "top" ? [{ plays: "desc" }, { createdAt: "desc" }] : { createdAt: "desc" },
@@ -95,12 +97,14 @@ export async function listQuizzes(user: SessionUser | null, sort: "recent" | "to
     }),
     user ? db().quiz.findMany({ where: { authorId: user.id }, orderBy: { createdAt: "desc" }, select: summarySelect }) : [],
     admin ? db().quiz.findMany({ where: { status: "hidden" }, orderBy: { createdAt: "desc" }, take: LIST_SIZE, select: summarySelect }) : [],
+    user ? listQuizDrafts(user) : [],
   ]);
   const best = await bestScores(user?.id, [...publicRows, ...mineRows, ...hiddenRows].map((row) => row.id));
   return {
     enabled: true,
     quizzes: publicRows.map((row) => toSummary(row, best, admin)),
     mine: mineRows.map((row) => toSummary(row, best, true)),
+    drafts,
     hidden: hiddenRows.map((row) => toSummary(row, best, true)),
     isAdmin: admin,
   };
@@ -132,7 +136,50 @@ export async function getQuiz(id: string, user: SessionUser | null): Promise<Qui
   };
 }
 
-export async function createQuiz(user: SessionUser, input: unknown): Promise<QuizResult<{ id: string }>> {
+/** Brouillons d'un joueur, le plus récemment enregistré d'abord. */
+async function listQuizDrafts(user: SessionUser): Promise<QuizDraftSummary[]> {
+  const rows = await db().quizDraft.findMany({ where: { authorId: user.id }, orderBy: { updatedAt: "desc" }, select: { id: true, data: true, updatedAt: true } });
+  return rows.flatMap((row) => {
+    // Colonne JSON : on ne se fie à son contenu qu'après validation
+    const draft = quizDraftSchema.safeParse(row.data);
+    return draft.success
+      ? [{ id: row.id, title: draft.data.title.trim(), questionCount: draft.data.questions.length, updatedAt: row.updatedAt.getTime() }]
+      : [];
+  });
+}
+
+/** Un brouillon du joueur, pour le reprendre dans le formulaire. */
+export async function getQuizDraft(user: SessionUser, id: string): Promise<QuizResult<{ draft: QuizDraft }>> {
+  const row = await db().quizDraft.findFirst({ where: { id, authorId: user.id }, select: { data: true } });
+  const draft = row && quizDraftSchema.safeParse(row.data);
+  return draft?.success ? { ok: true, draft: draft.data } : { ok: false, error: "not-found" };
+}
+
+/**
+ * Enregistre le formulaire comme brouillon dans le compte du joueur : un nouveau, ou la mise à jour
+ * de `id`. Un brouillon supprimé entre-temps est recréé plutôt que perdu.
+ */
+export async function saveQuizDraft(user: SessionUser, id: string | null, input: unknown): Promise<QuizResult<{ id: string }>> {
+  const parsed = quizDraftSchema.safeParse(input);
+  if (!parsed.success) return { ok: false, error: "invalid" };
+  if (parsed.data.thumbnail && !decodeThumbnail(parsed.data.thumbnail)) return { ok: false, error: "invalid" };
+
+  if (id) {
+    const updated = await db().quizDraft.updateMany({ where: { id, authorId: user.id }, data: { data: parsed.data } });
+    if (updated.count > 0) return { ok: true, id };
+  }
+  if ((await db().quizDraft.count({ where: { authorId: user.id } })) >= QUIZ_LIMITS.drafts) return { ok: false, error: "drafts" };
+  const draft = await db().quizDraft.create({ data: { authorId: user.id, data: parsed.data }, select: { id: true } });
+  return { ok: true, id: draft.id };
+}
+
+export async function deleteQuizDraft(user: SessionUser, id: string): Promise<QuizResult> {
+  const deleted = await db().quizDraft.deleteMany({ where: { id, authorId: user.id } });
+  return deleted.count > 0 ? { ok: true } : { ok: false, error: "not-found" };
+}
+
+/** Publie un quiz. `draftId` : le brouillon dont il vient, supprimé une fois le quiz en ligne. */
+export async function createQuiz(user: SessionUser, input: unknown, draftId: string | null = null): Promise<QuizResult<{ id: string }>> {
   const parsed = quizInputSchema.safeParse(input);
   if (!parsed.success) return { ok: false, error: "invalid" };
 
@@ -150,6 +197,7 @@ export async function createQuiz(user: SessionUser, input: unknown): Promise<Qui
     data: { authorId: user.id, ...fields, ...(image ? { thumbnail: { create: { data: image } } } : {}) },
     select: { id: true },
   });
+  if (draftId) await db().quizDraft.deleteMany({ where: { id: draftId, authorId: user.id } });
   return { ok: true, id: quiz.id };
 }
 

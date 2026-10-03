@@ -20,6 +20,8 @@ export const QUIZ_LIMITS = {
   perAuthor: 20,
   /** Quiz qu'un joueur peut créer par jour. */
   perDay: 5,
+  /** Brouillons qu'un joueur peut garder dans son compte. */
+  drafts: 10,
 };
 
 /**
@@ -86,6 +88,31 @@ export const quizInputSchema = z.object({
 });
 export type QuizInput = z.infer<typeof quizInputSchema>;
 
+const thumbnailSchema = quizInputSchema.shape.thumbnail;
+
+/**
+ * Brouillon enregistré dans un compte : le formulaire tel quel, inachevé ou non. Rien n'y est exigé,
+ * mais tout y est borné, avec de la marge sur les limites d'un quiz publié.
+ */
+export const quizDraftSchema = z.object({
+  title: z.string().max(QUIZ_LIMITS.title.max * 4),
+  description: z.string().max(QUIZ_LIMITS.description * 4),
+  spoiler: z.enum(["anime", "manga"]),
+  language: z.enum(LOCALES).optional(),
+  thumbnail: thumbnailSchema.optional(),
+  questions: z
+    .array(
+      z.object({
+        prompt: z.string().max(QUIZ_LIMITS.prompt.max * 4),
+        answer: z.string().max(QUIZ_LIMITS.answer * 4),
+        wrong: z.array(z.string().max(QUIZ_LIMITS.answer * 4)).length(3),
+        alternatives: z.string().max(QUIZ_LIMITS.answer * QUIZ_LIMITS.alternatives * 4),
+      }),
+    )
+    .min(1)
+    .max(QUIZ_LIMITS.questions.max),
+});
+
 export const quizAnswersSchema = z
   .array(z.object({ kind: z.enum(DCC_KINDS), value: z.string().max(120) }))
   .max(QUIZ_LIMITS.questions.max);
@@ -101,6 +128,27 @@ export type QuizDraft = {
   thumbnail?: string | null;
   questions: { prompt: string; answer: string; wrong: string[]; alternatives: string }[];
 };
+
+/**
+ * Le brouillon en cours d'écriture est gardé dans le navigateur sous `DRAFT_KEY` ; `DRAFT_ID_KEY`
+ * retient le brouillon enregistré dans le compte auquel il correspond, s'il y en a un.
+ */
+export const DRAFT_KEY = "opm.quiz.draft";
+export const DRAFT_ID_KEY = "opm.quiz.draft.id";
+
+const emptyQuestion = (): QuizDraft["questions"][number] => ({ prompt: "", answer: "", wrong: ["", "", ""], alternatives: "" });
+export const EMPTY_DRAFT: QuizDraft = {
+  title: "",
+  description: "",
+  spoiler: "anime",
+  questions: Array.from({ length: QUIZ_LIMITS.questions.min }, emptyQuestion),
+};
+
+/** Rien n'a encore été écrit dans ce brouillon : le remplacer ne fait rien perdre. */
+export function isBlankDraft(draft: QuizDraft): boolean {
+  const texts = [draft.title, draft.description, ...draft.questions.flatMap((q) => [q.prompt, q.answer, ...q.wrong, q.alternatives])];
+  return !draft.thumbnail && texts.every((text) => !text.trim());
+}
 
 /** `locale` : langue du site, retenue quand le brouillon n'en précise pas. */
 export function draftToInput(draft: QuizDraft, locale: Locale) {
@@ -120,6 +168,23 @@ export function draftToInput(draft: QuizDraft, locale: Locale) {
         .filter(Boolean),
     })),
   };
+}
+
+/** Le brouillon, une question déplacée d'un rang vers le haut (`-1`) ou vers le bas (`1`). */
+export function moveQuestion(draft: QuizDraft, index: number, step: -1 | 1): QuizDraft {
+  const target = index + step;
+  if (index < 0 || index >= draft.questions.length || target < 0 || target >= draft.questions.length) return draft;
+  const questions = [...draft.questions];
+  [questions[index], questions[target]] = [questions[target], questions[index]];
+  return { ...draft, questions };
+}
+
+/** Les questions du brouillon qui sont déjà valables : celles qu'on peut essayer avant de publier. */
+export function playableQuestions(draft: QuizDraft, locale: Locale): QuizQuestion[] {
+  return draftToInput(draft, locale).questions.flatMap((question) => {
+    const parsed = quizQuestionSchema.safeParse(question);
+    return parsed.success ? [parsed.data] : [];
+  });
 }
 
 /** Ce qui empêche de publier le brouillon, en clair ; vide s'il est prêt. */

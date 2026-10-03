@@ -48,6 +48,11 @@ function read<T>(key: string, fallback: T): T {
   return value;
 }
 
+/** Lecture ponctuelle, hors rendu : dans un gestionnaire d'événement, par exemple. */
+export function readStored<T>(key: string, fallback: T): T {
+  return read(key, fallback);
+}
+
 export function writeStored<T>(key: string, value: T): void {
   const raw = JSON.stringify(value);
   try {

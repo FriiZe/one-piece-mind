@@ -4,7 +4,7 @@ import { accountsEnabled } from "@/lib/server/db";
 import { listQuizzes } from "@/lib/server/quizzes";
 import { currentUser } from "@/lib/server/session";
 
-const CLOSED: QuizList = { enabled: false, quizzes: [], mine: [], hidden: [], isAdmin: false };
+const CLOSED: QuizList = { enabled: false, quizzes: [], mine: [], drafts: [], hidden: [], isAdmin: false };
 
 /**
  * Quiz de la communauté. `?sort=top` : les plus joués d'abord, sinon les plus récents.
