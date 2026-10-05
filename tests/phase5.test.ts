@@ -52,6 +52,7 @@ import {
   START_RATING,
 } from "@/lib/ranked/rules";
 import { accountsEnabled, db } from "@/lib/server/db";
+import { establish } from "./established";
 import { pendingCounts } from "@/lib/server/friends";
 import { acknowledgeSales, buyListing, cancelListing, createListing, marketOverview, type MarketFilters } from "@/lib/server/market";
 import { DUMMY_HASH } from "@/lib/server/password";
@@ -294,6 +295,8 @@ describe.skipIf(!accountsEnabled)("phase 5, en base", () => {
       const username = `${name}_${stamp}`;
       users.push(await db().user.create({ data: { username, usernameKey: username, passwordHash: DUMMY_HASH }, select: { id: true, username: true } }));
     }
+    // Le marché n'est ouvert qu'aux comptes qui ont joué plusieurs jours
+    for (const user of users) await establish(user.id);
     // Aucun autre joueur ne doit attendre dans la file pendant ces tests
     await db().rankedQueue.deleteMany({});
   });

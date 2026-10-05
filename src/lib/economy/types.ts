@@ -52,6 +52,9 @@ export type WeekProgress = ChallengeProgress & {
   key: string;
 };
 
+/** Un équipage enregistré : une composition qu'on remet en place d'un geste. */
+export type SavedCrew = { id: string; name: string; crew: Partial<Record<PostId, string>> };
+
 export type PlayerState = {
   berrys: number;
   /** Total gagné depuis le début : c'est lui qui fixe la prime du joueur. */
@@ -59,6 +62,8 @@ export type PlayerState = {
   games: number;
   collection: Record<string, CollectionEntry>;
   crew: Partial<Record<PostId, string>>;
+  /** Équipages enregistrés, du plus ancien au plus récent (voir crew.ts). */
+  savedCrews: SavedCrew[];
   /**
    * Gains du jour (date de Paris), pour le plafond journalier, jeux du jour
    * déjà validés, et avancement des défis quotidiens (voir dailies.ts).
@@ -77,11 +82,38 @@ export const EMPTY_PLAYER: PlayerState = {
   games: 0,
   collection: {},
   crew: {},
+  savedCrews: [],
   day: { key: "", earned: 0, done: [], challenges: { progress: [], done: [] } },
   stats: {},
   week: { key: "", progress: [], done: [] },
   cosmetics: NO_COSMETICS,
 };
+
+/** Équipages qu'un joueur peut garder de côté, et longueur de leur nom. */
+export const SAVED_CREWS_MAX = 5;
+export const CREW_NAME_MAX = 24;
+
+export const cleanCrewName = (name: string) => name.replace(/\s+/g, " ").trim();
+
+/** Ne garde d'une liste d'équipages enregistrés que ce qui en a la forme : elle vient d'une colonne JSON ou d'un navigateur. */
+export function sanitizeSavedCrews(input: unknown): SavedCrew[] {
+  if (!Array.isArray(input)) return [];
+  const crews: SavedCrew[] = [];
+  for (const item of input) {
+    if (!item || typeof item !== "object") continue;
+    const { id, name, crew } = item as { id?: unknown; name?: unknown; crew?: unknown };
+    if (typeof id !== "string" || !id || id.length > 80 || typeof name !== "string" || !crew || typeof crew !== "object") continue;
+    const label = cleanCrewName(name).slice(0, CREW_NAME_MAX);
+    const posts = POST_IDS.flatMap((post) => {
+      const member = (crew as Record<string, unknown>)[post];
+      return typeof member === "string" && member && member.length <= 80 ? [[post, member] as const] : [];
+    });
+    if (!label || !posts.length || crews.some((other) => other.id === id)) continue;
+    crews.push({ id, name: label, crew: Object.fromEntries(posts) });
+    if (crews.length === SAVED_CREWS_MAX) break;
+  }
+  return crews;
+}
 
 /** Complète un état enregistré avant l'ajout d'un champ (progression d'invité gardée dans le navigateur). */
 export function normalizePlayer(state: Partial<PlayerState> | null | undefined): PlayerState {
@@ -89,6 +121,7 @@ export function normalizePlayer(state: Partial<PlayerState> | null | undefined):
     ...EMPTY_PLAYER,
     ...state,
     day: { ...EMPTY_PLAYER.day, ...state?.day },
+    savedCrews: sanitizeSavedCrews(state?.savedCrews),
     cosmetics: sanitizeCosmetics(state?.cosmetics?.owned, state?.cosmetics?.equipped),
   };
 }

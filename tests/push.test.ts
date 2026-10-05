@@ -6,6 +6,7 @@ import { weekKey } from "@/lib/economy";
 import { parsePushSubscription, pushMessage, type PushMessage } from "@/lib/multi/push";
 import { RAID_QUESTIONS, raidBoss } from "@/lib/raid/rules";
 import { accountsEnabled, db } from "@/lib/server/db";
+import { establish } from "./established";
 import { answerFriendRequest, friendsOverview, requestFriend } from "@/lib/server/friends";
 import { buyListing, createListing } from "@/lib/server/market";
 import { DUMMY_HASH } from "@/lib/server/password";
@@ -91,6 +92,8 @@ describe.skipIf(!accountsEnabled)("envoi des notifications, en base", () => {
       const username = `${name}_${stamp % 1_000_000}`;
       const user = await db().user.create({ data: { username, usernameKey: username, passwordHash: DUMMY_HASH }, select: { id: true, username: true } });
       await db().session.create({ data: { id: session(users.length), userId: user.id, expiresAt: new Date(Date.now() + 3_600_000) } });
+      // Échanges et marché ne sont ouverts qu'aux comptes qui ont joué plusieurs jours
+      await establish(user.id);
       users.push(user);
     }
   });

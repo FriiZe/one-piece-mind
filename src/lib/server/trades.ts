@@ -2,6 +2,7 @@ import "server-only";
 import { TRADE_LIMITS, type FriendCollection, type TradeResult, type TradesOverview } from "@/lib/multi/trades";
 import { Prisma } from "@/generated/prisma/client";
 import { db } from "./db";
+import { exchangeAccessFor } from "./exchange";
 import { notifyFrom } from "./push";
 
 type Tx = Prisma.TransactionClient;
@@ -37,11 +38,14 @@ export async function friendCollection(userId: string, friendId: string): Promis
 }
 
 export async function tradesOverview(userId: string): Promise<TradesOverview> {
-  const trades = await db().trade.findMany({
-    where: { status: "pending", OR: [{ fromId: userId }, { toId: userId }] },
-    include: { from: { select: { username: true } }, to: { select: { username: true } } },
-    orderBy: { createdAt: "desc" },
-  });
+  const [trades, access] = await Promise.all([
+    db().trade.findMany({
+      where: { status: "pending", OR: [{ fromId: userId }, { toId: userId }] },
+      include: { from: { select: { username: true } }, to: { select: { username: true } } },
+      orderBy: { createdAt: "desc" },
+    }),
+    exchangeAccessFor(userId),
+  ]);
   const view = (trade: (typeof trades)[number], friend: string) => ({
     id: trade.id,
     friend,
@@ -52,7 +56,14 @@ export async function tradesOverview(userId: string): Promise<TradesOverview> {
   return {
     incoming: trades.filter((t) => t.toId === userId).map((t) => view(t, t.from.username)),
     outgoing: trades.filter((t) => t.fromId === userId).map((t) => view(t, t.to.username)),
+    access,
   };
+}
+
+/** Ce qui empêche ces deux comptes d'échanger, le cas échéant : l'un d'eux n'a pas encore assez joué. */
+async function lockedFor(userId: string, friendId: string): Promise<"locked" | "friend-locked" | null> {
+  const [mine, theirs] = await Promise.all([exchangeAccessFor(userId), exchangeAccessFor(friendId)]);
+  return !mine.open ? "locked" : !theirs.open ? "friend-locked" : null;
 }
 
 const owns = async (userId: string, characterId: string) =>
@@ -62,6 +73,8 @@ const owns = async (userId: string, characterId: string) =>
 export async function proposeTrade(userId: string, friendId: string, offeredId: string, requestedId: string): Promise<TradeResult> {
   if (offeredId === requestedId) return { ok: false, error: "same" };
   if (!(await areFriends(userId, friendId))) return { ok: false, error: "not-friends" };
+  const locked = await lockedFor(userId, friendId);
+  if (locked) return { ok: false, error: locked };
   if (!(await owns(userId, offeredId))) return { ok: false, error: "not-owned" };
   if (!(await owns(friendId, requestedId))) return { ok: false, error: "friend-not-owned" };
 
@@ -130,6 +143,9 @@ export async function answerTrade(userId: string, tradeId: string, accept: boole
     await close("cancelled");
     return { ok: false, error: "not-friends" };
   }
+  // Revérifié à l'acceptation : une proposition d'avant le garde-fou ne le contourne pas
+  const locked = await lockedFor(userId, trade.fromId);
+  if (locked) return { ok: false, error: locked };
 
   try {
     await db().$transaction(async (tx) => {

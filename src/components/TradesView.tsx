@@ -5,7 +5,7 @@ import Link from "@/components/Link";
 import type { PlayCharacter, ResolvedData } from "@/games/cards";
 import { Button, Panel } from "@/games/ui/primitives";
 import { LoadingPanel, WithGameData } from "@/games/ui/WithGameData";
-import type { CollectionEntry } from "@/lib/economy";
+import { exchangeLockNote, type CollectionEntry } from "@/lib/economy";
 import type { Locale } from "@/lib/i18n";
 import { useLocale, useT } from "@/lib/i18n/client";
 import { notificationsChanged, useFriendCollection, useFriends, useTrades } from "@/lib/multi/client";
@@ -226,6 +226,10 @@ function Trades({ data }: { data: ResolvedData }) {
       <p className={`font-semibold empty:hidden ${message?.ok ? "text-emerald-300" : "text-vest"}`} aria-live="polite">
         {message?.text}
       </p>
+      {/* Un compte qui n'a pas encore assez joué voit ses échanges, mais ne peut ni en proposer ni en accepter */}
+      {trades && !trades.access.open && (
+        <p className="rounded-xl border border-straw/50 bg-straw/5 px-4 py-3 font-semibold text-foam">{exchangeLockNote(trades.access)[locale]}</p>
+      )}
 
       {trades && trades.incoming.length > 0 && (
         <section aria-labelledby="recus" className="space-y-3">

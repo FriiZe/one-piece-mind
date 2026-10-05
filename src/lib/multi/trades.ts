@@ -1,5 +1,5 @@
 /** Échanges d'avis de recherche entre amis : ce qu'en sait l'interface. */
-import type { CollectionEntry } from "@/lib/economy";
+import type { CollectionEntry, ExchangeAccess } from "@/lib/economy";
 import type { Localized } from "@/lib/i18n";
 
 /** Propositions qu'un joueur peut avoir en attente, et qu'il peut envoyer par jour. */
@@ -21,6 +21,8 @@ export type TradesOverview = {
   incoming: TradeView[];
   /** Propositions envoyées, pas encore acceptées. */
   outgoing: TradeView[];
+  /** Les échanges ne s'ouvrent qu'aux comptes qui ont joué plusieurs jours. */
+  access: ExchangeAccess;
 };
 
 /** Collection d'un ami, pour choisir ce qu'on lui demande. */
@@ -35,6 +37,9 @@ export type TradeError =
   | "already"
   | "limit"
   | "not-found"
+  /** Le compte n'a pas encore joué assez de jours pour échanger ; `friend-locked` : celui de l'ami. */
+  | "locked"
+  | "friend-locked"
   /** L'un des deux avis a quitté sa collection depuis la proposition. */
   | "gone";
 export type TradeResult = { ok: true } | { ok: false; error: TradeError };
@@ -49,6 +54,8 @@ export const TRADE_ERRORS: Localized<Record<TradeError, string>> = {
     already: "Tu as déjà proposé cet échange.",
     limit: "Trop de propositions en attente. Annules-en une, ou réessaie demain.",
     "not-found": "Cette proposition n'existe plus.",
+    locked: "Les échanges ne sont pas encore ouverts à ton compte : il faut d'abord avoir joué plusieurs jours.",
+    "friend-locked": "Le compte de ton ami est trop récent pour échanger : il doit d'abord avoir joué plusieurs jours.",
     gone: "L'un des deux avis n'est plus disponible : la proposition est annulée.",
   },
   en: {
@@ -60,6 +67,8 @@ export const TRADE_ERRORS: Localized<Record<TradeError, string>> = {
     already: "You've already offered this trade.",
     limit: "Too many pending offers. Cancel one, or try again tomorrow.",
     "not-found": "That offer no longer exists.",
+    locked: "Trades aren't open to your account yet: you need to have played on several days first.",
+    "friend-locked": "Your friend's account is too new to trade: they need to have played on several days first.",
     gone: "One of the two posters is no longer available: the offer has been canceled.",
   },
 };

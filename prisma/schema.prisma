@@ -39,6 +39,8 @@ model User {
   /// Cosmétiques achetés ou gagnés (liste d'identifiants), et ceux qui sont portés ({ emplacement: identifiant }).
   cosmetics      Json   @default("[]")
   equipped       Json   @default("{}")
+  /// Équipages enregistrés ([{ id, name, crew: { poste: personnage } }]) : des compositions à remettre en place d'un geste.
+  savedCrews     Json   @default("[]")
 
   /// Classé : cote du joueur pour la saison `rankedSeason` (« 2026-10 »), vide tant qu'il n'a jamais joué.
   rating       Int    @default(1000)

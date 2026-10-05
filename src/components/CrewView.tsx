@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useMemo, useState } from "react";
+import { useMemo, useState, type FormEvent } from "react";
 import Link from "@/components/Link";
 import { portraitUrl, type ResolvedData } from "@/games/cards";
 import { Button, Panel } from "@/games/ui/primitives";
@@ -9,12 +9,15 @@ import { WithGameData } from "@/games/ui/WithGameData";
 import { translateAffiliation } from "@/lib/data/labels";
 import {
   bonusLabel,
+  CREW_NAME_MAX,
   crewBonuses,
   DEFAULT_TRAIT,
   FULL_CREW_BONUS,
   POST_IDS,
   POSTS,
   postStrength,
+  sameCrew,
+  SAVED_CREWS_MAX,
   TRAIT_STEPS,
   TRAITS,
   type CrewBonuses,
@@ -167,6 +170,136 @@ function Traits({ traits }: { traits: CrewTrait[] }) {
   );
 }
 
+/**
+ * Équipages enregistrés : garder de côté la composition en place, et y revenir d'un geste.
+ * Utile pour changer d'équipage selon le jeu du jour, sans tout replacer poste par poste.
+ */
+function SavedCrews({ data }: { data: ResolvedData }) {
+  const { state, saveCrewAs, switchCrew } = usePlayer();
+  const t = useT();
+  const [name, setName] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [note, setNote] = useState<{ text: string; ok: boolean } | null>(null);
+  const filled = POST_IDS.filter((post) => state.crew[post]).length;
+  const taken = state.savedCrews.some((saved) => saved.name.toLowerCase() === name.trim().toLowerCase());
+
+  const REASONS: Record<string, string> = {
+    empty: t("Place d'abord quelqu'un à un poste.", "Assign someone to a post first."),
+    "bad-name": t(`Donne-lui un nom de ${CREW_NAME_MAX} caractères au plus.`, `Give it a name of ${CREW_NAME_MAX} characters at most.`),
+    limit: t(
+      `Tu as déjà ${SAVED_CREWS_MAX} équipages enregistrés : supprimes-en un, ou réutilise un nom pour le remplacer.`,
+      `You already have ${SAVED_CREWS_MAX} saved crews: delete one, or reuse a name to replace it.`,
+    ),
+  };
+  async function run(action: () => ReturnType<typeof saveCrewAs>, success: string) {
+    setBusy(true);
+    const result = await action();
+    setBusy(false);
+    setNote(
+      result.ok
+        ? { text: success, ok: true }
+        : { text: REASONS[result.reason] ?? t("Ce changement n'a pas pu être enregistré.", "This change couldn't be saved."), ok: false },
+    );
+    return result.ok;
+  }
+
+  async function save(event: FormEvent) {
+    event.preventDefault();
+    const label = name.trim();
+    const saved = await run(
+      () => saveCrewAs(label),
+      taken ? t(`« ${label} » est mis à jour.`, `“${label}” has been updated.`) : t(`« ${label} » est enregistré.`, `“${label}” has been saved.`),
+    );
+    if (saved) setName("");
+  }
+
+  return (
+    <section aria-labelledby="equipages-enregistres" className="space-y-3 rounded-2xl border border-sea-700 p-4 sm:p-5">
+      <div>
+        <h2 id="equipages-enregistres" className="font-extrabold text-foam">
+          {t("Équipages enregistrés", "Saved crews")}{" "}
+          <span className="font-semibold text-mist">
+            · {state.savedCrews.length} {t("sur", "of")} {SAVED_CREWS_MAX}
+          </span>
+        </h2>
+        <p className="mt-1 text-sm text-mist">
+          {t(
+            "Garde de côté l'équipage en place pour y revenir d'un geste, selon le jeu du jour par exemple.",
+            "Set the current crew aside and switch back to it in one tap, depending on the daily game for instance.",
+          )}
+        </p>
+      </div>
+
+      {state.savedCrews.length > 0 && (
+        <ul className="space-y-2">
+          {state.savedCrews.map((saved) => {
+            const members = POST_IDS.flatMap((post) => (saved.crew[post] ? [saved.crew[post]] : []));
+            // Un avis parti depuis (échangé, vendu) laissera son poste libre
+            const missing = members.filter((id) => !state.collection[id] || !data.characterById.has(id)).length;
+            const active = sameCrew(saved.crew, state.crew);
+            return (
+              <li key={saved.id} className={`flex flex-wrap items-center gap-x-3 gap-y-2 rounded-xl border px-3 py-2 ${active ? "border-emerald-400/60 bg-emerald-600/10" : "border-sea-700"}`}>
+                <span className="min-w-0 flex-1 basis-40">
+                  <span className="block truncate font-bold text-foam">{saved.name}</span>
+                  <span className="block text-[13px] text-mist">
+                    {t(`${members.length} poste${members.length > 1 ? "s" : ""}`, `${members.length} ${members.length === 1 ? "post" : "posts"}`)}
+                    {missing > 0 &&
+                      t(
+                        ` · ${missing} avis que tu n'as plus`,
+                        ` · ${missing} ${missing === 1 ? "poster" : "posters"} you no longer have`,
+                      )}
+                  </span>
+                </span>
+                {active ? (
+                  <span className="text-sm font-extrabold text-emerald-300">{t("En place", "Active")}</span>
+                ) : (
+                  <Button
+                    variant="secondary"
+                    disabled={busy}
+                    onClick={() => run(() => switchCrew(saved.id), t(`« ${saved.name} » est en place.`, `“${saved.name}” is now active.`))}
+                    className="min-h-10 py-0 text-sm"
+                  >
+                    {t("Mettre en place", "Switch to it")}
+                  </Button>
+                )}
+                <Button
+                  variant="ghost"
+                  disabled={busy}
+                  onClick={() => run(() => switchCrew(saved.id, true), t(`« ${saved.name} » est supprimé.`, `“${saved.name}” has been deleted.`))}
+                  aria-label={t(`Supprimer l'équipage enregistré « ${saved.name} »`, `Delete the saved crew “${saved.name}”`)}
+                  className="min-h-10 py-0 text-sm"
+                >
+                  {t("Supprimer", "Delete")}
+                </Button>
+              </li>
+            );
+          })}
+        </ul>
+      )}
+
+      <form onSubmit={save} className="flex flex-wrap items-end gap-2">
+        <label className="min-w-0 flex-1 basis-48">
+          <span className="mb-1 block text-sm font-bold text-foam">{t("Enregistrer l'équipage en place sous le nom", "Save the current crew as")}</span>
+          <input
+            type="text"
+            value={name}
+            onChange={(event) => setName(event.target.value)}
+            maxLength={CREW_NAME_MAX}
+            placeholder={t("Spécial primes", "Bounty special")}
+            className="h-11 w-full rounded-[10px] border border-sea-600 bg-sea-900 px-3 text-foam placeholder:text-mist/60 focus:border-straw focus:outline-none"
+          />
+        </label>
+        <Button type="submit" disabled={busy || !name.trim() || filled === 0} className="min-h-11">
+          {taken ? t("Remplacer", "Replace") : t("Enregistrer", "Save")}
+        </Button>
+      </form>
+      <p className={`text-sm font-semibold empty:hidden ${note?.ok ? "text-emerald-300" : "text-vest"}`} aria-live="polite">
+        {note?.text}
+      </p>
+    </section>
+  );
+}
+
 function Crew({ data }: { data: ResolvedData }) {
   const { state, assign } = usePlayer();
   const t = useT();
@@ -288,6 +421,7 @@ function Crew({ data }: { data: ResolvedData }) {
             {error}
           </p>
         )}
+        <SavedCrews data={data} />
       </section>
 
       <aside className="space-y-4">

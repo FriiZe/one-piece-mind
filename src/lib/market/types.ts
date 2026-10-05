@@ -1,5 +1,5 @@
 /** Marché : ce qu'en sait l'interface. */
-import type { PlayerState } from "@/lib/economy";
+import type { ExchangeAccess, PlayerState } from "@/lib/economy";
 import type { Localized } from "@/lib/i18n";
 
 export type ListingView = {
@@ -33,6 +33,8 @@ export type MarketOverview = {
   total: number;
   /** Annonces et ventes récentes du joueur connecté ; `null` pour un visiteur. */
   mine: { active: ListingView[]; sales: SaleView[] } | null;
+  /** Vendre et acheter ne s'ouvrent qu'aux comptes qui ont joué plusieurs jours ; `null` pour un visiteur. */
+  access: ExchangeAccess | null;
 };
 
 export type MarketError =
@@ -47,7 +49,9 @@ export type MarketError =
   /** Annonce déjà vendue ou retirée. */
   | "gone"
   | "own-listing"
-  | "insufficient";
+  | "insufficient"
+  /** Le compte n'a pas encore joué assez de jours pour vendre ou acheter. */
+  | "locked";
 
 export type MarketResult = { ok: true; state: PlayerState } | { ok: false; error: MarketError };
 
@@ -62,6 +66,7 @@ export const MARKET_ERRORS: Localized<Record<MarketError, string>> = {
     gone: "Cette annonce vient d'être vendue ou retirée.",
     "own-listing": "C'est ta propre annonce.",
     insufficient: "Pas assez de Berrys.",
+    locked: "Le marché n'est pas encore ouvert à ton compte : il faut d'abord avoir joué plusieurs jours.",
   },
   en: {
     unavailable: "The market is unavailable right now.",
@@ -73,5 +78,6 @@ export const MARKET_ERRORS: Localized<Record<MarketError, string>> = {
     gone: "That listing has just been sold or taken down.",
     "own-listing": "That's your own listing.",
     insufficient: "Not enough Berries.",
+    locked: "The market isn't open to your account yet: you need to have played on several days first.",
   },
 };

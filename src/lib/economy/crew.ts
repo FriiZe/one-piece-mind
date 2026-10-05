@@ -1,6 +1,6 @@
 import { GAME_CATEGORIES, type GameCategoryId } from "@/lib/games/catalog";
 import type { Localized } from "@/lib/i18n";
-import { POST_IDS, type CollectionEntry, type PlayerState, type PostId, type Recruitable } from "./types";
+import { cleanCrewName, CREW_NAME_MAX, POST_IDS, SAVED_CREWS_MAX, type CollectionEntry, type PlayerState, type PostId, type Recruitable } from "./types";
 
 type BonusKind =
   | { kind: "berrys"; scope: "all" | "daily" | GameCategoryId }
@@ -211,7 +211,52 @@ export function berryBonus(bonuses: CrewBonuses, category: GameCategoryId, daily
   return (bonuses.berrys.all ?? 0) + (bonuses.berrys[category] ?? 0) + (daily ? (bonuses.berrys.daily ?? 0) : 0);
 }
 
-export type CrewError = "not-owned" | "unknown-post";
+export type CrewError = "not-owned" | "unknown-post" | "empty" | "bad-name" | "limit" | "unknown-crew";
+
+/** L'équipage en place est-il exactement celui-ci, poste pour poste ? */
+export function sameCrew(a: PlayerState["crew"], b: PlayerState["crew"]): boolean {
+  return POST_IDS.every((post) => (a[post] ?? null) === (b[post] ?? null));
+}
+
+/**
+ * Garde de côté l'équipage en place, sous ce nom. Un nom déjà pris remplace l'équipage qui le
+ * portait : c'est ainsi qu'on met un enregistrement à jour. `id` identifie un nouvel enregistrement.
+ */
+export function saveCrew(state: PlayerState, name: string, id: string): PlayerState | CrewError {
+  const label = cleanCrewName(name);
+  if (!label || label.length > CREW_NAME_MAX) return "bad-name";
+  if (!POST_IDS.some((post) => state.crew[post])) return "empty";
+  const crew = { ...state.crew };
+  const existing = state.savedCrews.find((saved) => saved.name.toLowerCase() === label.toLowerCase());
+  if (existing) {
+    return { ...state, savedCrews: state.savedCrews.map((saved) => (saved === existing ? { ...saved, name: label, crew } : saved)) };
+  }
+  if (state.savedCrews.length >= SAVED_CREWS_MAX) return "limit";
+  return { ...state, savedCrews: [...state.savedCrews, { id, name: label, crew }] };
+}
+
+/**
+ * Remet en place un équipage enregistré, à la place de l'actuel. Un personnage qui a quitté la
+ * collection depuis (échangé, vendu) laisse son poste libre.
+ */
+export function applyCrew(state: PlayerState, id: string): PlayerState | CrewError {
+  const saved = state.savedCrews.find((crew) => crew.id === id);
+  if (!saved) return "unknown-crew";
+  const placed = new Set<string>();
+  const crew: PlayerState["crew"] = {};
+  for (const post of POST_IDS) {
+    const member = saved.crew[post];
+    if (!member || !state.collection[member] || placed.has(member)) continue;
+    placed.add(member);
+    crew[post] = member;
+  }
+  return { ...state, crew };
+}
+
+export function deleteCrew(state: PlayerState, id: string): PlayerState | CrewError {
+  if (!state.savedCrews.some((crew) => crew.id === id)) return "unknown-crew";
+  return { ...state, savedCrews: state.savedCrews.filter((crew) => crew.id !== id) };
+}
 
 /**
  * Place un personnage à un poste (ou le libère avec `null`). Un personnage n'occupe qu'un poste :

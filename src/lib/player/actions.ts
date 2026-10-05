@@ -14,7 +14,10 @@ import {
   buyCosmeticFor,
   buyRecruitFor,
   equipCosmeticFor,
+  applyCrewFor,
+  deleteCrewFor,
   sanitizeGuestState,
+  saveCrewFor,
   sellDuplicatesFor,
   setCrewFor,
   submitGame,
@@ -68,6 +71,20 @@ export async function setCrewAction(post: string, characterId: string | null): P
     return { ok: false, reason: "unavailable" };
   }
   return setCrewFor(user.id, post, characterId);
+}
+
+/** Garde de côté l'équipage en place, sous ce nom. */
+export async function saveCrewAction(name: string): Promise<CrewResult> {
+  const user = await currentUser();
+  if (!user || typeof name !== "string" || name.length > 200) return { ok: false, reason: "unavailable" };
+  return saveCrewFor(user.id, name);
+}
+
+/** Remet en place un équipage enregistré (`remove` : le supprime). */
+export async function savedCrewAction(crewId: string, remove = false): Promise<CrewResult> {
+  const user = await currentUser();
+  if (!user || typeof crewId !== "string" || crewId.length > 80) return { ok: false, reason: "unavailable" };
+  return remove === true ? deleteCrewFor(user.id, crewId) : applyCrewFor(user.id, crewId);
 }
 
 export async function buyCosmeticAction(cosmeticId: string): Promise<CosmeticResult> {
@@ -153,6 +170,7 @@ export async function signupAction(_: AuthState, form: FormData): Promise<AuthSt
         games: guest?.games ?? 0,
         stats: guest?.stats ?? {},
         cosmetics: guest?.cosmetics.owned ?? [],
+        savedCrews: guest?.savedCrews ?? [],
         equipped: guest?.cosmetics.equipped ?? {},
         collection: guest ? { create: guest.collection } : undefined,
         crew: guest ? { create: guest.crew } : undefined,

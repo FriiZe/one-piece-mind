@@ -12,6 +12,7 @@ import type { ListingView, MarketOverview, MarketResult } from "@/lib/market/typ
 import type { SpoilerMode } from "@/lib/spoilers";
 import type { Prisma } from "@/generated/prisma/client";
 import { db } from "./db";
+import { exchangeAccessFor } from "./exchange";
 import { gameData, loadState, type Tx } from "./player";
 import { notifyFrom } from "./push";
 
@@ -68,7 +69,7 @@ export async function marketOverview(userId: string | null, filters: MarketFilte
   const hidden = new Set(owned);
   const where = { status: "active", characterId: { in: visible.filter((id) => !hidden.has(id)) } } satisfies Prisma.MarketListingWhereInput;
 
-  const [rows, total, active, sales] = await Promise.all([
+  const [rows, total, active, sales, access] = await Promise.all([
     db().marketListing.findMany({ where, orderBy: ORDER[filters.sort], take: MARKET_PAGE_SIZE, include: { seller: { select: { username: true } } } }),
     db().marketListing.count({ where }),
     userId
@@ -86,11 +87,13 @@ export async function marketOverview(userId: string | null, filters: MarketFilte
           include: { buyer: { select: { username: true } } },
         })
       : [],
+    userId ? exchangeAccessFor(userId) : null,
   ]);
 
   return {
     listings: rows.map((row) => toView(row, userId)),
     total,
+    access,
     mine: userId
       ? {
           active: active.map((row) => toView(row, userId)),
@@ -147,6 +150,7 @@ async function giveCopy(tx: Tx, userId: string, characterId: string, golden: boo
 
 /** Met en vente un exemplaire en trop : il quitte la collection du vendeur tant que l'annonce est ouverte. */
 export async function createListing(userId: string, characterId: string, golden: boolean, price: unknown): Promise<MarketResult> {
+  if (!(await exchangeAccessFor(userId)).open) return { ok: false, error: "locked" };
   const character = gameData("manga").characterById.get(characterId);
   if (!character) return { ok: false, error: "unknown-character" };
   if (!isValidPrice(price, character.tier, golden)) return { ok: false, error: "bad-price" };
@@ -188,6 +192,8 @@ export async function buyListing(userId: string, listingId: string): Promise<Mar
   const listing = await db().marketListing.findUnique({ where: { id: listingId } });
   if (!listing) return { ok: false, error: "not-found" };
   if (listing.sellerId === userId) return { ok: false, error: "own-listing" };
+  // Acheter aussi fait passer des Berrys d'un compte à l'autre : même garde-fou que pour vendre
+  if (!(await exchangeAccessFor(userId)).open) return { ok: false, error: "locked" };
 
   const proceeds = marketProceeds(listing.price);
   let result: MarketResult;

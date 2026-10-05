@@ -15,7 +15,10 @@ import { loadGameData } from "@/games/ui/data";
 import { useStored } from "@/games/ui/storage";
 import {
   applyGame,
+  applyCrew,
   assignPost,
+  deleteCrew,
+  saveCrew,
   buyBooster,
   buyCosmetic,
   buyRecruit,
@@ -33,6 +36,8 @@ import {
   buyRecruitAction,
   equipCosmeticAction,
   sellDuplicatesAction,
+  saveCrewAction,
+  savedCrewAction,
   setCrewAction,
   submitGameAction,
 } from "./actions";
@@ -51,6 +56,10 @@ type PlayerContext = {
   /** Achète un booster : plusieurs avis d'un coup. */
   booster: (mode: SpoilerMode) => Promise<BoosterResult>;
   assign: (post: string, characterId: string | null) => Promise<CrewResult>;
+  /** Garde de côté l'équipage en place, sous ce nom ; un nom déjà pris remplace l'enregistrement. */
+  saveCrewAs: (name: string) => Promise<CrewResult>;
+  /** Remet en place un équipage enregistré, ou le supprime (`remove`). */
+  switchCrew: (crewId: string, remove?: boolean) => Promise<CrewResult>;
   /** Défait les doublons d'un avis, ou de tous les avis visibles dans ce mode (`characterId` nul). */
   sell: (mode: SpoilerMode, characterId: string | null) => Promise<SellResult>;
   /** Achète un cosmétique à la boutique : il est porté aussitôt. */
@@ -178,6 +187,36 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
     [isUser, guest, setGuest],
   );
 
+  const saveCrewAs = useCallback(
+    async (name: string): Promise<CrewResult> => {
+      if (isUser) {
+        const result = await saveCrewAction(name).catch(() => ({ ok: false, reason: "unavailable" }) as const);
+        if (result.ok) setRemote(result.state);
+        return result;
+      }
+      const next = saveCrew(guest, name, crypto.randomUUID());
+      if (typeof next === "string") return { ok: false, reason: next };
+      setGuest(next);
+      return { ok: true, state: next };
+    },
+    [isUser, guest, setGuest],
+  );
+
+  const switchCrew = useCallback(
+    async (crewId: string, remove = false): Promise<CrewResult> => {
+      if (isUser) {
+        const result = await savedCrewAction(crewId, remove).catch(() => ({ ok: false, reason: "unavailable" }) as const);
+        if (result.ok) setRemote(result.state);
+        return result;
+      }
+      const next = remove ? deleteCrew(guest, crewId) : applyCrew(guest, crewId);
+      if (typeof next === "string") return { ok: false, reason: next };
+      setGuest(next);
+      return { ok: true, state: next };
+    },
+    [isUser, guest, setGuest],
+  );
+
   const sell = useCallback(
     async (mode: SpoilerMode, characterId: string | null): Promise<SellResult> => {
       if (isUser) {
@@ -235,13 +274,15 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
       recruit,
       booster,
       assign,
+      saveCrewAs,
+      switchCrew,
       sell,
       buyLook,
       wear,
       sync: setRemote,
       refresh,
     }),
-    [me, isUser, state, reportGame, recruit, booster, assign, sell, buyLook, wear, refresh],
+    [me, isUser, state, reportGame, recruit, booster, assign, saveCrewAs, switchCrew, sell, buyLook, wear, refresh],
   );
 
   return <Context.Provider value={value}>{children}</Context.Provider>;

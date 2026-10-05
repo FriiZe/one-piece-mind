@@ -6,7 +6,7 @@ import type { PlayCharacter, ResolvedData } from "@/games/cards";
 import { formatNumber } from "@/games/engine/text";
 import { Button, Panel } from "@/games/ui/primitives";
 import { LoadingPanel, WithGameData } from "@/games/ui/WithGameData";
-import { RARITY_LABELS } from "@/lib/economy";
+import { exchangeLockNote, RARITY_LABELS } from "@/lib/economy";
 import { useLocale, useT } from "@/lib/i18n/client";
 import { useMarket } from "@/lib/market/client";
 import {
@@ -328,6 +328,10 @@ function Market({ data }: { data: ResolvedData }) {
       <p className={`font-semibold empty:hidden ${message?.ok ? "text-emerald-300" : "text-vest"}`} aria-live="polite">
         {message?.text}
       </p>
+      {/* Un compte qui n'a pas encore assez joué peut regarder le marché, mais ni vendre ni acheter */}
+      {market?.access && !market.access.open && (
+        <p className="rounded-xl border border-straw/50 bg-straw/5 px-4 py-3 font-semibold text-foam">{exchangeLockNote(market.access)[locale]}</p>
+      )}
 
       {isUser && market?.mine && <Mine mine={market.mine} data={data} busy={busy} onCancel={(id) => run(() => cancelListingAction(id), t("Annonce retirée : l'avis est revenu dans ta collection.", "Listing taken down: the poster is back in your collection."))} />}
 

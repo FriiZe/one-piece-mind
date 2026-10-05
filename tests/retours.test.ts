@@ -16,6 +16,7 @@ import {
   DUPLICATE_VALUE,
   duplicatesValue,
   EMPTY_PLAYER,
+  EXCHANGE_MIN_PLAY_DAYS,
   GOLDEN_CHANCE,
   GOLDEN_DUPLICATE_FACTOR,
   sellDuplicates,
@@ -47,8 +48,11 @@ import {
 import { accountsEnabled, db } from "@/lib/server/db";
 import { pendingCounts } from "@/lib/server/friends";
 import { DUMMY_HASH } from "@/lib/server/password";
+import { priceBounds } from "@/lib/market/rules";
+import { buyListing, cancelListing, createListing } from "@/lib/server/market";
 import { answerTrade, cancelTrade, friendCollection, proposeTrade, tradesOverview } from "@/lib/server/trades";
-import { buyBoosterFor, loadState, sellDuplicatesFor } from "@/lib/server/player";
+import { establish, playedOn } from "./established";
+import { applyCrewFor, buyBoosterFor, deleteCrewFor, loadState, saveCrewFor, sellDuplicatesFor, setCrewFor } from "@/lib/server/player";
 import {
   createQuiz,
   deleteQuiz,
@@ -496,6 +500,34 @@ describe.skipIf(!accountsEnabled)("quiz et doublons, en base", () => {
     await db().user.update({ where: { id: player.id }, data: { berrys: 0 } });
   });
 
+  it("enregistre des équipages dans un compte et les remet en place", async () => {
+    const [, , , witness] = users;
+    const [first, second] = anime.characters.slice(0, 2).map((c) => c.id);
+    await db().collectionEntry.createMany({
+      data: [
+        { userId: witness.id, characterId: first, count: 1, golden: 0 },
+        { userId: witness.id, characterId: second, count: 1, golden: 0 },
+      ],
+    });
+    expect(await saveCrewFor(witness.id, "Vide")).toEqual({ ok: false, reason: "empty" });
+    await setCrewFor(witness.id, "capitaine", first);
+    const saved = await saveCrewFor(witness.id, "Premier");
+    if (!saved.ok) throw new Error(saved.reason);
+    const [crew] = saved.state.savedCrews;
+    expect(crew).toMatchObject({ name: "Premier", crew: { capitaine: first } });
+
+    await setCrewFor(witness.id, "capitaine", second);
+    expect((await loadState(witness.id)).crew).toEqual({ capitaine: second });
+    const applied = await applyCrewFor(witness.id, crew.id);
+    expect(applied).toMatchObject({ ok: true, state: { crew: { capitaine: first } } });
+    // L'enregistrement survit au rechargement, et se supprime
+    expect((await loadState(witness.id)).savedCrews).toEqual([crew]);
+    expect(await applyCrewFor(witness.id, "inconnu")).toEqual({ ok: false, reason: "unknown-crew" });
+    expect(await deleteCrewFor(witness.id, crew.id)).toMatchObject({ ok: true, state: { savedCrews: [] } });
+    await db().crewSlot.deleteMany({ where: { userId: witness.id } });
+    await db().collectionEntry.deleteMany({ where: { userId: witness.id } });
+  });
+
   it("vend un booster à un compte : cinq avis de plus, le prix en moins", async () => {
     const [, player] = users;
     expect(await buyBoosterFor(player.id, "anime")).toEqual({ ok: false, reason: "insufficient" });
@@ -665,6 +697,29 @@ describe.skipIf(!accountsEnabled)("quiz et doublons, en base", () => {
     await db().friendship.create({ data: { requesterId: a.id, addresseeId: b.id, status: "accepted" } });
     expect((await friendCollection(a.id, b.id))?.collection).toEqual({ [wanted]: { count: 1, golden: 1 } });
     expect(await friendCollection(stranger.id, b.id)).toBeNull();
+
+    // Un compte tout neuf n'échange pas et ne passe pas par le marché : il faut avoir joué plusieurs jours différents
+    expect((await tradesOverview(a.id)).access).toEqual({ open: false, playDays: 0, required: EXCHANGE_MIN_PLAY_DAYS });
+    expect(await proposeTrade(a.id, b.id, given, wanted)).toEqual({ ok: false, error: "locked" });
+    const price = priceBounds(anime.characterById.get(given)!.tier, false).suggested;
+    expect(await createListing(a.id, given, false, price)).toEqual({ ok: false, error: "locked" });
+    // Dix parties le même jour ne comptent que pour un jour
+    for (let i = 0; i < 10; i++) await playedOn(a.id, 1);
+    expect((await tradesOverview(a.id)).access).toMatchObject({ open: false, playDays: 1 });
+    await establish(a.id);
+    expect((await tradesOverview(a.id)).access).toMatchObject({ open: true, playDays: EXCHANGE_MIN_PLAY_DAYS });
+    // Les deux comptes doivent avoir fait leurs preuves : celui d'en face aussi
+    expect(await proposeTrade(a.id, b.id, given, wanted)).toEqual({ ok: false, error: "friend-locked" });
+    expect(await proposeTrade(b.id, a.id, wanted, given)).toEqual({ ok: false, error: "locked" });
+    // Acheter aussi fait passer des Berrys d'un compte à l'autre
+    const listed = await createListing(a.id, given, false, price);
+    expect(listed.ok).toBe(true);
+    const listing = await db().marketListing.findFirstOrThrow({ where: { sellerId: a.id, status: "active" } });
+    await db().user.update({ where: { id: b.id }, data: { berrys: price } });
+    expect(await buyListing(b.id, listing.id)).toEqual({ ok: false, error: "locked" });
+    expect((await cancelListing(a.id, listing.id)).ok).toBe(true);
+    await db().user.update({ where: { id: b.id }, data: { berrys: 0 } });
+    await establish(b.id);
 
     expect(await proposeTrade(a.id, b.id, given, given)).toEqual({ ok: false, error: "same" });
     expect(await proposeTrade(a.id, b.id, other, wanted)).toEqual({ ok: false, error: "not-owned" });

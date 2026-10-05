@@ -9,7 +9,14 @@ import {
   dailyChallenges,
   dailyGames,
   SIGNUP_BERRYS,
+  applyCrew,
   assignPost,
+  CREW_NAME_MAX,
+  deleteCrew,
+  sameCrew,
+  sanitizeSavedCrews,
+  saveCrew,
+  SAVED_CREWS_MAX,
   BASE_BERRYS,
   bestLabel,
   buyRecruit,
@@ -276,6 +283,52 @@ describe("équipage", () => {
     // Vers un poste libre, ou vers le sien : rien d'autre ne bouge
     expect((assignPost(state, "medecin", "zoro") as PlayerState).crew).toEqual({ capitaine: "luffy", navigateur: "nami", medecin: "zoro" });
     expect((assignPost(state, "capitaine", "luffy") as PlayerState).crew).toEqual(crew);
+  });
+
+  it("garde des équipages de côté et y revient d'un geste", () => {
+    const base: PlayerState = { ...owning("luffy", "nami", "zoro", "vergo"), crew: { capitaine: "luffy", navigateur: "nami" } };
+    expect(saveCrew({ ...base, crew: {} }, "Vide", "x")).toBe("empty");
+    expect(saveCrew(base, "   ", "x")).toBe("bad-name");
+    expect(saveCrew(base, "x".repeat(CREW_NAME_MAX + 1), "x")).toBe("bad-name");
+
+    const saved = saveCrew(base, "  Spécial   primes ", "a") as PlayerState;
+    expect(saved.savedCrews).toEqual([{ id: "a", name: "Spécial primes", crew: { capitaine: "luffy", navigateur: "nami" } }]);
+    // Changer l'équipage en place ne touche pas à l'enregistrement
+    const changed = assignPost(assignPost(saved, "capitaine", "zoro") as PlayerState, "navigateur", null) as PlayerState;
+    expect(sameCrew(changed.crew, saved.savedCrews[0].crew)).toBe(false);
+    const back = applyCrew(changed, "a") as PlayerState;
+    expect(back.crew).toEqual({ capitaine: "luffy", navigateur: "nami" });
+    expect(sameCrew(back.crew, back.savedCrews[0].crew)).toBe(true);
+    expect(applyCrew(changed, "inconnu")).toBe("unknown-crew");
+
+    // Un nom déjà pris, à la casse près, remplace l'enregistrement au lieu d'en ajouter un
+    const replaced = saveCrew(changed, "spécial PRIMES", "b") as PlayerState;
+    expect(replaced.savedCrews).toEqual([{ id: "a", name: "spécial PRIMES", crew: { capitaine: "zoro" } }]);
+
+    // Un avis parti depuis l'enregistrement laisse son poste libre
+    const collection = Object.fromEntries(Object.entries(saved.collection).filter(([id]) => id !== "nami"));
+    expect((applyCrew({ ...saved, collection, crew: {} }, "a") as PlayerState).crew).toEqual({ capitaine: "luffy" });
+
+    let full = saved;
+    for (let i = 1; i < SAVED_CREWS_MAX; i++) full = saveCrew(full, `Équipage ${i}`, `id-${i}`) as PlayerState;
+    expect(full.savedCrews).toHaveLength(SAVED_CREWS_MAX);
+    expect(saveCrew(full, "Un de trop", "z")).toBe("limit");
+    expect((saveCrew(full, "Équipage 1", "z") as PlayerState).savedCrews).toHaveLength(SAVED_CREWS_MAX);
+    expect((deleteCrew(full, "id-1") as PlayerState).savedCrews.map((crew) => crew.id)).not.toContain("id-1");
+    expect(deleteCrew(full, "inconnu")).toBe("unknown-crew");
+
+    // Ce qui vient d'un navigateur ou d'une colonne JSON n'est gardé que s'il en a la forme
+    expect(sanitizeSavedCrews("n'importe quoi")).toEqual([]);
+    expect(
+      sanitizeSavedCrews([
+        { id: "ok", name: " Bon ", crew: { capitaine: "luffy", amiral: "zoro", sabreur: 3 } },
+        { id: "ok", name: "Doublon", crew: { capitaine: "nami" } },
+        { id: "vide", name: "Sans poste", crew: {} },
+        { name: "Sans identifiant", crew: { capitaine: "nami" } },
+        null,
+      ]),
+    ).toEqual([{ id: "ok", name: "Bon", crew: { capitaine: "luffy" } }]);
+    expect(normalizePlayer({ berrys: 3 }).savedCrews).toEqual([]);
   });
 
   it("donne un bonus selon le poste et la rareté, renforcé par un avis doré", () => {

@@ -1,5 +1,5 @@
 import type { PlayCharacter } from "@/games/cards";
-import type { CosmeticError, GameOutcome, PlayerState, Recruit, Reward } from "@/lib/economy";
+import type { CosmeticError, CrewError, GameOutcome, PlayerState, Recruit, Reward } from "@/lib/economy";
 
 /** Réponse à un compte rendu de partie, que le joueur soit invité ou connecté. */
 export type GameResult =
@@ -11,7 +11,7 @@ export type RecruitResult =
   | { ok: true; state: PlayerState; recruit: Recruit; cost: number }
   | { ok: false; reason: "insufficient" | "empty" | "unavailable" };
 
-export type CrewResult = { ok: true; state: PlayerState } | { ok: false; reason: "not-owned" | "unknown-post" | "unavailable" };
+export type CrewResult = { ok: true; state: PlayerState } | { ok: false; reason: CrewError | "unavailable" };
 
 export type BoosterResult =
   | { ok: true; state: PlayerState; recruits: Recruit[]; cost: number }

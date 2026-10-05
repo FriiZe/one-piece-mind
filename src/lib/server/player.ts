@@ -1,5 +1,5 @@
 import "server-only";
-import { randomInt } from "node:crypto";
+import { randomInt, randomUUID } from "node:crypto";
 import { z } from "zod";
 import { buildGameData, resolveGameData, type GameData, type ResolvedData } from "@/games/cards";
 import { dailyKey } from "@/games/engine/daily";
@@ -7,6 +7,7 @@ import { createRng } from "@/games/engine/rng";
 import { evaluateReport, reportKey, reportSchema } from "@/games/report";
 import {
   applyGame,
+  applyCrew,
   assignPost,
   buyBooster,
   buyCosmetic,
@@ -17,7 +18,11 @@ import {
   getCosmetic,
   grantCosmetic,
   POST_IDS,
+  deleteCrew,
   sanitizeCosmetics,
+  sanitizeSavedCrews,
+  saveCrew,
+  type CrewError,
   sellDuplicates,
   type PlayerState,
   type PostId,
@@ -81,6 +86,7 @@ export async function loadState(userId: string, client: Tx = db()): Promise<Play
       week: true,
       cosmetics: true,
       equipped: true,
+      savedCrews: true,
       collection: { select: { characterId: true, count: true, golden: true } },
       crew: { select: { post: true, characterId: true } },
     },
@@ -99,6 +105,7 @@ export async function loadState(userId: string, client: Tx = db()): Promise<Play
     stats: statsSchema.safeParse(user.stats).data ?? {},
     week: weekSchema.safeParse(user.week).data ?? EMPTY_PLAYER.week,
     cosmetics: sanitizeCosmetics(user.cosmetics, user.equipped),
+    savedCrews: sanitizeSavedCrews(user.savedCrews),
     collection: Object.fromEntries(user.collection.map((e) => [e.characterId, { count: e.count, golden: e.golden }])),
     crew: Object.fromEntries(
       user.crew.filter((slot) => (POST_IDS as readonly string[]).includes(slot.post)).map((slot) => [slot.post, slot.characterId]),
@@ -273,9 +280,10 @@ export async function sellDuplicatesFor(userId: string, mode: SpoilerMode, chara
   }
 }
 
-export async function setCrewFor(userId: string, post: string, characterId: string | null): Promise<CrewResult> {
+/** Applique un changement d'équipage à un compte : les postes occupés et les équipages enregistrés sont réécrits ensemble. */
+async function changeCrewFor(userId: string, change: (state: PlayerState) => PlayerState | CrewError): Promise<CrewResult> {
   return db().$transaction(async (tx) => {
-    const next = assignPost(await loadState(userId, tx), post, characterId);
+    const next = change(await loadState(userId, tx));
     if (typeof next === "string") return { ok: false, reason: next };
 
     await tx.crewSlot.deleteMany({ where: { userId } });
@@ -283,9 +291,21 @@ export async function setCrewFor(userId: string, post: string, characterId: stri
     if (slots.length) {
       await tx.crewSlot.createMany({ data: slots.map(([p, id]) => ({ userId, post: p, characterId: id })) });
     }
+    await tx.user.update({ where: { id: userId }, data: { savedCrews: next.savedCrews } });
     return { ok: true, state: await loadState(userId, tx) };
   });
 }
+
+export const setCrewFor = (userId: string, post: string, characterId: string | null) =>
+  changeCrewFor(userId, (state) => assignPost(state, post, characterId));
+
+/** Garde de côté l'équipage en place, sous ce nom (ou remplace celui qui le portait déjà). */
+export const saveCrewFor = (userId: string, name: string) => changeCrewFor(userId, (state) => saveCrew(state, name, randomUUID()));
+
+/** Remet en place un équipage enregistré. */
+export const applyCrewFor = (userId: string, crewId: string) => changeCrewFor(userId, (state) => applyCrew(state, crewId));
+
+export const deleteCrewFor = (userId: string, crewId: string) => changeCrewFor(userId, (state) => deleteCrew(state, crewId));
 
 export async function buyCosmeticFor(userId: string, cosmeticId: string): Promise<CosmeticResult> {
   return db().$transaction(async (tx) => {
@@ -328,6 +348,7 @@ const guestStateSchema = z.object({
   crew: z.record(z.string(), z.string().max(80)),
   stats: statsSchema.optional(),
   cosmetics: z.object({ owned: z.array(z.string().max(80)).max(200), equipped: z.record(z.string(), z.string().max(80)) }).optional(),
+  savedCrews: z.array(z.unknown()).max(50).optional(),
 });
 
 /** Ce qu'on accepte de reprendre d'un état d'invité : valeurs plafonnées, personnages connus seulement. */
@@ -366,6 +387,8 @@ export function sanitizeGuestState(input: unknown) {
     stats: Object.fromEntries(Object.entries(guest.stats ?? {}).filter(([slug]) => isBuiltSlug(slug))),
     collection,
     crew: crew.map(([post, characterId]) => ({ post, characterId })),
+    // Un équipage enregistré peut citer un avis qui n'a pas été repris : il laissera son poste libre
+    savedCrews: sanitizeSavedCrews(guest.savedCrews),
     cosmetics,
   };
 }
