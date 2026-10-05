@@ -110,6 +110,8 @@ export function QuizEditor() {
   const [saving, setSaving] = useState<"idle" | "busy" | "saved">("idle");
   const [testing, setTesting] = useState<QuizQuestion[] | null>(null);
   const [restarting, setRestarting] = useState(false);
+  // Dernière question supprimée, tant qu'on peut encore la remettre à sa place
+  const [removed, setRemoved] = useState<{ question: QuizDraft["questions"][number]; index: number } | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [checked, setChecked] = useState(false);
@@ -208,8 +210,20 @@ export function QuizEditor() {
   }
 
   function removeQuestion() {
+    if (draft.questions.length <= 1) return;
+    // Une question déjà écrite se supprime d'un geste : on garde de quoi revenir en arrière
+    const written = [question.prompt, question.answer, ...question.wrong, question.alternatives].some((text) => text.trim());
+    setRemoved(written ? { question, index } : null);
     edit({ ...draft, questions: draft.questions.filter((_, i) => i !== index) });
     setCurrent(Math.max(0, index - 1));
+  }
+
+  function restoreQuestion() {
+    if (!removed || draft.questions.length >= max) return;
+    const at = Math.min(removed.index, draft.questions.length);
+    edit({ ...draft, questions: [...draft.questions.slice(0, at), removed.question, ...draft.questions.slice(at)] });
+    setCurrent(at);
+    setRemoved(null);
   }
 
   if (testing) return <TestRun title={cleanText(draft.title) || t("Quiz sans titre", "Untitled quiz")} questions={testing} onClose={() => setTesting(null)} />;
@@ -407,10 +421,36 @@ export function QuizEditor() {
                           </svg>
                         </button>
                       ))}
+                    {/* Supprimer se trouve aussi ici, à côté des flèches : c'est dans la liste qu'on le cherche */}
+                    {selected && draft.questions.length > 1 && (
+                      <button
+                        type="button"
+                        onClick={removeQuestion}
+                        aria-label={t(`Supprimer la question ${i + 1}`, `Delete question ${i + 1}`)}
+                        className="flex size-9 shrink-0 cursor-pointer items-center justify-center rounded-lg border border-sea-600 text-[#f5a88a] transition-colors hover:border-[#f5a88a]"
+                      >
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" className="size-4">
+                          <path d="M4 7h16M10 11v6M14 11v6M6 7l1 12a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1l1-12M9 7V4h6v3" />
+                        </svg>
+                      </button>
+                    )}
                   </li>
                 );
               })}
             </ol>
+            {removed && (
+              <p className="flex flex-wrap items-baseline gap-x-2 px-1.5 py-1 text-[13px] text-mist" aria-live="polite">
+                <span className="min-w-0 truncate">
+                  {t("Question supprimée", "Question deleted")}
+                  {removed.question.prompt.trim() ? t(` : « ${removed.question.prompt.trim()} »`, `: “${removed.question.prompt.trim()}”`) : ""}
+                </span>
+                {draft.questions.length < max && (
+                  <button type="button" onClick={restoreQuestion} className="cursor-pointer font-bold text-straw underline underline-offset-4">
+                    {t("Annuler", "Undo")}
+                  </button>
+                )}
+              </p>
+            )}
             {draft.questions.length < max && (
               <button
                 type="button"
