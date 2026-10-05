@@ -139,6 +139,25 @@ describe("Connexions", () => {
 });
 
 describe("Grille 3×3", () => {
+  it("tire une grille qu'on peut remplir en entier sans réutiliser un personnage", () => {
+    for (const data of modes) {
+      for (const difficulty of DIFFICULTIES) {
+        for (let seed = 1; seed <= 150; seed++) {
+          const grid = grille.generate(seed, difficulty, data);
+          if (grid) expect(grille.solvable(grid, data.characters), `${data.mode} ${difficulty} ${seed}`).toBe(true);
+        }
+      }
+    }
+    // Deux cases qui n'ont qu'un même personnage pour réponse : la grille ne se remplit pas
+    type Row = grille.Grid["rows"][number];
+    const [solo] = anime.characters;
+    const criterion = (id: string, test: Row["test"]): Row => ({ id, kind: "initial", label: id, question: `${id} ?`, test });
+    const only = criterion("seul", (c) => c.id === solo.id);
+    const any = criterion("tous", () => true);
+    expect(grille.solvable({ rows: [only, any, any], columns: [any, any, any] }, anime.characters)).toBe(false);
+    expect(grille.solvable({ rows: [any, any, any], columns: [any, any, any] }, anime.characters)).toBe(true);
+  }, 30_000);
+
   it("tire une grille dont chaque case a une réponse", () => {
     for (const data of modes) {
       for (const difficulty of DIFFICULTIES) {

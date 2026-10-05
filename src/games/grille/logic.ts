@@ -21,6 +21,35 @@ const MIN_ANSWERS: Record<Difficulty, number> = { facile: 3, normal: 2, expert: 
 /** En facile et en normal, les réponses comptées sont des personnages connus. */
 const FAMOUS_TIER: Record<Difficulty, number> = { facile: 2, normal: 3, expert: 4 };
 
+/**
+ * Peut-on remplir toutes les cases sans réutiliser personne ? `candidates` donne, case par case, qui y
+ * convient. Avoir une réponse par case ne suffit pas : si le même personnage est le seul à convenir à
+ * deux cases, l'une des deux restera vide. On cherche donc un personnage différent pour chaque case,
+ * en déplaçant au besoin ceux déjà placés (couplage par chemins augmentants).
+ */
+function fillable(candidates: readonly (readonly string[])[]): boolean {
+  const cellOf = new Map<string, number>();
+  const place = (cell: number, tried: Set<string>): boolean => {
+    for (const id of candidates[cell]) {
+      if (tried.has(id)) continue;
+      tried.add(id);
+      const holder = cellOf.get(id);
+      // Le personnage est libre, ou la case qui le tient peut en prendre un autre
+      if (holder === undefined || place(holder, tried)) {
+        cellOf.set(id, cell);
+        return true;
+      }
+    }
+    return false;
+  };
+  return candidates.every((_, cell) => place(cell, new Set()));
+}
+
+/** La grille se remplit-elle entièrement avec ces personnages, sans en réutiliser aucun ? */
+export function solvable(grid: Grid, characters: readonly PlayCharacter[]): boolean {
+  return fillable(Array.from({ length: CELLS }, (_, cell) => characters.filter((c) => fits(grid, cell, c)).map((c) => c.id)));
+}
+
 export function generate(seed: number, difficulty: Difficulty, data: ResolvedData): Grid | null {
   const rng = createRng(seed);
   const criteria = criteriaFor(data).filter((criterion) => criterion.id !== "race:human");
@@ -49,7 +78,11 @@ export function generate(seed: number, difficulty: Difficulty, data: ResolvedDat
     const others = fitting.filter((row) => row.kind !== "initial");
     const letters = others.length < SIZE || rng() < 0.25 ? Math.min(1, initials.length) : 0;
     if (others.length + letters < SIZE) continue;
-    return { rows: [...sample(rng, others, SIZE - letters), ...sample(rng, initials, letters)], columns: chosen };
+    const picked = [...sample(rng, others, SIZE - letters), ...sample(rng, initials, letters)];
+    // Chaque case a ses réponses, mais elles peuvent se disputer le même personnage : la grille doit se remplir en entier
+    const candidates = picked.flatMap((row) => chosen.map((column) => [...members.get(row.id)!].filter((id) => members.get(column.id)!.has(id))));
+    if (!fillable(candidates)) continue;
+    return { rows: picked, columns: chosen };
   }
   return null;
 }
