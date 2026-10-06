@@ -34,6 +34,17 @@ describe("critères", () => {
     }
   });
 
+  it("comptent tous les anciens membres d'une organisation dissoute", () => {
+    // Le wiki marque « ancienne » l'alliance de Wano pour la plupart de ses membres : Kinémon en fait partie quand même
+    const alliance = criteriaFor(manga).find((c) => c.id === "affiliation:Alliance des ninjas, pirates, minks et samouraïs")!;
+    const members = manga.characters.filter(alliance.test).map((c) => c.id);
+    expect(members).toEqual(expect.arrayContaining(["kin-emon", "monkey-d-luffy", "trafalgar-d-water-law", "eustass-kid", "nekomamushi"]));
+    expect(members.length).toBeGreaterThanOrEqual(50);
+    expect(manga.characterById.get("kin-emon")!.haki).toContain("armament");
+    const baroque = criteriaFor(manga).find((c) => c.id === "affiliation:Baroque Works")!;
+    expect(manga.characters.filter(baroque.test).map((c) => c.id)).toEqual(expect.arrayContaining(["crocodile", "nico-robin", "nefertari-vivi"]));
+  });
+
   it("ne proposent pas en mode anime un arc que l'anime n'a pas atteint", () => {
     const lastArc = Math.max(...anime.characters.map((c) => c.arc ?? 0));
     const arcs = criteriaFor(anime).filter((c) => c.kind === "arc").map((c) => Number(c.id.split(":")[1]));
@@ -57,8 +68,9 @@ describe("critères et groupes ajoutés", () => {
     const katakuri = manga.characterById.get("charlotte-katakuri")!;
     expect(criteria.get("affiliation:Famille Charlotte")!.test(katakuri)).toBe(true);
     expect(criteria.get("affiliation:Équipage de Big Mom")!.test(katakuri)).toBe(true);
-    // Une organisation quittée ne compte plus
-    expect(criteria.get("affiliation:Baroque Works")!.test(manga.characterById.get("nico-robin")!)).toBe(false);
+    // Une organisation quittée ne compte plus, sauf si elle n'existe plus elle-même (voir DISSOLVED_ORGANIZATIONS)
+    expect(criteria.get("affiliation:Marine")!.test(manga.characterById.get("kuzan")!)).toBe(false);
+    expect(criteria.get("affiliation:Baroque Works")!.test(manga.characterById.get("nico-robin")!)).toBe(true);
   });
 
   it("Den Den Devin ne demande jamais l'initiale", () => {

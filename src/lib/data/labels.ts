@@ -221,6 +221,18 @@ const SECONDARY_AFFILIATIONS = new Set([
   "Seraphim",
 ]);
 
+/**
+ * Organisations qui n'existent plus. Le wiki marque leurs membres « anciens », mais pas tous : la
+ * grille ne reconnaissait l'alliance de Wano qu'à sept personnages sur cinquante-huit. Pour une
+ * organisation dissoute, en avoir fait partie, c'est en faire partie.
+ */
+export const DISSOLVED_ORGANIZATIONS = new Set([
+  "Ninja-Pirate-Mink-Samurai Alliance",
+  "Baroque Works",
+  "Seven Warlords of the Sea",
+  "CP9",
+]);
+
 /** Affiliation principale imposée quand l'ordre du wiki donne un résultat trompeur. */
 export const MAIN_AFFILIATION_OVERRIDES: Record<string, string> = {
   "page-one": "Beasts Pirates",

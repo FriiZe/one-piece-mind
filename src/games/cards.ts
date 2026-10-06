@@ -10,7 +10,14 @@ import shipsJson from "@data/curated/ships.json";
 import techniquesJson from "@data/curated/techniques.json";
 import weaponsJson from "@data/curated/weapons.json";
 import { arcOfChapter, arcs, characters, fruits, groups, images, meta } from "@/lib/data";
-import { MAIN_AFFILIATION_OVERRIDES, mainOrganization, organizationOf, translateAffiliation, type HakiType } from "@/lib/data/labels";
+import {
+  DISSOLVED_ORGANIZATIONS,
+  MAIN_AFFILIATION_OVERRIDES,
+  mainOrganization,
+  organizationOf,
+  translateAffiliation,
+  type HakiType,
+} from "@/lib/data/labels";
 import type { Character, FruitType, Race, Sea } from "@/lib/data/schema";
 import { DEFAULT_LOCALE, type Locale, type Localized } from "@/lib/i18n";
 import { currentBounty, isPlayableCharacter, isPlayableFruit, viewCharacter, type SpoilerMode } from "@/lib/spoilers";
@@ -100,7 +107,9 @@ function modeFacts(character: Character, mode: SpoilerMode, locale: Locale): Mod
   const view = viewCharacter(character, mode);
   const fruit = view.fruitId ? fruitsById.get(view.fruitId) : undefined;
   const org = mainOrganization(view);
-  const others = view.affiliations.map((a) => ({ key: organizationOf(a.name), former: a.former })).filter((a) => a.key !== org);
+  const others = view.affiliations
+    .map((a) => ({ key: organizationOf(a.name), former: a.former && !DISSOLVED_ORGANIZATIONS.has(organizationOf(a.name)) }))
+    .filter((a) => a.key !== org);
   const also = [...new Set(others.filter((a) => !a.former).map((a) => a.key))];
   return {
     bounty: currentBounty(view),
