@@ -20,6 +20,8 @@ export type GameLeaderRow = {
 
 export type GameLeaderboard = {
   period: Period;
+  /** Niveau retenu, `null` pour tous les niveaux. */
+  difficulty: Difficulty | null;
   rows: GameLeaderRow[];
   /** Le joueur connecté, quand il a joué pendant la période sans figurer parmi les premiers ; `null` sinon. */
   you: GameLeaderRow | null;

@@ -2,11 +2,12 @@
 
 import Link from "@/components/Link";
 import { useState } from "react";
-import { DIFFICULTIES } from "@/games/engine/difficulty";
+import { DIFFICULTIES, type Difficulty } from "@/games/engine/difficulty";
 import { formatBounty, formatNumber } from "@/games/engine/text";
 import { LoadingPanel } from "@/games/ui/WithGameData";
 import { formatAgo } from "@/lib/admin/format";
 import { playerBounty, rankOf } from "@/lib/economy";
+import { hasDifficulty } from "@/lib/games/catalog";
 import { useLocale, useT } from "@/lib/i18n/client";
 import { useGameLeaderboard, useGlobalLeaderboard } from "@/lib/leaderboard/client";
 import type { GameLeaderRow, GlobalLeaderRow, Period } from "@/lib/leaderboard/types";
@@ -69,25 +70,61 @@ function GuestNote() {
   );
 }
 
-/** Classement d'un jeu : la meilleure partie de chaque joueur sur la journée, la semaine ou le mois. */
+/** Une liste de joueurs d'un jeu, pour une période et un niveau (ou tous). */
+function LevelBoard({ slug, period, difficulty, title }: { slug: string; period: Period; difficulty: Difficulty | null; title: string | null }) {
+  const t = useT();
+  const locale = useLocale();
+  const board = useGameLeaderboard(slug, period, difficulty);
+  const rows = board && board !== "failed" ? [...board.rows, ...(board.you ? [board.you] : [])] : [];
+  return (
+    <div className="space-y-2">
+      {title && (
+        <h3 className="flex items-baseline justify-between gap-2 px-1 text-sm font-extrabold tracking-wide text-mist uppercase">
+          {title}
+          {board && board !== "failed" && board.players > 0 && (
+            <span className="font-bold normal-case">
+              {board.players} {t(`joueur${board.players > 1 ? "s" : ""}`, board.players === 1 ? "player" : "players")}
+            </span>
+          )}
+        </h3>
+      )}
+      {board === null ? (
+        <LoadingPanel label={t("Chargement…", "Loading…")} />
+      ) : board === "failed" ? (
+        <p className="text-sm text-mist">{t("Le classement est indisponible pour l'instant.", "The leaderboard is unavailable right now.")}</p>
+      ) : rows.length === 0 ? (
+        <p className="rounded-xl border border-dashed border-sea-600 px-3.5 py-3 text-sm text-mist">
+          {t("Personne n'a encore joué sur cette période.", "Nobody has played in this period yet.")}
+        </p>
+      ) : (
+        <ol className="space-y-2">
+          {rows.map((row) => (
+            <Row key={row.username} rank={row.rank} you={row.you} name={row.username} look={row.look}>
+              <span className="block font-extrabold text-straw">{row.score}</span>
+              <span className="block text-xs text-mist">{formatAgo(new Date(row.playedAt), locale)}</span>
+            </Row>
+          ))}
+        </ol>
+      )}
+    </div>
+  );
+}
+
+/**
+ * Classement d'un jeu : la meilleure partie de chaque joueur sur la journée, la semaine ou le mois.
+ * Un jeu à niveaux a une colonne par niveau, de l'expert au facile ; les autres, une seule liste.
+ */
 export function GameLeaderboard({ slug }: { slug: string }) {
   const t = useT();
   const locale = useLocale();
   const [period, setPeriod] = useState<Period>("day");
-  const board = useGameLeaderboard(slug, period);
-  const difficultyLabel = (id: GameLeaderRow["difficulty"]) => DIFFICULTIES.find((d) => d.id === id)?.label[locale] ?? null;
-  const rows = board && board !== "failed" ? [...board.rows, ...(board.you ? [board.you] : [])] : [];
+  const levels = hasDifficulty(slug);
 
   return (
     <section aria-labelledby="classement-du-jeu" className="space-y-3 rounded-2xl border border-sea-700 p-5">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <h2 id="classement-du-jeu" className="text-lg font-extrabold text-foam">
           {t("Classement", "Leaderboard")}
-          {board && board !== "failed" && board.players > 0 && (
-            <span className="ml-2 text-sm font-bold text-mist">
-              · {board.players} {t(`joueur${board.players > 1 ? "s" : ""}`, board.players === 1 ? "player" : "players")}
-            </span>
-          )}
         </h2>
         <div className="flex gap-1 rounded-xl bg-sea-900 p-1" role="group" aria-label={t("Période", "Period")}>
           {PERIODS.map((value) => (
@@ -105,32 +142,22 @@ export function GameLeaderboard({ slug }: { slug: string }) {
           ))}
         </div>
       </div>
-      {board === null ? (
-        <LoadingPanel label={t("Chargement du classement…", "Loading the leaderboard…")} />
-      ) : board === "failed" ? (
-        <p className="text-sm text-mist">{t("Le classement est indisponible pour l'instant.", "The leaderboard is unavailable right now.")}</p>
-      ) : rows.length === 0 ? (
-        <p className="text-sm text-mist">
-          {t("Personne n'a encore joué sur cette période. À toi d'ouvrir le bal.", "Nobody has played in this period yet. Be the first.")}
-        </p>
-      ) : (
-        <ol className="grid gap-2 md:grid-cols-2">
-          {rows.map((row) => (
-            <Row key={row.username} rank={row.rank} you={row.you} name={row.username} look={row.look}>
-              <span className="block font-extrabold text-straw">
-                {row.score} / {row.maxScore}
-              </span>
-              <span className="block text-xs text-mist">
-                {[difficultyLabel(row.difficulty), formatAgo(new Date(row.playedAt), locale)].filter(Boolean).join(" · ")}
-              </span>
-            </Row>
+      {/* Un jeu à niveaux : une colonne par niveau, séparées d'un trait ; empilées sur téléphone, le trait passe entre elles */}
+      {levels ? (
+        <div className="grid divide-y divide-sea-700 lg:grid-cols-3 lg:divide-x lg:divide-y-0">
+          {[...DIFFICULTIES].reverse().map((level) => (
+            <div key={level.id} className="py-4 first:pt-0 last:pb-0 lg:px-4 lg:py-0 lg:first:pl-0 lg:last:pr-0">
+              <LevelBoard slug={slug} period={period} difficulty={level.id} title={level.label[locale]} />
+            </div>
           ))}
-        </ol>
+        </div>
+      ) : (
+        <LevelBoard slug={slug} period={period} difficulty={null} title={null} />
       )}
       <p className="text-xs text-mist">
         {t(
-          "Une ligne par joueur : sa meilleure partie sur la période, à l'heure de Paris. À égalité de points, la difficulté départage, puis la partie la plus ancienne.",
-          "One line per player: their best game in the period, Paris time. Ties go to the higher difficulty, then to the earlier game.",
+          "Une ligne par joueur : sa meilleure partie sur la période. À égalité, la partie la plus ancienne passe devant.",
+          "One line per player: their best game in the period. Ties go to the earlier game.",
         )}
       </p>
       <GuestNote />

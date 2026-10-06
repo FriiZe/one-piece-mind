@@ -6,7 +6,7 @@ import { Prisma } from "@/generated/prisma/client";
 import { db } from "./db";
 
 /** Lignes affichées d'un classement ; le joueur connecté s'y ajoute s'il est plus loin. */
-export const GAME_LEADERS_SHOWN = 20;
+export const GAME_LEADERS_SHOWN = 10;
 export const GLOBAL_LEADERS_SHOWN = 50;
 
 /** Les périodes sont celles de Paris, comme les jeux du jour : la semaine commence le lundi. */
@@ -34,7 +34,12 @@ type GameRow = {
  * puis par difficulté, puis la plus ancienne devant. Les parties sont celles que le serveur a
  * validées : seuls les comptes y figurent.
  */
-export async function gameLeaderboard(slug: string, period: Period, userId: string | null): Promise<GameLeaderboard> {
+export async function gameLeaderboard(
+  slug: string,
+  period: Period,
+  userId: string | null,
+  difficulty: Difficulty | null = null,
+): Promise<GameLeaderboard> {
   const rows = await db().$queryRaw<GameRow[]>(Prisma.sql`
     WITH best AS (
       SELECT DISTINCT ON ("userId") "userId", score, "maxScore", difficulty, "createdAt",
@@ -42,6 +47,7 @@ export async function gameLeaderboard(slug: string, period: Period, userId: stri
         CASE difficulty WHEN 'expert' THEN 3 WHEN 'facile' THEN 1 ELSE 2 END AS level
       FROM "GameResult"
       WHERE slug = ${slug} AND "maxScore" > 0
+        AND (${difficulty}::text IS NULL OR difficulty = ${difficulty})
         AND date_trunc(${TRUNC[period]}, ("createdAt" AT TIME ZONE 'UTC') AT TIME ZONE 'Europe/Paris')
           = date_trunc(${TRUNC[period]}, now() AT TIME ZONE 'Europe/Paris')
       ORDER BY "userId", performance DESC, level DESC, "createdAt" ASC
@@ -69,7 +75,7 @@ export async function gameLeaderboard(slug: string, period: Period, userId: stri
   });
   const shown = rows.filter((row) => row.rank <= GAME_LEADERS_SHOWN).map(view);
   const mine = rows.find((row) => row.userId === userId && row.rank > GAME_LEADERS_SHOWN);
-  return { period, rows: shown, you: mine ? view(mine) : null, players: rows[0]?.players ?? 0 };
+  return { period, difficulty, rows: shown, you: mine ? view(mine) : null, players: rows[0]?.players ?? 0 };
 }
 
 type GlobalRow = { id: string; username: string; lifetimeBerrys: number; games: number; cosmetics: unknown; equipped: unknown; rank: number; players: number };

@@ -552,6 +552,13 @@ describe.skipIf(!accountsEnabled)("quiz et doublons, en base", () => {
         expect(wider.board.you).toBeNull();
       }
       expect((await gameLeaderboard("onepiecedle", "day", null)).rows.some((row) => row.username === player.username)).toBe(false);
+      // Par niveau : la meilleure partie du joueur en expert n'est plus la même
+      const expert = await gameLeaderboard(slug, "day", player.id, "expert");
+      const inExpert = [...expert.rows, ...(expert.you ? [expert.you] : [])];
+      expect(expert.difficulty).toBe("expert");
+      expect(inExpert.find((row) => row.username === player.username)).toMatchObject({ score: 10, difficulty: "expert", you: true });
+      expect(inExpert.find((row) => row.username === author.username)).toMatchObject({ score: 25 });
+      expect(inExpert.some((row) => row.username === witness.username)).toBe(false);
 
       // Le classement général suit la prime, et signale le joueur connecté
       await db().user.update({ where: { id: witness.id }, data: { lifetimeBerrys: 2_000_000_000 } });
