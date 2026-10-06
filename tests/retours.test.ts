@@ -51,7 +51,9 @@ import { DUMMY_HASH } from "@/lib/server/password";
 import { priceBounds } from "@/lib/market/rules";
 import { buyListing, cancelListing, createListing } from "@/lib/server/market";
 import { answerTrade, cancelTrade, friendCollection, proposeTrade, tradesOverview } from "@/lib/server/trades";
+import { answerFriendRequest, requestFriend } from "@/lib/server/friends";
 import { gameLeaderboard, globalLeaderboard } from "@/lib/server/leaderboard";
+import { playerProfile } from "@/lib/server/players";
 import { establish, playedOn } from "./established";
 import { applyCrewFor, buyBoosterFor, deleteCrewFor, loadState, saveCrewFor, sellDuplicatesFor, setCrewFor } from "@/lib/server/player";
 import {
@@ -505,9 +507,11 @@ describe.skipIf(!accountsEnabled)("quiz et doublons, en base", () => {
 
   it("classe les meilleures parties d'un jeu sur la période, et les comptes par prime", async () => {
     const [author, player, admin, witness] = users;
+    // Un jeu que d'autres données de la base locale peuvent aussi contenir : on ne compare que nos comptes entre eux
+    const slug = "memo";
     const result = (userId: string, score: number, difficulty: string | null, minutesAgo: number) => ({
       userId,
-      slug: "le-classement",
+      slug,
       reportKey: `classement-${userId}-${minutesAgo}`,
       mode: "anime",
       difficulty,
@@ -516,41 +520,84 @@ describe.skipIf(!accountsEnabled)("quiz et doublons, en base", () => {
       berrys: 0,
       createdAt: new Date(Date.now() - minutesAgo * 60_000),
     });
-    await db().gameResult.createMany({
+    try {
+      await db().gameResult.createMany({
+        data: [
+          // Le joueur : sa meilleure partie compte, pas la dernière
+          result(player.id, 25, "normal", 30),
+          result(player.id, 10, "expert", 5),
+          // Même part des points que le joueur : la difficulté départage
+          result(author.id, 25, "expert", 20),
+          result(witness.id, 20, "facile", 10),
+        ],
+      });
+      const rowsFor = async (period: "day" | "week" | "month", viewer: string | null) => {
+        const board = await gameLeaderboard(slug, period, viewer);
+        const all = [...board.rows, ...(board.you ? [board.you] : [])];
+        return { board, mine: [author, player, witness].map((u) => all.find((row) => row.username === u.username)) };
+      };
+      const { board, mine } = await rowsFor("day", witness.id);
+      const [a, p, w] = mine;
+      expect(a).toMatchObject({ score: 25, difficulty: "expert", you: false });
+      expect(p).toMatchObject({ score: 25, difficulty: "normal", you: false });
+      expect(w).toMatchObject({ score: 20, difficulty: "facile", you: true });
+      expect(a!.rank).toBeLessThan(p!.rank);
+      expect(p!.rank).toBeLessThan(w!.rank);
+      expect(board.players).toBeGreaterThanOrEqual(3);
+      // La semaine et le mois comprennent le jour ; un compte sans partie n'y figure pas
+      for (const period of ["week", "month"] as const) {
+        const wider = await rowsFor(period, admin.id);
+        expect(wider.mine.every(Boolean)).toBe(true);
+        expect(wider.board.rows.some((row) => row.username === admin.username)).toBe(false);
+        expect(wider.board.you).toBeNull();
+      }
+      expect((await gameLeaderboard("onepiecedle", "day", null)).rows.some((row) => row.username === player.username)).toBe(false);
+
+      // Le classement général suit la prime, et signale le joueur connecté
+      await db().user.update({ where: { id: witness.id }, data: { lifetimeBerrys: 2_000_000_000 } });
+      const general = await globalLeaderboard(witness.id);
+      expect(general.rows[0]).toMatchObject({ rank: 1, username: witness.username, you: true, lifetimeBerrys: 2_000_000_000 });
+      expect(general.players).toBeGreaterThanOrEqual(users.length);
+    } finally {
+      await db().user.update({ where: { id: witness.id }, data: { lifetimeBerrys: 0 } });
+      await db().gameResult.deleteMany({ where: { reportKey: { startsWith: "classement-" } } });
+    }
+  });
+
+  it("montre la page d'un joueur, filtrée par le mode spoiler, avec le lien d'amitié du visiteur", async () => {
+    const [, , admin, witness] = users;
+    const known = anime.characters[0].id;
+    const spoiler = manga.characters.find((c) => c.debut > anime.latestChapter)!.id;
+    await db().collectionEntry.createMany({
       data: [
-        // Le joueur : sa meilleure partie compte, pas la dernière
-        result(player.id, 25, "normal", 30),
-        result(player.id, 10, "expert", 5),
-        // Même part des points que le joueur : la difficulté départage
-        result(author.id, 25, "expert", 20),
-        result(witness.id, 20, "facile", 10),
+        { userId: witness.id, characterId: known, count: 2, golden: 1 },
+        { userId: witness.id, characterId: spoiler, count: 1, golden: 0 },
       ],
     });
-    const board = await gameLeaderboard("le-classement", "day", witness.id);
-    const mine = board.rows.filter((row) => [author, player, witness].some((u) => u.username === row.username));
-    expect(mine.map((row) => [row.username, row.rank, row.score, row.difficulty, row.you])).toEqual([
-      [author.username, 1, 25, "expert", false],
-      [player.username, 2, 25, "normal", false],
-      [witness.username, 3, 20, "facile", true],
-    ]);
-    expect(board.players).toBeGreaterThanOrEqual(3);
-    expect(board.you).toBeNull();
-    // La semaine et le mois comprennent le jour ; un compte sans partie n'y figure pas
-    for (const period of ["week", "month"] as const) {
-      const wider = await gameLeaderboard("le-classement", period, admin.id);
-      expect(wider.rows.map((row) => row.username)).toEqual(expect.arrayContaining([author.username, player.username, witness.username]));
-      expect(wider.rows.some((row) => row.username === admin.username)).toBe(false);
-      expect(wider.you).toBeNull();
-    }
-    expect((await gameLeaderboard("onepiecedle", "day", null)).rows.some((row) => row.username === player.username)).toBe(false);
+    await db().crewSlot.create({ data: { userId: witness.id, post: "capitaine", characterId: spoiler } });
 
-    // Le classement général suit la prime, et signale le joueur connecté
-    await db().user.update({ where: { id: witness.id }, data: { lifetimeBerrys: 1_000_000_000 } });
-    const general = await globalLeaderboard(witness.id);
-    expect(general.rows[0]).toMatchObject({ rank: 1, username: witness.username, you: true, lifetimeBerrys: 1_000_000_000 });
-    expect(general.players).toBeGreaterThanOrEqual(users.length);
-    await db().user.update({ where: { id: witness.id }, data: { lifetimeBerrys: 0 } });
-    await db().gameResult.deleteMany({ where: { reportKey: { startsWith: "classement-" } } });
+    expect(await playerProfile("personne", "anime", null)).toBeNull();
+    const seen = (await playerProfile(witness.username.toUpperCase(), "anime", null))!;
+    expect(seen).toMatchObject({ username: witness.username, friendship: "guest", requestId: null, rating: null });
+    // Un personnage que le visiteur n'a pas encore vu reste caché, dans la collection comme à son poste
+    expect(seen.collection).toEqual({ [known]: { count: 2, golden: 1 } });
+    expect(seen.crew).toEqual({});
+    expect((await playerProfile(witness.username, "manga", null))!.collection[spoiler]).toEqual({ count: 1, golden: 0 });
+    expect((await playerProfile(witness.username, "manga", null))!.crew).toEqual({ capitaine: spoiler });
+
+    expect((await playerProfile(witness.username, "anime", witness.id))!.friendship).toBe("self");
+    expect((await playerProfile(witness.username, "anime", admin.id))!.friendship).toBe("none");
+    expect(await requestFriend(admin.id, witness.username)).toEqual({ ok: true });
+    const sent = (await playerProfile(witness.username, "anime", admin.id))!;
+    const received = (await playerProfile(admin.username, "anime", witness.id))!;
+    expect(sent.friendship).toBe("sent");
+    expect(received).toMatchObject({ friendship: "received", requestId: sent.requestId });
+    expect(await answerFriendRequest(witness.id, received.requestId!, true)).toEqual({ ok: true, accepted: true });
+    expect((await playerProfile(admin.username, "anime", witness.id))!.friendship).toBe("friends");
+
+    await db().friendship.deleteMany({ where: { OR: [{ requesterId: admin.id }, { addresseeId: admin.id }] } });
+    await db().crewSlot.deleteMany({ where: { userId: witness.id } });
+    await db().collectionEntry.deleteMany({ where: { userId: witness.id } });
   });
 
   it("enregistre des équipages dans un compte et les remet en place", async () => {

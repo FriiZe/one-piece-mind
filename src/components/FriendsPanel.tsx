@@ -5,10 +5,9 @@ import Link from "@/components/Link";
 import { formatNumber } from "@/games/engine/text";
 import { Button } from "@/games/ui/primitives";
 import { rankOf } from "@/lib/economy";
-import type { Localized } from "@/lib/i18n";
 import { useLocale, useT } from "@/lib/i18n/client";
 import { notificationsChanged, useFriends } from "@/lib/multi/client";
-import type { FriendError, FriendResult } from "@/lib/multi/friends";
+import { FRIEND_ERRORS, type FriendResult } from "@/lib/multi/friends";
 import {
   answerFriendRequestAction,
   cancelFriendRequestAction,
@@ -16,25 +15,6 @@ import {
   requestFriendAction,
 } from "@/lib/player/friend-actions";
 import { usePlayer } from "@/lib/player/PlayerProvider";
-
-const ERRORS: Localized<Record<FriendError, string>> = {
-  fr: {
-    "unknown-user": "Aucun joueur ne porte ce pseudo.",
-    self: "C'est ton propre pseudo.",
-    already: "Vous êtes déjà amis, ou une demande est déjà en attente.",
-    limit: "Trop de demandes pour l'instant. Réessaie plus tard.",
-    "not-found": "Cette demande n'existe plus.",
-    unavailable: "Action indisponible pour l'instant.",
-  },
-  en: {
-    "unknown-user": "No player has that username.",
-    self: "That's your own username.",
-    already: "You're already friends, or a request is already pending.",
-    limit: "Too many requests for now. Try again later.",
-    "not-found": "This request no longer exists.",
-    unavailable: "This action is unavailable right now.",
-  },
-};
 
 /** Amis du joueur connecté : en ajouter par pseudo, répondre aux demandes, voir les invitations. */
 export function FriendsPanel() {
@@ -52,7 +32,7 @@ export function FriendsPanel() {
     setBusy(true);
     const result = await action().catch((): FriendResult => ({ ok: false, error: "unavailable" }));
     setBusy(false);
-    setMessage(result.ok ? { text: success(result), ok: true } : { text: ERRORS[locale][result.error], ok: false });
+    setMessage(result.ok ? { text: success(result), ok: true } : { text: FRIEND_ERRORS[locale][result.error], ok: false });
     reload();
     notificationsChanged();
   }

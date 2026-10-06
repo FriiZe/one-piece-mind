@@ -289,7 +289,9 @@ function Leaderboard({ overview }: { overview: RankedOverview }) {
               className={`flex min-h-14 items-center gap-3 rounded-xl border-2 bg-sea-900 px-3 py-2 ${row.you ? "border-straw" : "border-transparent"}`}
             >
               <span className={`w-6 text-center font-display text-[22px] ${row.rank === 1 ? "text-straw" : "text-mist"}`}>{row.rank}</span>
-              <PlayerTag name={row.username} look={row.look} you={row.you} />
+              <Link href={`/joueurs/${encodeURIComponent(row.username)}`} className="flex min-w-0 flex-1 items-center rounded-lg hover:bg-sea-800">
+                <PlayerTag name={row.username} look={row.look} you={row.you} />
+              </Link>
               <span className="text-right">
                 <span className="block font-extrabold text-foam">{formatNumber(row.rating, locale)}</span>
                 <span className="block text-xs text-mist">{leagueOf(row.rating).league.title[locale]}</span>
