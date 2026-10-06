@@ -2,7 +2,7 @@
 
 import { useActionState, useEffect, useState } from "react";
 import { Button } from "@/games/ui/primitives";
-import { writeStored } from "@/games/ui/storage";
+import { readStored, writeStored } from "@/games/ui/storage";
 import { formatNumber } from "@/games/engine/text";
 import { EMPTY_PLAYER, SIGNUP_BERRYS } from "@/lib/economy";
 import { useLocale, useT } from "@/lib/i18n/client";
@@ -79,7 +79,8 @@ function SignupForm() {
   return (
     <form action={action} className="space-y-4">
       <Credentials mode="signup" username={result.username} />
-      <input type="hidden" name="guest" value={JSON.stringify(state)} />
+      {/* Le mode spoiler aussi : les recrues scellées sont tirées à l'inscription parmi ce que l'invité peut voir */}
+      <input type="hidden" name="guest" value={JSON.stringify({ ...state, mode: readStored<string | null>("opm.mode", null) ?? "anime" })} />
       {result.error && (
         <p role="alert" className="font-semibold text-vest">
           {result.error}

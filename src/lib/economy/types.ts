@@ -64,6 +64,8 @@ export type PlayerState = {
   crew: Partial<Record<PostId, string>>;
   /** Équipages enregistrés, du plus ancien au plus récent (voir crew.ts). */
   savedCrews: SavedCrew[];
+  /** Recrues gagnées sans compte, scellées jusqu'à l'inscription (voir guest.ts) ; toujours 0 pour un compte. */
+  pendingRecruits: number;
   /**
    * Gains du jour (date de Paris), pour le plafond journalier, jeux du jour
    * déjà validés, et avancement des défis quotidiens (voir dailies.ts).
@@ -83,6 +85,7 @@ export const EMPTY_PLAYER: PlayerState = {
   collection: {},
   crew: {},
   savedCrews: [],
+  pendingRecruits: 0,
   day: { key: "", earned: 0, done: [], challenges: { progress: [], done: [] } },
   stats: {},
   week: { key: "", progress: [], done: [] },
@@ -165,6 +168,8 @@ export type Reward = {
   bonus: number;
   /** Le plafond journalier a réduit les gains. */
   capped: boolean;
+  /** En invité : le plafond des Berrys sans compte a retenu une partie des gains (voir guest.ts). */
+  guestCapped?: boolean;
   recruit: Recruit | null;
   /** Objectifs du jeu atteints avec cette partie, ou réussis à une difficulté plus haute. */
   objectives: Milestone[];

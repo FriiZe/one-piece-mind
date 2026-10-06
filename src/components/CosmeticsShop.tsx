@@ -16,8 +16,9 @@ import { useLocale, useT } from "@/lib/i18n/client";
 import { usePlayer } from "@/lib/player/PlayerProvider";
 import { FlagArt, FrameArt, ShipArt } from "./Cosmetics";
 
-const REFUSALS: Localized<Record<CosmeticError | "unavailable", string>> = {
+const REFUSALS: Localized<Record<CosmeticError | "unavailable" | "account", string>> = {
   fr: {
+    account: "Les achats demandent un compte.",
     unknown: "Ce cosmétique n'existe pas.",
     owned: "Tu l'as déjà.",
     locked: "Ce cosmétique ne s'achète pas : il se gagne.",
@@ -26,6 +27,7 @@ const REFUSALS: Localized<Record<CosmeticError | "unavailable", string>> = {
     unavailable: "Achat indisponible pour l'instant. Réessaie dans un moment.",
   },
   en: {
+    account: "Purchases require an account.",
     unknown: "That cosmetic doesn't exist.",
     owned: "You already have it.",
     locked: "That cosmetic can't be bought: it has to be earned.",
@@ -37,14 +39,16 @@ const REFUSALS: Localized<Record<CosmeticError | "unavailable", string>> = {
 
 /** Les cosmétiques de la boutique, par emplacement : acheter, porter, ou revenir à l'apparence d'origine. */
 export function CosmeticsShop() {
-  const { state, buyLook, wear } = usePlayer();
+  const { state, status, buyLook, wear } = usePlayer();
+  // Les achats demandent un compte (voir src/lib/economy/guest.ts)
+  const guest = status !== "user";
   const t = useT();
   const locale = useLocale();
   const [busy, setBusy] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const { owned, equipped } = state.cosmetics;
 
-  async function run(key: string, action: () => Promise<{ ok: true } | { ok: false; reason: CosmeticError | "unavailable" }>) {
+  async function run(key: string, action: () => Promise<{ ok: true } | { ok: false; reason: CosmeticError | "unavailable" | "account" }>) {
     setBusy(key);
     setError(null);
     const result = await action();
@@ -85,7 +89,7 @@ export function CosmeticsShop() {
         ) : (
           <button
             type="button"
-            disabled={busy !== null || state.berrys < cosmetic.price}
+            disabled={busy !== null || state.berrys < cosmetic.price || guest}
             onClick={() => run(key, () => buyLook(cosmetic.id))}
             className="mt-auto min-h-10 w-full cursor-pointer rounded-lg bg-straw px-3 text-sm font-extrabold text-ink hover:bg-straw-dark disabled:cursor-not-allowed disabled:opacity-50"
           >

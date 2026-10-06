@@ -84,7 +84,7 @@ function Duplicates({ data }: { data: ResolvedData }) {
 }
 
 function Collection({ data }: { data: ResolvedData }) {
-  const { state } = usePlayer();
+  const { state, status, accountsEnabled } = usePlayer();
   const t = useT();
   const locale = useLocale();
   const [tier, setTier] = useState<number | null>(null);
@@ -111,6 +111,20 @@ function Collection({ data }: { data: ResolvedData }) {
       <h2 id="avis" className="sr-only">
         {t("Mes avis de recherche", "My wanted posters")}
       </h2>
+      {/* Sans compte, les recrues restent scellées : elles sont tirées à l'inscription */}
+      {status === "guest" && state.pendingRecruits > 0 && (
+        <p className="rounded-xl border border-straw/50 bg-straw/5 px-4 py-3 font-semibold text-foam">
+          {t(
+            `${state.pendingRecruits} avis de recherche t'attend${state.pendingRecruits > 1 ? "ent" : ""}, scellé${state.pendingRecruits > 1 ? "s" : ""} : crée un compte pour ${state.pendingRecruits > 1 ? "les" : "le"} découvrir.`,
+            `${state.pendingRecruits} sealed wanted ${state.pendingRecruits > 1 ? "posters are" : "poster is"} waiting for you: create an account to reveal ${state.pendingRecruits > 1 ? "them" : "it"}.`,
+          )}{" "}
+          {accountsEnabled && (
+            <Link href="/profil" className="font-bold text-straw underline underline-offset-4">
+              {t("Créer un compte", "Create an account")}
+            </Link>
+          )}
+        </p>
+      )}
 
       <div className="flex flex-wrap items-center gap-2">
         <div

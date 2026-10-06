@@ -9,19 +9,20 @@ export type GameResult =
 
 export type RecruitResult =
   | { ok: true; state: PlayerState; recruit: Recruit; cost: number }
-  | { ok: false; reason: "insufficient" | "empty" | "unavailable" };
+  | { ok: false; reason: "insufficient" | "empty" | "unavailable" | "account" };
 
 export type CrewResult = { ok: true; state: PlayerState } | { ok: false; reason: CrewError | "unavailable" };
 
 export type BoosterResult =
   | { ok: true; state: PlayerState; recruits: Recruit[]; cost: number }
-  | { ok: false; reason: "insufficient" | "empty" | "unavailable" };
+  | { ok: false; reason: "insufficient" | "empty" | "unavailable" | "account" };
 
 /** Doublons défaits : `berrys` rendus pour `sold` avis. */
 export type SellResult = { ok: true; state: PlayerState; berrys: number; sold: number } | { ok: false; reason: "nothing" | "unavailable" };
 
 /** Achat ou port d'un cosmétique. */
-export type CosmeticResult = { ok: true; state: PlayerState } | { ok: false; reason: CosmeticError | "unavailable" };
+/** `account` : les achats demandent un compte. */
+export type CosmeticResult = { ok: true; state: PlayerState } | { ok: false; reason: CosmeticError | "unavailable" | "account" };
 
 /** Ce que renvoie /api/me. */
 export type MeResponse = {

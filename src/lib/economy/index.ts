@@ -3,6 +3,7 @@ export * from "./crew";
 export * from "./dailies";
 export * from "./daily";
 export * from "./exchange";
+export * from "./guest";
 export * from "./objectives";
 export * from "./rank";
 export * from "./rewards";

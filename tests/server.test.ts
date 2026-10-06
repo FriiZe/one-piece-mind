@@ -5,10 +5,10 @@ import { dailyKey } from "@/games/engine/daily";
 import { createRng } from "@/games/engine/rng";
 import * as dle from "@/games/onepiecedle/logic";
 import * as typeDeFruit from "@/games/type-de-fruit/logic";
-import { DAILY_CHALLENGE_BERRYS, dailyGames, TAVERN_COST } from "@/lib/economy";
+import { DAILY_CHALLENGE_BERRYS, dailyGames, GUEST_BERRY_CAP, GUEST_RECRUITS_MAX, TAVERN_COST } from "@/lib/economy";
 import { accountsEnabled, db } from "@/lib/server/db";
 import { DUMMY_HASH, hashPassword, verifyPassword } from "@/lib/server/password";
-import { buyRecruitFor, loadState, sanitizeGuestState, setCrewFor, submitGame } from "@/lib/server/player";
+import { buyRecruitFor, loadState, openPendingRecruits, sanitizeGuestState, setCrewFor, submitGame } from "@/lib/server/player";
 
 const data = resolveGameData(buildGameData(), "anime");
 
@@ -29,37 +29,33 @@ describe("mots de passe", () => {
 });
 
 describe("reprise de la progression d'un invité", () => {
-  it("plafonne les Berrys et ne garde que des personnages connus", () => {
+  it("ne reprend que des Berrys plafonnés, aucune prime, et des recrues à tirer plutôt qu'une collection", () => {
     const clean = sanitizeGuestState({
       berrys: 9_000_000,
       lifetimeBerrys: 9_000_000,
       games: 12,
+      pendingRecruits: 3,
+      // Une collection d'avant les scellés : ses cartes ne sont pas reprises, leur nombre devient des recrues à tirer
       collection: {
-        "monkey-d-luffy": { count: 999, golden: 999 },
+        "monkey-d-luffy": { count: 4, golden: 4 },
         nami: { count: 2, golden: 1 },
         "personnage-invente": { count: 1, golden: 0 },
       },
-      crew: { capitaine: "monkey-d-luffy", navigateur: "monkey-d-luffy", sabreur: "roronoa-zoro", amiral: "nami" },
+      crew: { capitaine: "monkey-d-luffy" },
+      mode: "manga",
     })!;
-    expect(clean.berrys).toBe(100_000);
-    expect(clean.lifetimeBerrys).toBe(500_000);
-    expect(clean.collection).toEqual([
-      { characterId: "monkey-d-luffy", count: 50, golden: 50 },
-      { characterId: "nami", count: 2, golden: 1 },
-    ]);
-    // Un personnage par poste, possédé, à un poste qui existe
-    expect(clean.crew).toEqual([{ post: "capitaine", characterId: "monkey-d-luffy" }]);
+    expect(clean).toEqual({ berrys: GUEST_BERRY_CAP, games: 12, stats: {}, pendingRecruits: 3 + 4 + 2 + 1, mode: "manga" });
+    expect(clean).not.toHaveProperty("lifetimeBerrys");
+    expect(clean).not.toHaveProperty("collection");
+    // Pas plus de recrues que la limite, même avec un navigateur généreux
+    expect(sanitizeGuestState({ berrys: 0, games: 0, pendingRecruits: 999 })!.pendingRecruits).toBe(GUEST_RECRUITS_MAX);
+    expect(sanitizeGuestState({ berrys: 0, games: 0 })!).toMatchObject({ pendingRecruits: 0, mode: "anime" });
   });
 
   it("refuse un état mal formé", () => {
     expect(sanitizeGuestState(null)).toBeNull();
-    expect(sanitizeGuestState({ berrys: -5, lifetimeBerrys: 0, games: 0, collection: {}, crew: {} })).toBeNull();
+    expect(sanitizeGuestState({ berrys: -5, games: 0 })).toBeNull();
     expect(sanitizeGuestState({ berrys: "beaucoup" })).toBeNull();
-  });
-
-  it("ne laisse pas un solde dépasser le total gagné", () => {
-    const clean = sanitizeGuestState({ berrys: 5000, lifetimeBerrys: 100, games: 0, collection: {}, crew: {} })!;
-    expect(clean.berrys).toBe(100);
   });
 });
 
@@ -75,6 +71,18 @@ describe.skipIf(!accountsEnabled)("récompenses enregistrées en base", () => {
     });
     userId = user.id;
   });
+  it("tire les recrues scellées d'un invité devenu compte, parmi ce que son mode lui montre", async () => {
+    const before = Object.keys((await loadState(userId)).collection).length;
+    await openPendingRecruits(userId, 5, "anime");
+    const state = await loadState(userId);
+    const total = Object.values(state.collection).reduce((sum, entry) => sum + entry.count, 0);
+    expect(total).toBe(before + 5);
+    const anime = resolveGameData(buildGameData(), "anime");
+    for (const id of Object.keys(state.collection)) expect(anime.characterById.has(id), id).toBe(true);
+    await openPendingRecruits(userId, 0, "anime");
+    expect(Object.values((await loadState(userId)).collection).reduce((sum, entry) => sum + entry.count, 0)).toBe(before + 5);
+  });
+
   afterAll(async () => {
     await db().user.delete({ where: { id: userId } });
     await db().$disconnect();

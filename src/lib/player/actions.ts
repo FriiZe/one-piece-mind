@@ -16,6 +16,7 @@ import {
   equipCosmeticFor,
   applyCrewFor,
   deleteCrewFor,
+  openPendingRecruits,
   sanitizeGuestState,
   saveCrewFor,
   sellDuplicatesFor,
@@ -164,19 +165,16 @@ export async function signupAction(_: AuthState, form: FormData): Promise<AuthSt
         username,
         usernameKey: username.toLowerCase(),
         passwordHash: await hashPassword(password),
-        // Cadeau de bienvenue, en plus de la progression d'invité reprise
+        // Cadeau de bienvenue, en plus des Berrys gagnés en invité ; la prime, elle, part de zéro
         berrys: (guest?.berrys ?? 0) + SIGNUP_BERRYS,
-        lifetimeBerrys: (guest?.lifetimeBerrys ?? 0) + SIGNUP_BERRYS,
+        lifetimeBerrys: SIGNUP_BERRYS,
         games: guest?.games ?? 0,
         stats: guest?.stats ?? {},
-        cosmetics: guest?.cosmetics.owned ?? [],
-        savedCrews: guest?.savedCrews ?? [],
-        equipped: guest?.cosmetics.equipped ?? {},
-        collection: guest ? { create: guest.collection } : undefined,
-        crew: guest ? { create: guest.crew } : undefined,
       },
       select: { id: true },
     });
+    // Les recrues gagnées sans compte sont tirées maintenant, par le serveur
+    if (guest) await openPendingRecruits(user.id, guest.pendingRecruits, guest.mode);
     await createSession(user.id);
     return { ok: true };
   } catch (error) {

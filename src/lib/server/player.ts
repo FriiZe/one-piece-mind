@@ -15,7 +15,9 @@ import {
   DAILY_BERRY_CAP,
   EMPTY_PLAYER,
   equipCosmetic,
-  getCosmetic,
+  drawRecruit,
+  GUEST_BERRY_CAP,
+  GUEST_RECRUITS_MAX,
   grantCosmetic,
   POST_IDS,
   deleteCrew,
@@ -106,6 +108,7 @@ export async function loadState(userId: string, client: Tx = db()): Promise<Play
     week: weekSchema.safeParse(user.week).data ?? EMPTY_PLAYER.week,
     cosmetics: sanitizeCosmetics(user.cosmetics, user.equipped),
     savedCrews: sanitizeSavedCrews(user.savedCrews),
+    pendingRecruits: 0,
     collection: Object.fromEntries(user.collection.map((e) => [e.characterId, { count: e.count, golden: e.golden }])),
     crew: Object.fromEntries(
       user.crew.filter((slot) => (POST_IDS as readonly string[]).includes(slot.post)).map((slot) => [slot.post, slot.characterId]),
@@ -334,61 +337,51 @@ export async function equipCosmeticFor(userId: string, slot: string, cosmeticId:
 // ---------------------------------------------------------------------------
 // Reprise de la progression d'un invité à la création du compte
 
-/** Plafonds de la reprise : l'état d'un invité vit dans son navigateur, donc sans garantie. */
-const IMPORT_LIMITS = { berrys: 100_000, lifetimeBerrys: 500_000, perCharacter: 50 };
-
+/**
+ * L'état d'un invité vit dans son navigateur, où tout peut s'écrire à la main : on n'en reprend que
+ * ce qu'il a pu gagner sans compte (voir src/lib/economy/guest.ts). Ses Berrys, jusqu'au plafond ;
+ * aucune prime ; et ses recrues, scellées, que le serveur tire lui-même à l'inscription. Une
+ * collection d'avant les scellés compte comme autant de recrues à tirer : les cartes elles-mêmes ne
+ * sont pas reprises, puisqu'un navigateur peut déclarer n'importe lesquelles.
+ */
 const guestStateSchema = z.object({
   berrys: z.number().int().nonnegative(),
-  lifetimeBerrys: z.number().int().nonnegative(),
   games: z.number().int().nonnegative().max(100_000),
-  collection: z.record(
-    z.string().max(80),
-    z.object({ count: z.number().int().positive(), golden: z.number().int().nonnegative() }),
-  ),
-  crew: z.record(z.string(), z.string().max(80)),
+  pendingRecruits: z.number().int().nonnegative().max(100_000).optional(),
+  collection: z.record(z.string().max(80), z.object({ count: z.number().int().positive() })).optional(),
   stats: statsSchema.optional(),
-  cosmetics: z.object({ owned: z.array(z.string().max(80)).max(200), equipped: z.record(z.string(), z.string().max(80)) }).optional(),
-  savedCrews: z.array(z.unknown()).max(50).optional(),
+  /** Mode spoiler de l'invité : les recrues tirées à l'inscription viennent de ce qu'il a le droit de voir. */
+  mode: z.enum(["anime", "manga"]).optional(),
 });
 
-/** Ce qu'on accepte de reprendre d'un état d'invité : valeurs plafonnées, personnages connus seulement. */
+/** Ce qu'on accepte de reprendre d'un état d'invité. */
 export function sanitizeGuestState(input: unknown) {
   const parsed = guestStateSchema.safeParse(input);
   if (!parsed.success) return null;
   const guest = parsed.data;
-  const known = gameData("manga").characterById;
-
-  const collection = Object.entries(guest.collection)
-    .filter(([id]) => known.has(id))
-    .map(([characterId, entry]) => {
-      const count = Math.min(entry.count, IMPORT_LIMITS.perCharacter);
-      return { characterId, count, golden: Math.min(entry.golden, count) };
-    });
-  const owned = new Set(collection.map((entry) => entry.characterId));
-  const seen = new Set<string>();
-  const crew = Object.entries(guest.crew).filter(([post, id]) => {
-    if (!(POST_IDS as readonly string[]).includes(post) || !owned.has(id) || seen.has(id)) return false;
-    seen.add(id);
-    return true;
-  });
-
-  // Seuls les cosmétiques de la boutique se reprennent : les autres se gagnent avec un compte
-  const cosmetics = sanitizeCosmetics(
-    (guest.cosmetics?.owned ?? []).filter((id) => getCosmetic(id)?.price != null),
-    guest.cosmetics?.equipped,
-  );
-
-  const lifetimeBerrys = Math.min(guest.lifetimeBerrys, IMPORT_LIMITS.lifetimeBerrys);
+  const legacy = Object.values(guest.collection ?? {}).reduce((sum, entry) => sum + entry.count, 0);
   return {
-    berrys: Math.min(guest.berrys, IMPORT_LIMITS.berrys, lifetimeBerrys),
-    lifetimeBerrys,
-    games: guest.games,
+    berrys: Math.min(guest.berrys, GUEST_BERRY_CAP),
+    games: Math.min(guest.games, 2_000),
     // Le parcours par jeu est repris pour que les objectifs déjà atteints ne soient pas payés deux fois
     stats: Object.fromEntries(Object.entries(guest.stats ?? {}).filter(([slug]) => isBuiltSlug(slug))),
-    collection,
-    crew: crew.map(([post, characterId]) => ({ post, characterId })),
-    // Un équipage enregistré peut citer un avis qui n'a pas été repris : il laissera son poste libre
-    savedCrews: sanitizeSavedCrews(guest.savedCrews),
-    cosmetics,
+    pendingRecruits: Math.min((guest.pendingRecruits ?? 0) + legacy, GUEST_RECRUITS_MAX),
+    mode: guest.mode ?? "anime",
   };
+}
+
+/** Tire les recrues scellées d'un invité devenu compte, et les range dans sa collection. */
+export async function openPendingRecruits(userId: string, count: number, mode: SpoilerMode): Promise<void> {
+  if (count <= 0) return;
+  const pool = gameData(mode).characters;
+  const rng = createRng(randomInt(0, 0xffffffff));
+  await db().$transaction(async (tx) => {
+    let state = await loadState(userId, tx);
+    for (let i = 0; i < count; i++) {
+      const recruit = drawRecruit(rng, pool, state, 0);
+      if (!recruit) break;
+      await addToCollection(tx, userId, recruit.characterId, recruit.golden);
+      state = { ...state, collection: { ...state.collection, [recruit.characterId]: { count: 1, golden: 0 } } };
+    }
+  });
 }

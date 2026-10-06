@@ -267,16 +267,13 @@ describe("cosmétiques", () => {
     expect(grantCosmetic({ owned: [], equipped: {} }, "inconnu").owned).toEqual([]);
   });
 
-  it("ne reprend d'un invité que les cosmétiques de la boutique", () => {
+  it("ne reprend d'un invité aucun cosmétique : il n'a rien pu acheter", () => {
     const clean = sanitizeGuestState({
       berrys: 0,
-      lifetimeBerrys: 0,
       games: 0,
-      collection: {},
-      crew: {},
       cosmetics: { owned: ["flag-rouge", "title-laugh-tale", "inconnu"], equipped: { flag: "flag-rouge", title: "title-laugh-tale" } },
     })!;
-    expect(clean.cosmetics).toEqual({ owned: ["flag-rouge"], equipped: { flag: "flag-rouge" } });
+    expect(clean).not.toHaveProperty("cosmetics");
   });
 });
 

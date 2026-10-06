@@ -1,12 +1,17 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import type { ComponentType } from "react";
+import { useState, type ComponentType } from "react";
+import Link from "@/components/Link";
+import { Modal } from "@/components/Modal";
+import { formatNumber } from "@/games/engine/text";
+import { GUEST_BERRY_CAP, guestAtCap } from "@/lib/economy";
+import { usePlayer } from "@/lib/player/PlayerProvider";
 import type { ClueSlug } from "../clues/logic";
 import type { EstimateSlug } from "../estimate/logic";
 import type { QcmSlug } from "../qcm/logic";
 import type { LiveSlug } from "@/lib/games/catalog";
-import { useT } from "@/lib/i18n/client";
+import { useLocale, useT } from "@/lib/i18n/client";
 import { ModeBar, SpoilerGate } from "./SpoilerGate";
 import { LoadingPanel, WithGameData } from "./WithGameData";
 import type { GameProps } from "./types";
@@ -77,6 +82,36 @@ const GAME_COMPONENTS = {
   "den-den-devin": load(() => import("../den-den-devin/Game")),
 } satisfies Record<LiveSlug, ComponentType<GameProps>>;
 
+/**
+ * Un invité qui a atteint le plafond de Berrys le voit à chaque jeu qu'il ouvre : ses gains ne
+ * s'accumulent plus tant qu'il n'a pas de compte.
+ */
+function GuestCapNotice() {
+  const { status, state, accountsEnabled } = usePlayer();
+  const t = useT();
+  const locale = useLocale();
+  const [dismissed, setDismissed] = useState(false);
+  if (dismissed || status !== "guest" || !accountsEnabled || !guestAtCap(state)) return null;
+  return (
+    <Modal title={t("Tes Berrys t'attendent", "Your Berries are waiting")} onClose={() => setDismissed(true)}>
+      <p className="text-foam">
+        {t(
+          `Tu as atteint les ${formatNumber(GUEST_BERRY_CAP, locale)} ฿ qu'on peut garder sans compte. Afin de collecter tes Berrys, merci de te connecter ou de créer un compte : tu les retrouveras dessus, et tes recrues avec.`,
+          `You've reached the ${formatNumber(GUEST_BERRY_CAP, locale)} ฿ you can keep without an account. To collect your Berries, please log in or create an account: you'll find them there, and your recruits with them.`,
+        )}
+      </p>
+      <div className="flex flex-wrap gap-3">
+        <Link href="/profil" className="rounded-lg bg-straw px-4 py-2.5 font-bold text-ink hover:bg-straw-dark">
+          {t("Se connecter ou créer un compte", "Log in or create an account")}
+        </Link>
+        <button type="button" onClick={() => setDismissed(true)} className="cursor-pointer px-2 py-2.5 font-bold text-mist underline-offset-4 hover:text-foam hover:underline">
+          {t("Continuer sans compte", "Continue without an account")}
+        </button>
+      </div>
+    </Modal>
+  );
+}
+
 export function GameRunner({ slug }: { slug: LiveSlug }) {
   const t = useT();
   const Game = GAME_COMPONENTS[slug];
@@ -87,6 +122,7 @@ export function GameRunner({ slug }: { slug: LiveSlug }) {
           <SpoilerGate data={raw} onChoose={setMode} />
         ) : (
           <div className="space-y-4">
+            <GuestCapNotice />
             <ModeBar mode={mode} onChange={setMode} />
             {/* Changer de mode recommence la partie : les tirages ne sont plus les mêmes */}
             <Game key={mode} data={data} raw={raw} />

@@ -27,17 +27,21 @@ const REFUSALS = {
   fr: {
     insufficient: "Pas assez de Berrys.",
     empty: "Aucun avis à recruter pour l'instant.",
+    account: "Les achats demandent un compte.",
     unavailable: "Achat indisponible pour l'instant. Réessaie dans un moment.",
   },
   en: {
     insufficient: "Not enough Berries.",
     empty: "No posters to recruit for now.",
+    account: "Purchases require an account.",
     unavailable: "Purchases are unavailable right now. Try again in a moment.",
   },
 };
 
 function Shop({ data }: { data: ResolvedData }) {
-  const { state, recruit, booster } = usePlayer();
+  const { state, status, accountsEnabled, recruit, booster } = usePlayer();
+  // Les achats demandent un compte : un solde d'invité vit dans le navigateur
+  const guest = status !== "user";
   const t = useT();
   const locale = useLocale();
   const [busy, setBusy] = useState<Article | null>(null);
@@ -123,6 +127,17 @@ function Shop({ data }: { data: ResolvedData }) {
         </span>
       </p>
 
+      {guest && (
+        <p className="rounded-xl border border-straw/50 bg-straw/5 px-4 py-3 font-semibold text-foam">
+          {t("Les achats demandent un compte : tes Berrys d'invité t'attendent pour ça.", "Purchases require an account: your guest Berries are waiting for it.")}{" "}
+          {accountsEnabled && (
+            <Link href="/profil" className="font-bold text-straw underline underline-offset-4">
+              {t("Se connecter ou créer un compte", "Log in or create an account")}
+            </Link>
+          )}
+        </p>
+      )}
+
       <ul className="grid gap-5 lg:grid-cols-2">
         {offers.map((offer) => {
           const short = state.berrys < prices[offer.article];
@@ -148,7 +163,7 @@ function Shop({ data }: { data: ResolvedData }) {
                   <button
                     type="button"
                     onClick={() => buy(offer.article)}
-                    disabled={busy !== null || short}
+                    disabled={busy !== null || short || guest}
                     className={`min-h-12 cursor-pointer rounded-xl px-4 font-extrabold transition-colors disabled:cursor-not-allowed disabled:opacity-50 ${
                       featured ? "bg-straw text-ink hover:bg-straw-dark" : "border border-straw text-straw hover:bg-straw/10"
                     }`}

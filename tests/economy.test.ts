@@ -28,7 +28,10 @@ import {
   DAILY_CHALLENGE_BERRYS,
   drawRecruit,
   EMPTY_PLAYER,
+  GUEST_BERRY_CAP,
+  guestAtCap,
   isMet,
+  limitGuestGame,
   normalizePlayer,
   objectiveLevel,
   objectiveProgress,
@@ -205,6 +208,34 @@ describe("jeux du jour", () => {
     // La partie libre d'OnePiecedle, elle, n'est jamais un jeu du jour
     expect(applyGame(EMPTY_PLAYER, { ...challenge, daily: false }, pool, DAY, never).reward.daily).toBe("off");
     expect(SIGNUP_BERRYS).toBe(500);
+  });
+});
+
+describe("sans compte", () => {
+  it("plafonne les Berrys, ne donne pas de prime et scelle les recrues", () => {
+    const before: PlayerState = { ...EMPTY_PLAYER, berrys: 9_800, lifetimeBerrys: 0 };
+    const played = applyGame(before, outcome(), pool, DAY, () => 0);
+    expect(played.reward.recruit).not.toBeNull();
+    expect(played.state.berrys).toBeGreaterThan(GUEST_BERRY_CAP);
+
+    const limited = limitGuestGame(before, played.state, played.reward);
+    expect(limited.state.berrys).toBe(GUEST_BERRY_CAP);
+    expect(limited.state.lifetimeBerrys).toBe(0);
+    expect(limited.state.collection).toEqual({});
+    expect(limited.state.pendingRecruits).toBe(1);
+    expect(limited.capped).toBe(true);
+    expect(limited.reward.guestCapped).toBe(true);
+    expect(guestAtCap(limited.state)).toBe(true);
+    // Les objectifs et le parcours sont gardés : ils ne seront pas payés deux fois
+    expect(limited.state.stats).toEqual(played.state.stats);
+
+    // Loin du plafond, rien n'est retenu ; un solde déjà au-dessus (d'avant le plafond) ne baisse pas
+    const low = limitGuestGame(EMPTY_PLAYER, applyGame(EMPTY_PLAYER, outcome(), pool, DAY, never).state, played.reward);
+    expect(low.capped).toBe(false);
+    const high: PlayerState = { ...EMPTY_PLAYER, berrys: 17_900 };
+    const kept = limitGuestGame(high, applyGame(high, outcome(), pool, DAY, never).state, played.reward);
+    expect(kept.state.berrys).toBe(17_900);
+    expect(kept.capped).toBe(true);
   });
 });
 

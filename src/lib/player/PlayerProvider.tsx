@@ -19,9 +19,7 @@ import {
   assignPost,
   deleteCrew,
   saveCrew,
-  buyBooster,
-  buyCosmetic,
-  buyRecruit,
+  limitGuestGame,
   EMPTY_PLAYER,
   equipCosmetic,
   normalizePlayer,
@@ -133,9 +131,11 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
       if (!outcome) return { ok: false, reason: "invalid" };
 
       const applied = applyGame(guest, outcome, data.characters, dailyKey(), createRng(randomSeed()));
-      setGuest(applied.state);
+      // Sans compte : Berrys plafonnés, pas de prime, recrue scellée (voir src/lib/economy/guest.ts)
+      const limited = limitGuestGame(guest, applied.state, applied.reward);
+      setGuest(limited.state);
       setRewarded([...rewarded.slice(-200), key]);
-      return { ok: true, state: applied.state, outcome, reward: applied.reward };
+      return { ok: true, state: limited.state, outcome, reward: limited.reward };
     },
     [isUser, guest, rewarded, setGuest, setRewarded, locale],
   );
@@ -147,13 +147,10 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
         if (result.ok) setRemote(result.state);
         return result;
       }
-      const data = resolveGameData(await loadGameData(locale), mode);
-      const bought = buyRecruit(guest, data.characters, createRng(randomSeed()));
-      if (typeof bought === "string") return { ok: false, reason: bought };
-      setGuest(bought.state);
-      return { ok: true, ...bought };
+      // Les achats demandent un compte : un solde d'invité vit dans le navigateur, où tout peut s'écrire
+      return { ok: false, reason: "account" };
     },
-    [isUser, guest, setGuest, locale],
+    [isUser],
   );
 
   const booster = useCallback(
@@ -163,13 +160,9 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
         if (result.ok) setRemote(result.state);
         return result;
       }
-      const data = resolveGameData(await loadGameData(locale), mode);
-      const bought = buyBooster(guest, data.characters, createRng(randomSeed()));
-      if (typeof bought === "string") return { ok: false, reason: bought };
-      setGuest(bought.state);
-      return { ok: true, ...bought };
+      return { ok: false, reason: "account" };
     },
-    [isUser, guest, setGuest, locale],
+    [isUser],
   );
 
   const assign = useCallback(
@@ -240,12 +233,9 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
         if (result.ok) setRemote(result.state);
         return result;
       }
-      const bought = buyCosmetic(guest, cosmeticId);
-      if (typeof bought === "string") return { ok: false, reason: bought };
-      setGuest(bought.state);
-      return { ok: true, state: bought.state };
+      return { ok: false, reason: "account" };
     },
-    [isUser, guest, setGuest],
+    [isUser],
   );
 
   const wear = useCallback(

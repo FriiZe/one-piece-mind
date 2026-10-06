@@ -4,7 +4,7 @@ import Link from "@/components/Link";
 import type { ResolvedData } from "@/games/cards";
 import { formatNumber } from "@/games/engine/text";
 import { useUntilMidnight } from "@/games/ui/storage";
-import { OFF_DAY_RECRUIT_CHANCE } from "@/lib/economy";
+import { GUEST_BERRY_CAP, OFF_DAY_RECRUIT_CHANCE } from "@/lib/economy";
 import { useLocale, usePath, useT } from "@/lib/i18n/client";
 import { usePlayer } from "@/lib/player/PlayerProvider";
 import { useDaily } from "@/lib/player/useDaily";
@@ -113,7 +113,9 @@ export function RewardSummary({ view, data }: { view: RewardView | null; data: R
 
   const { reward } = view.result;
   const recruit = reward.recruit;
-  const character = recruit ? (data.characterById.get(recruit.characterId) ?? null) : null;
+  // Sans compte, la recrue reste scellée : on ne dit pas qui c'est (voir src/lib/economy/guest.ts)
+  const sealed = status === "guest" && !!recruit;
+  const character = recruit && !sealed ? (data.characterById.get(recruit.characterId) ?? null) : null;
 
   return (
     <div className="mt-3 space-y-4" aria-live="polite">
@@ -144,6 +146,14 @@ export function RewardSummary({ view, data }: { view: RewardView | null; data: R
           )}
           {reward.capped && (
             <p className="text-sm font-semibold">{t("Plafond de gains du jour atteint.", "Daily earnings cap reached.")}</p>
+          )}
+          {reward.guestCapped && (
+            <p className="text-sm font-semibold text-vest">
+              {t(
+                `Sans compte, les Berrys s'arrêtent à ${formatNumber(GUEST_BERRY_CAP, locale)} ฿ : une partie des gains n'a pas été gardée.`,
+                `Without an account, Berries stop at ${formatNumber(GUEST_BERRY_CAP, locale)} ฿: part of the winnings wasn't kept.`,
+              )}
+            </p>
           )}
           {(reward.objectives.length > 0 || reward.dailies.length > 0 || reward.weekly.length > 0) && (
             <ul className="mt-1 space-y-0.5 text-sm font-semibold">
@@ -176,7 +186,23 @@ export function RewardSummary({ view, data }: { view: RewardView | null; data: R
           )}
         </div>
         {/* La recrue a sa colonne : l'avis, puis son nom en entier (la carte le coupe) et ce qu'on peut en faire */}
-        {recruit && (
+        {recruit && sealed && (
+          <div className="mx-auto flex w-40 shrink-0 flex-col items-center gap-2 text-center sm:w-44">
+            <div className="w-28">
+              <CharacterCard character={null} />
+            </div>
+            <p className="text-sm font-semibold">
+              {t("Un avis de recherche t'attend, scellé.", "A wanted poster is waiting for you, sealed.")}
+            </p>
+            <Link
+              href="/profil"
+              className="inline-flex min-h-9 items-center rounded-lg bg-ink px-3 text-sm font-bold text-parchment transition-colors hover:bg-ink/85"
+            >
+              {t("Créer un compte pour le découvrir", "Create an account to reveal it")}
+            </Link>
+          </div>
+        )}
+        {recruit && !sealed && (
           <div className="mx-auto flex w-40 shrink-0 flex-col items-center gap-2 text-center sm:w-44">
             <div className="w-28">
               <CharacterCard character={character} golden={recruit.golden} />

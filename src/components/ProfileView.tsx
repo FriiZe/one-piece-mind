@@ -155,7 +155,8 @@ function GuestProfile() {
   const { state, accountsEnabled } = usePlayer();
   const t = useT();
   const locale = useLocale();
-  const owned = Object.keys(state.collection).length;
+  // Les recrues gagnées sans compte sont scellées ; une collection d'avant les scellés compte comme autant de recrues
+  const owned = Object.values(state.collection).reduce((sum, entry) => sum + entry.count, 0) + state.pendingRecruits;
 
   return (
     <div className="grid grid-cols-1 gap-7 lg:grid-cols-[minmax(0,1fr)_460px] lg:items-start lg:gap-x-16 lg:pt-6">
@@ -191,8 +192,8 @@ function GuestProfile() {
             </h2>
             <p className="text-[15px] text-mist">
               {t(
-                `${formatNumber(state.games, locale)} partie${state.games > 1 ? "s" : ""} · ${formatNumber(state.berrys, locale)} ฿ · ${owned} avis de recherche`,
-                `${formatNumber(state.games, locale)} ${state.games === 1 ? "game" : "games"} · ${formatNumber(state.berrys, locale)} ฿ · ${owned} wanted ${owned === 1 ? "poster" : "posters"}`,
+                `${formatNumber(state.games, locale)} partie${state.games > 1 ? "s" : ""} · ${formatNumber(state.berrys, locale)} ฿ · ${owned} avis de recherche à découvrir`,
+                `${formatNumber(state.games, locale)} ${state.games === 1 ? "game" : "games"} · ${formatNumber(state.berrys, locale)} ฿ · ${owned} wanted ${owned === 1 ? "poster" : "posters"} to reveal`,
               )}
             </p>
             {accountsEnabled && (
