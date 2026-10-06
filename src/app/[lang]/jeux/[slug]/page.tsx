@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { DailyChip, OtherDailyGames } from "@/components/DailyGames";
 import { GameObjectives, GameRecord } from "@/components/GameObjectives";
-import { GameLeaderboard } from "@/components/Leaderboards";
+import { DailyLeaderboard, GameLeaderboard } from "@/components/Leaderboards";
 import { JsonLd } from "@/components/JsonLd";
 import Link from "@/components/Link";
 import { GAME_CONTENT } from "@/games/content";
@@ -124,7 +124,11 @@ export default async function GamePage({ params }: PageProps<"/[lang]/jeux/[slug
         </section>
       </div>
 
-      {!rewardless && <GameLeaderboard slug={slug} />}
+      {/* OnePiecedle a son défi du jour, classé à part : les parties libres se comptent par niveau */}
+      {slug === "onepiecedle" && <DailyLeaderboard />}
+      {!rewardless && (
+        <GameLeaderboard slug={slug} title={slug === "onepiecedle" ? t("Classement des parties libres", "Free play leaderboard") : undefined} />
+      )}
 
       <OtherDailyGames slug={slug} />
 

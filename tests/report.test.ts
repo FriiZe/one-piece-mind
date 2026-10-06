@@ -92,6 +92,9 @@ describe("recalcul d'une partie à partir de son compte rendu", () => {
     expect(run({ ...report, guesses: [target.id] })?.performance).toBe(1);
     expect(run({ ...report, guesses: [other, other, target.id] })?.performance).toBe(0.8);
     expect(run({ ...report, guesses: [other] })?.performance).toBe(0);
+    // Le nombre d'essais est gardé pour le classement du défi du jour
+    expect(run({ ...report, guesses: [other, other, target.id] })?.attempts).toBe(3);
+    expect(run({ ...report, guesses: [other] })?.attempts).toBeNull();
   });
 
   it("Défi du jour : seulement le jour même, avec le personnage commun à tous", () => {

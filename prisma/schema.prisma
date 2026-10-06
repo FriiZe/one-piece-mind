@@ -138,6 +138,8 @@ model GameResult {
   difficulty String?
   score      Int
   maxScore   Int
+  /// Essais qu'il a fallu pour trouver (OnePiecedle) ; nul ailleurs, ou si rien n'a été trouvé.
+  attempts   Int?
   berrys     Int
   recruitId  String?
   createdAt  DateTime @default(now())

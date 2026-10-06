@@ -29,6 +29,25 @@ export type GameLeaderboard = {
   players: number;
 };
 
+/** Un joueur qui a trouvé le personnage du défi du jour. */
+export type DailyLeaderRow = {
+  rank: number;
+  username: string;
+  attempts: number;
+  playedAt: number;
+  you: boolean;
+  look: PlayerLook;
+};
+
+/** Défi du jour d'OnePiecedle : qui l'a trouvé, et en combien d'essais. */
+export type DailyLeaderboard = {
+  day: string;
+  rows: DailyLeaderRow[];
+  you: DailyLeaderRow | null;
+  /** Nombre de joueurs qui l'ont trouvé. */
+  players: number;
+};
+
 /** Un joueur du classement général, par prime. */
 export type GlobalLeaderRow = {
   rank: number;

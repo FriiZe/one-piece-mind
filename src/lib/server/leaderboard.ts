@@ -1,13 +1,15 @@
 import "server-only";
 import type { Difficulty } from "@/games/engine/difficulty";
 import { sanitizeCosmetics } from "@/lib/economy";
-import type { GameLeaderboard, GameLeaderRow, GlobalLeaderboard, GlobalLeaderRow, Period } from "@/lib/leaderboard/types";
+import { dailyKey } from "@/games/engine/daily";
+import type { DailyLeaderboard, DailyLeaderRow, GameLeaderboard, GameLeaderRow, GlobalLeaderboard, GlobalLeaderRow, Period } from "@/lib/leaderboard/types";
 import { Prisma } from "@/generated/prisma/client";
 import { db } from "./db";
 
 /** Lignes affichées d'un classement ; le joueur connecté s'y ajoute s'il est plus loin. */
 export const GAME_LEADERS_SHOWN = 10;
 export const GLOBAL_LEADERS_SHOWN = 50;
+export const DAILY_LEADERS_SHOWN = 50;
 
 /** Les périodes sont celles de Paris, comme les jeux du jour : la semaine commence le lundi. */
 const TRUNC: Record<Period, Prisma.Sql> = {
@@ -76,6 +78,50 @@ export async function gameLeaderboard(
   const shown = rows.filter((row) => row.rank <= GAME_LEADERS_SHOWN).map(view);
   const mine = rows.find((row) => row.userId === userId && row.rank > GAME_LEADERS_SHOWN);
   return { period, difficulty, rows: shown, you: mine ? view(mine) : null, players: rows[0]?.players ?? 0 };
+}
+
+type DailyRow = {
+  userId: string;
+  username: string;
+  attempts: number;
+  createdAt: Date;
+  cosmetics: unknown;
+  equipped: unknown;
+  rank: number;
+  players: number;
+};
+
+/**
+ * Défi du jour d'OnePiecedle : les joueurs qui ont trouvé le personnage, du moins d'essais au plus,
+ * le premier arrivé devant à égalité. Les parties d'avant l'enregistrement des essais les retrouvent
+ * d'après leur score (au-delà de 9 essais, le score ne les distingue plus).
+ */
+export async function dailyLeaderboard(userId: string | null, day = dailyKey()): Promise<DailyLeaderboard> {
+  const rows = await db().$queryRaw<DailyRow[]>(Prisma.sql`
+    WITH found AS (
+      SELECT "userId", "createdAt", COALESCE(attempts, "maxScore" + 1 - score)::int AS attempts
+      FROM "GameResult"
+      WHERE slug = 'onepiecedle-daily' AND "reportKey" = ${`daily:${day}`} AND score > 0
+    ),
+    ranked AS (
+      SELECT f.*, u.username, u.cosmetics, u.equipped,
+        RANK() OVER (ORDER BY f.attempts ASC, f."createdAt" ASC)::int AS rank,
+        COUNT(*) OVER ()::int AS players
+      FROM found f JOIN "User" u ON u.id = f."userId"
+    )
+    SELECT * FROM ranked WHERE rank <= ${DAILY_LEADERS_SHOWN} OR "userId" = ${userId ?? ""} ORDER BY rank
+  `);
+  const view = (row: DailyRow): DailyLeaderRow => ({
+    rank: row.rank,
+    username: row.username,
+    attempts: row.attempts,
+    playedAt: row.createdAt.getTime(),
+    you: row.userId === userId,
+    look: sanitizeCosmetics(row.cosmetics, row.equipped).equipped,
+  });
+  const shown = rows.filter((row) => row.rank <= DAILY_LEADERS_SHOWN).map(view);
+  const mine = rows.find((row) => row.userId === userId && row.rank > DAILY_LEADERS_SHOWN);
+  return { day, rows: shown, you: mine ? view(mine) : null, players: rows[0]?.players ?? 0 };
 }
 
 type GlobalRow = { id: string; username: string; lifetimeBerrys: number; games: number; cosmetics: unknown; equipped: unknown; rank: number; players: number };

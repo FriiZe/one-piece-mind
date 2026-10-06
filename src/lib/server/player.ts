@@ -191,6 +191,7 @@ export async function submitGame(userId: string, input: unknown, today = dailyKe
           difficulty: outcome.difficulty,
           score: outcome.score,
           maxScore: outcome.max,
+          attempts: outcome.attempts ?? null,
           berrys: reward.total,
           recruitId: reward.recruit?.characterId ?? null,
         },

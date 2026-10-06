@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import type { Difficulty } from "@/games/engine/difficulty";
-import type { GameLeaderboard, GlobalLeaderboard, Period } from "./types";
+import type { DailyLeaderboard, GameLeaderboard, GlobalLeaderboard, Period } from "./types";
 
 /**
  * Classement d'un jeu sur une période, pour un niveau ou pour tous ; `null` pendant le chargement,
@@ -42,5 +42,23 @@ export function useGlobalLeaderboard(): GlobalLeaderboard | "failed" | null {
       cancelled = true;
     };
   }, []);
+  return board;
+}
+
+/** Défi du jour d'OnePiecedle ; relu à chaque changement de `refresh` (une partie vient d'être payée). */
+export function useDailyLeaderboard(refresh: number): DailyLeaderboard | "failed" | null {
+  const [board, setBoard] = useState<DailyLeaderboard | "failed" | null>(null);
+  useEffect(() => {
+    let cancelled = false;
+    fetch("/api/leaderboard?slug=onepiecedle-daily", { cache: "no-store" })
+      .then((response): Promise<DailyLeaderboard | "failed"> => (response.ok ? response.json() : Promise.resolve("failed")))
+      .catch((): "failed" => "failed")
+      .then((loaded) => {
+        if (!cancelled) setBoard(loaded);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [refresh]);
   return board;
 }

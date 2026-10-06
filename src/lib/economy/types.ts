@@ -147,6 +147,8 @@ export type GameOutcome = {
   difficulty: Difficulty | null;
   /** Défi du jour : gains plus élevés et recrutement assuré en cas de victoire. */
   daily: boolean;
+  /** Essais qu'il a fallu pour trouver, aux jeux qui se comptent ainsi (OnePiecedle). */
+  attempts?: number | null;
 };
 
 export type Recruit = {

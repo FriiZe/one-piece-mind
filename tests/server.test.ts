@@ -9,6 +9,7 @@ import { DAILY_CHALLENGE_BERRYS, dailyGames, GUEST_BERRY_CAP, GUEST_RECRUITS_MAX
 import { accountsEnabled, db } from "@/lib/server/db";
 import { DUMMY_HASH, hashPassword, verifyPassword } from "@/lib/server/password";
 import { buyRecruitFor, loadState, openPendingRecruits, sanitizeGuestState, setCrewFor, submitGame } from "@/lib/server/player";
+import { dailyLeaderboard } from "@/lib/server/leaderboard";
 
 const data = resolveGameData(buildGameData(), "anime");
 
@@ -159,6 +160,10 @@ describe.skipIf(!accountsEnabled)("récompenses enregistrées en base", () => {
 
     expect(await submitGame(userId, report)).toEqual({ ok: false, reason: "duplicate" });
     expect(await submitGame(userId, { ...report, day: "2020-01-01" })).toEqual({ ok: false, reason: "invalid" });
+
+    // Le défi du jour a son classement : qui l'a trouvé, et en combien d'essais
+    const board = await dailyLeaderboard(userId, today);
+    expect([...board.rows, board.you].find((row) => row?.you)?.attempts).toBe(1);
   });
 
   it("vend un recrutement tant que le solde le permet", async () => {

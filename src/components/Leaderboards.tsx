@@ -9,7 +9,8 @@ import { formatAgo } from "@/lib/admin/format";
 import { playerBounty, rankOf } from "@/lib/economy";
 import { hasDifficulty } from "@/lib/games/catalog";
 import { useLocale, useT } from "@/lib/i18n/client";
-import { useGameLeaderboard, useGlobalLeaderboard } from "@/lib/leaderboard/client";
+import { dailyNumber } from "@/games/engine/daily";
+import { useDailyLeaderboard, useGameLeaderboard, useGlobalLeaderboard } from "@/lib/leaderboard/client";
 import type { GameLeaderRow, GlobalLeaderRow, Period } from "@/lib/leaderboard/types";
 import { PERIODS } from "@/lib/leaderboard/types";
 import { usePlayer } from "@/lib/player/PlayerProvider";
@@ -114,7 +115,7 @@ function LevelBoard({ slug, period, difficulty, title }: { slug: string; period:
  * Classement d'un jeu : la meilleure partie de chaque joueur sur la journée, la semaine ou le mois.
  * Un jeu à niveaux a une colonne par niveau, de l'expert au facile ; les autres, une seule liste.
  */
-export function GameLeaderboard({ slug }: { slug: string }) {
+export function GameLeaderboard({ slug, title }: { slug: string; title?: string }) {
   const t = useT();
   const locale = useLocale();
   const [period, setPeriod] = useState<Period>("day");
@@ -124,7 +125,7 @@ export function GameLeaderboard({ slug }: { slug: string }) {
     <section aria-labelledby="classement-du-jeu" className="space-y-3 rounded-2xl border border-sea-700 p-5">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <h2 id="classement-du-jeu" className="text-lg font-extrabold text-foam">
-          {t("Classement", "Leaderboard")}
+          {title ?? t("Classement", "Leaderboard")}
         </h2>
         <div className="flex gap-1 rounded-xl bg-sea-900 p-1" role="group" aria-label={t("Période", "Period")}>
           {PERIODS.map((value) => (
@@ -158,6 +159,60 @@ export function GameLeaderboard({ slug }: { slug: string }) {
         {t(
           "Une ligne par joueur : sa meilleure partie sur la période. À égalité, la partie la plus ancienne passe devant.",
           "One line per player: their best game in the period. Ties go to the earlier game.",
+        )}
+      </p>
+      <GuestNote />
+    </section>
+  );
+}
+
+/**
+ * Défi du jour d'OnePiecedle : qui a trouvé le personnage aujourd'hui, et en combien d'essais. Relu
+ * dès qu'une partie du joueur est payée, pour qu'il s'y voie en sortant de la sienne.
+ */
+export function DailyLeaderboard() {
+  const t = useT();
+  const locale = useLocale();
+  const { state } = usePlayer();
+  const board = useDailyLeaderboard(state.games);
+  const rows = board && board !== "failed" ? [...board.rows, ...(board.you ? [board.you] : [])] : [];
+
+  return (
+    <section aria-labelledby="classement-du-jour" className="space-y-3 rounded-2xl border border-sea-700 p-5">
+      <h2 id="classement-du-jour" className="flex flex-wrap items-baseline justify-between gap-2 text-lg font-extrabold text-foam">
+        {board && board !== "failed"
+          ? t(`Défi du jour n°${dailyNumber(board.day)}`, `Daily challenge #${dailyNumber(board.day)}`)
+          : t("Défi du jour", "Daily challenge")}
+        {board && board !== "failed" && board.players > 0 && (
+          <span className="text-sm font-bold text-mist">
+            {t(`${board.players} l'ont trouvé`, `${board.players} found it`)}
+          </span>
+        )}
+      </h2>
+      {board === null ? (
+        <LoadingPanel label={t("Chargement…", "Loading…")} />
+      ) : board === "failed" ? (
+        <p className="text-sm text-mist">{t("Le classement est indisponible pour l'instant.", "The leaderboard is unavailable right now.")}</p>
+      ) : rows.length === 0 ? (
+        <p className="rounded-xl border border-dashed border-sea-600 px-3.5 py-3 text-sm text-mist">
+          {t("Personne n'a encore trouvé le personnage du jour.", "Nobody has found today's character yet.")}
+        </p>
+      ) : (
+        <ol className="grid gap-2 md:grid-cols-2">
+          {rows.map((row) => (
+            <Row key={row.username} rank={row.rank} you={row.you} name={row.username} look={row.look}>
+              <span className="block font-extrabold text-straw">
+                {t(`${row.attempts} essai${row.attempts > 1 ? "s" : ""}`, `${row.attempts} ${row.attempts === 1 ? "guess" : "guesses"}`)}
+              </span>
+              <span className="block text-xs text-mist">{formatAgo(new Date(row.playedAt), locale)}</span>
+            </Row>
+          ))}
+        </ol>
+      )}
+      <p className="text-xs text-mist">
+        {t(
+          "Le moins d'essais passe devant ; à égalité, le premier à l'avoir trouvé.",
+          "Fewest guesses first; ties go to whoever found it first.",
         )}
       </p>
       <GuestNote />

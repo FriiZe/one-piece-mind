@@ -112,10 +112,11 @@ const WORST_ATTEMPTS = 10;
 
 /**
  * Note une partie : 1 si le personnage est trouvé du premier coup, puis de
- * moins en moins à chaque essai, 0 s'il n'est pas trouvé.
+ * moins en moins à chaque essai, 0 s'il n'est pas trouvé. `attempts` : les essais
+ * qu'il a fallu, `null` s'il n'est pas trouvé.
  */
 export function evaluate(target: PlayCharacter, guesses: readonly string[]) {
   const attempts = guesses.indexOf(target.id) + 1;
   const max = WORST_ATTEMPTS;
-  return { score: attempts === 0 ? 0 : Math.max(2, max + 1 - attempts), max };
+  return { score: attempts === 0 ? 0 : Math.max(2, max + 1 - attempts), max, attempts: attempts === 0 ? null : attempts };
 }

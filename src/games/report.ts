@@ -148,7 +148,7 @@ export function evaluateReport(report: GameReport, { data, animeCharacters, toda
   // Un jeu en pause n'a plus de page : la partie n'a pas pu y être jouée
   if (!isLiveSlug(slug)) return null;
   const category = getGame(slug)!.category;
-  const outcome = (result: { score: number; max: number }, daily = false): GameOutcome => ({
+  const outcome = (result: { score: number; max: number; attempts?: number | null }, daily = false): GameOutcome => ({
     slug,
     category,
     score: result.score,
@@ -157,6 +157,7 @@ export function evaluateReport(report: GameReport, { data, animeCharacters, toda
     // Un jeu sans niveau reçoit quand même une difficulté dans son compte rendu : elle ne doit rien moduler
     difficulty: "difficulty" in report && hasDifficulty(slug) ? report.difficulty : null,
     daily,
+    attempts: result.attempts ?? null,
   });
 
   switch (report.slug) {
