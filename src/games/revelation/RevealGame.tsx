@@ -1,9 +1,10 @@
 "use client";
 
+import { useNewSeed, useRoundLimit } from "../ui/roomRound";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { portraitUrl, type PlayCharacter } from "../cards";
 import { byDifficulty, type Difficulty } from "../engine/difficulty";
-import { createRng, randomSeed } from "../engine/rng";
+import { createRng } from "../engine/rng";
 import { CharacterSearch } from "../ui/CharacterSearch";
 import { GuessHistory } from "../ui/GuessHistory";
 import { Button, Correction, Progress, ResultPanel } from "../ui/primitives";
@@ -16,7 +17,6 @@ import { useLocale, useT } from "@/lib/i18n/client";
 import { useGameReward } from "@/lib/player/useGameReward";
 import {
   generateRounds,
-  MAX_SCORE,
   PIXEL_COLUMNS,
   pointsFor,
   STEPS,
@@ -133,6 +133,8 @@ export function RevealGame({ data, variant }: GameProps & { variant: Variant }) 
   const [run, setRun] = useState<Run | null>(null);
   const [best, submitBest] = useBest(`${slug}.${run?.difficulty ?? "normal"}`);
   const reward = useGameReward();
+  const newSeed = useNewSeed();
+  const limit = useRoundLimit();
 
   const seed = run?.seed;
   const difficulty = run?.difficulty;
@@ -140,8 +142,8 @@ export function RevealGame({ data, variant }: GameProps & { variant: Variant }) 
     () =>
       seed === undefined || difficulty === undefined
         ? []
-        : generateRounds(createRng(seed), byDifficulty(data.characters, difficulty)),
-    [data.characters, seed, difficulty],
+        : generateRounds(createRng(seed), byDifficulty(data.characters, difficulty)).slice(0, limit),
+    [data.characters, seed, difficulty, limit],
   );
   const index = run?.index ?? 0;
   const focus = useMemo(() => zoomFocus(createRng((seed ?? 0) + index + 1)), [seed, index]);
@@ -149,7 +151,7 @@ export function RevealGame({ data, variant }: GameProps & { variant: Variant }) 
   function start(level: Difficulty) {
     reward.reset();
     setRun({
-      seed: randomSeed(),
+      seed: newSeed(),
       difficulty: level,
       index: 0,
       step: 0,
@@ -173,8 +175,8 @@ export function RevealGame({ data, variant }: GameProps & { variant: Variant }) 
   if (run.finished) {
     return (
       <ResultPanel
-        title={`${run.score} / ${MAX_SCORE}`}
-        best={best !== null ? { label: t("Record à ce niveau", "Best at this level"), value: `${best} / ${MAX_SCORE}` } : null}
+        title={`${run.score} / ${rounds.length * STEPS}`}
+        best={best !== null ? { label: t("Record à ce niveau", "Best at this level"), value: `${best} / ${rounds.length * STEPS}` } : null}
         newBest={run.newBest}
         actions={
           <>

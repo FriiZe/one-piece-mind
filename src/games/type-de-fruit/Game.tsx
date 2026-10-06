@@ -1,7 +1,8 @@
 "use client";
 
+import { AutoStart, useNewSeed, useRoomRound, useRoundLimit } from "../ui/roomRound";
 import { useMemo, useState } from "react";
-import { createRng, randomSeed } from "../engine/rng";
+import { createRng } from "../engine/rng";
 import { Button, Panel, ResultPanel } from "../ui/primitives";
 import { QuizFlow, type QuizQuestion } from "../ui/QuizFlow";
 import { useBest } from "../ui/storage";
@@ -10,10 +11,9 @@ import { useLocale, useT } from "@/lib/i18n/client";
 import { useGameReward } from "@/lib/player/useGameReward";
 import type { GameProps } from "../ui/types";
 import { FRUIT_TYPE_LABELS } from "@/lib/data/labels";
-import { FAMILIES, familyOf, generateQuiz, QUIZ_LENGTH } from "./logic";
+import { FAMILIES, familyOf, generateQuiz } from "./logic";
 
 const FAMILY_LABELS = { paramecia: "Paramecia", logia: "Logia", zoan: "Zoan" } as const;
-const LENGTH = QUIZ_LENGTH;
 
 export default function TypeDeFruit({ data }: GameProps) {
   const t = useT();
@@ -22,10 +22,13 @@ export default function TypeDeFruit({ data }: GameProps) {
   const [result, setResult] = useState<{ score: number; newBest: boolean } | null>(null);
   const [best, submitBest] = useBest("type-de-fruit");
   const reward = useGameReward();
+  const newSeed = useNewSeed();
+  const inRoom = useRoomRound() !== null;
+  const limit = useRoundLimit();
 
   const questions = useMemo<QuizQuestion[]>(() => {
     if (seed === null) return [];
-    return generateQuiz(createRng(seed), data.fruits).map((fruit) => ({
+    return generateQuiz(createRng(seed), data.fruits).slice(0, limit).map((fruit) => ({
       id: fruit.id,
       prompt: (
         <div className="text-center">
@@ -40,14 +43,15 @@ export default function TypeDeFruit({ data }: GameProps) {
         `This fruit's type is ${FRUIT_TYPE_LABELS[locale][fruit.type]}.`,
       ),
     }));
-  }, [seed, data.fruits, t, locale]);
+  }, [seed, data.fruits, t, locale, limit]);
 
   function start() {
     reward.reset();
     setResult(null);
-    setSeed(randomSeed());
+    setSeed(newSeed());
   }
 
+  if (seed === null && inRoom) return <AutoStart onStart={start} />;
   if (seed === null) {
     return (
       <Panel className="space-y-4">
@@ -65,13 +69,13 @@ export default function TypeDeFruit({ data }: GameProps) {
   if (result) {
     return (
       <ResultPanel
-        title={`${result.score} / ${LENGTH}`}
-        best={best !== null ? { label: t("Record", "Best"), value: `${best} / ${LENGTH}` } : null}
+        title={`${result.score} / ${questions.length}`}
+        best={best !== null ? { label: t("Record", "Best"), value: `${best} / ${questions.length}` } : null}
         newBest={result.newBest}
         actions={<Button onClick={start}>{t("Rejouer", "Play again")}</Button>}
       >
         <p>
-          {result.score === LENGTH
+          {result.score === questions.length
             ? t("Sans faute : rien ne t'échappe.", "A perfect score: nothing gets past you.")
             : t("Les Zoan et les Logia sont plus rares qu'on ne croit.", "Zoans and Logias are rarer than you'd think.")}
         </p>

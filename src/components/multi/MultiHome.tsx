@@ -4,13 +4,23 @@ import Link from "@/components/Link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { DIFFICULTIES, type Difficulty } from "@/games/engine/difficulty";
-import { MIX_SLUGS, type MixSlug } from "@/games/qcm/logic";
+import { MIX_SLUGS } from "@/games/qcm/logic";
 import { Button, Panel } from "@/games/ui/primitives";
 import { useStored } from "@/games/ui/storage";
-import { getGame } from "@/lib/games/catalog";
+import { getGame, type LiveSlug } from "@/lib/games/catalog";
 import { useLocale, useLocalePath, useT } from "@/lib/i18n/client";
 import { createRoomRequest, ROOM_ERRORS, saveTicket, useFriends } from "@/lib/multi/client";
-import { ANSWER_SECONDS, CODE_LENGTH, DEFAULT_SETTINGS, MAX_PLAYERS, normalizeCode, QUESTION_COUNTS } from "@/lib/multi/rules";
+import {
+  ANSWER_SECONDS,
+  CODE_LENGTH,
+  DEFAULT_SETTINGS,
+  isQcmSlug,
+  MAX_PLAYERS,
+  normalizeCode,
+  QUESTION_COUNTS,
+  ROOM_GAME_SLUGS,
+  ROOM_SLUGS,
+} from "@/lib/multi/rules";
 import { usePlayer } from "@/lib/player/PlayerProvider";
 import type { SpoilerMode } from "@/lib/spoilers";
 
@@ -65,7 +75,7 @@ function CreateRoom() {
   const [storedMode] = useStored<SpoilerMode | null>("opm.mode", null);
   const [mode, setMode] = useState<SpoilerMode | null>(null);
   const [difficulty, setDifficulty] = useState<Difficulty>("normal");
-  const [games, setGames] = useState<MixSlug[]>([...MIX_SLUGS]);
+  const [games, setGames] = useState<LiveSlug[]>([...ROOM_SLUGS]);
   const [questionCount, setQuestionCount] = useState<number>(DEFAULT_SETTINGS.questionCount);
   const [seconds, setSeconds] = useState<number>(DEFAULT_SETTINGS.seconds);
   const [name, setName] = useState("");
@@ -74,7 +84,7 @@ function CreateRoom() {
   // Le mode du salon reprend par défaut celui du joueur ; à défaut, le mode anime, qui ne révèle rien
   const chosenMode = mode ?? storedMode ?? "anime";
 
-  function toggle(slug: MixSlug) {
+  function toggle(slug: LiveSlug) {
     setGames((current) => (current.includes(slug) ? current.filter((s) => s !== slug) : [...current, slug]));
   }
 
@@ -113,53 +123,88 @@ function CreateRoom() {
         </label>
       )}
 
-      <fieldset>
+      <fieldset className="space-y-3">
         <legend className={LEGEND}>
           {t(
             `Jeux tirés au sort · ${games.length} choisi${games.length > 1 ? "s" : ""}`,
             `Games drawn at random · ${games.length} selected`,
           )}
         </legend>
-        <div className="flex flex-wrap gap-2">
-          {MIX_SLUGS.map((slug) => {
-            const checked = games.includes(slug);
-            return (
-              <label
-                key={slug}
-                className={`flex min-h-11 cursor-pointer items-center rounded-full px-3.5 text-sm font-bold transition-colors has-focus-visible:outline-2 has-focus-visible:outline-straw ${
-                  checked ? "bg-straw text-ink" : "border border-sea-600 text-mist hover:text-foam"
-                }`}
-              >
-                <input type="checkbox" checked={checked} onChange={() => toggle(slug)} className="sr-only" />
-                {getGame(slug)?.title[locale] ?? slug}
-              </label>
-            );
-          })}
-          {games.length < MIX_SLUGS.length && (
+        {(
+          [
+            {
+              slugs: MIX_SLUGS,
+              title: t("QCM, chronométrés", "Quiz questions, timed"),
+              detail: t("Plus tu réponds vite, plus tu marques.", "The faster you answer, the more you score."),
+            },
+            {
+              slugs: ROOM_GAME_SLUGS,
+              title: t("Autres jeux, sans chrono", "Other games, no timer"),
+              detail: t(
+                "Une grille, un mot, un classement… : moins d'essais ou d'erreurs, plus de points.",
+                "One grid, one word, one ranking…: fewer tries or mistakes, more points.",
+              ),
+            },
+          ] as const
+        ).map((group) => (
+          <div key={group.title}>
+            <p className="mb-2 text-sm text-mist">
+              <span className="font-bold text-foam">{group.title}</span> · {group.detail}
+            </p>
+            <div className="flex flex-wrap gap-2">
+              {group.slugs.map((slug) => {
+                const checked = games.includes(slug);
+                return (
+                  <label
+                    key={slug}
+                    className={`flex min-h-11 cursor-pointer items-center rounded-full px-3.5 text-sm font-bold transition-colors has-focus-visible:outline-2 has-focus-visible:outline-straw ${
+                      checked ? "bg-straw text-ink" : "border border-sea-600 text-mist hover:text-foam"
+                    }`}
+                  >
+                    <input type="checkbox" checked={checked} onChange={() => toggle(slug)} className="sr-only" />
+                    {getGame(slug)?.title[locale] ?? slug}
+                  </label>
+                );
+              })}
+            </div>
+          </div>
+        ))}
+        <div className="flex flex-wrap gap-4">
+          {games.length < ROOM_SLUGS.length && (
             <button
               type="button"
-              onClick={() => setGames([...MIX_SLUGS])}
-              className="min-h-11 cursor-pointer px-2 text-sm font-bold text-straw underline underline-offset-4"
+              onClick={() => setGames([...ROOM_SLUGS])}
+              className="min-h-11 cursor-pointer text-sm font-bold text-straw underline underline-offset-4"
             >
               {t("Tout cocher", "Select all")}
             </button>
           )}
+          <button
+            type="button"
+            onClick={() => setGames([...MIX_SLUGS])}
+            className="min-h-11 cursor-pointer text-sm font-bold text-straw underline underline-offset-4"
+          >
+            {t("QCM seulement", "Quiz questions only")}
+          </button>
         </div>
       </fieldset>
 
       <div className="grid gap-4 sm:grid-cols-3">
         <Choice
-          legend="Questions"
+          legend={t("Manches", "Rounds")}
           value={questionCount}
           onChange={setQuestionCount}
           options={QUESTION_COUNTS.map((n) => ({ value: n, label: String(n) }))}
         />
-        <Choice
-          legend={t("Temps par question", "Time per question")}
-          value={seconds}
-          onChange={setSeconds}
-          options={ANSWER_SECONDS.map((n) => ({ value: n, label: `${n} s` }))}
-        />
+        {/* Le chrono ne concerne que les QCM : sans eux, rien à régler */}
+        {games.some(isQcmSlug) && (
+          <Choice
+            legend={t("Temps par QCM", "Time per quiz question")}
+            value={seconds}
+            onChange={setSeconds}
+            options={ANSWER_SECONDS.map((n) => ({ value: n, label: `${n} s` }))}
+          />
+        )}
         <Choice
           legend={t("Difficulté", "Difficulty")}
           value={difficulty}

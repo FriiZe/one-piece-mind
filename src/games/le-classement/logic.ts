@@ -50,10 +50,17 @@ export function roundAt(seed: number, index: number, characters: readonly PlayCh
 }
 
 /** Rejoue une partie à partir de sa graine et des classements proposés. */
-export function evaluate(seed: number, difficulty: Difficulty, orders: readonly (readonly string[])[], characters: readonly PlayCharacter[]) {
+export function evaluate(
+  seed: number,
+  difficulty: Difficulty,
+  orders: readonly (readonly string[])[],
+  characters: readonly PlayCharacter[],
+  limit = ROUNDS,
+) {
+  const rounds = Math.min(limit, ROUNDS);
   const pool = byDifficulty(characters, difficulty);
   let score = 0;
-  for (let index = 0; index < ROUNDS; index++) {
+  for (let index = 0; index < rounds; index++) {
     const round = roundAt(seed, index, pool);
     const order = orders[index] ?? [];
     // Un classement n'est noté que s'il contient exactement les cinq personnages de la manche
@@ -62,5 +69,5 @@ export function evaluate(seed: number, difficulty: Difficulty, orders: readonly 
       score += scoreRound(round, order);
     }
   }
-  return { score, max: MAX_SCORE };
+  return { score, max: rounds * ROUND_SIZE };
 }

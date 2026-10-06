@@ -1,9 +1,15 @@
 import type { GroupCard, PlayCharacter } from "../cards";
+import { createRng, pick } from "../engine/rng";
 import { nameForms, normalizeText } from "../engine/text";
 
 /** Temps accordé, en secondes : douze par personnage, une minute au minimum. */
 export function timeLimit(memberCount: number): number {
   return Math.max(60, memberCount * 12);
+}
+
+/** Groupe imposé par une manche de salon : le même pour tous les joueurs, tiré de la graine. */
+export function roomGroup(seed: number, groups: readonly GroupCard[]): GroupCard | null {
+  return groups.length > 0 ? pick(createRng(seed), groups) : null;
 }
 
 /**

@@ -2,9 +2,14 @@
 
 import Link from "@/components/Link";
 import { CheckIcon } from "@/components/GameBadge";
-import { useEffect, useMemo, useState } from "react";
+import { Suspense, use, useEffect, useMemo, useRef, useState } from "react";
+import { resolveGameData } from "@/games/cards";
 import { formatNumber } from "@/games/engine/text";
+import { loadGameData } from "@/games/ui/data";
+import { GAME_COMPONENTS } from "@/games/ui/GameRunner";
 import { Portrait } from "@/games/ui/Portrait";
+import { RoomRoundProvider, type RoomRound } from "@/games/ui/roomRound";
+import type { GameReport } from "@/games/report";
 import { Button, Panel, ShareButton } from "@/games/ui/primitives";
 import { useIsClient } from "@/games/ui/storage";
 import { DIFFICULTIES } from "@/games/engine/difficulty";
@@ -12,8 +17,8 @@ import { getGame } from "@/lib/games/catalog";
 import { LOCALE_NAMES, localePath } from "@/lib/i18n";
 import { useLocale, useT } from "@/lib/i18n/client";
 import { forgetTicket, loadTicket, ROOM_ERRORS, roomAction, saveTicket, useFriends, useNow, useRoom } from "@/lib/multi/client";
-import { CODE_PATTERN } from "@/lib/multi/rules";
-import type { RoomPlayerView, RoomQuestionView, RoomTicket, RoomView } from "@/lib/multi/types";
+import { CODE_PATTERN, isQcmSlug } from "@/lib/multi/rules";
+import type { RoomGameView, RoomPlayerView, RoomQcmView, RoomTicket, RoomView } from "@/lib/multi/types";
 import { usePlayer } from "@/lib/player/PlayerProvider";
 import { leagueOf } from "@/lib/ranked/rules";
 
@@ -176,6 +181,7 @@ function Lobby({ view, ticket, act }: { view: RoomView; ticket: RoomTicket; act:
   const locale = useLocale();
   const { settings } = view;
   const difficulty = DIFFICULTIES.find((d) => d.id === settings.difficulty)?.label[locale];
+  const withQcm = settings.games.some(isQcmSlug);
   return (
     <div className="space-y-6">
       <div className="rounded-2xl bg-parchment p-5 text-center text-ink sm:p-6">
@@ -199,15 +205,15 @@ function Lobby({ view, ticket, act }: { view: RoomView; ticket: RoomTicket; act:
         <InviteFriends code={view.code} ticket={ticket} />
         <p className="text-sm text-mist">
           {t(
-            `${settings.questionCount} questions · ${settings.seconds} s par question · difficulté ${difficulty?.toLowerCase()} · joueurs à jour sur ${settings.mode === "anime" ? "l'anime" : "le manga"}`,
-            `${settings.questionCount} questions · ${settings.seconds} s per question · ${difficulty?.toLowerCase()} difficulty · players caught up with ${settings.mode === "anime" ? "the anime" : "the manga"}`,
+            `${settings.questionCount} manches · ${withQcm ? `${settings.seconds} s par QCM, ` : ""}pas de chrono pour les autres jeux · difficulté ${difficulty?.toLowerCase()} · joueurs à jour sur ${settings.mode === "anime" ? "l'anime" : "le manga"}`,
+            `${settings.questionCount} rounds · ${withQcm ? `${settings.seconds} s per quiz question, ` : ""}no timer for the other games · ${difficulty?.toLowerCase()} difficulty · players caught up with ${settings.mode === "anime" ? "the anime" : "the manga"}`,
           )}
           {/* Le salon se joue dans la langue de son hôte, qui n'est pas forcément celle de l'invité */}
           {" · "}
           {t("langue des questions : ", "question language: ")}
           {LOCALE_NAMES[settings.lang]}
           <br />
-          {t("Quiz : ", "Quizzes: ")}
+          {t("Jeux : ", "Games: ")}
           {settings.games.map((slug) => getGame(slug)?.title[locale] ?? slug).join(", ")}
         </p>
         {view.you.isHost ? (
@@ -280,7 +286,7 @@ function Question({
   onAnswer,
 }: {
   view: RoomView;
-  question: RoomQuestionView;
+  question: RoomQcmView;
   clockOffset: number;
   onAnswer: (optionId: string) => void;
 }) {
@@ -394,6 +400,128 @@ function Question({
                 "The faster you answer, the more a correct answer is worth.",
               )}
       </p>
+    </section>
+  );
+}
+
+/** Données des jeux dans la langue et le mode du salon : tous les joueurs ont le même tirage que le serveur. */
+function RoomGame({ view, round, onFinish }: { view: RoomView; round: RoomGameView; onFinish: (report: GameReport) => void }) {
+  const raw = use(loadGameData(view.settings.lang));
+  const data = useMemo(() => resolveGameData(raw, view.settings.mode), [raw, view.settings.mode]);
+  // Le compte rendu passe par une référence : la manche garde le même contexte d'un rafraîchissement à l'autre
+  const finish = useRef(onFinish);
+  useEffect(() => {
+    finish.current = onFinish;
+  });
+  const context = useMemo<RoomRound>(
+    () => ({ seed: round.seed, difficulty: view.settings.difficulty, submit: (report) => finish.current(report) }),
+    [round.seed, view.settings.difficulty],
+  );
+  const Game = GAME_COMPONENTS[round.slug];
+  return (
+    <RoomRoundProvider round={context}>
+      <Game data={data} raw={raw} />
+    </RoomRoundProvider>
+  );
+}
+
+/** Manche jouée dans un autre jeu : pas de chrono, on passe à la suite quand chacun a fini ou abandonné. */
+function GameRound({
+  view,
+  round,
+  clockOffset,
+  onFinish,
+}: {
+  view: RoomView;
+  round: RoomGameView;
+  clockOffset: number;
+  onFinish: (report: GameReport | null) => void;
+}) {
+  const t = useT();
+  const locale = useLocale();
+  const now = useNow(round.reveal !== null);
+  const [sent, setSent] = useState<{ index: number; gaveUp: boolean } | null>(null);
+  const done = round.done || sent?.index === round.index;
+  // Après un abandon, le jeu n'a plus rien à montrer : sa partie n'est pas finie
+  const gaveUp = (sent?.index === round.index && sent.gaveUp) || (round.reveal !== null && round.reveal.results[view.you.id] === null);
+  const finished = view.players.filter((p) => p.answered).length;
+  const title = getGame(round.slug)?.title[locale] ?? round.slug;
+
+  function finish(report: GameReport | null) {
+    if (done) return;
+    setSent({ index: round.index, gaveUp: report === null });
+    onFinish(report);
+  }
+
+  return (
+    <section aria-label={t("Manche", "Round")} className="space-y-4">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <p className="text-[15px] font-extrabold text-foam">
+          {t(`Manche ${round.index + 1} / ${round.total}`, `Round ${round.index + 1} / ${round.total}`)}
+          <span className="ml-2 font-display text-2xl tracking-wide text-straw">{title}</span>
+        </p>
+        {round.reveal ? (
+          <span className="text-sm font-bold text-mist" aria-live="off">
+            {t(
+              `Suite dans ${Math.max(0, Math.ceil((round.reveal.nextAt - (now + clockOffset)) / 1000))} s`,
+              `Next in ${Math.max(0, Math.ceil((round.reveal.nextAt - (now + clockOffset)) / 1000))} s`,
+            )}
+          </span>
+        ) : done ? (
+          <span className="text-sm font-semibold text-mist" aria-live="polite">
+            {t(
+              `Terminé. En attente des autres joueurs (${finished} sur ${view.players.length}).`,
+              `Done. Waiting for the other players (${finished} of ${view.players.length}).`,
+            )}
+          </span>
+        ) : (
+          <Button variant="secondary" className="py-1.5 text-sm" onClick={() => finish(null)}>
+            {t("Abandonner la manche", "Give up this round")}
+          </Button>
+        )}
+      </div>
+
+      {round.reveal ? (
+        <div className="space-y-3 rounded-[20px] border border-sea-700 bg-sea-800 p-6" role="status">
+          <p className="font-bold text-foam">
+            {round.reveal.yourPoints > 0
+              ? t(
+                  `+${formatNumber(round.reveal.yourPoints, locale)} points pour toi.`,
+                  `+${formatNumber(round.reveal.yourPoints, locale)} ${round.reveal.yourPoints === 1 ? "point" : "points"} for you.`,
+                )
+              : t("Pas de points pour toi sur cette manche.", "No points for you this round.")}
+          </p>
+          <ul className="space-y-1.5">
+            {view.players.map((player) => {
+              const points = round.reveal!.results[player.id];
+              return (
+                <li key={player.id} className="flex items-center justify-between gap-3 rounded-lg bg-sea-900 px-3 py-2">
+                  <span className="truncate font-semibold text-foam">{player.name}</span>
+                  <span className={`shrink-0 font-bold ${points ? "text-emerald-300" : "text-mist"}`}>
+                    {points === null || points === undefined ? t("abandon", "gave up") : `+${formatNumber(points, locale)}`}
+                  </span>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+      ) : (
+        !done && (
+          <p className="text-sm text-mist">
+            {t(
+              "Pas de chrono : moins tu fais d'essais ou d'erreurs, plus tu marques de points.",
+              "No timer: the fewer tries or mistakes you make, the more points you score.",
+            )}
+          </p>
+        )
+      )}
+      {/* Le jeu reste affiché pendant les résultats : son écran de fin donne la solution */}
+      {!gaveUp && (!round.reveal || done) && (
+        <Suspense fallback={<Panel>{t("Chargement du jeu…", "Loading the game…")}</Panel>}>
+          {/* Une manche, un tirage : changer de manche remonte le jeu à neuf */}
+          <RoomGame key={`${round.index}:${round.seed}`} view={view} round={round} onFinish={finish} />
+        </Suspense>
+      )}
     </section>
   );
 }
@@ -567,12 +695,21 @@ export function Room({ code }: { code: string }) {
       {counting && <Countdown view={view} clockOffset={clockOffset} />}
       {view.status === "playing" && view.question && (
         <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_340px]">
-          <Question
-            view={view}
-            question={view.question}
-            clockOffset={clockOffset}
-            onAnswer={(optionId) => act("answer", { questionIndex: view.question!.index, optionId })}
-          />
+          {view.question.kind === "qcm" ? (
+            <Question
+              view={view}
+              question={view.question}
+              clockOffset={clockOffset}
+              onAnswer={(optionId) => act("answer", { questionIndex: view.question!.index, optionId })}
+            />
+          ) : (
+            <GameRound
+              view={view}
+              round={view.question}
+              clockOffset={clockOffset}
+              onFinish={(report) => act("finish", { questionIndex: view.question!.index, report })}
+            />
+          )}
           <aside className="space-y-3.5 rounded-[20px] border border-sea-700 bg-sea-800 p-5">
             <div className="flex items-baseline justify-between gap-3">
               <h2 className="text-lg font-extrabold text-foam">{t("Classement", "Leaderboard")}</h2>

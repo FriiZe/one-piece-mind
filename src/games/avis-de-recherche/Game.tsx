@@ -1,10 +1,11 @@
 "use client";
 
+import { useNewSeed, useRoundLimit } from "../ui/roomRound";
 import Image from "next/image";
 import { useMemo, useState } from "react";
 import { portraitUrl, type PlayCharacter } from "../cards";
 import { byDifficulty, type Difficulty } from "../engine/difficulty";
-import { createRng, randomSeed } from "../engine/rng";
+import { createRng } from "../engine/rng";
 import { formatNumber } from "../engine/text";
 import { CharacterSearch } from "../ui/CharacterSearch";
 import { GuessHistory } from "../ui/GuessHistory";
@@ -15,7 +16,7 @@ import type { GameProps } from "../ui/types";
 import { RewardSummary } from "@/components/RewardSummary";
 import { useLocale, useT } from "@/lib/i18n/client";
 import { useGameReward } from "@/lib/player/useGameReward";
-import { generatePosters, hintsFor, isAccepted, MAX_SCORE, pointsFor, type PosterEvent } from "./logic";
+import { generatePosters, hintsFor, isAccepted, MAX_POINTS, pointsFor, type PosterEvent } from "./logic";
 
 type Run = {
   seed: number;
@@ -57,6 +58,8 @@ export default function AvisDeRecherche({ data }: GameProps) {
   const [run, setRun] = useState<Run | null>(null);
   const [best, submitBest] = useBest(`avis-de-recherche.${run?.difficulty ?? "normal"}`);
   const reward = useGameReward();
+  const newSeed = useNewSeed();
+  const limit = useRoundLimit();
 
   const seed = run?.seed;
   const difficulty = run?.difficulty;
@@ -64,14 +67,14 @@ export default function AvisDeRecherche({ data }: GameProps) {
     () =>
       seed === undefined || difficulty === undefined
         ? []
-        : generatePosters(createRng(seed), byDifficulty(data.characters, difficulty)),
-    [data.characters, seed, difficulty],
+        : generatePosters(createRng(seed), byDifficulty(data.characters, difficulty)).slice(0, limit),
+    [data.characters, seed, difficulty, limit],
   );
 
   function start(level: Difficulty) {
     reward.reset();
     setRun({
-      seed: randomSeed(),
+      seed: newSeed(),
       difficulty: level,
       index: 0,
       revealed: 0,
@@ -100,10 +103,10 @@ export default function AvisDeRecherche({ data }: GameProps) {
   if (run.finished) {
     return (
       <ResultPanel
-        title={`${run.score} / ${MAX_SCORE}`}
+        title={`${run.score} / ${posters.length * MAX_POINTS}`}
         best={
           best !== null
-            ? { label: t("Record à ce niveau", "Best at this level"), value: `${best} / ${MAX_SCORE}` }
+            ? { label: t("Record à ce niveau", "Best at this level"), value: `${best} / ${posters.length * MAX_POINTS}` }
             : null
         }
         newBest={run.newBest}

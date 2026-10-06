@@ -1,6 +1,6 @@
 import type { RoomError, RoomTicket } from "@/lib/multi/types";
 import { accountsEnabled } from "@/lib/server/db";
-import { answerRoom, inviteToRoom, joinRoom, restartRoom, startRoom, viewRoom } from "@/lib/server/rooms";
+import { answerRoom, finishRound, inviteToRoom, joinRoom, restartRoom, startRoom, viewRoom } from "@/lib/server/rooms";
 import { allowAttempt, clientAddress, currentUser } from "@/lib/server/session";
 
 const STATUS: Partial<Record<RoomError, number>> = { "not-found": 404, forbidden: 403, "rate-limited": 429, unavailable: 503 };
@@ -50,6 +50,9 @@ export async function POST(request: Request, ctx: RouteContext<"/api/rooms/[code
       return reply(await startRoom(ticket));
     case "answer":
       return reply(await answerRoom(ticket, body.questionIndex, body.optionId));
+    case "finish":
+      // Compte rendu de la partie jouée pendant la manche, ou `null` pour abandonner
+      return reply(await finishRound(ticket, body.questionIndex, body.report ?? null));
     case "restart":
       return reply(await restartRoom(ticket));
     case "invite":

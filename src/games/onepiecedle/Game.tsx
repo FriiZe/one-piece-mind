@@ -1,10 +1,10 @@
 "use client";
 
+import { useNewSeed, useRoomRound } from "../ui/roomRound";
 import { useMemo, useState } from "react";
 import { resolveGameData, type PlayCharacter, type ResolvedData } from "../cards";
 import { dailyNumber, isNextDay } from "../engine/daily";
 import type { Difficulty } from "../engine/difficulty";
-import { randomSeed } from "../engine/rng";
 import { CharacterSearch } from "../ui/CharacterSearch";
 import { Portrait } from "../ui/Portrait";
 import { Button, Panel, ResultPanel, ShareButton } from "../ui/primitives";
@@ -220,6 +220,7 @@ function Free({ data }: GameProps) {
   const t = useT();
   const [run, setRun] = useState<FreeRun | null>(null);
   const reward = useGameReward();
+  const newSeed = useNewSeed();
   const seed = run?.seed;
   const difficulty = run?.difficulty;
   const target = useMemo(
@@ -230,7 +231,7 @@ function Free({ data }: GameProps) {
 
   function start(level: Difficulty) {
     reward.reset();
-    setRun({ seed: randomSeed(), difficulty: level, guessIds: [], gaveUp: false });
+    setRun({ seed: newSeed(), difficulty: level, guessIds: [], gaveUp: false });
   }
 
   if (!run || !target) {
@@ -310,6 +311,15 @@ export default function OnePiecedle(props: GameProps) {
   const t = useT();
   const locale = useLocale();
   const [tab, setTab] = useState<(typeof TABS)[number]["id"]>("daily");
+  // En salon, la manche se joue en partie libre, sur la graine du salon : pas de défi du jour
+  const inRoom = useRoomRound() !== null;
+  if (inRoom) {
+    return (
+      <Panel>
+        <Free {...props} />
+      </Panel>
+    );
+  }
 
   return (
     <div className="space-y-4">

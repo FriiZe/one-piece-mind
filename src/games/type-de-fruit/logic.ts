@@ -31,8 +31,8 @@ export function generateQuiz(rng: Rng, fruits: readonly FruitCard[], count = QUI
 }
 
 /** Rejoue une partie à partir de sa graine et des réponses données. */
-export function evaluate(seed: number, answers: readonly string[], fruits: readonly FruitCard[]) {
-  const quiz = generateQuiz(createRng(seed), fruits);
+export function evaluate(seed: number, answers: readonly string[], fruits: readonly FruitCard[], limit?: number) {
+  const quiz = generateQuiz(createRng(seed), fruits).slice(0, limit);
   const score = quiz.filter((fruit, index) => answers[index] === familyOf(fruit.type)).length;
   return { score, max: quiz.length };
 }

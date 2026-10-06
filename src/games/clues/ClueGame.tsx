@@ -1,5 +1,6 @@
 "use client";
 
+import { useRoundLimit } from "../ui/roomRound";
 import { useMemo, useState } from "react";
 import type { PlayCharacter } from "../cards";
 import { CharacterSearch } from "../ui/CharacterSearch";
@@ -39,6 +40,7 @@ export default function ClueGame({ data, slug }: GameProps & { slug: ClueSlug })
   const t = useT();
   const locale = useLocale();
   const base = useRun(slug);
+  const limit = useRoundLimit();
   const [state, setState] = useState<Progression>(START);
   const game = {
     ...base,
@@ -49,7 +51,7 @@ export default function ClueGame({ data, slug }: GameProps & { slug: ClueSlug })
   };
   const { run, finished } = base;
 
-  const rounds = useMemo(() => (run ? generateRounds(slug, run.seed, run.difficulty, data) : []), [slug, run, data]);
+  const rounds = useMemo(() => (run ? generateRounds(slug, run.seed, run.difficulty, data).slice(0, limit) : []), [slug, run, data, limit]);
 
   if (!run || !rounds.length) {
     return (

@@ -43,7 +43,7 @@ function clue(slug: ClueSlug) {
   });
 }
 
-const GAME_COMPONENTS = {
+export const GAME_COMPONENTS = {
   onepiecedle: load(() => import("../onepiecedle/Game")),
   revelation: load(() => import("../revelation/Game")),
   "zoom-extreme": load(() => import("../zoom-extreme/Game")),

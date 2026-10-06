@@ -1,8 +1,9 @@
 /**
- * Règles du multijoueur : un salon, un quiz commun, un classement.
+ * Règles du multijoueur : un salon, une suite de manches communes, un classement.
  * Calcul pur, partagé par le serveur (qui fait foi) et l'interface.
  */
 import { MIX_SLUGS, type MixSlug } from "@/games/qcm/logic";
+import { isRewardless, LIVE_SLUGS, type LiveSlug } from "@/lib/games/catalog";
 
 export const MAX_PLAYERS = 20;
 export const QUESTION_COUNTS = [5, 10, 15] as const;
@@ -13,6 +14,25 @@ export const REVEAL_SECONDS = 6;
 export const PRESENCE_SECONDS = 12;
 
 export const DEFAULT_SETTINGS = { questionCount: 10, seconds: 15 } as const;
+
+/**
+ * Jeux jouables en salon. Les quiz du mélange donnent des QCM chronométrés ;
+ * les autres jeux se jouent en entier, sur une seule unité (une grille, un mot,
+ * un classement…), sans chrono. Restent à l'écart le mode aléatoire, qui n'est
+ * qu'un mélange des quiz, et les jeux que le serveur ne peut pas vérifier.
+ */
+export const ROOM_GAME_SLUGS: readonly LiveSlug[] = LIVE_SLUGS.filter(
+  (slug) => !(MIX_SLUGS as readonly string[]).includes(slug) && slug !== "mode-aleatoire" && !isRewardless(slug),
+);
+export const ROOM_SLUGS: readonly LiveSlug[] = [...MIX_SLUGS, ...ROOM_GAME_SLUGS];
+export const isQcmSlug = (slug: string): slug is MixSlug => (MIX_SLUGS as readonly string[]).includes(slug);
+
+/**
+ * Une manche hors QCM n'a pas de chrono : elle s'achève quand chacun a fini ou
+ * abandonné. Ce délai, invisible, évite seulement qu'un joueur parti sans
+ * fermer la page bloque le salon indéfiniment.
+ */
+export const GAME_ROUND_MAX_SECONDS = 15 * 60;
 
 /** Lettres et chiffres sans ambiguïté à la lecture : ni O ni 0, ni I ni 1. */
 const CODE_ALPHABET = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
@@ -38,10 +58,10 @@ export function cleanName(input: string): string | null {
 
 export const nameKey = (name: string) => name.toLowerCase();
 
-export function validGames(slugs: unknown): MixSlug[] | null {
+export function validGames(slugs: unknown): LiveSlug[] | null {
   if (!Array.isArray(slugs) || slugs.length === 0) return null;
   const unique = [...new Set(slugs)];
-  return unique.every((slug) => (MIX_SLUGS as readonly string[]).includes(slug)) ? (unique as MixSlug[]) : null;
+  return unique.every((slug) => (ROOM_SLUGS as readonly string[]).includes(slug)) ? (unique as LiveSlug[]) : null;
 }
 
 export const MAX_POINTS = 1000;
@@ -54,6 +74,11 @@ export function pointsFor(correct: boolean, elapsedMs: number, limitMs: number):
   if (!correct) return 0;
   const remaining = Math.max(0, Math.min(1, 1 - elapsedMs / limitMs));
   return 500 + Math.round(500 * remaining);
+}
+
+/** Points d'une manche hors QCM : la part du score maximal obtenue (moins d'essais ou d'erreurs, plus de points). */
+export function gamePoints(performance: number): number {
+  return Math.round(MAX_POINTS * Math.max(0, Math.min(1, performance)));
 }
 
 export type Ranked<T> = T & { rank: number };

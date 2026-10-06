@@ -61,8 +61,9 @@ export function scoreRound(round: RankingRound, order: readonly string[]): numbe
 }
 
 /** Rejoue une partie à partir de sa graine et des classements proposés. */
-export function evaluate(seed: number, difficulty: Difficulty, orders: readonly (readonly string[])[], data: ResolvedData) {
+export function evaluate(seed: number, difficulty: Difficulty, orders: readonly (readonly string[])[], data: ResolvedData, limit = ROUNDS) {
+  const rounds = Math.min(limit, ROUNDS);
   let score = 0;
-  for (let index = 0; index < ROUNDS; index++) score += scoreRound(roundAt(seed, index, difficulty, data), orders[index] ?? []);
-  return { score, max: MAX_SCORE };
+  for (let index = 0; index < rounds; index++) score += scoreRound(roundAt(seed, index, difficulty, data), orders[index] ?? []);
+  return { score, max: rounds * ROUND_SIZE };
 }

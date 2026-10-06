@@ -73,8 +73,14 @@ export function scoreRound(target: Pictured, events: readonly RevealEvent[]): nu
 }
 
 /** Rejoue une partie à partir de sa graine et des actions du joueur, image par image. */
-export function evaluate(seed: number, difficulty: Difficulty, rounds: readonly (readonly RevealEvent[])[], characters: readonly PlayCharacter[]) {
-  const targets = generateRounds(createRng(seed), byDifficulty(characters, difficulty));
+export function evaluate(
+  seed: number,
+  difficulty: Difficulty,
+  rounds: readonly (readonly RevealEvent[])[],
+  characters: readonly PlayCharacter[],
+  limit?: number,
+) {
+  const targets = generateRounds(createRng(seed), byDifficulty(characters, difficulty)).slice(0, limit);
   const score = targets.reduce((sum, target, index) => sum + scoreRound(target, rounds[index] ?? []), 0);
-  return { score, max: MAX_SCORE };
+  return { score, max: limit === undefined ? MAX_SCORE : targets.length * STEPS };
 }

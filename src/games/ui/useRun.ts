@@ -2,8 +2,8 @@
 
 import { useState } from "react";
 import type { Difficulty } from "../engine/difficulty";
-import { randomSeed } from "../engine/rng";
 import { useGameReward } from "@/lib/player/useGameReward";
+import { useNewSeed } from "./roomRound";
 import { useBest } from "./storage";
 
 export type RunBase = { seed: number; difficulty: Difficulty };
@@ -18,11 +18,12 @@ export function useRun(slug: string) {
   const [finished, setFinished] = useState<Finished | null>(null);
   const [best, submitBest] = useBest(`${slug}.${run?.difficulty ?? "normal"}`);
   const reward = useGameReward();
+  const newSeed = useNewSeed();
 
   function start(difficulty: Difficulty) {
     reward.reset();
     setFinished(null);
-    setRun({ seed: randomSeed(), difficulty });
+    setRun({ seed: newSeed(), difficulty });
   }
   function finish(score: number) {
     setFinished({ score, newBest: submitBest(score) });

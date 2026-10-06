@@ -1,5 +1,6 @@
 "use client";
 
+import { useRoundLimit } from "../ui/roomRound";
 import { useMemo, useState } from "react";
 import { GameEnd, GameStart } from "../ui/GameEnd";
 import { Button, Panel, Progress } from "../ui/primitives";
@@ -7,7 +8,7 @@ import { SortableList } from "../ui/SortableList";
 import type { GameProps } from "../ui/types";
 import { useRun } from "../ui/useRun";
 import { useT } from "@/lib/i18n/client";
-import { correctOrder, MAX_SCORE, roundAt, ROUNDS, scoreRound } from "./logic";
+import { correctOrder, roundAt, ROUND_SIZE, ROUNDS, scoreRound } from "./logic";
 
 type Progression = {
   round: number;
@@ -22,6 +23,7 @@ const START: Progression = { round: 0, order: null, submitted: false, orders: []
 export default function Chronologie({ data }: GameProps) {
   const t = useT();
   const base = useRun("chronologie");
+  const rounds = useRoundLimit() ?? ROUNDS;
   const [state, setState] = useState<Progression>(START);
   const game = {
     ...base,
@@ -49,12 +51,12 @@ export default function Chronologie({ data }: GameProps) {
       </GameStart>
     );
   }
-  if (finished) return <GameEnd game={game} data={data} max={MAX_SCORE} />;
+  if (finished) return <GameEnd game={game} data={data} max={rounds * ROUND_SIZE} />;
 
   const byId = new Map(round.items.map((item) => [item.id, item]));
   const order = state.order ?? round.items.map((item) => item.id);
   const expected = correctOrder(round);
-  const last = state.round === ROUNDS - 1;
+  const last = state.round === rounds - 1;
 
   function submit() {
     if (!round) return;
@@ -73,7 +75,7 @@ export default function Chronologie({ data }: GameProps) {
 
   return (
     <Panel className="space-y-4">
-      <Progress current={state.round + 1} total={ROUNDS} score={t(`Score : ${state.score}`, `Score: ${state.score}`)} />
+      <Progress current={state.round + 1} total={rounds} score={t(`Score : ${state.score}`, `Score: ${state.score}`)} />
       <p className="text-lg text-foam">{round.prompt}</p>
       <SortableList
         order={order}

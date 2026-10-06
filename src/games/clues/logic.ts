@@ -125,8 +125,15 @@ export function scoreRound(slug: ClueSlug, round: ClueRound, events: readonly Cl
 }
 
 /** Rejoue une partie à partir de sa graine et des actions du joueur, manche par manche. */
-export function evaluate(slug: ClueSlug, seed: number, difficulty: Difficulty, rounds: readonly (readonly ClueEvent[])[], data: ResolvedData) {
-  const generated = generateRounds(slug, seed, difficulty, data);
+export function evaluate(
+  slug: ClueSlug,
+  seed: number,
+  difficulty: Difficulty,
+  rounds: readonly (readonly ClueEvent[])[],
+  data: ResolvedData,
+  limit?: number,
+) {
+  const generated = generateRounds(slug, seed, difficulty, data).slice(0, limit);
   const score = generated.reduce((sum, round, index) => sum + scoreRound(slug, round, rounds[index] ?? []), 0);
   return { score, max: generated.length * maxPoints(slug) };
 }

@@ -2,6 +2,7 @@
 
 import { useState, type ButtonHTMLAttributes, type ReactNode } from "react";
 import { useT } from "@/lib/i18n/client";
+import { useRoomRound } from "./roomRound";
 
 type Variant = "primary" | "secondary" | "ghost";
 
@@ -86,11 +87,16 @@ export function ResultPanel({
   actions: ReactNode;
 }) {
   const t = useT();
+  // En salon, la partie compte pour une manche : ni record, ni « Rejouer » (le salon dit qui reste à attendre)
+  const inRoom = useRoomRound() !== null;
   return (
     <div role="status" className="rounded-2xl bg-parchment p-5 text-ink sm:p-6">
       <h3 className="font-display text-3xl tracking-wide">{title}</h3>
       {children && <div className="mt-2 space-y-1">{children}</div>}
-      {best && (
+      {inRoom && (
+        <p className="mt-4 font-semibold">{t("Manche terminée.", "Round over.")}</p>
+      )}
+      {!inRoom && best && (
         <p className="mt-2 text-sm font-semibold">
           {newBest ? t("Nouveau record ! ", "New best! ") : ""}
           {best.label}
@@ -98,7 +104,7 @@ export function ResultPanel({
           {best.value}
         </p>
       )}
-      <div className="mt-4 flex flex-wrap gap-3">{actions}</div>
+      {!inRoom && <div className="mt-4 flex flex-wrap gap-3">{actions}</div>}
     </div>
   );
 }

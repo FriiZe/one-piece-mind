@@ -201,8 +201,15 @@ export function generateEstimates(slug: EstimateSlug, seed: number, difficulty: 
 }
 
 /** Rejoue une partie à partir de sa graine et des estimations données. */
-export function evaluate(slug: EstimateSlug, seed: number, difficulty: Difficulty, answers: readonly number[], data: ResolvedData) {
-  const questions = generateEstimates(slug, seed, difficulty, data);
+export function evaluate(
+  slug: EstimateSlug,
+  seed: number,
+  difficulty: Difficulty,
+  answers: readonly number[],
+  data: ResolvedData,
+  limit?: number,
+) {
+  const questions = generateEstimates(slug, seed, difficulty, data).slice(0, limit);
   const score = questions.reduce(
     (sum, question, index) => sum + (index in answers ? scoreEstimate(question, answers[index]) : 0),
     0,

@@ -43,8 +43,8 @@ export function answerLabel(question: Question): string {
 
 
 /** Rejoue une partie à partir de sa graine et des réponses données. */
-export function evaluate(seed: number, difficulty: Difficulty, answers: readonly string[], data: ResolvedData) {
-  const quiz = generateQuiz(createRng(seed), data, byDifficulty(data.characters, difficulty));
+export function evaluate(seed: number, difficulty: Difficulty, answers: readonly string[], data: ResolvedData, limit?: number) {
+  const quiz = generateQuiz(createRng(seed), data, byDifficulty(data.characters, difficulty)).slice(0, limit);
   const score = quiz.filter((question, index) => answers[index] === question.answerId).length;
   return { score, max: quiz.length };
 }

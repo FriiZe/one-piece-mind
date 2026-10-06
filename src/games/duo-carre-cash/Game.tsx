@@ -1,5 +1,6 @@
 "use client";
 
+import { useRoundLimit } from "../ui/roomRound";
 import { useMemo } from "react";
 import { GameEnd, GameStart } from "../ui/GameEnd";
 import type { GameProps } from "../ui/types";
@@ -14,7 +15,8 @@ export default function DuoCarreCash({ data }: GameProps) {
   const game = useRun("duo-carre-cash");
   const { run, finished } = game;
 
-  const questions = useMemo(() => (run ? generate(run.seed, run.difficulty, data) : []), [run, data]);
+  const limit = useRoundLimit();
+  const questions = useMemo(() => (run ? generate(run.seed, run.difficulty, data).slice(0, limit) : []), [run, data, limit]);
 
   if (!run || !questions.length) {
     return (

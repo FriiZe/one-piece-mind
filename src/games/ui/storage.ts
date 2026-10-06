@@ -8,6 +8,7 @@
 import { useCallback, useSyncExternalStore } from "react";
 import { dailyKey } from "../engine/daily";
 import { useLocale } from "@/lib/i18n/client";
+import { useRoomRound } from "./roomRound";
 
 const listeners = new Set<() => void>();
 const parsed = new Map<string, { raw: string | null; value: unknown }>();
@@ -122,13 +123,15 @@ export function useUntilMidnight(): string | null {
 /** Meilleur score d'un jeu ; `submit` ne l'écrase que s'il est battu (un score nul n'est pas un record). */
 export function useBest(id: string): [number | null, (score: number) => boolean] {
   const [best, setBest] = useStored<number | null>(`opm.best.${id}`, null);
+  // Une manche de salon ne se joue que sur une unité du jeu : elle ne compte pas pour les records
+  const inRoom = useRoomRound() !== null;
   const submit = useCallback(
     (score: number) => {
-      const beaten = score > (best ?? 0);
+      const beaten = !inRoom && score > (best ?? 0);
       if (beaten) setBest(score);
       return beaten;
     },
-    [best, setBest],
+    [best, setBest, inRoom],
   );
   return [best, submit];
 }

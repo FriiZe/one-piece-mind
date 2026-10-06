@@ -78,8 +78,8 @@ export function scorePoster(target: PlayCharacter, events: readonly PosterEvent[
 }
 
 /** Rejoue une partie à partir de sa graine et des actions du joueur, affiche par affiche. */
-export function evaluate(seed: number, difficulty: Difficulty, posters: readonly (readonly PosterEvent[])[], data: ResolvedData) {
-  const targets = generatePosters(createRng(seed), byDifficulty(data.characters, difficulty));
+export function evaluate(seed: number, difficulty: Difficulty, posters: readonly (readonly PosterEvent[])[], data: ResolvedData, limit?: number) {
+  const targets = generatePosters(createRng(seed), byDifficulty(data.characters, difficulty)).slice(0, limit);
   const score = targets.reduce((sum, target, index) => sum + scorePoster(target, posters[index] ?? [], data), 0);
-  return { score, max: MAX_SCORE };
+  return { score, max: limit === undefined ? MAX_SCORE : targets.length * MAX_POINTS };
 }

@@ -1,10 +1,15 @@
 import "dotenv/config";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { buildGameData, resolveGameData } from "@/games/cards";
+import { evaluate as evaluateClassement } from "@/games/le-classement/logic";
 import { generateMixed, MIX_SLUGS } from "@/games/qcm/logic";
+import { evaluate as evaluateTypeDeFruit } from "@/games/type-de-fruit/logic";
+import { targetOf, toWord } from "@/games/wordle/logic";
 import {
   cleanName,
   CODE_PATTERN,
+  gamePoints,
+  ROOM_GAME_SLUGS,
   normalizeCode,
   pointsFor,
   randomCode,
@@ -16,7 +21,7 @@ import type { RoomTicket, RoomView } from "@/lib/multi/types";
 import { accountsEnabled, db } from "@/lib/server/db";
 import { answerFriendRequest, friendsOverview, pendingCounts, removeFriend, requestFriend } from "@/lib/server/friends";
 import { DUMMY_HASH } from "@/lib/server/password";
-import { answerRoom, createRoom, inviteToRoom, joinRoom, restartRoom, startRoom, viewRoom } from "@/lib/server/rooms";
+import { answerRoom, createRoom, finishRound, inviteToRoom, joinRoom, restartRoom, startRoom, viewRoom } from "@/lib/server/rooms";
 
 describe("règles du multijoueur", () => {
   it("tire des codes lisibles et tolère la saisie", () => {
@@ -41,6 +46,25 @@ describe("règles du multijoueur", () => {
     expect(validGames([])).toBeNull();
     expect(validGames(["mode-aleatoire"])).toBeNull();
     expect(validGames("haki")).toBeNull();
+    // Les autres jeux se jouent aussi en salon, sauf ceux que le serveur ne peut pas vérifier
+    expect(validGames(["wordle", "grille", "haki"])).toEqual(["wordle", "grille", "haki"]);
+    expect(validGames(["den-den-devin"])).toBeNull();
+    expect(ROOM_GAME_SLUGS).toContain("le-classement");
+    expect(ROOM_GAME_SLUGS).not.toContain("haki");
+  });
+
+  it("note une manche hors QCM selon la part du score maximal", () => {
+    expect(gamePoints(1)).toBe(1000);
+    expect(gamePoints(5 / 6)).toBe(833);
+    expect(gamePoints(0)).toBe(0);
+    expect(gamePoints(2)).toBe(1000);
+  });
+
+  it("ne note qu'une unité d'un jeu en plusieurs manches", () => {
+    const data = resolveGameData(buildGameData(), "anime");
+    expect(evaluateClassement(1, "normal", [], data.characters).max).toBe(25);
+    expect(evaluateClassement(1, "normal", [], data.characters, 1).max).toBe(5);
+    expect(evaluateTypeDeFruit(1, [], data.fruits, 1).max).toBe(1);
   });
 
   it("récompense la bonne réponse, et la rapidité", () => {
@@ -258,5 +282,66 @@ describe.skipIf(!accountsEnabled)("salon et amis, en base", () => {
     expect(await removeFriend(b.id, a.id)).toEqual({ ok: true });
     expect((await friendsOverview(a.id)).friends).toEqual([]);
     expect(await inviteToRoom(host, a, b.id)).toEqual({ ok: false, error: "forbidden" });
+  });
+});
+
+describe.skipIf(!accountsEnabled)("manches hors QCM, en base", () => {
+  const settings = { mode: "anime", difficulty: "normal", games: ["wordle"], questionCount: 5, seconds: 15 };
+  let host: RoomTicket;
+  let guest: RoomTicket;
+  let code: string;
+
+  afterAll(async () => {
+    await db().room.deleteMany({ where: { code } });
+    await db().$disconnect();
+  });
+
+  async function view(ticket: RoomTicket): Promise<RoomView> {
+    const result = await viewRoom(ticket);
+    if (!result.ok || !("view" in result)) throw new Error("vue indisponible");
+    return result.view;
+  }
+
+  it("joue une manche Wordle sans chrono, notée au nombre d'essais", async () => {
+    const created = await createRoom(settings, { user: null, name: "Nami" });
+    if (!created.ok) throw new Error(created.error);
+    host = created.ticket;
+    code = host.code;
+    const joined = await joinRoom(code, { user: null, name: "Usopp" });
+    if (!joined.ok) throw new Error(joined.error);
+    guest = joined.ticket;
+    expect(await startRoom(host)).toEqual({ ok: true });
+
+    const round = (await view(guest)).question;
+    if (round?.kind !== "game") throw new Error("manche attendue");
+    expect(round).toMatchObject({ index: 0, total: 5, slug: "wordle", done: false, reveal: null });
+
+    // Une manche hors QCM ne se répond pas comme un QCM, et le compte rendu doit être celui de la manche
+    expect(await answerRoom(host, 0, "peu-importe")).toEqual({ ok: false, error: "forbidden" });
+    const data = resolveGameData(buildGameData(), "anime");
+    const target = toWord(targetOf(round.seed, "normal", data.characters).name);
+    const report = { slug: "wordle", seed: round.seed, mode: "anime", difficulty: "normal", guesses: [target] };
+    expect(await finishRound(host, 0, { ...report, seed: round.seed + 1 })).toEqual({ ok: false, error: "bad-request" });
+    expect(await finishRound(host, 0, { ...report, difficulty: "expert" })).toEqual({ ok: false, error: "bad-request" });
+    expect(await finishRound(host, 0, { ...report, slug: "anagramme", answers: [] })).toEqual({ ok: false, error: "bad-request" });
+
+    // Pas de chrono : même longtemps après, la manche attend toujours les joueurs
+    const room = await db().room.findUniqueOrThrow({ where: { code } });
+    await db().room.update({
+      where: { id: room.id },
+      data: { phaseStartedAt: new Date(room.phaseStartedAt!.getTime() - 120_000), phaseEndsAt: new Date(room.phaseEndsAt!.getTime() - 120_000) },
+    });
+    expect(await finishRound(host, 0, report)).toEqual({ ok: true });
+    const waiting = await view(guest);
+    expect(waiting.question).toMatchObject({ index: 0, reveal: null });
+    expect(waiting.players.find((p) => p.name === "Nami")).toMatchObject({ answered: true, score: 0 });
+
+    // L'invité abandonne : tout le monde a fini, les résultats s'affichent
+    expect(await finishRound(guest, 0, null)).toEqual({ ok: true });
+    const revealed = await view(host);
+    if (revealed.question?.kind !== "game") throw new Error("manche attendue");
+    const ids = Object.fromEntries(revealed.players.map((p) => [p.name, p.id]));
+    expect(revealed.question.reveal).toMatchObject({ yourPoints: 1000, results: { [ids.Nami]: 1000, [ids.Usopp]: null } });
+    expect(revealed.players[0]).toMatchObject({ name: "Nami", score: 1000, rank: 1 });
   });
 });

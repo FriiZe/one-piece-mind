@@ -140,10 +140,12 @@ export type EvaluationContext = {
   animeCharacters: ResolvedData["characters"];
   /** Date du jour à Paris : un défi du jour ne se joue que le jour même. */
   today: string;
+  /** Manche de salon : nombre d'unités notées (une grille, une affiche…) ; toute la partie par défaut. */
+  limit?: number;
 };
 
 /** Rejoue la partie décrite par le compte rendu. `null` si elle ne peut pas avoir eu lieu. */
-export function evaluateReport(report: GameReport, { data, animeCharacters, today }: EvaluationContext): GameOutcome | null {
+export function evaluateReport(report: GameReport, { data, animeCharacters, today, limit }: EvaluationContext): GameOutcome | null {
   const slug = report.slug === "onepiecedle-daily" ? "onepiecedle" : report.slug;
   // Un jeu en pause n'a plus de page : la partie n'a pas pu y être jouée
   if (!isLiveSlug(slug)) return null;
@@ -162,15 +164,15 @@ export function evaluateReport(report: GameReport, { data, animeCharacters, toda
 
   switch (report.slug) {
     case "type-de-fruit":
-      return outcome(typeDeFruit.evaluate(report.seed, report.answers, data.fruits));
+      return outcome(typeDeFruit.evaluate(report.seed, report.answers, data.fruits, limit));
     case "qui-a-mange-ce-fruit":
-      return outcome(quiAMange.evaluate(report.seed, report.difficulty, report.answers, data));
+      return outcome(quiAMange.evaluate(report.seed, report.difficulty, report.answers, data, limit));
     case "le-classement":
-      return outcome(classement.evaluate(report.seed, report.difficulty, report.orders, data.characters));
+      return outcome(classement.evaluate(report.seed, report.difficulty, report.orders, data.characters, limit));
     case "plus-ou-moins":
       return outcome(plusOuMoins.evaluate(report.seed, report.difficulty, report.answers, data.characters));
     case "avis-de-recherche":
-      return outcome(avis.evaluate(report.seed, report.difficulty, report.posters, data));
+      return outcome(avis.evaluate(report.seed, report.difficulty, report.posters, data, limit));
     case "trouve-les-tous": {
       const group = data.groups.find((g) => g.id === report.groupId);
       return group ? outcome(trouve.evaluate(group, report.found)) : null;
@@ -184,11 +186,11 @@ export function evaluateReport(report: GameReport, { data, animeCharacters, toda
       return outcome(onepiecedle.evaluate(onepiecedle.dailyTarget(animeCharacters, report.day), report.guesses), true);
     case "revelation":
     case "zoom-extreme":
-      return outcome(reveal.evaluate(report.seed, report.difficulty, report.rounds, data.characters));
+      return outcome(reveal.evaluate(report.seed, report.difficulty, report.rounds, data.characters, limit));
     case "chronologie":
-      return outcome(chronologie.evaluate(report.seed, report.difficulty, report.orders, data));
+      return outcome(chronologie.evaluate(report.seed, report.difficulty, report.orders, data, limit));
     case "anagramme":
-      return outcome(anagramme.evaluate(report.seed, report.difficulty, report.answers, data.characters));
+      return outcome(anagramme.evaluate(report.seed, report.difficulty, report.answers, data.characters, limit));
     case "wordle":
       return outcome(wordle.evaluate(report.seed, report.difficulty, report.guesses, data.characters));
     case "memo":
@@ -196,7 +198,7 @@ export function evaluateReport(report: GameReport, { data, animeCharacters, toda
     case "devine-la-prime":
     case "premiere-apparition":
     case "prime-d-equipage":
-      return outcome(estimate.evaluate(report.slug, report.seed, report.difficulty, report.answers, data));
+      return outcome(estimate.evaluate(report.slug, report.seed, report.difficulty, report.answers, data, limit));
     case "connexions":
       return outcome(connexions.evaluate(report.seed, report.difficulty, report.guesses, data));
     case "grille":
@@ -204,12 +206,12 @@ export function evaluateReport(report: GameReport, { data, animeCharacters, toda
     case "recrute-ton-equipage":
       return outcome(recrute.evaluate(report.seed, report.difficulty, report.posts, data));
     case "la-route-de-grand-line":
-      return outcome(route.evaluate(report.seed, report.answers, data));
+      return outcome(route.evaluate(report.seed, report.answers, data, limit));
     case "duo-carre-cash":
-      return outcome(dcc.evaluate(report.seed, report.difficulty, report.answers, data));
+      return outcome(dcc.evaluate(report.seed, report.difficulty, report.answers, data, limit));
     case "les-indices":
     case "emojis":
-      return outcome(clues.evaluate(report.slug, report.seed, report.difficulty, report.rounds, data));
+      return outcome(clues.evaluate(report.slug, report.seed, report.difficulty, report.rounds, data, limit));
     default:
       return outcome(qcm.evaluate(report.slug, report.seed, report.difficulty, report.answers, data));
   }

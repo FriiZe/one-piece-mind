@@ -1,8 +1,9 @@
 "use client";
 
+import { useNewSeed, useRoundLimit } from "../ui/roomRound";
 import { useMemo, useState } from "react";
 import { byDifficulty, type Difficulty } from "../engine/difficulty";
-import { createRng, randomSeed } from "../engine/rng";
+import { createRng } from "../engine/rng";
 import { Button, ResultPanel } from "../ui/primitives";
 import { Portrait } from "../ui/Portrait";
 import { QuizFlow, type QuizQuestion } from "../ui/QuizFlow";
@@ -22,10 +23,12 @@ export default function QuiAMangeCeFruit({ data }: GameProps) {
   const [result, setResult] = useState<{ score: number; newBest: boolean } | null>(null);
   const [best, submitBest] = useBest(`qui-a-mange-ce-fruit.${run?.difficulty ?? "normal"}`);
   const reward = useGameReward();
+  const newSeed = useNewSeed();
+  const limit = useRoundLimit();
 
   const questions = useMemo<QuizQuestion[]>(() => {
     if (!run) return [];
-    const quiz = generateQuiz(createRng(run.seed), data, byDifficulty(data.characters, run.difficulty));
+    const quiz = generateQuiz(createRng(run.seed), data, byDifficulty(data.characters, run.difficulty)).slice(0, limit);
     return quiz.map((q, index): QuizQuestion => {
       const explanation = t(`La réponse était : ${answerLabel(q)}.`, `The answer was: ${answerLabel(q)}.`);
       if (q.kind === "fruit-to-user") {
@@ -58,7 +61,7 @@ export default function QuiAMangeCeFruit({ data }: GameProps) {
         explanation,
       };
     });
-  }, [run, data, t]);
+  }, [run, data, t, limit]);
 
   if (!run) {
     return (
@@ -66,7 +69,7 @@ export default function QuiAMangeCeFruit({ data }: GameProps) {
         onStart={(difficulty) => {
           reward.reset();
           setResult(null);
-          setRun({ seed: randomSeed(), difficulty });
+          setRun({ seed: newSeed(), difficulty });
         }}
       >
         <p className="text-mist">
@@ -91,7 +94,7 @@ export default function QuiAMangeCeFruit({ data }: GameProps) {
               onClick={() => {
                 reward.reset();
                 setResult(null);
-                setRun({ seed: randomSeed(), difficulty: run.difficulty });
+                setRun({ seed: newSeed(), difficulty: run.difficulty });
               }}
             >
               {t("Rejouer", "Play again")}

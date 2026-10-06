@@ -1,15 +1,15 @@
 "use client";
 
+import { AutoStart, useNewSeed, useRoomRound } from "../ui/roomRound";
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { GroupCard } from "../cards";
-import { randomSeed } from "../engine/rng";
 import { Button, Panel, ResultPanel } from "../ui/primitives";
 import { useStored } from "../ui/storage";
 import type { GameProps } from "../ui/types";
 import { RewardSummary } from "@/components/RewardSummary";
 import { useT } from "@/lib/i18n/client";
 import { useGameReward } from "@/lib/player/useGameReward";
-import { acceptedForms, matchMember, membersOf, timeLimit } from "./logic";
+import { acceptedForms, matchMember, membersOf, roomGroup, timeLimit } from "./logic";
 
 type Run = {
   /** Identifie la partie : une même partie n'est récompensée qu'une fois. */
@@ -40,7 +40,9 @@ export default function TrouveLesTous({ data }: GameProps) {
   const members = useMemo(() => (group ? membersOf(group, data.characterById) : []), [group, data.characterById]);
   const forms = useMemo(() => acceptedForms(members), [members]);
 
-  const playing = run !== null && !run.over;
+  // En salon, pas de chrono : la manche s'arrête quand le joueur a tout trouvé ou abandonne
+  const round = useRoomRound();
+  const playing = run !== null && !run.over && !round;
   useEffect(() => {
     if (!playing) return;
     const timer = window.setInterval(() => {
@@ -56,13 +58,15 @@ export default function TrouveLesTous({ data }: GameProps) {
   // La partie peut se terminer toute seule, au bout du chrono : le record est
   // donc enregistré ici plutôt que dans un gestionnaire d'événement.
   const finalScore = run?.over ? run.found.length : null;
+  // Une manche de salon ne compte pas pour les records
   useEffect(() => {
-    if (!group || finalScore === null || finalScore <= (records[group.id] ?? 0)) return;
+    if (round || !group || finalScore === null || finalScore <= (records[group.id] ?? 0)) return;
     setRecords({ ...records, [group.id]: finalScore });
-  }, [group, finalScore, records, setRecords]);
+  }, [round, group, finalScore, records, setRecords]);
 
   // Compte rendu de partie, envoyé une seule fois quand elle se termine (chrono compris)
   const reward = useGameReward();
+  const newSeed = useNewSeed();
   const reported = useRef<number | null>(null);
   const finishedRun = run?.over ? run : null;
   const { submit } = reward;
@@ -82,7 +86,7 @@ export default function TrouveLesTous({ data }: GameProps) {
     setInput("");
     reward.reset();
     setRun({
-      seed: randomSeed(),
+      seed: newSeed(),
       group: chosen,
       found: [],
       remaining: timeLimit(chosen.memberIds.length),
@@ -103,6 +107,10 @@ export default function TrouveLesTous({ data }: GameProps) {
     setRun({ ...run, found, over: found.length === members.length });
   }
 
+  if (!run && round) {
+    const group = roomGroup(round.seed, data.groups);
+    if (group) return <AutoStart onStart={() => start(group)} />;
+  }
   if (!run) {
     return (
       <Panel className="space-y-4">
@@ -158,8 +166,13 @@ export default function TrouveLesTous({ data }: GameProps) {
         <div className="flex flex-wrap items-baseline justify-between gap-2">
           <h3 className="font-display text-2xl tracking-wide text-straw">{run.group.title}</h3>
           <p className="font-semibold text-foam" aria-live="off">
-            {run.found.length} / {members.length} ·{" "}
-            <span className={run.remaining <= 10 && !run.over ? "text-vest" : ""}>{formatTime(run.remaining)}</span>
+            {run.found.length} / {members.length}
+            {!round && (
+              <>
+                {" · "}
+                <span className={run.remaining <= 10 && !run.over ? "text-vest" : ""}>{formatTime(run.remaining)}</span>
+              </>
+            )}
           </p>
         </div>
 
@@ -224,12 +237,12 @@ export default function TrouveLesTous({ data }: GameProps) {
             </>
           }
         >
-          {run.found.length === members.length ? (
+          {round ? null : run.found.length === members.length ? (
             <p>{t(`Il te restait ${formatTime(run.remaining)}.`, `You had ${formatTime(run.remaining)} left.`)}</p>
           ) : (
             <p>{t("Les oubliés sont en rouge ci-dessus.", "The ones you missed are in red above.")}</p>
           )}
-          {beaten && <p className="font-semibold">{t("Nouveau record !", "New best!")}</p>}
+          {beaten && !round && <p className="font-semibold">{t("Nouveau record !", "New best!")}</p>}
           <RewardSummary view={reward.view} data={data} />
         </ResultPanel>
       )}

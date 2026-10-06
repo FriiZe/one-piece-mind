@@ -46,7 +46,7 @@ export function replay(stages: readonly Stage[], answers: readonly string[]) {
 }
 
 /** Rejoue une traversée à partir de sa graine et des réponses : un point par île conquise. */
-export function evaluate(seed: number, answers: readonly string[], data: ResolvedData) {
-  const stages = generateRoute(seed, data);
+export function evaluate(seed: number, answers: readonly string[], data: ResolvedData, limit?: number) {
+  const stages = generateRoute(seed, data).slice(0, limit);
   return { score: replay(stages, answers).conquered, max: stages.length };
 }

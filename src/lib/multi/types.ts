@@ -1,5 +1,6 @@
 import type { Difficulty } from "@/games/engine/difficulty";
-import type { MixSlug, QcmOption } from "@/games/qcm/logic";
+import type { QcmOption } from "@/games/qcm/logic";
+import type { LiveSlug } from "@/lib/games/catalog";
 import type { Locale } from "@/lib/i18n";
 import type { RoomRankedView } from "@/lib/ranked/types";
 import type { SpoilerMode } from "@/lib/spoilers";
@@ -7,7 +8,7 @@ import type { SpoilerMode } from "@/lib/spoilers";
 export type RoomSettings = {
   mode: SpoilerMode;
   difficulty: Difficulty;
-  games: MixSlug[];
+  games: LiveSlug[];
   questionCount: number;
   seconds: number;
   /** Langue des questions : celle de l'hôte, pour que tout le salon joue les mêmes. */
@@ -26,7 +27,11 @@ export type RoomPlayerView = {
   answered: boolean;
 };
 
-export type RoomQuestionView = {
+export type RoomQuestionView = RoomQcmView | RoomGameView;
+
+/** Question à choix multiple, chronométrée. */
+export type RoomQcmView = {
+  kind: "qcm";
   index: number;
   total: number;
   title: string;
@@ -45,6 +50,25 @@ export type RoomQuestionView = {
     counts: Record<string, number>;
     yourPoints: number;
     /** Passage à la question suivante. */
+    nextAt: number;
+  } | null;
+};
+
+/** Manche jouée dans un autre jeu, sur une seule unité, sans chrono. */
+export type RoomGameView = {
+  kind: "game";
+  index: number;
+  total: number;
+  slug: LiveSlug;
+  /** Graine de la manche : tous les joueurs ont le même tirage. */
+  seed: number;
+  /** Le joueur a fini sa manche, ou l'a abandonnée. */
+  done: boolean;
+  /** Résultats, une fois que tout le monde a fini. */
+  reveal: {
+    /** Points de chaque joueur ; `null` s'il a abandonné ou n'a pas fini. */
+    results: Record<string, number | null>;
+    yourPoints: number;
     nextAt: number;
   } | null;
 };

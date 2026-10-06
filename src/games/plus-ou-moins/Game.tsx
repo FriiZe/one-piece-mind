@@ -1,8 +1,8 @@
 "use client";
 
+import { useNewSeed } from "../ui/roomRound";
 import { useMemo, useState } from "react";
 import { byDifficulty, type Difficulty } from "../engine/difficulty";
-import { randomSeed } from "../engine/rng";
 import { formatBounty } from "../engine/text";
 import { Button, ResultPanel } from "../ui/primitives";
 import { StartScreen } from "../ui/StartScreen";
@@ -47,6 +47,7 @@ export default function PlusOuMoins({ data }: GameProps) {
   const [run, setRun] = useState<Run | null>(null);
   const [best, submitBest] = useBest(`plus-ou-moins.${run?.difficulty ?? "normal"}`);
   const reward = useGameReward();
+  const newSeed = useNewSeed();
   const difficulty = run?.difficulty;
   const pool = useMemo(
     () => (difficulty ? bountyPool(byDifficulty(data.characters, difficulty)) : []),
@@ -54,7 +55,7 @@ export default function PlusOuMoins({ data }: GameProps) {
   );
 
   function start(level: Difficulty) {
-    const seed = randomSeed();
+    const seed = newSeed();
     const chain = startChain(seed, bountyPool(byDifficulty(data.characters, level)), level);
     reward.reset();
     setRun({ ...chain, seed, difficulty: level, streak: 0, answers: [], answer: null, lost: false, newBest: false });

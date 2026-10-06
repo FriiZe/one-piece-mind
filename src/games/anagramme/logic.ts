@@ -35,8 +35,8 @@ export function isCorrect(round: AnagramRound, answer: string): boolean {
 }
 
 /** Rejoue une partie : un point par nom retrouvé. */
-export function evaluate(seed: number, difficulty: Difficulty, answers: readonly string[], characters: readonly PlayCharacter[]) {
-  const rounds = generateRounds(seed, difficulty, characters);
+export function evaluate(seed: number, difficulty: Difficulty, answers: readonly string[], characters: readonly PlayCharacter[], limit?: number) {
+  const rounds = generateRounds(seed, difficulty, characters).slice(0, limit);
   const score = rounds.filter((round, index) => isCorrect(round, answers[index] ?? "")).length;
   return { score, max: rounds.length };
 }

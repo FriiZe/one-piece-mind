@@ -1,9 +1,9 @@
 "use client";
 
+import { useNewSeed, useRoundLimit } from "../ui/roomRound";
 import { useMemo, useState } from "react";
 import type { PlayCharacter } from "../cards";
 import { byDifficulty, type Difficulty } from "../engine/difficulty";
-import { randomSeed } from "../engine/rng";
 import { formatBounty, formatHeight } from "../engine/text";
 import { Button, Panel, Progress, ResultPanel } from "../ui/primitives";
 import { SortableList, type SortableItem } from "../ui/SortableList";
@@ -14,7 +14,7 @@ import { RewardSummary } from "@/components/RewardSummary";
 import type { Locale } from "@/lib/i18n";
 import { useLocale, useT } from "@/lib/i18n/client";
 import { useGameReward } from "@/lib/player/useGameReward";
-import { CRITERIA, correctOrder, MAX_SCORE, roundAt, ROUNDS, type Criterion } from "./logic";
+import { CRITERIA, correctOrder, roundAt, ROUND_SIZE, ROUNDS, type Criterion } from "./logic";
 
 function formatValue(character: PlayCharacter, criterion: Criterion, locale: Locale): string {
   if (criterion === "bounty") return formatBounty(character.bounty, locale);
@@ -42,6 +42,9 @@ export default function LeClassement({ data }: GameProps) {
   const [run, setRun] = useState<Run | null>(null);
   const [best, submitBest] = useBest(`le-classement.${run?.difficulty ?? "normal"}`);
   const reward = useGameReward();
+  const newSeed = useNewSeed();
+  const rounds = useRoundLimit() ?? ROUNDS;
+  const maxScore = rounds * ROUND_SIZE;
 
   const seed = run?.seed;
   const roundIndex = run?.round;
@@ -57,7 +60,7 @@ export default function LeClassement({ data }: GameProps) {
   function start(level: Difficulty) {
     reward.reset();
     setRun({
-      seed: randomSeed(),
+      seed: newSeed(),
       difficulty: level,
       round: 0,
       order: null,
@@ -85,8 +88,8 @@ export default function LeClassement({ data }: GameProps) {
   if (run.finished) {
     return (
       <ResultPanel
-        title={`${run.score} / ${MAX_SCORE}`}
-        best={best !== null ? { label: t("Record à ce niveau", "Best at this level"), value: `${best} / ${MAX_SCORE}` } : null}
+        title={`${run.score} / ${maxScore}`}
+        best={best !== null ? { label: t("Record à ce niveau", "Best at this level"), value: `${best} / ${maxScore}` } : null}
         newBest={run.newBest}
         actions={
           <>
@@ -117,7 +120,7 @@ export default function LeClassement({ data }: GameProps) {
 
   function next() {
     if (!run) return;
-    if (run.round === ROUNDS - 1) {
+    if (run.round === rounds - 1) {
       setRun({ ...run, finished: true, newBest: submitBest(run.score) });
       reward.submit({ slug: "le-classement", seed: run.seed, mode: data.mode, difficulty: run.difficulty, orders: run.orders });
       return;
@@ -127,7 +130,7 @@ export default function LeClassement({ data }: GameProps) {
 
   return (
     <Panel className="space-y-4">
-      <Progress current={run.round + 1} total={ROUNDS} score={t(`Score : ${run.score}`, `Score: ${run.score}`)} />
+      <Progress current={run.round + 1} total={rounds} score={t(`Score : ${run.score}`, `Score: ${run.score}`)} />
       <p className="text-lg text-foam">
         {t("Range ces personnages par", "Rank these characters by")}{" "}
         <strong className="text-straw">{criterion.label[locale]}</strong>, {criterion.order[locale]}.
@@ -141,7 +144,7 @@ export default function LeClassement({ data }: GameProps) {
       />
       {run.submitted ? (
         <Button autoFocus onClick={next}>
-          {run.round === ROUNDS - 1 ? t("Voir mon score", "See my score") : t("Manche suivante", "Next round")}
+          {run.round === rounds - 1 ? t("Voir mon score", "See my score") : t("Manche suivante", "Next round")}
         </Button>
       ) : (
         <Button onClick={submit}>{t("Valider", "Submit")}</Button>

@@ -4,6 +4,7 @@ import type { ReactNode } from "react";
 import { DIFFICULTIES, type Difficulty } from "../engine/difficulty";
 import { useLocale, useT } from "@/lib/i18n/client";
 import { Button, Panel } from "./primitives";
+import { AutoStart, useRoomRound } from "./roomRound";
 import { useStored } from "./storage";
 
 /** Écran de départ : choix de la difficulté, mémorisé d'une partie à l'autre. */
@@ -19,7 +20,10 @@ export function StartScreen({
   const t = useT();
   const locale = useLocale();
   const [difficulty, setDifficulty] = useStored<Difficulty>("opm.difficulty", "normal");
+  // En salon, la difficulté est celle du salon : la partie démarre aussitôt
+  const inRoom = useRoomRound() !== null;
 
+  if (inRoom) return <AutoStart onStart={onStart} />;
   const current = DIFFICULTIES.find((d) => d.id === difficulty) ?? DIFFICULTIES[0];
 
   return (

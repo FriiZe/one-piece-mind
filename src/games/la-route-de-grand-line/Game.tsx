@@ -1,5 +1,6 @@
 "use client";
 
+import { useRoundLimit } from "../ui/roomRound";
 import { useMemo, useState } from "react";
 import { GameEnd, GameStart } from "../ui/GameEnd";
 import { Portrait } from "../ui/Portrait";
@@ -25,7 +26,8 @@ export default function RouteDeGrandLine({ data }: GameProps) {
   };
   const { run, finished } = base;
 
-  const stages = useMemo(() => (run ? generateRoute(run.seed, data) : []), [run, data]);
+  const limit = useRoundLimit();
+  const stages = useMemo(() => (run ? generateRoute(run.seed, data).slice(0, limit) : []), [run, data, limit]);
 
   if (!run || !stages.length) {
     return (

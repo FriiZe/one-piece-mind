@@ -3,12 +3,19 @@ import { createHash, randomBytes, randomInt } from "node:crypto";
 import { buildGameData, resolveGameData, type GameData, type ResolvedData } from "@/games/cards";
 import { dailyKey } from "@/games/engine/daily";
 import type { Difficulty } from "@/games/engine/difficulty";
-import { generateMixed, type MixSlug, type QcmQuestion } from "@/games/qcm/logic";
+import { createRng, pick } from "@/games/engine/rng";
+import { generateMixed, type QcmQuestion } from "@/games/qcm/logic";
+import { evaluateReport, reportSchema } from "@/games/report";
+import { roomGroup } from "@/games/trouve-les-tous/logic";
+import type { LiveSlug } from "@/lib/games/catalog";
 import { DAILY_BERRY_CAP } from "@/lib/economy";
 import { DEFAULT_LOCALE, isLocale, type Locale } from "@/lib/i18n";
 import {
   ANSWER_SECONDS,
   cleanName,
+  GAME_ROUND_MAX_SECONDS,
+  gamePoints,
+  isQcmSlug,
   MAX_PLAYERS,
   nameKey,
   normalizeCode,
@@ -49,23 +56,50 @@ const roomLocale = (room: { lang: string }): Locale => (isLocale(room.lang) ? ro
 
 type RoomRow = Prisma.RoomGetPayload<{ include: { players: true } }>;
 
-/** Questions d'un salon : recalculées à partir de la graine, et gardées en mémoire le temps de la partie. */
-const questionCache = new Map<string, QcmQuestion[]>();
-function questionsOf(room: Pick<RoomRow, "id" | "seed" | "mode" | "lang" | "difficulty" | "games" | "questionCount">): QcmQuestion[] {
+/**
+ * Manche d'un salon : une question à choix multiple, chronométrée, ou une
+ * unité d'un autre jeu (une grille, un mot…), jouée sans chrono sur une
+ * graine commune à tous les joueurs.
+ */
+type Round = { kind: "qcm"; question: QcmQuestion } | { kind: "game"; slug: LiveSlug; seed: number };
+
+/** Manches d'un salon : recalculées à partir de la graine, et gardées en mémoire le temps de la partie. */
+const roundCache = new Map<string, Round[]>();
+function roundsOf(room: Pick<RoomRow, "id" | "seed" | "mode" | "lang" | "difficulty" | "games" | "questionCount">): Round[] {
   const key = `${room.id}:${room.seed}`;
-  let questions = questionCache.get(key);
-  if (!questions) {
-    questions = generateMixed(
-      room.seed,
-      room.games as MixSlug[],
-      room.questionCount,
-      room.difficulty as Difficulty,
-      gameData(room.mode as SpoilerMode, roomLocale(room)),
-    );
-    if (questionCache.size > 200) questionCache.delete(questionCache.keys().next().value!);
-    questionCache.set(key, questions);
+  let rounds = roundCache.get(key);
+  if (!rounds) {
+    // Le jeu de chaque manche est tiré parmi ceux du salon ; les QCM sont générés d'un seul coup, sans doublon
+    const games = room.games as LiveSlug[];
+    const rng = createRng(room.seed);
+    const drawn = Array.from({ length: room.questionCount }, () => pick(rng, games));
+    const qcmSlugs = games.filter(isQcmSlug);
+    const questions = qcmSlugs.length
+      ? generateMixed(
+          room.seed,
+          qcmSlugs,
+          drawn.filter(isQcmSlug).length,
+          room.difficulty as Difficulty,
+          gameData(room.mode as SpoilerMode, roomLocale(room)),
+        )
+      : [];
+    rounds = drawn.flatMap((slug): Round[] => {
+      if (!isQcmSlug(slug)) return [{ kind: "game", slug, seed: Math.floor(rng() * MAX_SEED) }];
+      const question = questions.shift();
+      return question ? [{ kind: "qcm", question }] : [];
+    });
+    if (roundCache.size > 200) roundCache.delete(roundCache.keys().next().value!);
+    roundCache.set(key, rounds);
   }
-  return questions;
+  return rounds;
+}
+
+/** Réponse enregistrée pour un joueur qui a abandonné une manche hors QCM. */
+const GAVE_UP = "gave-up";
+
+/** Temps accordé pour une manche : le chrono du salon pour un QCM, un simple garde-fou sinon. */
+function roundMs(room: Pick<RoomRow, "seconds">, round: Round | undefined): number {
+  return (round?.kind === "game" ? GAME_ROUND_MAX_SECONDS : room.seconds) * 1000;
 }
 
 export type Identity = { user: SessionUser | null; name?: string };
@@ -184,13 +218,14 @@ async function advance(room: RoomRow): Promise<RoomRow> {
   for (let step = 0; step < 4; step++) {
     if (room.status !== "playing" || !room.phaseEndsAt) return room;
     const now = Date.now();
-    const total = questionsOf(room).length;
+    const rounds = roundsOf(room);
+    const total = rounds.length;
     let data: Prisma.RoomUpdateManyMutationInput | null = null;
 
     if (room.phase === "countdown") {
       // Duel classé : les deux joueurs ont eu le temps d'arriver, la première question part
       if (now >= room.phaseEndsAt.getTime()) {
-        data = { phase: "question", phaseStartedAt: new Date(now), phaseEndsAt: new Date(now + room.seconds * 1000) };
+        data = { phase: "question", phaseStartedAt: new Date(now), phaseEndsAt: new Date(now + roundMs(room, rounds[0])) };
       }
     } else if (room.phase === "question") {
       const present = room.players.filter((p) => isPresent(p.lastSeenAt, now));
@@ -211,7 +246,7 @@ async function advance(room: RoomRow): Promise<RoomRow> {
               questionIndex: room.questionIndex + 1,
               phase: "question",
               phaseStartedAt: new Date(now),
-              phaseEndsAt: new Date(now + room.seconds * 1000),
+              phaseEndsAt: new Date(now + roundMs(room, rounds[room.questionIndex + 1])),
             };
     }
     if (!data) return room;
@@ -230,7 +265,7 @@ async function claimReward(room: RoomRow, player: RoomRow["players"][number]): P
 
   const ranking = rank(room.players.map((p) => ({ id: p.id, score: p.score, joinedAt: p.joinedAt.getTime() })));
   const mine = ranking.find((p) => p.id === player.id)!;
-  const wanted = roomBerrys(player.score, questionsOf(room).length, mine.rank, room.players.length);
+  const wanted = roomBerrys(player.score, roundsOf(room).length, mine.rank, room.players.length);
   const today = dailyKey();
 
   return db().$transaction(async (tx) => {
@@ -259,9 +294,9 @@ async function claimReward(room: RoomRow, player: RoomRow["players"][number]): P
 
 async function toView(room: RoomRow, player: RoomRow["players"][number]): Promise<RoomView> {
   const now = Date.now();
-  const questions = room.status === "lobby" ? [] : questionsOf(room);
+  const rounds = room.status === "lobby" ? [] : roundsOf(room);
   const counting = room.status === "playing" && room.phase === "countdown";
-  const current = room.status === "playing" && !counting ? questions[room.questionIndex] : undefined;
+  const current = room.status === "playing" && !counting ? rounds[room.questionIndex] : undefined;
   const answers = current
     ? await db().roomAnswer.findMany({ where: { roomId: room.id, questionIndex: room.questionIndex } })
     : [];
@@ -286,7 +321,7 @@ async function toView(room: RoomRow, player: RoomRow["players"][number]): Promis
     settings: {
       mode: room.mode as SpoilerMode,
       difficulty: room.difficulty as Difficulty,
-      games: room.games as MixSlug[],
+      games: room.games as LiveSlug[],
       questionCount: room.questionCount,
       seconds: room.seconds,
       lang: roomLocale(room),
@@ -302,30 +337,52 @@ async function toView(room: RoomRow, player: RoomRow["players"][number]): Promis
       answered: answeredBy.has(p.id),
     })),
     serverNow: now,
-    question: current
-      ? {
-          index: room.questionIndex,
-          total: questions.length,
-          title: current.title,
-          subject: current.subject,
-          detail: current.detail,
-          img: current.img,
-          options: current.options,
-          endsAt: revealing ? (room.phaseStartedAt ?? new Date(now)).getTime() : room.phaseEndsAt!.getTime(),
-          yourAnswer: mine?.optionId ?? null,
-          reveal: revealing
-            ? {
-                answerId: current.answerId,
-                explanation: current.explanation,
-                counts: Object.fromEntries(
-                  current.options.map((o) => [o.id, answers.filter((a) => a.optionId === o.id).length]),
-                ),
-                yourPoints: mine?.points ?? 0,
-                nextAt: room.phaseEndsAt!.getTime(),
-              }
-            : null,
-        }
-      : null,
+    question: !current
+      ? null
+      : current.kind === "game"
+        ? {
+            kind: "game",
+            index: room.questionIndex,
+            total: rounds.length,
+            slug: current.slug,
+            seed: current.seed,
+            done: mine !== undefined,
+            reveal: revealing
+              ? {
+                  results: Object.fromEntries(
+                    room.players.map((p) => {
+                      const answer = answers.find((a) => a.playerId === p.id);
+                      return [p.id, answer && answer.optionId !== GAVE_UP ? answer.points : null];
+                    }),
+                  ),
+                  yourPoints: mine?.points ?? 0,
+                  nextAt: room.phaseEndsAt!.getTime(),
+                }
+              : null,
+          }
+        : {
+            kind: "qcm",
+            index: room.questionIndex,
+            total: rounds.length,
+            title: current.question.title,
+            subject: current.question.subject,
+            detail: current.question.detail,
+            img: current.question.img,
+            options: current.question.options,
+            endsAt: revealing ? (room.phaseStartedAt ?? new Date(now)).getTime() : room.phaseEndsAt!.getTime(),
+            yourAnswer: mine?.optionId ?? null,
+            reveal: revealing
+              ? {
+                  answerId: current.question.answerId,
+                  explanation: current.question.explanation,
+                  counts: Object.fromEntries(
+                    current.question.options.map((o) => [o.id, answers.filter((a) => a.optionId === o.id).length]),
+                  ),
+                  yourPoints: mine?.points ?? 0,
+                  nextAt: room.phaseEndsAt!.getTime(),
+                }
+              : null,
+          },
     reward: room.status === "finished" && player.userId ? { berrys: await claimReward(room, player) } : null,
   };
 }
@@ -365,7 +422,8 @@ export async function startRoom(ticket: RoomTicket): Promise<Result<object>> {
   const { room, player } = found;
   if (room.hostId !== player.id) return { ok: false, error: "forbidden" };
   if (room.status !== "lobby") return { ok: false, error: "started" };
-  if (questionsOf(room).length === 0) return { ok: false, error: "unavailable" };
+  const rounds = roundsOf(room);
+  if (rounds.length === 0) return { ok: false, error: "unavailable" };
 
   const now = Date.now();
   await db().room.updateMany({
@@ -375,7 +433,7 @@ export async function startRoom(ticket: RoomTicket): Promise<Result<object>> {
       questionIndex: 0,
       phase: "question",
       phaseStartedAt: new Date(now),
-      phaseEndsAt: new Date(now + room.seconds * 1000),
+      phaseEndsAt: new Date(now + roundMs(room, rounds[0])),
       version: { increment: 1 },
     },
   });
@@ -387,11 +445,15 @@ export async function startRoom(ticket: RoomTicket): Promise<Result<object>> {
 /** Marge accordée à une réponse partie juste avant la fin du chrono. */
 const LATE_GRACE_MS = 600;
 
-export async function answerRoom(ticket: RoomTicket, questionIndex: unknown, optionId: unknown): Promise<Result<object>> {
+/** Le salon et le joueur, si la manche `questionIndex` attend encore des réponses ; et la manche elle-même. */
+async function openRound(
+  ticket: RoomTicket,
+  questionIndex: unknown,
+): Promise<Result<{ room: RoomRow; player: RoomRow["players"][number]; round: Round; now: number }>> {
   const found = await authenticate(ticket);
   if (!found) return { ok: false, error: "not-found" };
   const { room, player } = found;
-  if (typeof optionId !== "string" || typeof questionIndex !== "number") return { ok: false, error: "bad-request" };
+  if (typeof questionIndex !== "number") return { ok: false, error: "bad-request" };
   if (room.status !== "playing" || room.phase !== "question" || room.questionIndex !== questionIndex) {
     return { ok: false, error: "forbidden" };
   }
@@ -399,21 +461,79 @@ export async function answerRoom(ticket: RoomTicket, questionIndex: unknown, opt
   if (!room.phaseStartedAt || !room.phaseEndsAt || now > room.phaseEndsAt.getTime() + LATE_GRACE_MS) {
     return { ok: false, error: "forbidden" };
   }
-  const question = questionsOf(room)[room.questionIndex];
-  if (!question.options.some((o) => o.id === optionId)) return { ok: false, error: "bad-request" };
+  return { ok: true, room, player, round: roundsOf(room)[room.questionIndex], now };
+}
 
-  const correct = optionId === question.answerId;
-  const points = pointsFor(correct, now - room.phaseStartedAt.getTime(), room.seconds * 1000);
+/** Enregistre la réponse d'un joueur à la manche en cours et ses points. Une seule par manche : la seconde est ignorée. */
+async function recordAnswer(
+  room: RoomRow,
+  player: RoomRow["players"][number],
+  answer: { optionId: string; correct: boolean; points: number },
+  now: number,
+): Promise<void> {
   try {
     await db().$transaction([
-      db().roomAnswer.create({ data: { roomId: room.id, playerId: player.id, questionIndex, optionId, correct, points } }),
-      db().roomPlayer.update({ where: { id: player.id }, data: { score: { increment: points }, lastSeenAt: new Date(now) } }),
+      db().roomAnswer.create({ data: { roomId: room.id, playerId: player.id, questionIndex: room.questionIndex, ...answer } }),
+      db().roomPlayer.update({ where: { id: player.id }, data: { score: { increment: answer.points }, lastSeenAt: new Date(now) } }),
       db().room.update({ where: { id: room.id }, data: { version: { increment: 1 } } }),
     ]);
   } catch (error) {
-    // Une seule réponse par question : la seconde est ignorée
     if (!isUniqueViolation(error)) throw error;
   }
+}
+
+export async function answerRoom(ticket: RoomTicket, questionIndex: unknown, optionId: unknown): Promise<Result<object>> {
+  if (typeof optionId !== "string") return { ok: false, error: "bad-request" };
+  const open = await openRound(ticket, questionIndex);
+  if (!open.ok) return open;
+  const { room, player, round, now } = open;
+  if (round.kind !== "qcm") return { ok: false, error: "forbidden" };
+  const { question } = round;
+  if (!question.options.some((o) => o.id === optionId)) return { ok: false, error: "bad-request" };
+
+  const correct = optionId === question.answerId;
+  const points = pointsFor(correct, now - room.phaseStartedAt!.getTime(), room.seconds * 1000);
+  await recordAnswer(room, player, { optionId, correct, points }, now);
+  return { ok: true };
+}
+
+/**
+ * Fin d'une manche hors QCM pour un joueur : le compte rendu de sa partie
+ * (graine et réponses, jamais un score), que le serveur rejoue pour en tirer
+ * les points ; ou `null` s'il abandonne, ce qui ne rapporte rien.
+ */
+export async function finishRound(ticket: RoomTicket, questionIndex: unknown, input: unknown): Promise<Result<object>> {
+  const open = await openRound(ticket, questionIndex);
+  if (!open.ok) return open;
+  const { room, player, round, now } = open;
+  if (round.kind !== "game") return { ok: false, error: "forbidden" };
+  if (input === null) {
+    await recordAnswer(room, player, { optionId: GAVE_UP, correct: false, points: 0 }, now);
+    return { ok: true };
+  }
+
+  const parsed = reportSchema.safeParse(input);
+  if (!parsed.success) return { ok: false, error: "bad-request" };
+  const report = parsed.data;
+  // La partie doit être celle de la manche : même jeu, même tirage, mêmes réglages que le salon
+  if (report.slug !== round.slug || !("seed" in report) || report.seed !== round.seed || report.mode !== room.mode) {
+    return { ok: false, error: "bad-request" };
+  }
+  if ("difficulty" in report && report.difficulty !== room.difficulty) return { ok: false, error: "bad-request" };
+  const data = gameData(room.mode as SpoilerMode, roomLocale(room));
+  if (report.slug === "trouve-les-tous" && report.groupId !== roomGroup(round.seed, data.groups)?.id) {
+    return { ok: false, error: "bad-request" };
+  }
+
+  const outcome = evaluateReport(report, {
+    data,
+    animeCharacters: gameData("anime", roomLocale(room)).characters,
+    today: dailyKey(),
+    limit: 1,
+  });
+  if (!outcome) return { ok: false, error: "bad-request" };
+  const points = gamePoints(outcome.performance);
+  await recordAnswer(room, player, { optionId: "done", correct: points > 0, points }, now);
   return { ok: true };
 }
 

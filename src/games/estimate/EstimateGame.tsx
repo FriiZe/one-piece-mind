@@ -1,5 +1,6 @@
 "use client";
 
+import { useRoundLimit } from "../ui/roomRound";
 import { useMemo, useState } from "react";
 import { formatBounty, formatNumber } from "../engine/text";
 import { GameEnd, GameStart } from "../ui/GameEnd";
@@ -55,6 +56,7 @@ export default function EstimateGame({ data, slug }: GameProps & { slug: Estimat
   const t = useT();
   const locale = useLocale();
   const base = useRun(slug);
+  const limit = useRoundLimit();
   const [index, setIndex] = useState(0);
   /** Position du curseur, de 0 à 1. */
   const [position, setPosition] = useState(0.5);
@@ -77,8 +79,8 @@ export default function EstimateGame({ data, slug }: GameProps & { slug: Estimat
   const withDifficulty = usesDifficulty(slug);
 
   const questions = useMemo(
-    () => (run ? generateEstimates(slug, run.seed, run.difficulty, data) : []),
-    [slug, run, data],
+    () => (run ? generateEstimates(slug, run.seed, run.difficulty, data).slice(0, limit) : []),
+    [slug, run, data, limit],
   );
   const max = questions.reduce((sum, question) => sum + maxPoints(question), 0);
 

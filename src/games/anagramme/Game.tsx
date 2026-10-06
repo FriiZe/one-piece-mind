@@ -1,5 +1,6 @@
 "use client";
 
+import { useRoundLimit } from "../ui/roomRound";
 import { useMemo, useState } from "react";
 import { GameEnd, GameStart } from "../ui/GameEnd";
 import { Portrait } from "../ui/Portrait";
@@ -24,6 +25,7 @@ const START: Progression = { index: 0, answers: [], missed: false, done: false, 
 export default function Anagramme({ data }: GameProps) {
   const t = useT();
   const base = useRun("anagramme");
+  const limit = useRoundLimit();
   const [state, setState] = useState<Progression>(START);
   const [input, setInput] = useState("");
   const game = {
@@ -36,7 +38,10 @@ export default function Anagramme({ data }: GameProps) {
   };
   const { run, finished } = base;
 
-  const rounds = useMemo(() => (run ? generateRounds(run.seed, run.difficulty, data.characters) : []), [run, data.characters]);
+  const rounds = useMemo(
+    () => (run ? generateRounds(run.seed, run.difficulty, data.characters).slice(0, limit) : []),
+    [run, data.characters, limit],
+  );
 
   if (!run || !rounds.length) {
     return (

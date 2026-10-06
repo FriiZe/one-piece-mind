@@ -5,6 +5,7 @@ import type { ResolvedData } from "../cards";
 import { RewardSummary } from "@/components/RewardSummary";
 import { useT } from "@/lib/i18n/client";
 import { Button, Panel, ResultPanel } from "./primitives";
+import { AutoStart, useRoomRound } from "./roomRound";
 import { StartScreen } from "./StartScreen";
 import type { useRun } from "./useRun";
 
@@ -62,6 +63,8 @@ export function GameStart({
 
 function PlainStart({ game, children }: { game: ReturnType<typeof useRun>; children: ReactNode }) {
   const t = useT();
+  const inRoom = useRoomRound() !== null;
+  if (inRoom) return <AutoStart onStart={game.start} />;
   return (
     <Panel className="space-y-4">
       {children}

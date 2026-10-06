@@ -146,6 +146,6 @@ export function scoreAnswers(questions: readonly DccKey[], answers: readonly Dcc
 }
 
 /** Rejoue une partie à partir de sa graine et des réponses données. */
-export function evaluate(seed: number, difficulty: Difficulty, answers: readonly DccAnswer[], data: ResolvedData) {
-  return scoreAnswers(generate(seed, difficulty, data), answers);
+export function evaluate(seed: number, difficulty: Difficulty, answers: readonly DccAnswer[], data: ResolvedData, limit?: number) {
+  return scoreAnswers(generate(seed, difficulty, data).slice(0, limit), answers);
 }
