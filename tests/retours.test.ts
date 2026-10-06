@@ -51,6 +51,7 @@ import { DUMMY_HASH } from "@/lib/server/password";
 import { priceBounds } from "@/lib/market/rules";
 import { buyListing, cancelListing, createListing } from "@/lib/server/market";
 import { answerTrade, cancelTrade, friendCollection, proposeTrade, tradesOverview } from "@/lib/server/trades";
+import { gameLeaderboard, globalLeaderboard } from "@/lib/server/leaderboard";
 import { establish, playedOn } from "./established";
 import { applyCrewFor, buyBoosterFor, deleteCrewFor, loadState, saveCrewFor, sellDuplicatesFor, setCrewFor } from "@/lib/server/player";
 import {
@@ -305,7 +306,9 @@ describe("Duo, Carré ou Cash", () => {
     expect(katakuri.affiliation).toBe("Famille Charlotte");
     expect(katakuri.also).toContain("Big Mom Pirates");
     // Une organisation quittée n'est pas une bonne réponse, mais ne sert pas de leurre non plus
-    expect(manga.characterById.get("nico-robin")!.past).toContain("Baroque Works");
+    expect(manga.characterById.get("kuzan")!.past).toContain("Marines");
+    // Une organisation dissoute reste celle de ses anciens membres
+    expect(manga.characterById.get("nico-robin")!.also).toContain("Baroque Works");
 
     let seen = 0;
     for (const data of [anime, manga]) {
@@ -498,6 +501,56 @@ describe.skipIf(!accountsEnabled)("quiz et doublons, en base", () => {
     expect(state.lifetimeBerrys).toBe(0);
     expect(await sellDuplicatesFor(player.id, "anime", null)).toEqual({ ok: false, reason: "nothing" });
     await db().user.update({ where: { id: player.id }, data: { berrys: 0 } });
+  });
+
+  it("classe les meilleures parties d'un jeu sur la période, et les comptes par prime", async () => {
+    const [author, player, admin, witness] = users;
+    const result = (userId: string, score: number, difficulty: string | null, minutesAgo: number) => ({
+      userId,
+      slug: "le-classement",
+      reportKey: `classement-${userId}-${minutesAgo}`,
+      mode: "anime",
+      difficulty,
+      score,
+      maxScore: 25,
+      berrys: 0,
+      createdAt: new Date(Date.now() - minutesAgo * 60_000),
+    });
+    await db().gameResult.createMany({
+      data: [
+        // Le joueur : sa meilleure partie compte, pas la dernière
+        result(player.id, 25, "normal", 30),
+        result(player.id, 10, "expert", 5),
+        // Même part des points que le joueur : la difficulté départage
+        result(author.id, 25, "expert", 20),
+        result(witness.id, 20, "facile", 10),
+      ],
+    });
+    const board = await gameLeaderboard("le-classement", "day", witness.id);
+    const mine = board.rows.filter((row) => [author, player, witness].some((u) => u.username === row.username));
+    expect(mine.map((row) => [row.username, row.rank, row.score, row.difficulty, row.you])).toEqual([
+      [author.username, 1, 25, "expert", false],
+      [player.username, 2, 25, "normal", false],
+      [witness.username, 3, 20, "facile", true],
+    ]);
+    expect(board.players).toBeGreaterThanOrEqual(3);
+    expect(board.you).toBeNull();
+    // La semaine et le mois comprennent le jour ; un compte sans partie n'y figure pas
+    for (const period of ["week", "month"] as const) {
+      const wider = await gameLeaderboard("le-classement", period, admin.id);
+      expect(wider.rows.map((row) => row.username)).toEqual(expect.arrayContaining([author.username, player.username, witness.username]));
+      expect(wider.rows.some((row) => row.username === admin.username)).toBe(false);
+      expect(wider.you).toBeNull();
+    }
+    expect((await gameLeaderboard("onepiecedle", "day", null)).rows.some((row) => row.username === player.username)).toBe(false);
+
+    // Le classement général suit la prime, et signale le joueur connecté
+    await db().user.update({ where: { id: witness.id }, data: { lifetimeBerrys: 1_000_000_000 } });
+    const general = await globalLeaderboard(witness.id);
+    expect(general.rows[0]).toMatchObject({ rank: 1, username: witness.username, you: true, lifetimeBerrys: 1_000_000_000 });
+    expect(general.players).toBeGreaterThanOrEqual(users.length);
+    await db().user.update({ where: { id: witness.id }, data: { lifetimeBerrys: 0 } });
+    await db().gameResult.deleteMany({ where: { reportKey: { startsWith: "classement-" } } });
   });
 
   it("enregistre des équipages dans un compte et les remet en place", async () => {

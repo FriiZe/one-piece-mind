@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { DailyChip, OtherDailyGames } from "@/components/DailyGames";
 import { GameObjectives, GameRecord } from "@/components/GameObjectives";
+import { GameLeaderboard } from "@/components/Leaderboards";
 import { JsonLd } from "@/components/JsonLd";
 import Link from "@/components/Link";
 import { GAME_CONTENT } from "@/games/content";
@@ -122,6 +123,8 @@ export default async function GamePage({ params }: PageProps<"/[lang]/jeux/[slug
           </a>
         </section>
       </div>
+
+      {!rewardless && <GameLeaderboard slug={slug} />}
 
       <OtherDailyGames slug={slug} />
 

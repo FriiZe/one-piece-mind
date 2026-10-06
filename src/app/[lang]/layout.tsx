@@ -61,6 +61,7 @@ export default async function RootLayout({ children, params }: LayoutProps<"/[la
                     { href: "/jeux", label: t("Jeux", "Games") },
                     { href: "/multi", label: t("Multijoueur", "Multiplayer") },
                     { href: "/classe", label: t("Classé", "Ranked") },
+                    { href: "/classement", label: t("Classement", "Leaderboard") },
                     { href: "/raid", label: t("Raid", "Raid") },
                     { href: "/quiz", label: t("Quiz de la commu", "Community quizzes") },
                     { href: "/defis", label: t("Défis", "Challenges") },

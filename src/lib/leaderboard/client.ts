@@ -1,0 +1,42 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import type { GameLeaderboard, GlobalLeaderboard, Period } from "./types";
+
+/** Classement d'un jeu sur une période ; `null` pendant le chargement, `"failed"` si le serveur n'a pas répondu. */
+export function useGameLeaderboard(slug: string, period: Period): GameLeaderboard | "failed" | null {
+  const [loaded, setLoaded] = useState<{ key: string; board: GameLeaderboard | "failed" } | null>(null);
+  const key = `${slug}:${period}`;
+
+  useEffect(() => {
+    let cancelled = false;
+    fetch(`/api/leaderboard?slug=${encodeURIComponent(slug)}&period=${period}`, { cache: "no-store" })
+      .then((response): Promise<GameLeaderboard | "failed"> => (response.ok ? response.json() : Promise.resolve("failed")))
+      .catch((): "failed" => "failed")
+      .then((board) => {
+        if (!cancelled) setLoaded({ key, board });
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [slug, period, key]);
+
+  return loaded?.key === key ? loaded.board : null;
+}
+
+export function useGlobalLeaderboard(): GlobalLeaderboard | "failed" | null {
+  const [board, setBoard] = useState<GlobalLeaderboard | "failed" | null>(null);
+  useEffect(() => {
+    let cancelled = false;
+    fetch("/api/leaderboard", { cache: "no-store" })
+      .then((response): Promise<GlobalLeaderboard | "failed"> => (response.ok ? response.json() : Promise.resolve("failed")))
+      .catch((): "failed" => "failed")
+      .then((loaded) => {
+        if (!cancelled) setBoard(loaded);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+  return board;
+}
