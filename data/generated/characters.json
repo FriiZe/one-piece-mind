@@ -700,8 +700,7 @@
     },
     "gender": "female",
     "races": [
-      "human",
-      "animal"
+      "human"
     ],
     "origin": {
       "sea": "west-blue",

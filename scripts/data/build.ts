@@ -206,7 +206,7 @@ const RACE_BY_CATEGORY: [RegExp, Race][] = [
 function parseRaces(categories: string[]): Race[] {
   const races = new Set<Race>();
   for (const name of categories) {
-    if (/^Fighters Who Use Animals$/.test(name)) continue;
+    if (/Fighters Who Use Animals$/.test(name)) continue;
     for (const [pattern, race] of RACE_BY_CATEGORY) if (pattern.test(name)) races.add(race);
   }
   return [...races];
