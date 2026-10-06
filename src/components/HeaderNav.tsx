@@ -104,7 +104,7 @@ const TABS = [
 
 /**
  * Avancement des jeux du jour : toujours sous les yeux, il mène aux défis. Quand la place manque
- * sur téléphone, il se réduit au compte : partout sur un écran très étroit (moins de 360 px), et
+ * sur téléphone, il se réduit au compte : partout sur un écran étroit (moins de 400 px), et
  * dès qu'il partage l'en-tête avec le bouton « Connexion » (`compact`). Les deux à la fois, il
  * s'efface : l'onglet « Défis » de la barre du bas mène au même endroit.
  */
@@ -122,7 +122,7 @@ function DailyPill({ compact }: { compact: boolean }) {
         current ? "bg-straw text-ink" : "text-straw hover:bg-straw/15"
       } ${compact ? "max-[360px]:hidden" : ""}`}
     >
-      <span className={compact ? "max-sm:hidden" : "max-[360px]:hidden"}>{t("Jour", "Daily")} </span>
+      <span className={compact ? "max-sm:hidden" : "max-[400px]:hidden"}>{t("Jour", "Daily")} </span>
       <span className={ready ? "" : "invisible"}>{count}</span>/{total}
     </Link>
   );
@@ -172,6 +172,19 @@ export function SiteHeader() {
             className={`whitespace-nowrap hover:text-straw ${status === "loading" ? "invisible" : ""}`}
           >
             ฿ {berrys}
+          </Link>
+          {/* Le classement : une coupe. En invité sur téléphone, le bouton « Connexion » prend déjà toute la place */}
+          <Link
+            href="/classement"
+            aria-label={t("Classement", "Leaderboard")}
+            aria-current={under(pathname, "/classement") ? "page" : undefined}
+            className={`size-9 items-center justify-center rounded-full border transition-colors ${
+              under(pathname, "/classement") ? "border-straw text-straw" : "border-sea-600 text-mist hover:text-foam"
+            } ${guest ? "hidden sm:flex" : "flex"}`}
+          >
+            <svg viewBox="0 0 20 20" fill="currentColor" aria-hidden="true" className="size-5">
+              <path d="M6 2h8v1h3a1 1 0 0 1 1 1v1.5A3.5 3.5 0 0 1 14.6 9a4.8 4.8 0 0 1-3.6 3.4V15h2.5a1 1 0 0 1 0 2H6.5a1 1 0 0 1 0-2H9v-2.6A4.8 4.8 0 0 1 5.4 9 3.5 3.5 0 0 1 2 5.5V4a1 1 0 0 1 1-1h3V2Zm0 3H4v.5A1.5 1.5 0 0 0 5.2 7 7 7 0 0 1 6 5Zm8 0a7 7 0 0 1 .8 2A1.5 1.5 0 0 0 16 5.5V5h-2Z" />
+            </svg>
           </Link>
           <NotificationBell />
           <LanguageSwitch className="hidden lg:inline-flex" />

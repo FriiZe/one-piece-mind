@@ -20,12 +20,36 @@ const PERIOD_LABELS: Record<Period, { fr: string; en: string }> = {
   month: { fr: "Ce mois-ci", en: "This month" },
 };
 
+/** Les trois premiers ont leur couleur : or, argent, bronze. */
+const PODIUM: Record<number, string> = {
+  1: "bg-straw text-ink",
+  2: "bg-[#c9d3df] text-ink",
+  3: "bg-[#c48a5a] text-ink",
+};
+
+/**
+ * Un joueur du classement, dans une carte comme celles des jeux du jour : son rang en badge, son
+ * pseudo, et sa marque à droite. Toute la carte mène à sa page : collection, équipage, amitié.
+ */
 function Row({ rank, you, children, name, look }: { rank: number; you: boolean; name: string; look: GameLeaderRow["look"]; children: React.ReactNode }) {
   return (
-    <li className={`flex min-h-14 items-center gap-3 rounded-xl border-2 bg-sea-900 px-3 py-2 ${you ? "border-straw" : "border-transparent"}`}>
-      <span className={`w-7 shrink-0 text-center font-display text-[22px] ${rank === 1 ? "text-straw" : "text-mist"}`}>{rank}</span>
-      <PlayerTag name={name} look={look} you={you} />
-      <span className="shrink-0 text-right">{children}</span>
+    <li>
+      <Link
+        href={`/joueurs/${encodeURIComponent(name)}`}
+        className={`flex min-h-14 items-center gap-3 rounded-xl border bg-sea-800 px-3.5 py-2 transition-colors hover:border-straw ${
+          you ? "border-straw" : "border-sea-600"
+        }`}
+      >
+        <span
+          aria-hidden="true"
+          className={`flex size-8 shrink-0 items-center justify-center rounded-[10px] font-display text-lg ${PODIUM[rank] ?? "bg-sea-700 text-foam"}`}
+        >
+          {rank}
+        </span>
+        <span className="sr-only">{rank}.</span>
+        <PlayerTag name={name} look={look} you={you} />
+        <span className="shrink-0 text-right">{children}</span>
+      </Link>
     </li>
   );
 }
@@ -93,7 +117,7 @@ export function GameLeaderboard({ slug }: { slug: string }) {
         <ol className="grid gap-2 md:grid-cols-2">
           {rows.map((row) => (
             <Row key={row.username} rank={row.rank} you={row.you} name={row.username} look={row.look}>
-              <span className="block font-extrabold text-foam">
+              <span className="block font-extrabold text-straw">
                 {row.score} / {row.maxScore}
               </span>
               <span className="block text-xs text-mist">
@@ -139,7 +163,7 @@ export function GlobalLeaderboard() {
           <ol className="grid gap-2 md:grid-cols-2">
             {rows.map((row) => (
               <Row key={row.username} rank={row.rank} you={row.you} name={row.username} look={row.look}>
-                <span className="block font-extrabold text-foam">{formatBounty(bounty(row), locale)}</span>
+                <span className="block font-extrabold text-straw">{formatBounty(bounty(row), locale)}</span>
                 <span className="block text-xs text-mist">
                   {rankOf(bounty(row)).title[locale]} · {formatNumber(row.games, locale)} {t(`partie${row.games > 1 ? "s" : ""}`, row.games === 1 ? "game" : "games")}
                 </span>
