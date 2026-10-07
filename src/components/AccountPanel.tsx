@@ -1,12 +1,13 @@
 "use client";
 
 import { useActionState, useEffect, useState } from "react";
+import { Modal } from "@/components/Modal";
 import { Button } from "@/games/ui/primitives";
 import { readStored, writeStored } from "@/games/ui/storage";
 import { formatNumber } from "@/games/engine/text";
 import { EMPTY_PLAYER, SIGNUP_BERRYS } from "@/lib/economy";
 import { useLocale, useT } from "@/lib/i18n/client";
-import { loginAction, logoutAction, signupAction, type AuthState } from "@/lib/player/actions";
+import { deleteAccountAction, loginAction, logoutAction, signupAction, type AuthState } from "@/lib/player/actions";
 import { usePlayer } from "@/lib/player/PlayerProvider";
 
 const INITIAL: AuthState = { ok: false };
@@ -127,6 +128,51 @@ function LoginForm() {
   );
 }
 
+/** Confirmation de la suppression du compte : ce qui sera perdu, et le mot de passe pour s'en assurer. */
+function DeleteAccount({ onClose }: { onClose: () => void }) {
+  const t = useT();
+  const locale = useLocale();
+  const [result, action, pending] = useActionState(deleteAccountAction, INITIAL);
+
+  // Le compte n'existe plus : la page se recharge en invité
+  useEffect(() => {
+    if (result.ok) window.location.reload();
+  }, [result.ok]);
+
+  return (
+    <Modal title={t("Supprimer mon compte", "Delete my account")} onClose={onClose}>
+      <form action={action} className="space-y-4">
+        <input type="hidden" name="lang" value={locale} />
+        <p className="text-foam">
+          {t(
+            "Ton compte sera supprimé définitivement, avec tout ce qui s'y rattache : Berrys, prime, collection d'avis, équipages, amis, échanges, annonces du marché et quiz que tu as écrits. Rien ne pourra être récupéré.",
+            "Your account will be permanently deleted, along with everything attached to it: Berries, bounty, wanted poster collection, crews, friends, trades, market listings and the quizzes you wrote. Nothing can be recovered.",
+          )}
+        </p>
+        <label className="block">
+          <span className="mb-1.5 block text-[15px] font-bold text-foam">
+            {t("Ton mot de passe, pour confirmer", "Your password, to confirm")}
+          </span>
+          <input name="password" type="password" required maxLength={200} autoComplete="current-password" autoFocus className={INPUT} />
+        </label>
+        {result.error && (
+          <p role="alert" className="font-semibold text-vest">
+            {result.error}
+          </p>
+        )}
+        <div className="flex flex-wrap gap-3">
+          <Button type="submit" variant="danger" disabled={pending}>
+            {pending ? t("Suppression…", "Deleting…") : t("Supprimer définitivement", "Delete permanently")}
+          </Button>
+          <Button variant="secondary" onClick={onClose} disabled={pending}>
+            {t("Annuler", "Cancel")}
+          </Button>
+        </div>
+      </form>
+    </Modal>
+  );
+}
+
 const TABS = [
   { id: "signup", label: { fr: "Créer un compte", en: "Create an account" } },
   { id: "login", label: { fr: "J'ai déjà un compte", en: "I already have an account" } },
@@ -138,6 +184,7 @@ export function AccountPanel() {
   const locale = useLocale();
   const [tab, setTab] = useState<(typeof TABS)[number]["id"]>("signup");
   const [leaving, setLeaving] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
   async function logout() {
     setLeaving(true);
@@ -150,7 +197,7 @@ export function AccountPanel() {
   if (status === "user") {
     return (
       <section aria-labelledby="compte" className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-sea-700 p-5">
-        <div className="min-w-0 flex-1">
+        <div className="min-w-0 flex-1 basis-64">
           <h2 id="compte" className="text-xl font-extrabold text-foam">
             {t("Compte", "Account")}
           </h2>
@@ -166,9 +213,19 @@ export function AccountPanel() {
             )}
           </p>
         </div>
-        <Button variant="secondary" onClick={logout} disabled={leaving}>
-          {t("Me déconnecter", "Log out")}
-        </Button>
+        <div className="flex flex-wrap items-center gap-3">
+          <Button variant="secondary" onClick={logout} disabled={leaving}>
+            {t("Me déconnecter", "Log out")}
+          </Button>
+          <button
+            type="button"
+            onClick={() => setDeleting(true)}
+            className="cursor-pointer px-2 py-2.5 text-sm font-bold text-vest underline-offset-4 hover:underline"
+          >
+            {t("Supprimer mon compte", "Delete my account")}
+          </button>
+        </div>
+        {deleting && <DeleteAccount onClose={() => setDeleting(false)} />}
       </section>
     );
   }

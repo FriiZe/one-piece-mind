@@ -214,3 +214,29 @@ export async function loginAction(_: AuthState, form: FormData): Promise<AuthSta
 export async function logoutAction(): Promise<void> {
   await destroySession();
 }
+
+/**
+ * Supprime le compte connecté et tout ce qui s'y rattache (collection,
+ * équipages, amis, échanges, annonces, quiz…). Le mot de passe est redemandé :
+ * une session laissée ouverte ne suffit pas à effacer un compte.
+ */
+export async function deleteAccountAction(_: AuthState, form: FormData): Promise<AuthState> {
+  const t = translatorOf(form);
+  const user = await currentUser();
+  if (!user) return { ok: false, error: t("Tu n'es plus connecté.", "You're no longer logged in.") };
+  const password = field(form, "password");
+  const refused = { ok: false, error: t("Mot de passe incorrect.", "Wrong password.") };
+  if (!password || password.length > PASSWORD_MAX) return refused;
+
+  if (!(await allowAttempt(`delete:${user.id}`, 5, 15 * MINUTE))) {
+    return { ok: false, error: t("Trop de tentatives. Réessaie dans un quart d'heure.", "Too many attempts. Try again in fifteen minutes.") };
+  }
+  const account = await db().user.findUnique({ where: { id: user.id }, select: { passwordHash: true } });
+  if (!account || !(await verifyPassword(password, account.passwordHash))) return refused;
+
+  // Les données du joueur suivent son compte : le schéma les supprime en cascade
+  await db().user.delete({ where: { id: user.id } });
+  await clearAttempts(`delete:${user.id}`);
+  await destroySession();
+  return { ok: true };
+}

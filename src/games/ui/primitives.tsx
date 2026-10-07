@@ -4,12 +4,14 @@ import { useState, type ButtonHTMLAttributes, type ReactNode } from "react";
 import { useT } from "@/lib/i18n/client";
 import { useRoomRound } from "./roomRound";
 
-type Variant = "primary" | "secondary" | "ghost";
+type Variant = "primary" | "secondary" | "ghost" | "danger";
 
 const VARIANTS: Record<Variant, string> = {
   primary: "bg-straw text-ink hover:bg-straw-dark",
   secondary: "border border-sea-600 bg-sea-700 text-foam hover:bg-sea-600",
   ghost: "text-mist underline-offset-4 hover:text-foam hover:underline",
+  /** Action qu'on ne peut pas défaire. */
+  danger: "bg-vest text-foam hover:bg-vest-dark",
 };
 
 export function Button({
