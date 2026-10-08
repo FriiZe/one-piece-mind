@@ -1,5 +1,13 @@
 import "server-only";
-import { TRADE_LIMITS, type FriendCollection, type TradeResult, type TradesOverview } from "@/lib/multi/trades";
+import {
+  normalizeTradeSide,
+  TRADE_LIMITS,
+  tradeLineKey,
+  type FriendCollection,
+  type TradeLine,
+  type TradeResult,
+  type TradesOverview,
+} from "@/lib/multi/trades";
 import { Prisma } from "@/generated/prisma/client";
 import { db } from "./db";
 import { exchangeAccessFor } from "./exchange";
@@ -41,7 +49,7 @@ export async function tradesOverview(userId: string): Promise<TradesOverview> {
   const [trades, access] = await Promise.all([
     db().trade.findMany({
       where: { status: "pending", OR: [{ fromId: userId }, { toId: userId }] },
-      include: { from: { select: { username: true } }, to: { select: { username: true } } },
+      include: { from: { select: { username: true } }, to: { select: { username: true } }, items: true },
       orderBy: { createdAt: "desc" },
     }),
     exchangeAccessFor(userId),
@@ -49,10 +57,7 @@ export async function tradesOverview(userId: string): Promise<TradesOverview> {
   const view = (trade: (typeof trades)[number], friend: string) => ({
     id: trade.id,
     friend,
-    offeredId: trade.offeredId,
-    offeredGolden: trade.offeredGolden,
-    requestedId: trade.requestedId,
-    requestedGolden: trade.requestedGolden,
+    ...sides(trade.items),
     createdAt: trade.createdAt.getTime(),
   });
   return {
@@ -68,45 +73,63 @@ async function lockedFor(userId: string, friendId: string): Promise<"locked" | "
   return !mine.open ? "locked" : !theirs.open ? "friend-locked" : null;
 }
 
-/** Le joueur a-t-il un exemplaire de cette version de l'avis : doré, ou ordinaire. */
-async function owns(userId: string, characterId: string, golden: boolean): Promise<boolean> {
-  const entry = await db().collectionEntry.findUnique({ where: { userId_characterId: { userId, characterId } } });
-  return !!entry && hasCopy(entry, golden);
+type Item = { side: string; characterId: string; golden: boolean; count: number };
+
+/** Les deux côtés d'un échange tel qu'il est rangé en base, dans un ordre stable. */
+function sides(items: Item[]): { offered: TradeLine[]; requested: TradeLine[] } {
+  const side = (name: string) =>
+    items
+      .filter((item) => item.side === name)
+      .map((item) => ({ id: item.characterId, golden: item.golden, count: item.count }))
+      .sort((a, b) => tradeLineKey(a).localeCompare(tradeLineKey(b)));
+  return { offered: side("offered"), requested: side("requested") };
 }
 
-const hasCopy = (entry: { count: number; golden: number }, golden: boolean) =>
-  golden ? entry.golden > 0 : entry.count - entry.golden > 0;
+const available = (entry: { count: number; golden: number }, golden: boolean) =>
+  golden ? entry.golden : entry.count - entry.golden;
+
+/** Le joueur a-t-il assez d'exemplaires de chaque version demandée, ordinaire ou dorée. */
+async function ownsAll(userId: string, lines: TradeLine[]): Promise<boolean> {
+  const entries = await db().collectionEntry.findMany({
+    where: { userId, characterId: { in: lines.map((line) => line.id) } },
+  });
+  return lines.every((line) => {
+    const entry = entries.find((e) => e.characterId === line.id);
+    return !!entry && available(entry, line.golden) >= line.count;
+  });
+}
+
+const signature = (side: { offered: TradeLine[]; requested: TradeLine[] }) => JSON.stringify(side);
 
 /**
- * Propose à un ami d'échanger un de ses avis contre un des siens, chacun dans
- * sa version ordinaire ou dorée. Rien ne bouge tant qu'il n'a pas accepté.
+ * Propose à un ami d'échanger quelques-uns de ses avis contre quelques-uns des
+ * siens, chacun dans sa version ordinaire ou dorée. Rien ne bouge tant qu'il n'a pas accepté.
  */
-export async function proposeTrade(
-  userId: string,
-  friendId: string,
-  offered: { id: string; golden: boolean },
-  requested: { id: string; golden: boolean },
-): Promise<TradeResult> {
-  const { id: offeredId, golden: offeredGolden } = offered;
-  const { id: requestedId, golden: requestedGolden } = requested;
-  if (offeredId === requestedId && offeredGolden === requestedGolden) return { ok: false, error: "same" };
+export async function proposeTrade(userId: string, friendId: string, offeredLines: unknown, requestedLines: unknown): Promise<TradeResult> {
+  const offered = normalizeTradeSide(offeredLines);
+  const requested = normalizeTradeSide(requestedLines);
+  if (!offered || !requested) return { ok: false, error: "bad-size" };
+  const given = new Set(offered.map(tradeLineKey));
+  if (requested.some((line) => given.has(tradeLineKey(line)))) return { ok: false, error: "same" };
   if (!(await areFriends(userId, friendId))) return { ok: false, error: "not-friends" };
   const locked = await lockedFor(userId, friendId);
   if (locked) return { ok: false, error: locked };
-  if (!(await owns(userId, offeredId, offeredGolden))) return { ok: false, error: "not-owned" };
-  if (!(await owns(friendId, requestedId, requestedGolden))) return { ok: false, error: "friend-not-owned" };
+  if (!(await ownsAll(userId, offered))) return { ok: false, error: "not-owned" };
+  if (!(await ownsAll(friendId, requested))) return { ok: false, error: "friend-not-owned" };
 
-  const [same, pending, today] = await Promise.all([
-    db().trade.count({
-      where: { fromId: userId, toId: friendId, offeredId, offeredGolden, requestedId, requestedGolden, status: "pending" },
-    }),
-    db().trade.count({ where: { fromId: userId, status: "pending" } }),
+  const [open, today] = await Promise.all([
+    db().trade.findMany({ where: { fromId: userId, status: "pending" }, select: { toId: true, items: true } }),
     db().trade.count({ where: { fromId: userId, createdAt: { gte: new Date(Date.now() - DAY) } } }),
   ]);
-  if (same > 0) return { ok: false, error: "already" };
-  if (pending >= TRADE_LIMITS.pending || today >= TRADE_LIMITS.perDay) return { ok: false, error: "limit" };
+  const wanted = signature({ offered, requested });
+  if (open.some((trade) => trade.toId === friendId && signature(sides(trade.items)) === wanted)) return { ok: false, error: "already" };
+  if (open.length >= TRADE_LIMITS.pending || today >= TRADE_LIMITS.perDay) return { ok: false, error: "limit" };
 
-  await db().trade.create({ data: { fromId: userId, toId: friendId, offeredId, offeredGolden, requestedId, requestedGolden } });
+  const items = [
+    ...offered.map((line) => ({ side: "offered", characterId: line.id, golden: line.golden, count: line.count })),
+    ...requested.map((line) => ({ side: "requested", characterId: line.id, golden: line.golden, count: line.count })),
+  ];
+  await db().trade.create({ data: { fromId: userId, toId: friendId, items: { create: items } } });
   await notifyFrom(friendId, userId, (from) => ({ type: "trade-proposed", from }));
   return { ok: true };
 }
@@ -114,39 +137,39 @@ export async function proposeTrade(
 class Gone extends Error {}
 
 /**
- * Retire à un joueur l'exemplaire promis d'un avis, ordinaire ou doré : s'il ne
- * l'a plus, l'échange tombe. Sans autre exemplaire, l'avis quitte aussi son équipage.
+ * Retire à un joueur les exemplaires promis d'un avis, ordinaires ou dorés : s'il
+ * ne les a plus, l'échange tombe. Sans autre exemplaire, l'avis quitte aussi son équipage.
  */
-async function takeCopy(tx: Tx, userId: string, characterId: string, golden: boolean) {
+async function takeCopies(tx: Tx, userId: string, { id: characterId, golden, count }: TradeLine) {
   const entry = await tx.collectionEntry.findUnique({ where: { userId_characterId: { userId, characterId } } });
-  if (!entry || !hasCopy(entry, golden)) throw new Gone();
+  if (!entry || available(entry, golden) < count) throw new Gone();
 
   // L'avis doit être resté tel qu'on l'a lu : deux échanges simultanés ne donnent pas deux fois le même exemplaire
   const where = { userId, characterId, count: entry.count, golden: entry.golden };
-  if (entry.count === 1) {
+  if (entry.count === count) {
     const removed = await tx.collectionEntry.deleteMany({ where });
     if (removed.count === 0) throw new Gone();
     await tx.crewSlot.deleteMany({ where: { userId, characterId } });
   } else {
     const updated = await tx.collectionEntry.updateMany({
       where,
-      data: { count: { decrement: 1 }, golden: { decrement: golden ? 1 : 0 } },
+      data: { count: { decrement: count }, golden: { decrement: golden ? count : 0 } },
     });
     if (updated.count === 0) throw new Gone();
   }
 }
 
-async function giveCopy(tx: Tx, userId: string, characterId: string, golden: boolean) {
+async function giveCopies(tx: Tx, userId: string, { id: characterId, golden, count }: TradeLine) {
   await tx.collectionEntry.upsert({
     where: { userId_characterId: { userId, characterId } },
-    create: { userId, characterId, count: 1, golden: golden ? 1 : 0 },
-    update: { count: { increment: 1 }, golden: { increment: golden ? 1 : 0 } },
+    create: { userId, characterId, count, golden: golden ? count : 0 },
+    update: { count: { increment: count }, golden: { increment: golden ? count : 0 } },
   });
 }
 
-/** Réponse à une proposition reçue. Acceptée, les deux avis changent de collection d'un seul tenant. */
+/** Réponse à une proposition reçue. Acceptée, tous les avis changent de collection d'un seul tenant. */
 export async function answerTrade(userId: string, tradeId: string, accept: boolean): Promise<TradeResult> {
-  const trade = await db().trade.findFirst({ where: { id: tradeId, toId: userId, status: "pending" } });
+  const trade = await db().trade.findFirst({ where: { id: tradeId, toId: userId, status: "pending" }, include: { items: true } });
   if (!trade) return { ok: false, error: "not-found" };
   const close = (status: string) =>
     db().trade.updateMany({ where: { id: trade.id, status: "pending" }, data: { status, answeredAt: new Date() } });
@@ -171,10 +194,11 @@ export async function answerTrade(userId: string, tradeId: string, accept: boole
         data: { status: "accepted", answeredAt: new Date() },
       });
       if (closed.count === 0) throw new Gone();
-      await takeCopy(tx, trade.fromId, trade.offeredId, trade.offeredGolden);
-      await takeCopy(tx, userId, trade.requestedId, trade.requestedGolden);
-      await giveCopy(tx, userId, trade.offeredId, trade.offeredGolden);
-      await giveCopy(tx, trade.fromId, trade.requestedId, trade.requestedGolden);
+      const { offered, requested } = sides(trade.items);
+      for (const line of offered) await takeCopies(tx, trade.fromId, line);
+      for (const line of requested) await takeCopies(tx, userId, line);
+      for (const line of offered) await giveCopies(tx, userId, line);
+      for (const line of requested) await giveCopies(tx, trade.fromId, line);
     });
   } catch (error) {
     if (!(error instanceof Gone)) throw error;

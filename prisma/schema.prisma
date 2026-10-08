@@ -342,27 +342,34 @@ model QuizPlay {
   @@index([userId, createdAt])
 }
 
-/// Échange proposé entre deux amis : un avis contre un avis.
+/// Échange proposé entre deux amis : quelques avis contre quelques avis.
 model Trade {
-  id              String    @id @default(cuid())
-  fromId          String
-  from            User      @relation("tradeFrom", fields: [fromId], references: [id], onDelete: Cascade)
-  toId            String
-  to              User      @relation("tradeTo", fields: [toId], references: [id], onDelete: Cascade)
-  /// Avis que donne celui qui propose.
-  offeredId       String
-  /// Son exemplaire doré plutôt qu'un ordinaire.
-  offeredGolden   Boolean   @default(false)
-  /// Avis qu'il demande en retour.
-  requestedId     String
-  requestedGolden Boolean   @default(false)
+  id         String      @id @default(cuid())
+  fromId     String
+  from       User        @relation("tradeFrom", fields: [fromId], references: [id], onDelete: Cascade)
+  toId       String
+  to         User        @relation("tradeTo", fields: [toId], references: [id], onDelete: Cascade)
+  items      TradeItem[]
   /// pending, accepted, declined ou cancelled.
-  status          String    @default("pending")
-  createdAt       DateTime  @default(now())
-  answeredAt      DateTime?
+  status     String      @default("pending")
+  createdAt  DateTime    @default(now())
+  answeredAt DateTime?
 
   @@index([toId, status])
   @@index([fromId, status])
+}
+
+/// Exemplaires d'une version d'un avis, d'un côté d'un échange.
+model TradeItem {
+  tradeId     String
+  trade       Trade   @relation(fields: [tradeId], references: [id], onDelete: Cascade)
+  /// offered : donnés par celui qui propose ; requested : demandés en retour.
+  side        String
+  characterId String
+  golden      Boolean @default(false)
+  count       Int     @default(1)
+
+  @@id([tradeId, side, characterId, golden])
 }
 
 /// File d'attente du classé : un joueur qui cherche un adversaire, puis le duel qu'on lui a trouvé.

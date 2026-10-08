@@ -136,7 +136,7 @@ describe.skipIf(!accountsEnabled)("envoi des notifications, en base", () => {
       ],
     });
 
-    expect(await proposeTrade(a.id, b.id, { id: "monkey-d-luffy", golden: false }, { id: "nami", golden: false })).toEqual({ ok: true });
+    expect(await proposeTrade(a.id, b.id, [{ id: "monkey-d-luffy", golden: false, count: 1 }], [{ id: "nami", golden: false, count: 1 }])).toEqual({ ok: true });
     expect(sent()).toMatchObject([{ to: endpoint("nami"), title: "Trade offer", url: "/en/echanges" }]);
 
     send.mockClear();

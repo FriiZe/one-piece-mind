@@ -5,29 +5,80 @@ import Link from "@/components/Link";
 import type { PlayCharacter, ResolvedData } from "@/games/cards";
 import { Button, Panel } from "@/games/ui/primitives";
 import { LoadingPanel, WithGameData } from "@/games/ui/WithGameData";
-import { collectionCopies, exchangeLockNote, type CollectionCopy } from "@/lib/economy";
+import { collectionCopies, exchangeLockNote, type CollectionCopy, type CollectionEntry } from "@/lib/economy";
 import type { Locale } from "@/lib/i18n";
 import { useLocale, useT } from "@/lib/i18n/client";
 import { notificationsChanged, useFriendCollection, useFriends, useTrades } from "@/lib/multi/client";
-import { TRADE_ERRORS, type TradeResult, type TradeView } from "@/lib/multi/trades";
+import { TRADE_ERRORS, TRADE_LIMITS, tradeLineKey, type TradeLine, type TradeResult, type TradeView } from "@/lib/multi/trades";
 import { usePlayer } from "@/lib/player/PlayerProvider";
 import { answerTradeAction, cancelTradeAction, proposeTradeAction } from "@/lib/player/trade-actions";
 import { CharacterCard } from "./CharacterCard";
 
-/** Un exemplaire d'avis : ordinaire ou doré, les deux ne se valent pas. */
+/** Une version d'un avis : ordinaire ou dorée, les deux ne se valent pas. */
 type Copy = { id: string; golden: boolean };
 
-const copyKey = (copy: Copy) => `${copy.id}:${copy.golden ? "golden" : "plain"}`;
+const total = (lines: TradeLine[]) => lines.reduce((sum, line) => sum + line.count, 0);
+const chosenCount = (lines: TradeLine[], copy: Copy) => lines.find((line) => tradeLineKey(line) === tradeLineKey(copy))?.count ?? 0;
+
+/** Ajoute ou retire un exemplaire d'une version à un côté de l'échange. */
+function adjust(lines: TradeLine[], copy: Copy, delta: 1 | -1): TradeLine[] {
+  const count = chosenCount(lines, copy) + delta;
+  const others = lines.filter((line) => tradeLineKey(line) !== tradeLineKey(copy));
+  return count > 0 ? [...others, { ...copy, count }] : others;
+}
+
+/** Le joueur donne-t-il tous ses exemplaires d'un des avis : il quittera alors sa collection et son équipage. */
+function givesLastCopy(lines: TradeLine[], collection: Record<string, CollectionEntry>): boolean {
+  return lines.some((line) => {
+    const entry = collection[line.id];
+    const given = lines.filter((other) => other.id === line.id).reduce((sum, other) => sum + other.count, 0);
+    return !!entry && given >= entry.count;
+  });
+}
+
+/** Les avis d'une liste, en toutes lettres : « Namur ×2, Luffy doré ». */
+function describe(lines: TradeLine[], data: ResolvedData, t: ReturnType<typeof useT>): string {
+  return lines
+    .map((line) => {
+      const name = data.characterById.get(line.id)?.name ?? "?";
+      const label = line.golden ? t(`${name} doré`, `golden ${name}`) : name;
+      return line.count > 1 ? `${label} ×${line.count}` : label;
+    })
+    .join(", ");
+}
+
+const sortLines = (lines: TradeLine[], data: ResolvedData) =>
+  [...lines].sort(
+    (a, b) =>
+      (data.characterById.get(a.id)?.tier ?? 9) - (data.characterById.get(b.id)?.tier ?? 9) ||
+      a.id.localeCompare(b.id) ||
+      Number(a.golden) - Number(b.golden),
+  );
 
 /** Un avis dans une proposition. Un personnage que le mode du joueur ne montre pas encore reste caché. */
-function TradeCard({ id, golden, data, label }: Copy & { data: ResolvedData; label: string }) {
+function TradeCard({ id, golden, count, data }: TradeLine & { data: ResolvedData }) {
   const character = data.characterById.get(id) ?? null;
   const t = useT();
   return (
-    <div className="w-24 shrink-0 text-center sm:w-28">
-      <p className="mb-1 text-xs font-bold text-mist">{label}</p>
-      <CharacterCard character={character} golden={golden} note={golden ? t("Doré", "Golden") : undefined} />
+    <li className="w-20 shrink-0 text-center sm:w-24">
+      <CharacterCard character={character} golden={golden} count={count} note={golden ? t("Doré", "Golden") : undefined} />
       {!character && <p className="mt-1 text-xs text-mist">{t("Pas encore vu dans ton mode", "Not seen yet in your mode")}</p>}
+    </li>
+  );
+}
+
+/** Un côté d'une proposition : les avis qu'on donne, ou ceux qu'on reçoit. */
+function TradeSide({ lines, data, label }: { lines: TradeLine[]; data: ResolvedData; label: string }) {
+  return (
+    <div className="min-w-0">
+      <p className="mb-1 text-xs font-bold text-mist">
+        {label} · {total(lines)}
+      </p>
+      <ul className="flex flex-wrap gap-2">
+        {sortLines(lines, data).map((line) => (
+          <TradeCard key={tradeLineKey(line)} {...line} data={data} />
+        ))}
+      </ul>
     </div>
   );
 }
@@ -44,7 +95,7 @@ function TradeRow({
   trade: TradeView;
   data: ResolvedData;
   incoming: boolean;
-  /** L'avis à donner est le seul exemplaire du joueur. */
+  /** Le joueur donne tous ses exemplaires d'un des avis. */
   lastCopy: boolean;
   busy: boolean;
   onAnswer: (accept: boolean) => void;
@@ -52,22 +103,20 @@ function TradeRow({
 }) {
   const t = useT();
   // Pour celui qui reçoit la proposition, ce qui est offert est ce qu'il reçoit
-  const offered = { id: trade.offeredId, golden: trade.offeredGolden };
-  const requested = { id: trade.requestedId, golden: trade.requestedGolden };
-  const give = incoming ? requested : offered;
-  const receive = incoming ? offered : requested;
+  const give = incoming ? trade.requested : trade.offered;
+  const receive = incoming ? trade.offered : trade.requested;
   return (
     <li
-      className={`flex flex-col gap-4 rounded-2xl border p-4 sm:flex-row sm:items-center ${
+      className={`flex flex-col gap-4 rounded-2xl border p-4 lg:flex-row lg:items-center ${
         incoming ? "border-straw/50 bg-straw/5" : "border-sea-700 bg-sea-800"
       }`}
     >
-      <div className="flex items-end gap-2">
-        <TradeCard {...give} data={data} label={t("Tu donnes", "You give")} />
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" className="mb-12 size-7 shrink-0 text-straw">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+        <TradeSide lines={give} data={data} label={t("Tu donnes", "You give")} />
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" className="size-7 shrink-0 rotate-90 self-center text-straw sm:rotate-0">
           <path d="M7 8h13M16 4l4 4-4 4M17 16H4M8 12l-4 4 4 4" />
         </svg>
-        <TradeCard {...receive} data={data} label={t("Tu reçois", "You get")} />
+        <TradeSide lines={receive} data={data} label={t("Tu reçois", "You get")} />
       </div>
       <div className="min-w-0 flex-1 space-y-2">
         <p className="text-mist">
@@ -90,8 +139,8 @@ function TradeRow({
         {lastCopy && (
           <p className="text-sm font-semibold text-straw">
             {t(
-              "Tu donnes ton seul exemplaire : il quittera ta collection et ton équipage.",
-              "You're giving away your only copy: it will leave your collection and your crew.",
+              "Tu donnes tous tes exemplaires d'un de ces avis : il quittera ta collection et ton équipage.",
+              "You're giving away every copy of one of these posters: it will leave your collection and your crew.",
             )}
           </p>
         )}
@@ -116,23 +165,27 @@ function TradeRow({
   );
 }
 
-/** Grille d'avis dans laquelle on en choisit un. Les exemplaires dorés ont leur propre carte. */
+/**
+ * Grille d'avis dans laquelle on en choisit quelques-uns : chaque clic ajoute un
+ * exemplaire, le bouton « − » en retire un. Les exemplaires dorés ont leur propre carte.
+ */
 function Picker({
   title,
   hint,
   copies,
   selected,
-  onSelect,
+  onChange,
   empty,
 }: {
   title: string;
   hint?: string;
   copies: CollectionCopy<PlayCharacter>[];
-  selected: Copy | null;
-  onSelect: (copy: Copy) => void;
+  selected: TradeLine[];
+  onChange: (lines: TradeLine[]) => void;
   empty: string;
 }) {
   const t = useT();
+  const full = total(selected) >= TRADE_LIMITS.perSide;
   return (
     <div className="space-y-2.5">
       <h3 className="flex flex-wrap items-baseline justify-between gap-x-3 text-xs font-extrabold tracking-[0.15em] text-mist uppercase">
@@ -142,24 +195,42 @@ function Picker({
       {copies.length === 0 ? (
         <p className="text-sm text-mist">{empty}</p>
       ) : (
-        <ul className="grid max-h-96 grid-cols-3 gap-2.5 overflow-y-auto p-1 sm:grid-cols-4">
+        <ul className="grid max-h-[28rem] grid-cols-3 gap-2.5 overflow-y-auto p-1 sm:grid-cols-4">
           {copies.map(({ character, golden, count }) => {
             const copy = { id: character.id, golden };
-            const chosen = !!selected && copyKey(selected) === copyKey(copy);
+            const chosen = chosenCount(selected, copy);
+            const canAdd = !full && chosen < count;
             return (
-              <li key={copyKey(copy)} className={`relative rounded-md ${chosen ? "ring-4 ring-emerald-400" : ""}`}>
-                <CharacterCard character={character} golden={golden} count={count} note={golden ? t("Doré", "Golden") : undefined} />
-                <button
-                  type="button"
-                  onClick={() => onSelect(copy)}
-                  aria-pressed={chosen}
-                  aria-label={
-                    golden
-                      ? t(`Choisir ${character.name}, doré`, `Pick golden ${character.name}`)
-                      : t(`Choisir ${character.name}`, `Pick ${character.name}`)
-                  }
-                  className="absolute inset-0 cursor-pointer rounded-md focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-straw"
-                />
+              <li key={tradeLineKey(copy)} className="space-y-1">
+                <div className={`relative rounded-md ${chosen > 0 ? "ring-4 ring-emerald-400" : canAdd ? "" : "opacity-50"}`}>
+                  <CharacterCard character={character} golden={golden} count={count} note={golden ? t("Doré", "Golden") : undefined} />
+                  <button
+                    type="button"
+                    onClick={() => onChange(adjust(selected, copy, 1))}
+                    disabled={!canAdd}
+                    aria-label={
+                      golden
+                        ? t(`Ajouter un ${character.name} doré`, `Add a golden ${character.name}`)
+                        : t(`Ajouter un ${character.name}`, `Add a ${character.name}`)
+                    }
+                    className="absolute inset-0 cursor-pointer rounded-md focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-straw disabled:cursor-not-allowed"
+                  />
+                </div>
+                {chosen > 0 && (
+                  <div className="flex items-center justify-between rounded-md bg-emerald-400/15 font-bold whitespace-nowrap text-emerald-300">
+                    <button
+                      type="button"
+                      onClick={() => onChange(adjust(selected, copy, -1))}
+                      aria-label={t(`Retirer un ${character.name}`, `Remove a ${character.name}`)}
+                      className="min-h-9 min-w-9 cursor-pointer rounded-md text-lg leading-none hover:bg-emerald-400/20"
+                    >
+                      −
+                    </button>
+                    <span className="pr-2.5 text-sm" title={t(`${chosen} choisi${chosen > 1 ? "s" : ""}`, `${chosen} picked`)}>
+                      ✓ {chosen}
+                    </span>
+                  </div>
+                )}
               </li>
             );
           })}
@@ -180,8 +251,8 @@ function Trades({ data }: { data: ResolvedData }) {
   const { trades, reload } = useTrades(true);
   const [friendId, setFriendId] = useState<string | null>(null);
   const friend = useFriendCollection(friendId);
-  const [offered, setOffered] = useState<Copy | null>(null);
-  const [requested, setRequested] = useState<Copy | null>(null);
+  const [offered, setOffered] = useState<TradeLine[]>([]);
+  const [requested, setRequested] = useState<TradeLine[]>([]);
   const [duplicatesOnly, setDuplicatesOnly] = useState(true);
   const [missingOnly, setMissingOnly] = useState(true);
   const [busy, setBusy] = useState(false);
@@ -221,22 +292,19 @@ function Trades({ data }: { data: ResolvedData }) {
   }
 
   async function propose() {
-    if (!friendId || !offered || !requested) return;
+    if (!friendId || offered.length === 0 || requested.length === 0) return;
     const sent = await run(
-      () => proposeTradeAction(friendId, offered.id, offered.golden, requested.id, requested.golden),
+      () => proposeTradeAction(friendId, offered, requested),
       t("Proposition envoyée.", "Offer sent."),
     );
     if (sent) {
-      setOffered(null);
-      setRequested(null);
+      setOffered([]);
+      setRequested([]);
     }
   }
 
-  const lastCopy = offered ? state.collection[offered.id]?.count === 1 : false;
-  const offeredCharacter = offered ? data.characterById.get(offered.id) : undefined;
-  const requestedCharacter = requested ? data.characterById.get(requested.id) : undefined;
-  const fr = (copy: Copy | null, name: string) => (copy?.golden ? `${name} doré` : name);
-  const en = (copy: Copy | null, name: string) => (copy?.golden ? `golden ${name}` : name);
+  const lastCopy = givesLastCopy(offered, state.collection);
+  const ready = offered.length > 0 && requested.length > 0;
 
   return (
     <div className="space-y-7">
@@ -260,15 +328,15 @@ function Trades({ data }: { data: ResolvedData }) {
                 trade={trade}
                 data={data}
                 incoming
-                lastCopy={state.collection[trade.requestedId]?.count === 1}
+                lastCopy={givesLastCopy(trade.requested, state.collection)}
                 busy={busy}
                 onAnswer={(accept) =>
                   run(
                     () => answerTradeAction(trade.id, accept),
                     accept
                       ? t(
-                          "Échange fait : l'avis a rejoint ta collection.",
-                          "Trade done: the poster has joined your collection.",
+                          "Échange fait : les avis reçus ont rejoint ta collection.",
+                          "Trade done: the posters you got have joined your collection.",
                         )
                       : t("Proposition refusée.", "Offer declined."),
                     accept,
@@ -293,7 +361,7 @@ function Trades({ data }: { data: ResolvedData }) {
                 trade={trade}
                 data={data}
                 incoming={false}
-                lastCopy={state.collection[trade.offeredId]?.count === 1}
+                lastCopy={givesLastCopy(trade.offered, state.collection)}
                 busy={busy}
                 onAnswer={() => undefined}
                 onCancel={() => run(() => cancelTradeAction(trade.id), t("Proposition annulée.", "Offer canceled."))}
@@ -336,7 +404,7 @@ function Trades({ data }: { data: ResolvedData }) {
                           aria-pressed={chosen}
                           onClick={() => {
                             setFriendId(f.id);
-                            setRequested(null);
+                            setRequested([]);
                           }}
                           className={`flex min-h-12 w-full cursor-pointer items-center gap-2.5 rounded-[10px] px-2.5 text-left font-bold transition-colors ${
                             chosen ? "border-2 border-straw bg-sea-800 text-foam" : "border border-sea-700 text-mist hover:text-foam"
@@ -358,13 +426,13 @@ function Trades({ data }: { data: ResolvedData }) {
 
               <div className="space-y-2.5 rounded-[14px] border border-sea-700 p-4">
                 <Picker
-                  title={t("2 · Je donne", "2 · I give")}
+                  title={t(`2 · Je donne · ${total(offered)}/${TRADE_LIMITS.perSide}`, `2 · I give · ${total(offered)}/${TRADE_LIMITS.perSide}`)}
                   hint={
                     duplicatesOnly ? t("Mes doublons", "My duplicates") : t("Toute ma collection", "My whole collection")
                   }
                   copies={mine}
                   selected={offered}
-                  onSelect={setOffered}
+                  onChange={setOffered}
                   empty={
                     duplicatesOnly
                       ? t(
@@ -402,7 +470,7 @@ function Trades({ data }: { data: ResolvedData }) {
                 ) : (
                   <>
                     <Picker
-                      title={t("3 · Je demande", "3 · I ask for")}
+                      title={t(`3 · Je demande · ${total(requested)}/${TRADE_LIMITS.perSide}`, `3 · I ask for · ${total(requested)}/${TRADE_LIMITS.perSide}`)}
                       hint={
                         missingOnly
                           ? t(`Ce qui me manque chez ${friend.username}`, `What I'm missing from ${friend.username}`)
@@ -410,7 +478,7 @@ function Trades({ data }: { data: ResolvedData }) {
                       }
                       copies={theirs}
                       selected={requested}
-                      onSelect={setRequested}
+                      onChange={setRequested}
                       empty={
                         missingOnly
                           ? t(
@@ -431,31 +499,31 @@ function Trades({ data }: { data: ResolvedData }) {
 
             <div className="flex flex-wrap items-center gap-4 rounded-[14px] border border-sea-700 bg-sea-800 px-5 py-4">
               <p className="min-w-0 flex-1 text-mist">
-                {offeredCharacter && requestedCharacter && friend && friend !== "missing"
+                {ready && friend && friend !== "missing"
                   ? t(
                       <>
-                        Tu donnes <strong className="text-foam">{fr(offered, offeredCharacter.name)}</strong> à {friend.username} contre{" "}
-                        <strong className="text-foam">{fr(requested, requestedCharacter.name)}</strong>. Rien ne bouge tant que {friend.username} n&apos;a pas accepté.
+                        Tu donnes <strong className="text-foam">{describe(sortLines(offered, data), data, t)}</strong> à {friend.username} contre{" "}
+                        <strong className="text-foam">{describe(sortLines(requested, data), data, t)}</strong>. Rien ne bouge tant que {friend.username} n&apos;a pas accepté.
                       </>,
                       <>
-                        You give <strong className="text-foam">{en(offered, offeredCharacter.name)}</strong> to {friend.username} for{" "}
-                        <strong className="text-foam">{en(requested, requestedCharacter.name)}</strong>. Nothing moves until {friend.username} accepts.
+                        You give <strong className="text-foam">{describe(sortLines(offered, data), data, t)}</strong> to {friend.username} for{" "}
+                        <strong className="text-foam">{describe(sortLines(requested, data), data, t)}</strong>. Nothing moves until {friend.username} accepts.
                       </>,
                     )
                   : t(
-                      "Un avis contre un avis : choisis un ami, l'avis que tu donnes et celui que tu demandes.",
-                      "One poster for another: pick a friend, the poster you give and the one you ask for.",
+                      `Jusqu'à ${TRADE_LIMITS.perSide} avis de chaque côté : choisis un ami, les avis que tu donnes et ceux que tu demandes. Chaque clic sur une carte en ajoute un exemplaire.`,
+                      `Up to ${TRADE_LIMITS.perSide} posters on each side: pick a friend, the posters you give and the ones you ask for. Each click on a card adds one copy.`,
                     )}
                 {lastCopy && (
                   <span className="mt-1 block text-sm font-semibold text-straw">
                     {t(
-                      "C'est ton seul exemplaire de cet avis : s'il part, il quitte ta collection et ton équipage.",
-                      "This is your only copy of this poster: if it goes, it leaves your collection and your crew.",
+                      "Tu donnes tous tes exemplaires d'un de ces avis : s'il part, il quitte ta collection et ton équipage.",
+                      "You're giving every copy of one of these posters: if it goes, it leaves your collection and your crew.",
                     )}
                   </span>
                 )}
               </p>
-              <Button onClick={propose} disabled={busy || !offered || !requested} className="min-h-12 px-6">
+              <Button onClick={propose} disabled={busy || !ready} className="min-h-12 px-6">
                 {t("Proposer l'échange", "Offer the trade")}
               </Button>
             </div>
