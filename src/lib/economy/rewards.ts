@@ -288,12 +288,15 @@ export function sellDuplicates(
   return { state: { ...state, collection, berrys: state.berrys + berrys }, berrys, sold, changed };
 }
 
+/** La réduction à la boutique est plafonnée, quel que soit l'équipage. */
+export const MAX_DISCOUNT = 0.5;
+
 export function tavernCost(discount: number): number {
-  return roundToTen(TAVERN_COST * (1 - Math.min(discount, 0.5)));
+  return roundToTen(TAVERN_COST * (1 - Math.min(discount, MAX_DISCOUNT)));
 }
 
 export function boosterCost(discount: number): number {
-  return roundToTen(BOOSTER_COST * (1 - Math.min(discount, 0.5)));
+  return roundToTen(BOOSTER_COST * (1 - Math.min(discount, MAX_DISCOUNT)));
 }
 
 /** Achat d'un booster : une carte par emplacement de `BOOSTER_SLOTS`, dans l'ordre. */

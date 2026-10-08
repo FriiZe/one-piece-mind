@@ -11,6 +11,7 @@ import {
   boosterCost,
   crewBonuses,
   GOLDEN_CHANCE,
+  MAX_DISCOUNT,
   RARITY_LABELS,
   RARITY_WEIGHTS,
   tavernCost,
@@ -121,8 +122,8 @@ function Shop({ data }: { data: ResolvedData }) {
                 )}
           {discount > 0 &&
             t(
-              ` Ton musicien te fait ${Math.round(Math.min(discount, 0.5) * 100)} % de réduction.`,
-              ` Your musician gets you ${Math.round(Math.min(discount, 0.5) * 100)}% off.`,
+              ` Ton musicien te fait ${Math.round(Math.min(discount, MAX_DISCOUNT) * 100)} % de réduction.`,
+              ` Your musician gets you ${Math.round(Math.min(discount, MAX_DISCOUNT) * 100)}% off.`,
             )}
         </span>
       </p>

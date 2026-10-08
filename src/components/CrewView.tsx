@@ -13,6 +13,7 @@ import {
   crewBonuses,
   DEFAULT_TRAIT,
   FULL_CREW_BONUS,
+  MAX_DISCOUNT,
   POST_IDS,
   POSTS,
   postStrength,
@@ -40,7 +41,7 @@ function midSentence(label: Localized, locale: Locale): string {
 }
 
 /** Tous les bonus de l'équipage, postes et traits confondus, du plus général au plus particulier. */
-function bonusLines(bonuses: CrewBonuses, t: Translate): { label: string; value: number }[] {
+function bonusLines(bonuses: CrewBonuses, t: Translate): { label: string; value: number; note?: string }[] {
   return [
     { label: t("Berrys sur tous les jeux", "Berries on every game"), value: bonuses.berrys.all ?? 0 },
     { label: t("Berrys sur le défi du jour", "Berries on the daily challenge"), value: bonuses.berrys.daily ?? 0 },
@@ -50,7 +51,12 @@ function bonusLines(bonuses: CrewBonuses, t: Translate): { label: string; value:
     })),
     { label: t("Chances de recruter", "Chance to recruit"), value: bonuses.recruit },
     { label: t("Chances d'avis doré", "Chance of a golden poster"), value: bonuses.golden },
-    { label: t("Réduction à la boutique", "Discount at the shop"), value: bonuses.discount },
+    {
+      label: t("Réduction à la boutique", "Discount at the shop"),
+      value: bonuses.discount,
+      // Au-delà du plafond, le surplus ne sert à rien : on le dit plutôt que de le cacher
+      note: bonuses.discount > MAX_DISCOUNT ? t(`max ${MAX_DISCOUNT * 100} %`, `max ${MAX_DISCOUNT * 100}%`) : undefined,
+    },
   ].filter((line) => line.value > 0);
 }
 
@@ -72,7 +78,10 @@ function Summary({ bonuses }: { bonuses: CrewBonuses }) {
           {lines.map((line) => (
             <div key={line.label} className="flex items-baseline justify-between gap-3 text-[15px]">
               <dt className="text-mist">{line.label}</dt>
-              <dd className="font-display text-xl tracking-wide text-straw">{percent(line.value, locale)}</dd>
+              <dd className="font-display text-xl tracking-wide text-straw">
+                {percent(line.value, locale)}
+                {line.note && <span className="ml-1.5 font-sans text-sm font-normal text-mist">({line.note})</span>}
+              </dd>
             </div>
           ))}
         </dl>
