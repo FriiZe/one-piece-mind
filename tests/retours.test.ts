@@ -51,7 +51,7 @@ import { DUMMY_HASH } from "@/lib/server/password";
 import { priceBounds } from "@/lib/market/rules";
 import { buyListing, cancelListing, createListing } from "@/lib/server/market";
 import { TRADE_LIMITS } from "@/lib/multi/trades";
-import { answerTrade, cancelTrade, friendCollection, proposeTrade, tradesOverview } from "@/lib/server/trades";
+import { acknowledgeTrades, answerTrade, cancelTrade, friendCollection, proposeTrade, tradesOverview } from "@/lib/server/trades";
 import { answerFriendRequest, requestFriend } from "@/lib/server/friends";
 import { gameLeaderboard, globalLeaderboard } from "@/lib/server/leaderboard";
 import { playerProfile } from "@/lib/server/players";
@@ -860,6 +860,14 @@ describe.skipIf(!accountsEnabled)("quiz et doublons, en base", () => {
     expect(after.crew).toEqual({});
     expect((await pendingCounts(b.id, false)).trades).toBe(0);
     expect(await answerTrade(b.id, trade.id, true)).toEqual({ ok: false, error: "not-found" });
+
+    // L'auteur de la proposition en découvre l'issue dans l'historique ; la cloche la lui signale tant qu'il ne l'a pas vue
+    expect((await tradesOverview(a.id)).history[0]).toMatchObject({ id: trade.id, friend: b.username, status: "accepted", mine: true, fresh: true });
+    expect((await tradesOverview(b.id)).history[0]).toMatchObject({ id: trade.id, friend: a.username, status: "accepted", mine: false, fresh: false });
+    expect((await pendingCounts(a.id, false)).tradeAnswers).toBe(1);
+    await acknowledgeTrades(a.id);
+    expect((await pendingCounts(a.id, false)).tradeAnswers).toBe(0);
+    expect((await tradesOverview(a.id)).history[0]).toMatchObject({ id: trade.id, fresh: false });
   });
 
   it("annule une proposition dont un avis n'est plus là, et laisse retirer la sienne", async () => {
@@ -872,6 +880,8 @@ describe.skipIf(!accountsEnabled)("quiz et doublons, en base", () => {
     expect(await answerTrade(a.id, trade.id, true)).toEqual({ ok: false, error: "gone" });
     expect((await loadState(a.id)).collection[wanted]).toEqual({ count: 1, golden: 1 });
     expect((await tradesOverview(a.id)).incoming).toEqual([]);
+    // Tombée sans que son auteur y soit pour rien : il doit l'apprendre
+    expect((await tradesOverview(b.id)).history[0]).toMatchObject({ id: trade.id, status: "cancelled", mine: true, fresh: true });
 
     expect(await proposeTrade(a.id, b.id, [{ id: wanted, golden: true, count: 1 }], [{ id: given, golden: false, count: 1 }])).toEqual({ ok: false, error: "friend-not-owned" });
     await db().collectionEntry.create({ data: { userId: b.id, characterId: given, count: 1, golden: 0 } });
@@ -880,6 +890,9 @@ describe.skipIf(!accountsEnabled)("quiz et doublons, en base", () => {
     expect(await cancelTrade(b.id, mine.id)).toEqual({ ok: false, error: "not-found" });
     expect(await cancelTrade(a.id, mine.id)).toEqual({ ok: true });
     expect((await tradesOverview(b.id)).incoming).toEqual([]);
+    // Annulée par son auteur : il le sait déjà, rien de neuf à lui signaler
+    expect((await tradesOverview(a.id)).history[0]).toMatchObject({ id: mine.id, status: "cancelled", mine: true, fresh: false });
+    expect((await pendingCounts(a.id, false)).tradeAnswers).toBe(0);
   });
 
   it("échange plusieurs avis contre plusieurs, exemplaires ordinaires et dorés compris", async () => {

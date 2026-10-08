@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "@/components/Link";
 import type { PlayCharacter, ResolvedData } from "@/games/cards";
 import { Button, Panel } from "@/games/ui/primitives";
@@ -9,9 +9,17 @@ import { collectionCopies, exchangeLockNote, type CollectionCopy, type Collectio
 import type { Locale } from "@/lib/i18n";
 import { useLocale, useT } from "@/lib/i18n/client";
 import { notificationsChanged, useFriendCollection, useFriends, useTrades } from "@/lib/multi/client";
-import { TRADE_ERRORS, TRADE_LIMITS, tradeLineKey, type TradeLine, type TradeResult, type TradeView } from "@/lib/multi/trades";
+import {
+  TRADE_ERRORS,
+  TRADE_LIMITS,
+  tradeLineKey,
+  type TradeHistoryEntry,
+  type TradeLine,
+  type TradeResult,
+  type TradeView,
+} from "@/lib/multi/trades";
 import { usePlayer } from "@/lib/player/PlayerProvider";
-import { answerTradeAction, cancelTradeAction, proposeTradeAction } from "@/lib/player/trade-actions";
+import { acknowledgeTradesAction, answerTradeAction, cancelTradeAction, proposeTradeAction } from "@/lib/player/trade-actions";
 import { CharacterCard } from "./CharacterCard";
 
 /** Une version d'un avis : ordinaire ou dorée, les deux ne se valent pas. */
@@ -162,6 +170,91 @@ function TradeRow({
         </div>
       </div>
     </li>
+  );
+}
+
+/**
+ * Les derniers échanges conclus : on sait ce qu'est devenue une proposition
+ * sans avoir à la retrouver de mémoire dans sa collection. Les issues qu'on
+ * n'avait pas encore vues sont mises en avant, puis la cloche cesse de les compter.
+ */
+function History({ entries, data }: { entries: TradeHistoryEntry[]; data: ResolvedData }) {
+  const t = useT();
+  const locale = useLocale();
+  const fresh = entries.some((entry) => entry.fresh);
+  useEffect(() => {
+    if (fresh) void acknowledgeTradesAction().then(notificationsChanged, () => undefined);
+  }, [fresh]);
+  if (entries.length === 0) return null;
+
+  const day = new Intl.DateTimeFormat(locale, { day: "numeric", month: "short" });
+  const STATUS: Record<TradeHistoryEntry["status"], { label: string; className: string }> = {
+    accepted: { label: t("Acceptée", "Accepted"), className: "bg-emerald-400/15 text-emerald-300" },
+    declined: { label: t("Refusée", "Declined"), className: "bg-vest/15 text-vest" },
+    cancelled: { label: t("Annulée", "Canceled"), className: "bg-sea-700 text-mist" },
+  };
+  return (
+    <section aria-labelledby="historique" className="space-y-3">
+      <h2 id="historique" className="text-xl font-extrabold text-foam">
+        {t("Derniers échanges", "Recent trades")}
+      </h2>
+      <ul className="space-y-2">
+        {entries.map((entry) => {
+          // Ce que le joueur donne : ce qu'il offrait, ou ce qu'on lui demandait
+          const give = describe(sortLines(entry.mine ? entry.offered : entry.requested, data), data, t);
+          const get = describe(sortLines(entry.mine ? entry.requested : entry.offered, data), data, t);
+          const friend = <strong className="text-foam">{entry.friend}</strong>;
+          return (
+            <li
+              key={entry.id}
+              className={`flex flex-wrap items-center gap-x-3 gap-y-1 rounded-xl border px-4 py-3 ${
+                entry.fresh ? "border-straw/50 bg-straw/5" : "border-sea-700 bg-sea-800"
+              }`}
+            >
+              <span className={`rounded-full px-2.5 py-0.5 text-xs font-extrabold ${STATUS[entry.status].className}`}>
+                {STATUS[entry.status].label}
+              </span>
+              <span className="min-w-0 flex-1 text-sm text-mist">
+                {entry.status === "accepted"
+                  ? t(
+                      <>
+                        {entry.mine ? <>{friend} a accepté</> : <>Tu as accepté l&apos;échange de {friend}</>} : tu as donné{" "}
+                        <strong className="text-foam">{give}</strong>, reçu <strong className="text-foam">{get}</strong>.
+                      </>,
+                      <>
+                        {entry.mine ? <>{friend} accepted</> : <>You accepted {friend}&apos;s trade</>}: you gave{" "}
+                        <strong className="text-foam">{give}</strong> and got <strong className="text-foam">{get}</strong>.
+                      </>,
+                    )
+                  : entry.status === "declined"
+                    ? t(
+                        <>
+                          {entry.mine ? <>{friend} a refusé</> : <>Tu as refusé l&apos;échange de {friend}</>} :{" "}
+                          <strong className="text-foam">{give}</strong> contre <strong className="text-foam">{get}</strong>.
+                        </>,
+                        <>
+                          {entry.mine ? <>{friend} declined</> : <>You declined {friend}&apos;s trade</>}:{" "}
+                          <strong className="text-foam">{give}</strong> for <strong className="text-foam">{get}</strong>.
+                        </>,
+                      )
+                    : t(
+                        <>
+                          Avec {friend} : <strong className="text-foam">{give}</strong> contre <strong className="text-foam">{get}</strong>.
+                        </>,
+                        <>
+                          With {friend}: <strong className="text-foam">{give}</strong> for <strong className="text-foam">{get}</strong>.
+                        </>,
+                      )}
+              </span>
+              <time dateTime={new Date(entry.answeredAt).toISOString()} className="text-xs text-mist">
+                {day.format(entry.answeredAt)}
+              </time>
+              {entry.fresh && <span className="text-xs font-extrabold text-straw">{t("Nouveau", "New")}</span>}
+            </li>
+          );
+        })}
+      </ul>
+    </section>
   );
 }
 
@@ -370,6 +463,8 @@ function Trades({ data }: { data: ResolvedData }) {
           </ul>
         </section>
       )}
+
+      {trades && <History entries={trades.history} data={data} />}
 
       <section aria-labelledby="proposer" className="space-y-3.5">
         <h2 id="proposer" className="text-xl font-extrabold text-foam">

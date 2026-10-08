@@ -3,7 +3,7 @@
 /** Actions sur les échanges entre amis. Chacune vérifie la session : elles peuvent être appelées directement. */
 import type { TradeLine, TradeResult } from "@/lib/multi/trades";
 import { currentUser } from "@/lib/server/session";
-import { answerTrade, cancelTrade, proposeTrade } from "@/lib/server/trades";
+import { acknowledgeTrades, answerTrade, cancelTrade, proposeTrade } from "@/lib/server/trades";
 
 const UNAVAILABLE: TradeResult = { ok: false, error: "unavailable" };
 const isId = (value: unknown): value is string => typeof value === "string" && value.length > 0 && value.length <= 80;
@@ -25,4 +25,10 @@ export async function cancelTradeAction(tradeId: string): Promise<TradeResult> {
   const user = await currentUser();
   if (!user || !isId(tradeId)) return UNAVAILABLE;
   return cancelTrade(user.id, tradeId);
+}
+
+/** Le joueur a vu l'issue de ses propositions : la cloche ne les compte plus. */
+export async function acknowledgeTradesAction(): Promise<void> {
+  const user = await currentUser();
+  if (user) await acknowledgeTrades(user.id);
 }

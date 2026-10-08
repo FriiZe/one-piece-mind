@@ -3,6 +3,7 @@ import { playerBounty } from "@/lib/economy";
 import { MAX_FRIENDS, type FriendResult, type FriendsOverview, type NotificationCounts } from "@/lib/multi/friends";
 import { db } from "./db";
 import { unseenSales } from "./market";
+import { unseenTradeAnswers } from "./trades";
 import { notifyFrom } from "./push";
 import { pendingLootCount } from "./raid";
 
@@ -18,15 +19,16 @@ const openInvites = (userId: string) => ({
 
 /** Nombre de demandes et d'invitations en attente. `admin` : compte aussi les quiz masqués à relire. */
 export async function pendingCounts(userId: string, admin: boolean): Promise<NotificationCounts> {
-  const [requests, invites, trades, hiddenQuizzes, sales, loot] = await Promise.all([
+  const [requests, invites, trades, tradeAnswers, hiddenQuizzes, sales, loot] = await Promise.all([
     db().friendship.count({ where: { addresseeId: userId, status: "pending" } }),
     db().roomInvite.count({ where: openInvites(userId) }),
     db().trade.count({ where: { toId: userId, status: "pending" } }),
+    unseenTradeAnswers(userId),
     admin ? db().quiz.count({ where: { status: "hidden" } }) : 0,
     unseenSales(userId),
     pendingLootCount(userId),
   ]);
-  return { requests, invites, trades, hiddenQuizzes, sales, loot };
+  return { requests, invites, trades, tradeAnswers, hiddenQuizzes, sales, loot };
 }
 
 export async function friendsOverview(userId: string): Promise<FriendsOverview> {

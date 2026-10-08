@@ -97,12 +97,15 @@ export function NotificationBell() {
 
   if (!enabled) return null;
 
-  const total = counts ? counts.requests + counts.invites + counts.trades + counts.hiddenQuizzes + counts.sales + counts.loot : 0;
+  const total = counts
+    ? counts.requests + counts.invites + counts.trades + counts.tradeAnswers + counts.hiddenQuizzes + counts.sales + counts.loot
+    : 0;
   const empty =
     friends &&
     friends.incoming.length === 0 &&
     friends.invites.length === 0 &&
     !counts?.trades &&
+    !counts?.tradeAnswers &&
     !counts?.hiddenQuizzes &&
     !counts?.sales &&
     !counts?.loot;
@@ -203,6 +206,26 @@ export function NotificationBell() {
                       )}
                     </strong>{" "}
                     {t(`proposé${counts.trades > 1 ? "s" : ""} par tes amis.`, "offered by your friends.")}
+                  </span>
+                  <Link
+                    href="/echanges"
+                    onClick={() => setOpen(false)}
+                    className="shrink-0 font-bold text-straw underline underline-offset-4"
+                  >
+                    {t("Voir", "View")}
+                  </Link>
+                </li>
+              )}
+              {counts && counts.tradeAnswers > 0 && (
+                <li className="flex items-center justify-between gap-2">
+                  <span className="text-mist">
+                    <strong className="text-foam">
+                      {t(
+                        `${counts.tradeAnswers} réponse${counts.tradeAnswers > 1 ? "s" : ""}`,
+                        `${counts.tradeAnswers} ${counts.tradeAnswers === 1 ? "reply" : "replies"}`,
+                      )}
+                    </strong>{" "}
+                    {t("à tes propositions d'échange.", "to your trade offers.")}
                   </span>
                   <Link
                     href="/echanges"

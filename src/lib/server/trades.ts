@@ -1,9 +1,11 @@
 import "server-only";
 import {
   normalizeTradeSide,
+  TRADE_HISTORY_SHOWN,
   TRADE_LIMITS,
   tradeLineKey,
   type FriendCollection,
+  type TradeHistoryEntry,
   type TradeLine,
   type TradeResult,
   type TradesOverview,
@@ -46,25 +48,49 @@ export async function friendCollection(userId: string, friendId: string): Promis
 }
 
 export async function tradesOverview(userId: string): Promise<TradesOverview> {
-  const [trades, access] = await Promise.all([
+  const include = { from: { select: { username: true } }, to: { select: { username: true } }, items: true };
+  const [trades, closed, access] = await Promise.all([
     db().trade.findMany({
       where: { status: "pending", OR: [{ fromId: userId }, { toId: userId }] },
-      include: { from: { select: { username: true } }, to: { select: { username: true } }, items: true },
+      include,
       orderBy: { createdAt: "desc" },
+    }),
+    db().trade.findMany({
+      where: { status: { not: "pending" }, OR: [{ fromId: userId }, { toId: userId }] },
+      include,
+      orderBy: { answeredAt: "desc" },
+      take: TRADE_HISTORY_SHOWN,
     }),
     exchangeAccessFor(userId),
   ]);
-  const view = (trade: (typeof trades)[number], friend: string) => ({
+  const view = (trade: (typeof trades)[number]) => ({
     id: trade.id,
-    friend,
+    friend: trade.fromId === userId ? trade.to.username : trade.from.username,
     ...sides(trade.items),
     createdAt: trade.createdAt.getTime(),
   });
   return {
-    incoming: trades.filter((t) => t.toId === userId).map((t) => view(t, t.from.username)),
-    outgoing: trades.filter((t) => t.fromId === userId).map((t) => view(t, t.to.username)),
+    incoming: trades.filter((t) => t.toId === userId).map(view),
+    outgoing: trades.filter((t) => t.fromId === userId).map(view),
+    history: closed.map((trade) => ({
+      ...view(trade),
+      status: trade.status as TradeHistoryEntry["status"],
+      answeredAt: (trade.answeredAt ?? trade.createdAt).getTime(),
+      mine: trade.fromId === userId,
+      fresh: trade.fromId === userId && trade.seenAt === null,
+    })),
     access,
   };
+}
+
+/** Issues de ses propositions que le joueur n'a pas encore vues, pour la cloche de l'en-tête. */
+export function unseenTradeAnswers(userId: string): Promise<number> {
+  return db().trade.count({ where: { fromId: userId, status: { not: "pending" }, seenAt: null } });
+}
+
+/** Le joueur a vu l'issue de ses propositions : la cloche ne les compte plus. */
+export async function acknowledgeTrades(userId: string): Promise<void> {
+  await db().trade.updateMany({ where: { fromId: userId, status: { not: "pending" }, seenAt: null }, data: { seenAt: new Date() } });
 }
 
 /** Ce qui empêche ces deux comptes d'échanger, le cas échéant : l'un d'eux n'a pas encore assez joué. */
@@ -209,11 +235,12 @@ export async function answerTrade(userId: string, tradeId: string, accept: boole
   return { ok: true };
 }
 
-/** Annule une proposition envoyée et restée sans réponse. */
+/** Annule une proposition envoyée et restée sans réponse. Son auteur le sait : rien de neuf à lui montrer. */
 export async function cancelTrade(userId: string, tradeId: string): Promise<TradeResult> {
+  const now = new Date();
   const cancelled = await db().trade.updateMany({
     where: { id: tradeId, fromId: userId, status: "pending" },
-    data: { status: "cancelled", answeredAt: new Date() },
+    data: { status: "cancelled", answeredAt: now, seenAt: now },
   });
   return cancelled.count > 0 ? { ok: true } : { ok: false, error: "not-found" };
 }

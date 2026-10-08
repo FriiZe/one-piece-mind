@@ -23,6 +23,8 @@ export type NotificationCounts = {
   invites: number;
   /** Échanges d'avis proposés par un ami. */
   trades: number;
+  /** Propositions d'échange du joueur acceptées, refusées ou tombées, qu'il n'a pas encore vues. */
+  tradeAnswers: number;
   /** Quiz de la communauté masqués, à relire : pour les administrateurs seulement. */
   hiddenQuizzes: number;
   /** Annonces du marché vendues, que le vendeur n'a pas encore vues. */

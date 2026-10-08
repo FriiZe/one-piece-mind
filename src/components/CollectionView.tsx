@@ -90,6 +90,7 @@ function Collection({ data }: { data: ResolvedData }) {
   const locale = useLocale();
   const [tier, setTier] = useState<number | null>(null);
   const [org, setOrg] = useState("");
+  const [goldenOnly, setGoldenOnly] = useState(false);
   const [withMissing, setWithMissing] = useState(false);
   const [opened, setOpened] = useState<{ id: string; golden: boolean } | null>(null);
   const open = opened ? data.characterById.get(opened.id) : undefined;
@@ -103,8 +104,12 @@ function Collection({ data }: { data: ResolvedData }) {
   );
   const byTier = (c: { tier: number }) => tier === null || c.tier === tier;
   const byOrg = (c: { org: string | null }) => !org || c.org === org;
+  const byGolden = (c: { id: string }) => !goldenOnly || state.collection[c.id].golden > 0;
   // Un avis doré ne s'empile pas avec les ordinaires du même personnage : chacun a sa carte
-  const shown = collectionCopies(owned.filter((c) => byTier(c) && byOrg(c)), state.collection);
+  const shown = collectionCopies(
+    owned.filter((c) => byTier(c) && byOrg(c) && byGolden(c)),
+    state.collection,
+  ).filter((copy) => !goldenOnly || copy.golden);
   const missing = useMemo(
     () =>
       withMissing
@@ -113,7 +118,7 @@ function Collection({ data }: { data: ResolvedData }) {
     [withMissing, data.characters, state.collection, tier, org],
   );
   const hidden = missing.length - MISSING_SHOWN;
-  const filtered = tier !== null || org !== "";
+  const filtered = tier !== null || org !== "" || goldenOnly;
 
   // Les affiliations assez nombreuses pour former un trait d'équipage, celles de la collection en tête :
   // on y voit ce qui manque pour le compléter
@@ -163,7 +168,7 @@ function Collection({ data }: { data: ResolvedData }) {
           {[null, ...TIERS].map((value) => {
             const inTier = (c: { tier: number; org: string | null }) => (value === null || c.tier === value) && byOrg(c);
             const total = data.characters.filter(inTier).length;
-            const have = owned.filter(inTier).length;
+            const have = owned.filter((c) => inTier(c) && byGolden(c)).length;
             return (
               <button
                 key={value ?? "tous"}
@@ -178,6 +183,17 @@ function Collection({ data }: { data: ResolvedData }) {
               </button>
             );
           })}
+          {/* Les avis dorés seulement : les puces de rareté ne comptent alors qu'eux */}
+          <button
+            type="button"
+            aria-pressed={goldenOnly}
+            onClick={() => setGoldenOnly(!goldenOnly)}
+            className={`min-h-11 cursor-pointer rounded-full px-4 text-sm font-bold whitespace-nowrap transition-colors ${
+              goldenOnly ? "bg-straw text-ink" : "border border-sea-700 text-mist hover:text-foam"
+            }`}
+          >
+            {t("Dorés", "Golden")}
+          </button>
         </div>
         <select value={org} onChange={(event) => setOrg(event.target.value)} aria-label={t("Filtrer par trait", "Filter by trait")} className={FIELD}>
           <option value="">{t("Tous les traits", "All traits")}</option>

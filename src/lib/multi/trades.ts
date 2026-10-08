@@ -7,6 +7,8 @@ import type { Localized } from "@/lib/i18n";
  * et avis de chaque côté d'un échange au plus.
  */
 export const TRADE_LIMITS = { pending: 10, perDay: 20, perSide: 5 };
+/** Échanges conclus gardés dans l'historique de l'onglet. */
+export const TRADE_HISTORY_SHOWN = 10;
 
 /** Des exemplaires d'une version d'un avis, ordinaire ou dorée, d'un côté d'un échange. */
 export type TradeLine = { id: string; golden: boolean; count: number };
@@ -44,11 +46,23 @@ export type TradeView = {
   createdAt: number;
 };
 
+/** Un échange conclu : accepté, refusé, ou annulé avant réponse. */
+export type TradeHistoryEntry = TradeView & {
+  status: "accepted" | "declined" | "cancelled";
+  answeredAt: number;
+  /** C'est le joueur qui l'avait proposé. */
+  mine: boolean;
+  /** Issue d'une de ses propositions que le joueur n'avait pas encore vue. */
+  fresh: boolean;
+};
+
 export type TradesOverview = {
   /** Propositions reçues, en attente de réponse. */
   incoming: TradeView[];
   /** Propositions envoyées, pas encore acceptées. */
   outgoing: TradeView[];
+  /** Derniers échanges conclus, dans un sens comme dans l'autre, du plus récent au plus ancien. */
+  history: TradeHistoryEntry[];
   /** Les échanges ne s'ouvrent qu'aux comptes qui ont joué plusieurs jours. */
   access: ExchangeAccess;
 };

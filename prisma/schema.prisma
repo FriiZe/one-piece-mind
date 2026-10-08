@@ -354,6 +354,8 @@ model Trade {
   status     String      @default("pending")
   createdAt  DateTime    @default(now())
   answeredAt DateTime?
+  /// Celui qui a proposé a vu l'issue de l'échange ; renseigné d'emblée quand c'est lui qui l'annule.
+  seenAt     DateTime?
 
   @@index([toId, status])
   @@index([fromId, status])
