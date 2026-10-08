@@ -540,6 +540,12 @@
       "height": 358,
       "source": "anilist:75422"
     },
+    "leo": {
+      "file": "6dc5d4bcf576",
+      "width": 230,
+      "height": 346,
+      "source": "anilist:126150"
+    },
     "road": {
       "file": "2f51f6b5283c",
       "width": 230,
@@ -587,6 +593,12 @@
       "width": 230,
       "height": 345,
       "source": "anilist:7467"
+    },
+    "charlotte-lola": {
+      "file": "eb55fe278eb7",
+      "width": 230,
+      "height": 345,
+      "source": "anilist:35834"
     },
     "bepo": {
       "file": "62c6a5f3fb9b",
@@ -1200,6 +1212,12 @@
       "height": 345,
       "source": "anilist:4897"
     },
+    "sham": {
+      "file": "78dc3cf100c4",
+      "width": 225,
+      "height": 350,
+      "source": "anilist:21370"
+    },
     "buchi": {
       "file": "a0f8bd56c40a",
       "width": 225,
@@ -1488,6 +1506,12 @@
       "height": 345,
       "source": "anilist:25394"
     },
+    "little-oars-jr": {
+      "file": "6f473d953e4e",
+      "width": 230,
+      "height": 344,
+      "source": "anilist:25393"
+    },
     "epoida": {
       "file": "55f0935fcd8c",
       "width": 230,
@@ -1523,6 +1547,12 @@
       "width": 230,
       "height": 344,
       "source": "anilist:40260"
+    },
+    "ikaros-much": {
+      "file": "6b1b872d4703",
+      "width": 230,
+      "height": 344,
+      "source": "anilist:40268"
     },
     "hyouzou": {
       "file": "a6d27855e67d",
@@ -1566,6 +1596,12 @@
       "height": 345,
       "source": "anilist:247775"
     },
+    "rosward-rosward": {
+      "file": "0a42b8aabc88",
+      "width": 225,
+      "height": 291,
+      "source": "anilist:20175"
+    },
     "rosward-charlos": {
       "file": "f07336ce10bd",
       "width": 225,
@@ -1583,6 +1619,18 @@
       "width": 230,
       "height": 345,
       "source": "anilist:32718"
+    },
+    "sadi": {
+      "file": "c838590f7f29",
+      "width": 230,
+      "height": 360,
+      "source": "anilist:21399"
+    },
+    "tsuru": {
+      "file": "cfede9e36431",
+      "width": 230,
+      "height": 358,
+      "source": "anilist:21558"
     },
     "momonga": {
       "file": "93eb19bb35bd",
@@ -1752,6 +1800,12 @@
       "height": 345,
       "source": "anilist:5413"
     },
+    "mr-9": {
+      "file": "a7e2a59dce7a",
+      "width": 230,
+      "height": 345,
+      "source": "anilist:5414"
+    },
     "dalton": {
       "file": "5fd501b808b9",
       "width": 230,
@@ -1787,6 +1841,12 @@
       "width": 230,
       "height": 360,
       "source": "anilist:9098"
+    },
+    "koza": {
+      "file": "ca39c4024d33",
+      "width": 225,
+      "height": 350,
+      "source": "anilist:23528"
     },
     "toto": {
       "file": "4a948a9dc2ab",
@@ -1883,6 +1943,12 @@
       "width": 230,
       "height": 345,
       "source": "anilist:365033"
+    },
+    "tsurujo": {
+      "file": "751a6a5f3efe",
+      "width": 230,
+      "height": 358,
+      "source": "anilist:127911"
     },
     "smiley": {
       "file": "d8859675579f",
@@ -2123,6 +2189,12 @@
       "width": 230,
       "height": 345,
       "source": "anilist:271029"
+    },
+    "gab": {
+      "file": "2b0dd3d64a51",
+      "width": 230,
+      "height": 345,
+      "source": "anilist:271032"
     },
     "rockstar": {
       "file": "833099e99624",
@@ -2436,6 +2508,12 @@
       "height": 344,
       "source": "anilist:49819"
     },
+    "rosward-shalria": {
+      "file": "6443f570413b",
+      "width": 225,
+      "height": 283,
+      "source": "anilist:20176"
+    },
     "jalmack": {
       "file": "4cbd5a12d805",
       "width": 230,
@@ -2567,6 +2645,12 @@
       "width": 230,
       "height": 344,
       "source": "anilist:37451"
+    },
+    "shimotsuki-koushirou": {
+      "file": "886bfcfa4ea9",
+      "width": 225,
+      "height": 350,
+      "source": "anilist:21219"
     },
     "boodle": {
       "file": "51bd0bae7289",
