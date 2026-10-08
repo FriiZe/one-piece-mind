@@ -6,7 +6,7 @@ import type { PlayCharacter, ResolvedData } from "@/games/cards";
 import { formatNumber } from "@/games/engine/text";
 import { Button, Panel } from "@/games/ui/primitives";
 import { LoadingPanel, WithGameData } from "@/games/ui/WithGameData";
-import { exchangeLockNote, RARITY_LABELS } from "@/lib/economy";
+import { collectionCopies, exchangeLockNote, RARITY_LABELS } from "@/lib/economy";
 import { useLocale, useT } from "@/lib/i18n/client";
 import { useMarket } from "@/lib/market/client";
 import {
@@ -49,17 +49,23 @@ function Sell({
   const [picked, setPicked] = useState<{ id: string; golden: boolean } | null>(null);
   const [price, setPrice] = useState("");
 
+  // Chaque version a sa carte : un doré ne s'empile pas avec les ordinaires du même personnage
   const sellable = useMemo(
     () =>
-      data.characters
-        .map((character) => ({ character, copies: sellableCopies(state.collection[character.id]) }))
-        .filter(({ copies }) => copies.plain + copies.golden > 0)
-        .sort((a, b) => a.character.tier - b.character.tier || a.character.name.localeCompare(b.character.name, locale)),
+      collectionCopies(
+        [...data.characters].sort((a, b) => a.tier - b.tier || a.name.localeCompare(b.name, locale)),
+        state.collection,
+      ).filter(({ character, golden }) => {
+        const copies = sellableCopies(state.collection[character.id]);
+        return (golden ? copies.golden : copies.plain) > 0;
+      }),
     [data.characters, state.collection, locale],
   );
   // L'exemplaire choisi peut avoir quitté la collection entre-temps (vente, échange)
-  const chosen = picked ? sellable.find(({ character }) => character.id === picked.id) : undefined;
-  const golden = !!chosen && (picked!.golden ? chosen.copies.golden > 0 : chosen.copies.plain === 0);
+  const chosen = picked
+    ? sellable.find(({ character, golden }) => character.id === picked.id && golden === picked.golden)
+    : undefined;
+  const golden = !!chosen?.golden;
   const bounds = chosen ? priceBounds(chosen.character.tier, golden) : null;
   const amount = Number(price);
   const valid = !!chosen && isValidPrice(amount, chosen.character.tier, golden);
@@ -99,16 +105,23 @@ function Sell({
           <div className="space-y-2.5 rounded-[14px] border border-sea-700 p-4">
             <h3 className={LEGEND}>{t("1 · L'avis à vendre", "1 · The poster to sell")}</h3>
             <ul className="grid max-h-96 grid-cols-3 gap-2.5 overflow-y-auto p-1 sm:grid-cols-4 lg:grid-cols-5">
-              {sellable.map(({ character, copies }) => {
-                const isChosen = chosen?.character.id === character.id;
+              {sellable.map(({ character, golden: isGolden, count }) => {
+                const isChosen = chosen?.character.id === character.id && chosen.golden === isGolden;
                 return (
-                  <li key={character.id} className={`relative rounded-md ${isChosen ? "ring-4 ring-emerald-400" : ""}`}>
-                    <CharacterCard character={character} golden={copies.plain === 0} count={state.collection[character.id].count} />
+                  <li
+                    key={`${character.id}:${isGolden ? "golden" : "plain"}`}
+                    className={`relative rounded-md ${isChosen ? "ring-4 ring-emerald-400" : ""}`}
+                  >
+                    <CharacterCard character={character} golden={isGolden} count={count} note={isGolden ? t("Doré", "Golden") : undefined} />
                     <button
                       type="button"
-                      onClick={() => pick(character, copies.plain === 0)}
+                      onClick={() => pick(character, isGolden)}
                       aria-pressed={isChosen}
-                      aria-label={t(`Vendre ${character.name}`, `Sell ${character.name}`)}
+                      aria-label={
+                        isGolden
+                          ? t(`Vendre ${character.name}, doré`, `Sell golden ${character.name}`)
+                          : t(`Vendre ${character.name}`, `Sell ${character.name}`)
+                      }
                       className="absolute inset-0 cursor-pointer rounded-md focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-straw"
                     />
                   </li>
@@ -124,23 +137,10 @@ function Sell({
             ) : (
               <>
                 <p className="font-extrabold text-foam">
-                  {chosen.character.name} <span className="font-normal text-mist">· {RARITY_LABELS[locale][chosen.character.tier]}</span>
+                  {chosen.character.name}
+                  {golden && <span className="text-straw">{t(" · doré", " · golden")}</span>}{" "}
+                  <span className="font-normal text-mist">· {RARITY_LABELS[locale][chosen.character.tier]}</span>
                 </p>
-                {chosen.copies.plain > 0 && chosen.copies.golden > 0 && (
-                  <div className="grid grid-cols-2 rounded-xl bg-sea-900 p-1 text-sm font-extrabold">
-                    {[false, true].map((option) => (
-                      <button
-                        key={String(option)}
-                        type="button"
-                        aria-pressed={golden === option}
-                        onClick={() => pick(chosen.character, option)}
-                        className={`min-h-10 cursor-pointer rounded-[9px] ${golden === option ? "bg-sea-700 text-foam" : "text-mist hover:text-foam"}`}
-                      >
-                        {option ? t("Exemplaire doré", "Golden copy") : t("Exemplaire ordinaire", "Plain copy")}
-                      </button>
-                    ))}
-                  </div>
-                )}
                 <label className="block">
                   <span className="mb-1 block text-sm font-semibold text-foam">
                     {t("Prix en Berrys", "Price in Berries")}{" "}
