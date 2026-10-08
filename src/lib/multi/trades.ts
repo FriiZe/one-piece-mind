@@ -11,8 +11,11 @@ export type TradeView = {
   friend: string;
   /** Avis que donne celui qui a fait la proposition. */
   offeredId: string;
+  /** L'exemplaire donné est doré. */
+  offeredGolden: boolean;
   /** Avis qu'il demande en retour. */
   requestedId: string;
+  requestedGolden: boolean;
   createdAt: number;
 };
 

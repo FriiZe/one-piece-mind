@@ -789,10 +789,12 @@ describe.skipIf(!accountsEnabled)("quiz et doublons, en base", () => {
   it("échange un avis contre un avis entre deux amis, d'un seul tenant", async () => {
     const [a, b, stranger] = users;
     const [given, wanted, other] = anime.characters.slice(0, 3).map((c) => c.id);
+    const plain = (id: string) => ({ id, golden: false });
+    const gold = (id: string) => ({ id, golden: true });
     await db().collectionEntry.deleteMany({ where: { userId: { in: [a.id, b.id] } } });
     await db().collectionEntry.createMany({
       data: [
-        { userId: a.id, characterId: given, count: 2, golden: 0 },
+        { userId: a.id, characterId: given, count: 2, golden: 1 },
         { userId: b.id, characterId: wanted, count: 1, golden: 1 },
       ],
     });
@@ -800,14 +802,14 @@ describe.skipIf(!accountsEnabled)("quiz et doublons, en base", () => {
 
     // Sans lien d'amitié, ni collection consultable ni proposition
     expect(await friendCollection(a.id, b.id)).toBeNull();
-    expect(await proposeTrade(a.id, b.id, given, wanted)).toEqual({ ok: false, error: "not-friends" });
+    expect(await proposeTrade(a.id, b.id, gold(given), gold(wanted))).toEqual({ ok: false, error: "not-friends" });
     await db().friendship.create({ data: { requesterId: a.id, addresseeId: b.id, status: "accepted" } });
     expect((await friendCollection(a.id, b.id))?.collection).toEqual({ [wanted]: { count: 1, golden: 1 } });
     expect(await friendCollection(stranger.id, b.id)).toBeNull();
 
     // Un compte tout neuf n'échange pas et ne passe pas par le marché : il faut avoir joué plusieurs jours différents
     expect((await tradesOverview(a.id)).access).toEqual({ open: false, playDays: 0, required: EXCHANGE_MIN_PLAY_DAYS });
-    expect(await proposeTrade(a.id, b.id, given, wanted)).toEqual({ ok: false, error: "locked" });
+    expect(await proposeTrade(a.id, b.id, gold(given), gold(wanted))).toEqual({ ok: false, error: "locked" });
     const price = priceBounds(anime.characterById.get(given)!.tier, false).suggested;
     expect(await createListing(a.id, given, false, price)).toEqual({ ok: false, error: "locked" });
     // Dix parties le même jour ne comptent que pour un jour
@@ -816,8 +818,8 @@ describe.skipIf(!accountsEnabled)("quiz et doublons, en base", () => {
     await establish(a.id);
     expect((await tradesOverview(a.id)).access).toMatchObject({ open: true, playDays: EXCHANGE_MIN_PLAY_DAYS });
     // Les deux comptes doivent avoir fait leurs preuves : celui d'en face aussi
-    expect(await proposeTrade(a.id, b.id, given, wanted)).toEqual({ ok: false, error: "friend-locked" });
-    expect(await proposeTrade(b.id, a.id, wanted, given)).toEqual({ ok: false, error: "locked" });
+    expect(await proposeTrade(a.id, b.id, gold(given), gold(wanted))).toEqual({ ok: false, error: "friend-locked" });
+    expect(await proposeTrade(b.id, a.id, gold(wanted), gold(given))).toEqual({ ok: false, error: "locked" });
     // Acheter aussi fait passer des Berrys d'un compte à l'autre
     const listed = await createListing(a.id, given, false, price);
     expect(listed.ok).toBe(true);
@@ -828,24 +830,27 @@ describe.skipIf(!accountsEnabled)("quiz et doublons, en base", () => {
     await db().user.update({ where: { id: b.id }, data: { berrys: 0 } });
     await establish(b.id);
 
-    expect(await proposeTrade(a.id, b.id, given, given)).toEqual({ ok: false, error: "same" });
-    expect(await proposeTrade(a.id, b.id, other, wanted)).toEqual({ ok: false, error: "not-owned" });
-    expect(await proposeTrade(a.id, b.id, given, other)).toEqual({ ok: false, error: "friend-not-owned" });
-    expect(await proposeTrade(a.id, b.id, given, wanted)).toEqual({ ok: true });
-    expect(await proposeTrade(a.id, b.id, given, wanted)).toEqual({ ok: false, error: "already" });
+    expect(await proposeTrade(a.id, b.id, gold(given), gold(given))).toEqual({ ok: false, error: "same" });
+    expect(await proposeTrade(a.id, b.id, plain(other), gold(wanted))).toEqual({ ok: false, error: "not-owned" });
+    expect(await proposeTrade(a.id, b.id, gold(given), plain(other))).toEqual({ ok: false, error: "friend-not-owned" });
+    // Ordinaire et doré ne se confondent pas : b n'a que l'exemplaire doré
+    expect(await proposeTrade(a.id, b.id, gold(given), plain(wanted))).toEqual({ ok: false, error: "friend-not-owned" });
+    expect(await proposeTrade(a.id, b.id, gold(given), gold(wanted))).toEqual({ ok: true });
+    expect(await proposeTrade(a.id, b.id, gold(given), gold(wanted))).toEqual({ ok: false, error: "already" });
 
     const [trade] = (await tradesOverview(b.id)).incoming;
-    expect(trade).toMatchObject({ friend: a.username, offeredId: given, requestedId: wanted });
+    expect(trade).toMatchObject({ friend: a.username, offeredId: given, offeredGolden: true, requestedId: wanted, requestedGolden: true });
     expect((await tradesOverview(a.id)).outgoing).toHaveLength(1);
     expect((await pendingCounts(b.id, false)).trades).toBe(1);
     // Seul le destinataire répond ; rien n'a bougé d'ici là
     expect(await answerTrade(a.id, trade.id, true)).toEqual({ ok: false, error: "not-found" });
-    expect((await loadState(a.id)).collection).toEqual({ [given]: { count: 2, golden: 0 } });
+    expect((await loadState(a.id)).collection).toEqual({ [given]: { count: 2, golden: 1 } });
 
+    // C'est bien l'exemplaire doré promis qui part, pas l'ordinaire
     expect(await answerTrade(b.id, trade.id, true)).toEqual({ ok: true });
     expect((await loadState(a.id)).collection).toEqual({ [given]: { count: 1, golden: 0 }, [wanted]: { count: 1, golden: 1 } });
     const after = await loadState(b.id);
-    expect(after.collection).toEqual({ [given]: { count: 1, golden: 0 } });
+    expect(after.collection).toEqual({ [given]: { count: 1, golden: 1 } });
     // Son seul exemplaire est parti : l'avis quitte aussi son équipage
     expect(after.crew).toEqual({});
     expect((await pendingCounts(b.id, false)).trades).toBe(0);
@@ -855,17 +860,17 @@ describe.skipIf(!accountsEnabled)("quiz et doublons, en base", () => {
   it("annule une proposition dont un avis n'est plus là, et laisse retirer la sienne", async () => {
     const [a, b] = users;
     const [given, wanted] = anime.characters.slice(0, 2).map((c) => c.id);
-    // Après l'échange précédent : a possède `given` et `wanted`, b possède `given`
-    expect(await proposeTrade(b.id, a.id, given, wanted)).toEqual({ ok: true });
+    // Après l'échange précédent : a possède `given` ordinaire et `wanted` doré, b possède `given` doré
+    expect(await proposeTrade(b.id, a.id, { id: given, golden: true }, { id: wanted, golden: true })).toEqual({ ok: true });
     const [trade] = (await tradesOverview(a.id)).incoming;
     await db().collectionEntry.deleteMany({ where: { userId: b.id, characterId: given } });
     expect(await answerTrade(a.id, trade.id, true)).toEqual({ ok: false, error: "gone" });
     expect((await loadState(a.id)).collection[wanted]).toEqual({ count: 1, golden: 1 });
     expect((await tradesOverview(a.id)).incoming).toEqual([]);
 
-    expect(await proposeTrade(a.id, b.id, wanted, given)).toEqual({ ok: false, error: "friend-not-owned" });
+    expect(await proposeTrade(a.id, b.id, { id: wanted, golden: true }, { id: given, golden: false })).toEqual({ ok: false, error: "friend-not-owned" });
     await db().collectionEntry.create({ data: { userId: b.id, characterId: given, count: 1, golden: 0 } });
-    expect(await proposeTrade(a.id, b.id, wanted, given)).toEqual({ ok: true });
+    expect(await proposeTrade(a.id, b.id, { id: wanted, golden: true }, { id: given, golden: false })).toEqual({ ok: true });
     const [mine] = (await tradesOverview(a.id)).outgoing;
     expect(await cancelTrade(b.id, mine.id)).toEqual({ ok: false, error: "not-found" });
     expect(await cancelTrade(a.id, mine.id)).toEqual({ ok: true });

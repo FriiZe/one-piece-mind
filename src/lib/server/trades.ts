@@ -50,7 +50,9 @@ export async function tradesOverview(userId: string): Promise<TradesOverview> {
     id: trade.id,
     friend,
     offeredId: trade.offeredId,
+    offeredGolden: trade.offeredGolden,
     requestedId: trade.requestedId,
+    requestedGolden: trade.requestedGolden,
     createdAt: trade.createdAt.getTime(),
   });
   return {
@@ -66,27 +68,45 @@ async function lockedFor(userId: string, friendId: string): Promise<"locked" | "
   return !mine.open ? "locked" : !theirs.open ? "friend-locked" : null;
 }
 
-const owns = async (userId: string, characterId: string) =>
-  !!(await db().collectionEntry.findUnique({ where: { userId_characterId: { userId, characterId } }, select: { count: true } }));
+/** Le joueur a-t-il un exemplaire de cette version de l'avis : doré, ou ordinaire. */
+async function owns(userId: string, characterId: string, golden: boolean): Promise<boolean> {
+  const entry = await db().collectionEntry.findUnique({ where: { userId_characterId: { userId, characterId } } });
+  return !!entry && hasCopy(entry, golden);
+}
 
-/** Propose à un ami d'échanger un de ses avis contre un des siens. Rien ne bouge tant qu'il n'a pas accepté. */
-export async function proposeTrade(userId: string, friendId: string, offeredId: string, requestedId: string): Promise<TradeResult> {
-  if (offeredId === requestedId) return { ok: false, error: "same" };
+const hasCopy = (entry: { count: number; golden: number }, golden: boolean) =>
+  golden ? entry.golden > 0 : entry.count - entry.golden > 0;
+
+/**
+ * Propose à un ami d'échanger un de ses avis contre un des siens, chacun dans
+ * sa version ordinaire ou dorée. Rien ne bouge tant qu'il n'a pas accepté.
+ */
+export async function proposeTrade(
+  userId: string,
+  friendId: string,
+  offered: { id: string; golden: boolean },
+  requested: { id: string; golden: boolean },
+): Promise<TradeResult> {
+  const { id: offeredId, golden: offeredGolden } = offered;
+  const { id: requestedId, golden: requestedGolden } = requested;
+  if (offeredId === requestedId && offeredGolden === requestedGolden) return { ok: false, error: "same" };
   if (!(await areFriends(userId, friendId))) return { ok: false, error: "not-friends" };
   const locked = await lockedFor(userId, friendId);
   if (locked) return { ok: false, error: locked };
-  if (!(await owns(userId, offeredId))) return { ok: false, error: "not-owned" };
-  if (!(await owns(friendId, requestedId))) return { ok: false, error: "friend-not-owned" };
+  if (!(await owns(userId, offeredId, offeredGolden))) return { ok: false, error: "not-owned" };
+  if (!(await owns(friendId, requestedId, requestedGolden))) return { ok: false, error: "friend-not-owned" };
 
   const [same, pending, today] = await Promise.all([
-    db().trade.count({ where: { fromId: userId, toId: friendId, offeredId, requestedId, status: "pending" } }),
+    db().trade.count({
+      where: { fromId: userId, toId: friendId, offeredId, offeredGolden, requestedId, requestedGolden, status: "pending" },
+    }),
     db().trade.count({ where: { fromId: userId, status: "pending" } }),
     db().trade.count({ where: { fromId: userId, createdAt: { gte: new Date(Date.now() - DAY) } } }),
   ]);
   if (same > 0) return { ok: false, error: "already" };
   if (pending >= TRADE_LIMITS.pending || today >= TRADE_LIMITS.perDay) return { ok: false, error: "limit" };
 
-  await db().trade.create({ data: { fromId: userId, toId: friendId, offeredId, requestedId } });
+  await db().trade.create({ data: { fromId: userId, toId: friendId, offeredId, offeredGolden, requestedId, requestedGolden } });
   await notifyFrom(friendId, userId, (from) => ({ type: "trade-proposed", from }));
   return { ok: true };
 }
@@ -94,14 +114,12 @@ export async function proposeTrade(userId: string, friendId: string, offeredId: 
 class Gone extends Error {}
 
 /**
- * Retire un exemplaire d'un avis à un joueur : un exemplaire ordinaire s'il en
- * a un, sinon un doré. S'il n'en a plus, l'avis quitte aussi son équipage.
- * Renvoie `true` si l'exemplaire retiré était doré.
+ * Retire à un joueur l'exemplaire promis d'un avis, ordinaire ou doré : s'il ne
+ * l'a plus, l'échange tombe. Sans autre exemplaire, l'avis quitte aussi son équipage.
  */
-async function takeCopy(tx: Tx, userId: string, characterId: string): Promise<boolean> {
+async function takeCopy(tx: Tx, userId: string, characterId: string, golden: boolean) {
   const entry = await tx.collectionEntry.findUnique({ where: { userId_characterId: { userId, characterId } } });
-  if (!entry || entry.count < 1) throw new Gone();
-  const golden = entry.count - entry.golden <= 0;
+  if (!entry || !hasCopy(entry, golden)) throw new Gone();
 
   // L'avis doit être resté tel qu'on l'a lu : deux échanges simultanés ne donnent pas deux fois le même exemplaire
   const where = { userId, characterId, count: entry.count, golden: entry.golden };
@@ -116,7 +134,6 @@ async function takeCopy(tx: Tx, userId: string, characterId: string): Promise<bo
     });
     if (updated.count === 0) throw new Gone();
   }
-  return golden;
 }
 
 async function giveCopy(tx: Tx, userId: string, characterId: string, golden: boolean) {
@@ -154,10 +171,10 @@ export async function answerTrade(userId: string, tradeId: string, accept: boole
         data: { status: "accepted", answeredAt: new Date() },
       });
       if (closed.count === 0) throw new Gone();
-      const offeredGolden = await takeCopy(tx, trade.fromId, trade.offeredId);
-      const requestedGolden = await takeCopy(tx, userId, trade.requestedId);
-      await giveCopy(tx, userId, trade.offeredId, offeredGolden);
-      await giveCopy(tx, trade.fromId, trade.requestedId, requestedGolden);
+      await takeCopy(tx, trade.fromId, trade.offeredId, trade.offeredGolden);
+      await takeCopy(tx, userId, trade.requestedId, trade.requestedGolden);
+      await giveCopy(tx, userId, trade.offeredId, trade.offeredGolden);
+      await giveCopy(tx, trade.fromId, trade.requestedId, trade.requestedGolden);
     });
   } catch (error) {
     if (!(error instanceof Gone)) throw error;

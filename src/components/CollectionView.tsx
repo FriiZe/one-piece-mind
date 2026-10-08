@@ -6,7 +6,7 @@ import type { ResolvedData } from "@/games/cards";
 import { formatNumber } from "@/games/engine/text";
 import { Button, Panel } from "@/games/ui/primitives";
 import { WithGameData } from "@/games/ui/WithGameData";
-import { duplicatesValue, RARITY_LABELS, spareCopies } from "@/lib/economy";
+import { collectionCopies, duplicatesValue, RARITY_LABELS, spareCopies } from "@/lib/economy";
 import { useLocale, useT } from "@/lib/i18n/client";
 import { usePlayer } from "@/lib/player/PlayerProvider";
 import { CharacterCard } from "./CharacterCard";
@@ -89,8 +89,8 @@ function Collection({ data }: { data: ResolvedData }) {
   const locale = useLocale();
   const [tier, setTier] = useState<number | null>(null);
   const [withMissing, setWithMissing] = useState(false);
-  const [openId, setOpenId] = useState<string | null>(null);
-  const open = openId ? data.characterById.get(openId) : undefined;
+  const [opened, setOpened] = useState<{ id: string; golden: boolean } | null>(null);
+  const open = opened ? data.characterById.get(opened.id) : undefined;
 
   const owned = useMemo(
     () =>
@@ -99,7 +99,8 @@ function Collection({ data }: { data: ResolvedData }) {
         .sort((a, b) => a.tier - b.tier || a.name.localeCompare(b.name, locale)),
     [data.characters, state.collection, locale],
   );
-  const shown = tier === null ? owned : owned.filter((c) => c.tier === tier);
+  // Un avis doré ne s'empile pas avec les ordinaires du même personnage : chacun a sa carte
+  const shown = collectionCopies(tier === null ? owned : owned.filter((c) => c.tier === tier), state.collection);
   const missing = useMemo(
     () => (withMissing ? data.characters.filter((c) => !state.collection[c.id] && (tier === null || c.tier === tier)).sort((a, b) => a.tier - b.tier) : []),
     [withMissing, data.characters, state.collection, tier],
@@ -180,25 +181,21 @@ function Collection({ data }: { data: ResolvedData }) {
         </Panel>
       ) : (
         <ul className="grid grid-cols-2 gap-3 sm:grid-cols-4 sm:gap-3.5 lg:grid-cols-6">
-          {shown.map((character) => {
-            const entry = state.collection[character.id];
-            return (
-              <li key={character.id} className="relative transition-transform hover:-translate-y-0.5">
-                <CharacterCard
-                  character={character}
-                  golden={entry.golden > 0}
-                  count={entry.count}
-                  note={character.affiliation ?? undefined}
-                />
-                <button
-                  type="button"
-                  onClick={() => setOpenId(character.id)}
-                  aria-label={t(`Détails de l'avis de ${character.name}`, `Details of ${character.name}'s poster`)}
-                  className="absolute inset-0 cursor-pointer rounded-md focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-straw"
-                />
-              </li>
-            );
-          })}
+          {shown.map(({ character, golden, count }) => (
+            <li key={`${character.id}:${golden ? "golden" : "plain"}`} className="relative transition-transform hover:-translate-y-0.5">
+              <CharacterCard character={character} golden={golden} count={count} note={character.affiliation ?? undefined} />
+              <button
+                type="button"
+                onClick={() => setOpened({ id: character.id, golden })}
+                aria-label={
+                  golden
+                    ? t(`Détails de l'avis doré de ${character.name}`, `Details of ${character.name}'s golden poster`)
+                    : t(`Détails de l'avis de ${character.name}`, `Details of ${character.name}'s poster`)
+                }
+                className="absolute inset-0 cursor-pointer rounded-md focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-straw"
+              />
+            </li>
+          ))}
           {missing.slice(0, MISSING_SHOWN).map((character) => (
             <li
               key={character.id}
@@ -222,7 +219,9 @@ function Collection({ data }: { data: ResolvedData }) {
           )}
         </p>
       )}
-      {open && state.collection[open.id] && <CharacterDetails character={open} data={data} onClose={() => setOpenId(null)} />}
+      {open && opened && state.collection[open.id] && (
+        <CharacterDetails character={open} golden={opened.golden} data={data} onClose={() => setOpened(null)} />
+      )}
     </section>
   );
 }

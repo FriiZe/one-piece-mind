@@ -5,7 +5,7 @@ import Link from "@/components/Link";
 import type { PlayCharacter, ResolvedData } from "@/games/cards";
 import { Button, Panel } from "@/games/ui/primitives";
 import { LoadingPanel, WithGameData } from "@/games/ui/WithGameData";
-import { exchangeLockNote, type CollectionEntry } from "@/lib/economy";
+import { collectionCopies, exchangeLockNote, type CollectionCopy } from "@/lib/economy";
 import type { Locale } from "@/lib/i18n";
 import { useLocale, useT } from "@/lib/i18n/client";
 import { notificationsChanged, useFriendCollection, useFriends, useTrades } from "@/lib/multi/client";
@@ -14,14 +14,19 @@ import { usePlayer } from "@/lib/player/PlayerProvider";
 import { answerTradeAction, cancelTradeAction, proposeTradeAction } from "@/lib/player/trade-actions";
 import { CharacterCard } from "./CharacterCard";
 
+/** Un exemplaire d'avis : ordinaire ou doré, les deux ne se valent pas. */
+type Copy = { id: string; golden: boolean };
+
+const copyKey = (copy: Copy) => `${copy.id}:${copy.golden ? "golden" : "plain"}`;
+
 /** Un avis dans une proposition. Un personnage que le mode du joueur ne montre pas encore reste caché. */
-function TradeCard({ id, data, label }: { id: string; data: ResolvedData; label: string }) {
+function TradeCard({ id, golden, data, label }: Copy & { data: ResolvedData; label: string }) {
   const character = data.characterById.get(id) ?? null;
   const t = useT();
   return (
     <div className="w-24 shrink-0 text-center sm:w-28">
       <p className="mb-1 text-xs font-bold text-mist">{label}</p>
-      <CharacterCard character={character} />
+      <CharacterCard character={character} golden={golden} note={golden ? t("Doré", "Golden") : undefined} />
       {!character && <p className="mt-1 text-xs text-mist">{t("Pas encore vu dans ton mode", "Not seen yet in your mode")}</p>}
     </div>
   );
@@ -47,8 +52,10 @@ function TradeRow({
 }) {
   const t = useT();
   // Pour celui qui reçoit la proposition, ce qui est offert est ce qu'il reçoit
-  const give = incoming ? trade.requestedId : trade.offeredId;
-  const receive = incoming ? trade.offeredId : trade.requestedId;
+  const offered = { id: trade.offeredId, golden: trade.offeredGolden };
+  const requested = { id: trade.requestedId, golden: trade.requestedGolden };
+  const give = incoming ? requested : offered;
+  const receive = incoming ? offered : requested;
   return (
     <li
       className={`flex flex-col gap-4 rounded-2xl border p-4 sm:flex-row sm:items-center ${
@@ -56,11 +63,11 @@ function TradeRow({
       }`}
     >
       <div className="flex items-end gap-2">
-        <TradeCard id={give} data={data} label={t("Tu donnes", "You give")} />
+        <TradeCard {...give} data={data} label={t("Tu donnes", "You give")} />
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" className="mb-12 size-7 shrink-0 text-straw">
           <path d="M7 8h13M16 4l4 4-4 4M17 16H4M8 12l-4 4 4 4" />
         </svg>
-        <TradeCard id={receive} data={data} label={t("Tu reçois", "You get")} />
+        <TradeCard {...receive} data={data} label={t("Tu reçois", "You get")} />
       </div>
       <div className="min-w-0 flex-1 space-y-2">
         <p className="text-mist">
@@ -109,22 +116,20 @@ function TradeRow({
   );
 }
 
-/** Grille d'avis dans laquelle on en choisit un. */
+/** Grille d'avis dans laquelle on en choisit un. Les exemplaires dorés ont leur propre carte. */
 function Picker({
   title,
   hint,
-  characters,
-  collection,
+  copies,
   selected,
   onSelect,
   empty,
 }: {
   title: string;
   hint?: string;
-  characters: PlayCharacter[];
-  collection: Record<string, CollectionEntry>;
-  selected: string | null;
-  onSelect: (id: string) => void;
+  copies: CollectionCopy<PlayCharacter>[];
+  selected: Copy | null;
+  onSelect: (copy: Copy) => void;
   empty: string;
 }) {
   const t = useT();
@@ -134,21 +139,25 @@ function Picker({
         {title}
         {hint && <span className="text-[13px] font-normal tracking-normal normal-case">{hint}</span>}
       </h3>
-      {characters.length === 0 ? (
+      {copies.length === 0 ? (
         <p className="text-sm text-mist">{empty}</p>
       ) : (
         <ul className="grid max-h-96 grid-cols-3 gap-2.5 overflow-y-auto p-1 sm:grid-cols-4">
-          {characters.map((character) => {
-            const entry = collection[character.id];
-            const chosen = selected === character.id;
+          {copies.map(({ character, golden, count }) => {
+            const copy = { id: character.id, golden };
+            const chosen = !!selected && copyKey(selected) === copyKey(copy);
             return (
-              <li key={character.id} className={`relative rounded-md ${chosen ? "ring-4 ring-emerald-400" : ""}`}>
-                <CharacterCard character={character} golden={entry.golden > 0} count={entry.count} />
+              <li key={copyKey(copy)} className={`relative rounded-md ${chosen ? "ring-4 ring-emerald-400" : ""}`}>
+                <CharacterCard character={character} golden={golden} count={count} note={golden ? t("Doré", "Golden") : undefined} />
                 <button
                   type="button"
-                  onClick={() => onSelect(character.id)}
+                  onClick={() => onSelect(copy)}
                   aria-pressed={chosen}
-                  aria-label={t(`Choisir ${character.name}`, `Pick ${character.name}`)}
+                  aria-label={
+                    golden
+                      ? t(`Choisir ${character.name}, doré`, `Pick golden ${character.name}`)
+                      : t(`Choisir ${character.name}`, `Pick ${character.name}`)
+                  }
                   className="absolute inset-0 cursor-pointer rounded-md focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-straw"
                 />
               </li>
@@ -171,8 +180,8 @@ function Trades({ data }: { data: ResolvedData }) {
   const { trades, reload } = useTrades(true);
   const [friendId, setFriendId] = useState<string | null>(null);
   const friend = useFriendCollection(friendId);
-  const [offered, setOffered] = useState<string | null>(null);
-  const [requested, setRequested] = useState<string | null>(null);
+  const [offered, setOffered] = useState<Copy | null>(null);
+  const [requested, setRequested] = useState<Copy | null>(null);
   const [duplicatesOnly, setDuplicatesOnly] = useState(true);
   const [missingOnly, setMissingOnly] = useState(true);
   const [busy, setBusy] = useState(false);
@@ -180,15 +189,21 @@ function Trades({ data }: { data: ResolvedData }) {
 
   const mine = useMemo(
     () =>
-      data.characters
-        .filter((c) => state.collection[c.id] && (!duplicatesOnly || state.collection[c.id].count > 1))
-        .sort(byRarity(locale)),
+      collectionCopies(
+        data.characters
+          .filter((c) => state.collection[c.id] && (!duplicatesOnly || state.collection[c.id].count > 1))
+          .sort(byRarity(locale)),
+        state.collection,
+      ),
     [data.characters, state.collection, duplicatesOnly, locale],
   );
   const theirs = useMemo(
     () =>
       friend && friend !== "missing"
-        ? data.characters.filter((c) => friend.collection[c.id] && (!missingOnly || !state.collection[c.id])).sort(byRarity(locale))
+        ? collectionCopies(
+            data.characters.filter((c) => friend.collection[c.id] && (!missingOnly || !state.collection[c.id])).sort(byRarity(locale)),
+            friend.collection,
+          )
         : [],
     [data.characters, friend, state.collection, missingOnly, locale],
   );
@@ -208,7 +223,7 @@ function Trades({ data }: { data: ResolvedData }) {
   async function propose() {
     if (!friendId || !offered || !requested) return;
     const sent = await run(
-      () => proposeTradeAction(friendId, offered, requested),
+      () => proposeTradeAction(friendId, offered.id, offered.golden, requested.id, requested.golden),
       t("Proposition envoyée.", "Offer sent."),
     );
     if (sent) {
@@ -217,9 +232,11 @@ function Trades({ data }: { data: ResolvedData }) {
     }
   }
 
-  const lastCopy = offered ? state.collection[offered]?.count === 1 : false;
-  const offeredCharacter = offered ? data.characterById.get(offered) : undefined;
-  const requestedCharacter = requested ? data.characterById.get(requested) : undefined;
+  const lastCopy = offered ? state.collection[offered.id]?.count === 1 : false;
+  const offeredCharacter = offered ? data.characterById.get(offered.id) : undefined;
+  const requestedCharacter = requested ? data.characterById.get(requested.id) : undefined;
+  const fr = (copy: Copy | null, name: string) => (copy?.golden ? `${name} doré` : name);
+  const en = (copy: Copy | null, name: string) => (copy?.golden ? `golden ${name}` : name);
 
   return (
     <div className="space-y-7">
@@ -345,8 +362,7 @@ function Trades({ data }: { data: ResolvedData }) {
                   hint={
                     duplicatesOnly ? t("Mes doublons", "My duplicates") : t("Toute ma collection", "My whole collection")
                   }
-                  characters={mine}
-                  collection={state.collection}
+                  copies={mine}
                   selected={offered}
                   onSelect={setOffered}
                   empty={
@@ -392,8 +408,7 @@ function Trades({ data }: { data: ResolvedData }) {
                           ? t(`Ce qui me manque chez ${friend.username}`, `What I'm missing from ${friend.username}`)
                           : t(`Toute la collection de ${friend.username}`, `${friend.username}'s whole collection`)
                       }
-                      characters={theirs}
-                      collection={friend.collection}
+                      copies={theirs}
                       selected={requested}
                       onSelect={setRequested}
                       empty={
@@ -419,12 +434,12 @@ function Trades({ data }: { data: ResolvedData }) {
                 {offeredCharacter && requestedCharacter && friend && friend !== "missing"
                   ? t(
                       <>
-                        Tu donnes <strong className="text-foam">{offeredCharacter.name}</strong> à {friend.username} contre{" "}
-                        <strong className="text-foam">{requestedCharacter.name}</strong>. Rien ne bouge tant que {friend.username} n&apos;a pas accepté.
+                        Tu donnes <strong className="text-foam">{fr(offered, offeredCharacter.name)}</strong> à {friend.username} contre{" "}
+                        <strong className="text-foam">{fr(requested, requestedCharacter.name)}</strong>. Rien ne bouge tant que {friend.username} n&apos;a pas accepté.
                       </>,
                       <>
-                        You give <strong className="text-foam">{offeredCharacter.name}</strong> to {friend.username} for{" "}
-                        <strong className="text-foam">{requestedCharacter.name}</strong>. Nothing moves until {friend.username} accepts.
+                        You give <strong className="text-foam">{en(offered, offeredCharacter.name)}</strong> to {friend.username} for{" "}
+                        <strong className="text-foam">{en(requested, requestedCharacter.name)}</strong>. Nothing moves until {friend.username} accepts.
                       </>,
                     )
                   : t(

@@ -344,19 +344,22 @@ model QuizPlay {
 
 /// Échange proposé entre deux amis : un avis contre un avis.
 model Trade {
-  id          String    @id @default(cuid())
-  fromId      String
-  from        User      @relation("tradeFrom", fields: [fromId], references: [id], onDelete: Cascade)
-  toId        String
-  to          User      @relation("tradeTo", fields: [toId], references: [id], onDelete: Cascade)
+  id              String    @id @default(cuid())
+  fromId          String
+  from            User      @relation("tradeFrom", fields: [fromId], references: [id], onDelete: Cascade)
+  toId            String
+  to              User      @relation("tradeTo", fields: [toId], references: [id], onDelete: Cascade)
   /// Avis que donne celui qui propose.
-  offeredId   String
+  offeredId       String
+  /// Son exemplaire doré plutôt qu'un ordinaire.
+  offeredGolden   Boolean   @default(false)
   /// Avis qu'il demande en retour.
-  requestedId String
+  requestedId     String
+  requestedGolden Boolean   @default(false)
   /// pending, accepted, declined ou cancelled.
-  status      String    @default("pending")
-  createdAt   DateTime  @default(now())
-  answeredAt  DateTime?
+  status          String    @default("pending")
+  createdAt       DateTime  @default(now())
+  answeredAt      DateTime?
 
   @@index([toId, status])
   @@index([fromId, status])

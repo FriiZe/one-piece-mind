@@ -14,10 +14,13 @@ import { Modal } from "./Modal";
 /** Fiche d'un avis de recherche de la collection : ce qu'on sait du personnage, et ses doublons. */
 export function CharacterDetails({
   character,
+  golden = false,
   data,
   onClose,
 }: {
   character: PlayCharacter;
+  /** La carte ouverte est celle des exemplaires dorés. */
+  golden?: boolean;
   data: ResolvedData;
   onClose: () => void;
 }) {
@@ -89,7 +92,11 @@ export function CharacterDetails({
     <Modal title={character.name} onClose={onClose}>
       <div className="grid gap-4 sm:grid-cols-[11rem_1fr]">
         <div className="mx-auto w-44 sm:mx-0 sm:w-auto">
-          <CharacterCard character={character} golden={!!entry && entry.golden > 0} count={entry?.count} />
+          <CharacterCard
+            character={character}
+            golden={golden}
+            count={entry && (golden ? entry.golden : entry.count - entry.golden)}
+          />
         </div>
         <div className="space-y-3">
           {character.altName && <p className="text-mist">{character.altName}</p>}

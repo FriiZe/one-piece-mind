@@ -7,7 +7,7 @@ import { Button, Panel } from "@/games/ui/primitives";
 import { LoadingPanel, WithGameData } from "@/games/ui/WithGameData";
 import type { ResolvedData } from "@/games/cards";
 import { formatDate } from "@/lib/admin/format";
-import { playerBounty, POST_IDS, POSTS, rankOf } from "@/lib/economy";
+import { collectionCopies, playerBounty, POST_IDS, POSTS, rankOf } from "@/lib/economy";
 import { useLocale, useT } from "@/lib/i18n/client";
 import { FRIEND_ERRORS, type FriendResult } from "@/lib/multi/friends";
 import { answerFriendRequestAction, cancelFriendRequestAction, requestFriendAction } from "@/lib/player/friend-actions";
@@ -226,14 +226,11 @@ function Profile({ username, data, mode }: { username: string; data: ResolvedDat
           <p className="text-sm text-mist">{t("Aucun avis de recherche pour l'instant.", "No wanted posters yet.")}</p>
         ) : (
           <ul className="grid grid-cols-3 gap-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8">
-            {collection.map((character) => {
-              const entry = profile.collection[character.id];
-              return (
-                <li key={character.id}>
-                  <CharacterCard character={character} golden={entry.golden > 0} count={entry.count} />
-                </li>
-              );
-            })}
+            {collectionCopies(collection, profile.collection).map(({ character, golden, count }) => (
+              <li key={`${character.id}:${golden ? "golden" : "plain"}`}>
+                <CharacterCard character={character} golden={golden} count={count} />
+              </li>
+            ))}
           </ul>
         )}
         <p className="text-xs text-mist">
