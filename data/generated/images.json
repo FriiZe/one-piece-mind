@@ -2969,6 +2969,594 @@
       "width": 230,
       "height": 345,
       "source": "anilist:247782"
+    },
+    "boo": {
+      "file": "dcb8962620b7",
+      "width": 225,
+      "height": 350,
+      "source": "mal:101175"
+    },
+    "abdullah": {
+      "file": "30a56030a01e",
+      "width": 225,
+      "height": 350,
+      "source": "mal:108589"
+    },
+    "jeet": {
+      "file": "b8236668a89c",
+      "width": 225,
+      "height": 350,
+      "source": "mal:108591"
+    },
+    "indigo": {
+      "file": "651714732b5e",
+      "width": 225,
+      "height": 350,
+      "source": "mal:32881"
+    },
+    "edward-weevil": {
+      "file": "a812f136c9f6",
+      "width": 225,
+      "height": 349,
+      "source": "mal:142324"
+    },
+    "charlotte-newichi": {
+      "file": "9d525e872149",
+      "width": 225,
+      "height": 350,
+      "source": "mal:171101"
+    },
+    "charlotte-newji": {
+      "file": "a1a920acdba7",
+      "width": 225,
+      "height": 350,
+      "source": "mal:171102"
+    },
+    "atmos": {
+      "file": "a6dfcebce1f2",
+      "width": 225,
+      "height": 350,
+      "source": "mal:25388"
+    },
+    "lao-g": {
+      "file": "7032d398fdfc",
+      "width": 225,
+      "height": 350,
+      "source": "mal:100125"
+    },
+    "donquixote-mjosgard": {
+      "file": "48f5cc3bc7c0",
+      "width": 225,
+      "height": 350,
+      "source": "mal:43091"
+    },
+    "bas": {
+      "file": "1df6751dcf51",
+      "width": 225,
+      "height": 350,
+      "source": "mal:220071"
+    },
+    "kerville": {
+      "file": "86793a996ab3",
+      "width": 225,
+      "height": 350,
+      "source": "mal:220072"
+    },
+    "donquixote-homing": {
+      "file": "94d743110cef",
+      "width": 225,
+      "height": 350,
+      "source": "mal:133227"
+    },
+    "yeti-cool-brothers": {
+      "file": "d233473e1eec",
+      "width": 225,
+      "height": 350,
+      "source": "mal:100293"
+    },
+    "gatz": {
+      "file": "a83afdc82ea9",
+      "width": 225,
+      "height": 350,
+      "source": "mal:101183"
+    },
+    "tank-lepanto": {
+      "file": "70823da887bc",
+      "width": 225,
+      "height": 350,
+      "source": "mal:110749"
+    },
+    "elizabello-ii": {
+      "file": "54c7855c1ddd",
+      "width": 225,
+      "height": 338,
+      "source": "mal:104117"
+    },
+    "dagama": {
+      "file": "a3187fea50a6",
+      "width": 225,
+      "height": 350,
+      "source": "mal:101177"
+    },
+    "bobby-funk": {
+      "file": "9b16b0a20989",
+      "width": 225,
+      "height": 350,
+      "source": "mal:101179"
+    },
+    "minister-of-the-left": {
+      "file": "9ceb4b38ce33",
+      "width": 225,
+      "height": 350,
+      "source": "mal:43095"
+    },
+    "minister-of-the-right": {
+      "file": "9500b4c13706",
+      "width": 225,
+      "height": 350,
+      "source": "mal:43096"
+    },
+    "gambia": {
+      "file": "d98a5b349241",
+      "width": 225,
+      "height": 350,
+      "source": "mal:108595"
+    },
+    "heat": {
+      "file": "545a91789a48",
+      "width": 225,
+      "height": 350,
+      "source": "mal:158476"
+    },
+    "wire": {
+      "file": "9180ac7383ad",
+      "width": 225,
+      "height": 350,
+      "source": "mal:158477"
+    },
+    "charlotte-compote": {
+      "file": "f89d92915abb",
+      "width": 225,
+      "height": 350,
+      "source": "mal:158085"
+    },
+    "charlotte-mondee": {
+      "file": "3b34a051e037",
+      "width": 225,
+      "height": 350,
+      "source": "mal:167093"
+    },
+    "charlotte-effilee": {
+      "file": "4c139a40504c",
+      "width": 225,
+      "height": 350,
+      "source": "mal:167092"
+    },
+    "charlotte-zuccotto": {
+      "file": "a10de8b87b85",
+      "width": 225,
+      "height": 349,
+      "source": "mal:183815"
+    },
+    "charlotte-basskarte": {
+      "file": "52c23cafa79e",
+      "width": 225,
+      "height": 350,
+      "source": "mal:162608"
+    },
+    "charlotte-dosmarche": {
+      "file": "a620eb2c5488",
+      "width": 225,
+      "height": 350,
+      "source": "mal:162003"
+    },
+    "charlotte-noisette": {
+      "file": "0f292c694284",
+      "width": 225,
+      "height": 350,
+      "source": "mal:162601"
+    },
+    "charlotte-moscato": {
+      "file": "25ad66aebfa2",
+      "width": 225,
+      "height": 350,
+      "source": "mal:150938"
+    },
+    "charlotte-mash": {
+      "file": "c5b78c1071aa",
+      "width": 225,
+      "height": 350,
+      "source": "mal:171109"
+    },
+    "charlotte-cornstarch": {
+      "file": "c22ea2a8e9a5",
+      "width": 225,
+      "height": 350,
+      "source": "mal:171111"
+    },
+    "charlotte-compo": {
+      "file": "145f2b08b454",
+      "width": 225,
+      "height": 350,
+      "source": "mal:168385"
+    },
+    "charlotte-laurin": {
+      "file": "ad49f6c385cf",
+      "width": 225,
+      "height": 350,
+      "source": "mal:168387"
+    },
+    "charlotte-mozart": {
+      "file": "14013f84bbd8",
+      "width": 225,
+      "height": 350,
+      "source": "mal:183811"
+    },
+    "charlotte-marnier": {
+      "file": "0094319e1b66",
+      "width": 225,
+      "height": 350,
+      "source": "mal:164956"
+    },
+    "charlotte-high-fat": {
+      "file": "3129a21b2878",
+      "width": 225,
+      "height": 350,
+      "source": "mal:168388"
+    },
+    "charlotte-tablet": {
+      "file": "5ee7dcc57340",
+      "width": 225,
+      "height": 350,
+      "source": "mal:168389"
+    },
+    "charlotte-citron": {
+      "file": "7ae7c851e461",
+      "width": 225,
+      "height": 350,
+      "source": "mal:158832"
+    },
+    "charlotte-cinnamon": {
+      "file": "cebd41d5bf0f",
+      "width": 225,
+      "height": 350,
+      "source": "mal:158833"
+    },
+    "charlotte-saint-marc": {
+      "file": "b678db672588",
+      "width": 225,
+      "height": 350,
+      "source": "mal:166170"
+    },
+    "charlotte-dacquoise": {
+      "file": "dcb4694ec492",
+      "width": 225,
+      "height": 350,
+      "source": "mal:166171"
+    },
+    "charlotte-poire": {
+      "file": "bd5db0fc876e",
+      "width": 225,
+      "height": 350,
+      "source": "mal:161072"
+    },
+    "charlotte-kanten": {
+      "file": "bb27c81d80b9",
+      "width": 225,
+      "height": 350,
+      "source": "mal:183793"
+    },
+    "charlotte-kato": {
+      "file": "9a02905d89e0",
+      "width": 225,
+      "height": 350,
+      "source": "mal:164957"
+    },
+    "charlotte-montb": {
+      "file": "34f29fe587ca",
+      "width": 225,
+      "height": 350,
+      "source": "mal:183810"
+    },
+    "charlotte-chiboust": {
+      "file": "6e69dfb97dba",
+      "width": 225,
+      "height": 350,
+      "source": "mal:168390"
+    },
+    "charlotte-mobile": {
+      "file": "17bb4cab2ac4",
+      "width": 225,
+      "height": 350,
+      "source": "mal:168392"
+    },
+    "charlotte-raisin": {
+      "file": "85d365102041",
+      "width": 225,
+      "height": 350,
+      "source": "mal:161070"
+    },
+    "charlotte-mascarpone": {
+      "file": "af4e4d3cf682",
+      "width": 225,
+      "height": 350,
+      "source": "mal:156164"
+    },
+    "charlotte-joscarpone": {
+      "file": "a1fcb32ed682",
+      "width": 225,
+      "height": 350,
+      "source": "mal:156168"
+    },
+    "charlotte-newshi": {
+      "file": "1a4c55fe9188",
+      "width": 225,
+      "height": 350,
+      "source": "mal:171103"
+    },
+    "charlotte-nougat": {
+      "file": "e9bdd2e9a519",
+      "width": 225,
+      "height": 350,
+      "source": "mal:168394"
+    },
+    "charlotte-anglais": {
+      "file": "f40b48aae35b",
+      "width": 225,
+      "height": 350,
+      "source": "mal:155602"
+    },
+    "charlotte-wafers": {
+      "file": "850446b528bc",
+      "width": 225,
+      "height": 350,
+      "source": "mal:183813"
+    },
+    "charlotte-wiro": {
+      "file": "28ae881dd69f",
+      "width": 225,
+      "height": 350,
+      "source": "mal:183814"
+    },
+    "charlotte-de-chat": {
+      "file": "b2997a24685c",
+      "width": 225,
+      "height": 350,
+      "source": "mal:183792"
+    },
+    "charlotte-dolce": {
+      "file": "adad4670c7c8",
+      "width": 225,
+      "height": 350,
+      "source": "mal:155599"
+    },
+    "charlotte-dragee": {
+      "file": "1c1e3ccc68c0",
+      "width": 225,
+      "height": 350,
+      "source": "mal:155600"
+    },
+    "solitaire": {
+      "file": "dc963fd01ef2",
+      "width": 225,
+      "height": 350,
+      "source": "mal:170596"
+    },
+    "mizerka": {
+      "file": "13283a62e810",
+      "width": 225,
+      "height": 350,
+      "source": "mal:206742"
+    },
+    "alpacaman": {
+      "file": "55d44b2cd7c0",
+      "width": 225,
+      "height": 350,
+      "source": "mal:170598"
+    },
+    "juki": {
+      "file": "39ec498afe32",
+      "width": 225,
+      "height": 350,
+      "source": "mal:236611"
+    },
+    "daikoku": {
+      "file": "0a74a1c3c3bc",
+      "width": 225,
+      "height": 350,
+      "source": "mal:170582"
+    },
+    "hanzo": {
+      "file": "b9b44680032d",
+      "width": 225,
+      "height": 350,
+      "source": "mal:170583"
+    },
+    "jigoku-benten": {
+      "file": "42c698750470",
+      "width": 225,
+      "height": 350,
+      "source": "mal:184016"
+    },
+    "fujin": {
+      "file": "37c59891b23b",
+      "width": 225,
+      "height": 350,
+      "source": "mal:181282"
+    },
+    "raijin": {
+      "file": "ff90b93b21ae",
+      "width": 225,
+      "height": 350,
+      "source": "mal:181283"
+    },
+    "bishamon": {
+      "file": "14df2813224d",
+      "width": 225,
+      "height": 350,
+      "source": "mal:181285"
+    },
+    "peachbeard": {
+      "file": "9b10c679133e",
+      "width": 225,
+      "height": 350,
+      "source": "mal:162402"
+    },
+    "seagull-guns-nozdon": {
+      "file": "1a1638b28e72",
+      "width": 225,
+      "height": 350,
+      "source": "mal:213388"
+    },
+    "mcguy": {
+      "file": "6893408184dc",
+      "width": 225,
+      "height": 350,
+      "source": "mal:25390"
+    },
+    "elmy": {
+      "file": "3af0d535d6d7",
+      "width": 225,
+      "height": 350,
+      "source": "mal:161856"
+    },
+    "ramba": {
+      "file": "6cfc58609b74",
+      "width": 225,
+      "height": 350,
+      "source": "mal:161857"
+    },
+    "delacuaji": {
+      "file": "c332e7ac4d08",
+      "width": 225,
+      "height": 350,
+      "source": "mal:161859"
+    },
+    "palms": {
+      "file": "35c7131fa60a",
+      "width": 225,
+      "height": 350,
+      "source": "mal:161860"
+    },
+    "bizarre": {
+      "file": "1ff6adb0d3b1",
+      "width": 225,
+      "height": 350,
+      "source": "mal:161861"
+    },
+    "andre": {
+      "file": "c3a80225503c",
+      "width": 225,
+      "height": 350,
+      "source": "mal:183446"
+    },
+    "blondie": {
+      "file": "9c486b62d3b0",
+      "width": 225,
+      "height": 350,
+      "source": "mal:161864"
+    },
+    "amadob": {
+      "file": "05b118f5c4b7",
+      "width": 225,
+      "height": 350,
+      "source": "mal:161865"
+    },
+    "brew": {
+      "file": "5fd2a5618fe6",
+      "width": 225,
+      "height": 350,
+      "source": "mal:183789"
+    },
+    "kinga": {
+      "file": "cb16ef0e35eb",
+      "width": 225,
+      "height": 350,
+      "source": "mal:184065"
+    },
+    "jerry": {
+      "file": "d6b6b1b62c67",
+      "width": 225,
+      "height": 350,
+      "source": "mal:161882"
+    },
+    "stainless": {
+      "file": "5c4d42be6f28",
+      "width": 225,
+      "height": 350,
+      "source": "mal:40269"
+    },
+    "mozambia": {
+      "file": "cf2700ce0541",
+      "width": 225,
+      "height": 350,
+      "source": "mal:161870"
+    },
+    "catacombo": {
+      "file": "60f5b91bc757",
+      "width": 225,
+      "height": 350,
+      "source": "mal:161871"
+    },
+    "daigin": {
+      "file": "f49e247db1b2",
+      "width": 225,
+      "height": 350,
+      "source": "mal:161873"
+    },
+    "outlook-iii": {
+      "file": "3efac52c7194",
+      "width": 225,
+      "height": 350,
+      "source": "mal:37454"
+    },
+    "didit": {
+      "file": "5aedd08aaddf",
+      "width": 225,
+      "height": 350,
+      "source": "mal:37455"
+    },
+    "kinderella": {
+      "file": "935e073b51d4",
+      "width": 225,
+      "height": 350,
+      "source": "mal:164252"
+    },
+    "gancho": {
+      "file": "67789c000047",
+      "width": 225,
+      "height": 350,
+      "source": "mal:108577"
+    },
+    "concelot": {
+      "file": "0b49b5e60061",
+      "width": 225,
+      "height": 350,
+      "source": "mal:183889"
+    },
+    "giovanni": {
+      "file": "1e38db333693",
+      "width": 225,
+      "height": 350,
+      "source": "mal:183903"
+    },
+    "hotori": {
+      "file": "3f4806c24703",
+      "width": 225,
+      "height": 350,
+      "source": "mal:214155"
+    },
+    "s-bear": {
+      "file": "ad63b328cdfb",
+      "width": 225,
+      "height": 350,
+      "source": "mal:247236"
+    },
+    "s-shark": {
+      "file": "e34296c22ab3",
+      "width": 225,
+      "height": 350,
+      "source": "mal:247237"
     }
   }
 }

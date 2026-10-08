@@ -3,8 +3,10 @@
  * du jeu de données. Deux sources publiques, dans l'ordre :
  *
  *   1. AniList (API GraphQL) ;
- *   2. MyAnimeList, par l'API Jikan, pour les personnages qu'AniList n'a pas :
- *      sa liste est bien plus longue (lieutenants, famille Charlotte…).
+ *   2. MyAnimeList, pour les personnages qu'AniList n'a pas : sa liste est bien
+ *      plus longue (lieutenants, famille Charlotte…). On la lit par l'API de
+ *      Shikimori, un miroir de MyAnimeList qui garde ses identifiants et ses
+ *      images : l'API Jikan, plus connue, est souvent injoignable.
  *
  * (Le One Piece Wiki, source du reste des données, protège ses images contre
  * les téléchargements automatisés : on ne passe pas outre.)
@@ -37,7 +39,7 @@ import {
 } from "../data/lib/io";
 
 const ANILIST_API = "https://graphql.anilist.co";
-const JIKAN_API = "https://api.jikan.moe/v4";
+const SHIKIMORI = "https://shikimori.one";
 /** One Piece (série animée) : sur AniList, puis sur MyAnimeList. */
 const ANILIST_MEDIA_ID = 21;
 const MAL_ANIME_ID = 21;
@@ -58,8 +60,8 @@ type AniListCharacter = {
   image: { large: string | null };
 };
 
-type JikanCharacter = {
-  character: { mal_id: number; name: string; images: { jpg: { image_url: string | null } } };
+type ShikimoriRole = {
+  character: { id: number; name: string; image: { original: string | null } } | null;
 };
 
 export function hashedName(kind: string, key: string): string {
@@ -96,15 +98,14 @@ async function fetchAniListCharacters(): Promise<AniListCharacter[]> {
   return all;
 }
 
-/** Jikan renvoie tous les personnages d'un anime d'un coup, sans pagination. */
-async function fetchJikanCharacters(): Promise<JikanCharacter[]> {
-  const res = await fetch(`${JIKAN_API}/anime/${MAL_ANIME_ID}/characters`, {
+/** Shikimori renvoie tous les rôles d'un anime d'un coup, personnages et doubleurs mêlés. */
+async function fetchShikimoriRoles(): Promise<ShikimoriRole[]> {
+  const res = await fetch(`${SHIKIMORI}/api/animes/${MAL_ANIME_ID}/roles`, {
     headers: { Accept: "application/json", "User-Agent": USER_AGENT },
     signal: AbortSignal.timeout(30_000),
   });
-  if (!res.ok) throw new Error(`Jikan : HTTP ${res.status}`);
-  const json = (await res.json()) as { data: JikanCharacter[] };
-  return json.data;
+  if (!res.ok) throw new Error(`Shikimori : HTTP ${res.status}`);
+  return (await res.json()) as ShikimoriRole[];
 }
 
 /** Les listes sont gardées en cache : on ne redemande aux API qu'avec `--refresh`. */
@@ -124,8 +125,8 @@ async function cached<T>(file: string, refresh: boolean, load: () => Promise<T>)
   }
 }
 
-/** AniList masque les images absentes derrière une image par défaut ; MyAnimeList, derrière un point d'interrogation. */
-const isPlaceholder = (url: string) => /\/default\.|questionmark|\/icon\/na/.test(url);
+/** AniList masque les images absentes derrière une image par défaut ; Shikimori, derrière « missing ». */
+const isPlaceholder = (url: string) => /\/default\.|missing/.test(url);
 
 function aniListCandidates(characters: AniListCharacter[]): Candidate[] {
   return characters
@@ -133,11 +134,12 @@ function aniListCandidates(characters: AniListCharacter[]): Candidate[] {
     .map((c) => ({ source: "anilist", id: c.id, name: c.name.full ?? "", url: c.image.large! }));
 }
 
-function jikanCandidates(characters: JikanCharacter[]): Candidate[] {
-  return characters
-    .map((c) => c.character)
-    .filter((c) => c.images.jpg.image_url && !isPlaceholder(c.images.jpg.image_url))
-    .map((c) => ({ source: "mal", id: c.mal_id, name: c.name, url: c.images.jpg.image_url! }));
+/** Les identifiants de Shikimori sont ceux de MyAnimeList : la provenance reste `mal`. */
+function shikimoriCandidates(roles: ShikimoriRole[]): Candidate[] {
+  return roles
+    .flatMap((role) => (role.character ? [role.character] : []))
+    .filter((c) => c.image.original && !isPlaceholder(c.image.original))
+    .map((c) => ({ source: "mal", id: c.id, name: c.name, url: `${SHIKIMORI}${c.image.original}` }));
 }
 
 /**
@@ -225,8 +227,8 @@ async function main() {
   const sources: { label: string; file: string; candidates: Candidate[] }[] = [];
   const anilist = await cached("anilist/characters.json", refresh, fetchAniListCharacters);
   if (anilist) sources.push({ label: "AniList", file: "anilist-ids.json", candidates: aniListCandidates(anilist) });
-  const jikan = await cached("jikan/characters.json", refresh, fetchJikanCharacters);
-  if (jikan) sources.push({ label: "MyAnimeList", file: "mal-ids.json", candidates: jikanCandidates(jikan) });
+  const shikimori = await cached("shikimori/roles.json", refresh, fetchShikimoriRoles);
+  if (shikimori) sources.push({ label: "MyAnimeList", file: "mal-ids.json", candidates: shikimoriCandidates(shikimori) });
   if (sources.length === 0) throw new Error("Aucune source d'images disponible");
 
   const matches = new Map<string, Candidate>();
@@ -274,7 +276,8 @@ async function main() {
         .webp({ quality: 82 })
         .toFile(target);
       downloaded++;
-      await sleep(candidate.source === "mal" ? 400 : 100);
+      // Shikimori tolère cinq requêtes par seconde
+      await sleep(candidate.source === "mal" ? 300 : 100);
     }
     const { width, height } = await sharp(target).metadata();
     manifest.portraits[id] = { file, width: width!, height: height!, source };
