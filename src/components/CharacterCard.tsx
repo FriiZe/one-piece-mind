@@ -65,7 +65,8 @@ export function CharacterCard({
         <p className="truncate font-display text-lg leading-tight tracking-wide" title={character?.name}>
           {character?.name ?? "· · ·"}
         </p>
-        {note && <p className="truncate text-xs font-semibold">{note}</p>}
+        {/* La ligne est toujours réservée : deux cartes côte à côte, avec ou sans mention, ont la même hauteur */}
+        <p className="h-4 truncate text-xs font-semibold">{note}</p>
       </div>
     </div>
   );

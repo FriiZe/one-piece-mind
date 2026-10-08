@@ -62,11 +62,11 @@ export const POSTS: Record<PostId, { label: Localized; effect: Localized; bonus:
 };
 
 /** Force d'un bonus selon la rareté du personnage placé au poste (1 = légendaire). */
-const STRENGTH_BY_TIER: Record<number, number> = { 1: 0.2, 2: 0.14, 3: 0.09, 4: 0.05 };
+export const STRENGTH_BY_TIER: Record<number, number> = { 1: 0.2, 2: 0.14, 3: 0.09, 4: 0.05 };
 /** Un avis doré renforce le bonus du poste. */
-const GOLDEN_FACTOR = 1.5;
+export const GOLDEN_FACTOR = 1.5;
 /** Le capitaine agit partout : son bonus est divisé par deux. */
-const CAPTAIN_FACTOR = 0.5;
+export const CAPTAIN_FACTOR = 0.5;
 /**
  * Traits d'équipage : plusieurs membres d'une même affiliation, placés à des
  * postes, activent le trait de cette affiliation. Il a trois paliers, selon

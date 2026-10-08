@@ -1,26 +1,32 @@
 "use client";
 
 import Image from "next/image";
-import { useMemo, useState, type FormEvent } from "react";
+import { useEffect, useMemo, useRef, useState, type FormEvent } from "react";
 import Link from "@/components/Link";
-import { portraitUrl, type ResolvedData } from "@/games/cards";
+import { portraitUrl, type PlayCharacter, type ResolvedData } from "@/games/cards";
 import { Button, Panel } from "@/games/ui/primitives";
 import { WithGameData } from "@/games/ui/WithGameData";
 import { translateAffiliation } from "@/lib/data/labels";
 import {
+  assignPost,
   bonusLabel,
+  CAPTAIN_FACTOR,
   CREW_NAME_MAX,
   crewBonuses,
   DEFAULT_TRAIT,
   FULL_CREW_BONUS,
+  GOLDEN_FACTOR,
   MAX_DISCOUNT,
   POST_IDS,
   POSTS,
   postStrength,
+  RARITY_LABELS,
   sameCrew,
   SAVED_CREWS_MAX,
+  STRENGTH_BY_TIER,
   TRAIT_STEPS,
   TRAITS,
+  traitOf,
   type CrewBonuses,
   type CrewTrait,
   type PostId,
@@ -30,7 +36,266 @@ import type { Locale, Localized, Translate } from "@/lib/i18n";
 import { useLocale, useT } from "@/lib/i18n/client";
 import { usePlayer } from "@/lib/player/PlayerProvider";
 import { CharacterCard } from "./CharacterCard";
-import { Modal } from "./Modal";
+
+const FIELD =
+  "h-11 rounded-[10px] border border-sea-600 bg-sea-900 px-3 text-foam placeholder:text-mist/70 focus:border-straw focus:outline-none";
+const CHIP = "min-h-9 cursor-pointer rounded-full border px-3 text-[13px] font-bold transition-colors";
+const chip = (on: boolean) => `${CHIP} ${on ? "border-straw bg-straw text-ink" : "border-sea-600 text-mist hover:text-foam"}`;
+
+const TIERS = [1, 2, 3, 4];
+
+/** Premier poste libre après celui-ci, dans l'ordre des postes ; `null` s'il n'y en a plus. */
+function nextVacant(crew: Partial<Record<PostId, string>>, after: PostId): PostId | null {
+  const start = POST_IDS.indexOf(after);
+  for (let step = 1; step < POST_IDS.length; step++) {
+    const post = POST_IDS[(start + step) % POST_IDS.length];
+    if (!crew[post]) return post;
+  }
+  return null;
+}
+
+/**
+ * Le banc : la collection, filtrée et triée par bonus, pour pourvoir le poste
+ * choisi. Il reste ouvert d'un poste à l'autre, ses filtres aussi.
+ */
+function PostBench({
+  post,
+  data,
+  owned,
+  onPick,
+  onVacate,
+  onSwitch,
+  onClose,
+}: {
+  post: PostId;
+  data: ResolvedData;
+  owned: PlayCharacter[];
+  onPick: (characterId: string) => void;
+  onVacate: () => void;
+  onSwitch: (post: PostId) => void;
+  onClose: () => void;
+}) {
+  const { state } = usePlayer();
+  const t = useT();
+  const locale = useLocale();
+  const ref = useRef<HTMLElement>(null);
+  const [query, setQuery] = useState("");
+  const [tiers, setTiers] = useState<number[]>([]);
+  const [goldenOnly, setGoldenOnly] = useState(false);
+  const [affiliation, setAffiliation] = useState("");
+  const [hideInPost, setHideInPost] = useState(false);
+  const [filtersOpen, setFiltersOpen] = useState(false);
+
+  // Sur un petit écran, le banc est sous les postes : on y descend à chaque changement de poste
+  useEffect(() => {
+    if (window.innerWidth < 1024) ref.current?.scrollIntoView({ block: "start", behavior: "smooth" });
+  }, [post]);
+
+  const bonuses = crewBonuses(state, data.characterById);
+  const aboard = new Map(bonuses.traits.map((trait) => [trait.affiliation, trait.count]));
+  const postOf = (characterId: string) => POST_IDS.find((p) => state.crew[p] === characterId);
+  const holderId = state.crew[post];
+  const holder = holderId ? data.characterById.get(holderId) : undefined;
+  const next = nextVacant(state.crew, post);
+
+  // Les affiliations possédées, celles déjà à bord en tête : c'est là qu'un trait se complète
+  const orgs = new Map<string, string>();
+  for (const character of owned) if (character.affiliation && character.org) orgs.set(character.affiliation, character.org);
+  const affiliations = [...orgs.entries()]
+    .map(([label, org]) => ({ label, trait: traitOf(org).name[locale], count: aboard.get(label) ?? 0 }))
+    .sort((a, b) => b.count - a.count || a.label.localeCompare(b.label, locale));
+
+  const normalized = query.trim().toLocaleLowerCase(locale);
+  const shown = owned
+    .filter((character) => {
+      const entry = state.collection[character.id];
+      if (tiers.length > 0 && !tiers.includes(character.tier)) return false;
+      if (goldenOnly && entry.golden === 0) return false;
+      if (affiliation && character.affiliation !== affiliation) return false;
+      if (hideInPost && postOf(character.id)) return false;
+      if (normalized && !character.name.toLocaleLowerCase(locale).includes(normalized)) return false;
+      return true;
+    })
+    .map((character) => ({ character, strength: postStrength(character, state.collection[character.id], post) }))
+    .sort((a, b) => b.strength - a.strength || a.character.name.localeCompare(b.character.name, locale));
+
+  const active = (tiers.length > 0 ? 1 : 0) + (goldenOnly ? 1 : 0) + (affiliation ? 1 : 0) + (hideInPost ? 1 : 0) + (normalized ? 1 : 0);
+  const clear = () => {
+    setQuery("");
+    setTiers([]);
+    setGoldenOnly(false);
+    setAffiliation("");
+    setHideInPost(false);
+  };
+  const strengthOf = (tier: number) => percent(STRENGTH_BY_TIER[tier] * (post === "capitaine" ? CAPTAIN_FACTOR : 1), locale);
+
+  return (
+    <section ref={ref} aria-labelledby="banc" className="scroll-mt-4 rounded-2xl border-2 border-straw/60 bg-sea-800">
+      {/* L'en-tête suit le défilement : on sait toujours quel poste on pourvoit */}
+      <header className="sticky top-0 z-10 space-y-2 rounded-t-2xl border-b border-sea-700 bg-sea-800 p-4">
+        <div className="flex items-start justify-between gap-3">
+          <div className="min-w-0">
+            <h2 id="banc" className="font-display text-3xl tracking-wide text-straw">
+              {POSTS[post].label[locale]}
+            </h2>
+            <p className="font-extrabold text-foam">{POSTS[post].effect[locale]}</p>
+          </div>
+          <button
+            type="button"
+            onClick={onClose}
+            aria-label={t("Fermer le banc", "Close the bench")}
+            className="min-h-10 shrink-0 cursor-pointer rounded-lg border border-sea-600 px-3 text-lg font-bold text-mist hover:text-foam"
+          >
+            ×
+          </button>
+        </div>
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm">
+          {holder ? (
+            <>
+              <span className="text-mist">
+                {t("En poste : ", "In post: ")}
+                <strong className="text-foam">{holder.name}</strong> ·{" "}
+                <span className="font-display text-base tracking-wide text-straw">{percent(postStrength(holder, state.collection[holder.id], post), locale)}</span>
+              </span>
+              <button type="button" onClick={onVacate} className="cursor-pointer font-bold text-mist underline underline-offset-4 hover:text-foam">
+                {t("Libérer le poste", "Vacate the post")}
+              </button>
+            </>
+          ) : (
+            <span className="font-semibold text-mist">{t("Poste libre", "Vacant post")}</span>
+          )}
+          {next && (
+            <Button variant="secondary" onClick={() => onSwitch(next)} className="min-h-9 py-0 text-sm">
+              {t("Poste libre suivant", "Next vacant post")} →
+            </Button>
+          )}
+        </div>
+      </header>
+
+      <div className="space-y-3 border-b border-sea-700 p-4">
+        <p className="text-xs text-mist">
+          {TIERS.map((tier) => `${RARITY_LABELS[locale][tier]} ${strengthOf(tier)}`).join(" · ")} ·{" "}
+          {t(`doré ×${GOLDEN_FACTOR}`, `golden ×${GOLDEN_FACTOR}`).replace(".", locale === "fr" ? "," : ".")}
+          {post === "capitaine" && t(" · le capitaine agit partout, son bonus est divisé par deux", " · the captain acts everywhere, so their bonus is halved")}
+        </p>
+        <div className="flex gap-2">
+          <input
+            type="search"
+            value={query}
+            onChange={(event) => setQuery(event.target.value)}
+            placeholder={t("Chercher un nom…", "Search a name…")}
+            aria-label={t("Chercher un personnage", "Search a character")}
+            className={`${FIELD} min-w-0 flex-1`}
+          />
+          <button
+            type="button"
+            onClick={() => setFiltersOpen((open) => !open)}
+            aria-expanded={filtersOpen}
+            className={`${chip(filtersOpen)} sm:hidden`}
+          >
+            {t("Filtrer", "Filter")}
+            {active > 0 && ` · ${active}`}
+          </button>
+        </div>
+        <div className={`${filtersOpen ? "space-y-3" : "hidden"} sm:block sm:space-y-3`}>
+          <div role="group" aria-label={t("Rareté", "Rarity")} className="flex flex-wrap gap-2">
+            {TIERS.map((tier) => {
+              const on = tiers.includes(tier);
+              return (
+                <button
+                  key={tier}
+                  type="button"
+                  aria-pressed={on}
+                  onClick={() => setTiers(on ? tiers.filter((value) => value !== tier) : [...tiers, tier])}
+                  className={chip(on)}
+                >
+                  {RARITY_LABELS[locale][tier]}
+                </button>
+              );
+            })}
+            <button type="button" aria-pressed={goldenOnly} onClick={() => setGoldenOnly(!goldenOnly)} className={chip(goldenOnly)}>
+              {t("Dorés", "Golden")}
+            </button>
+          </div>
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
+            <select
+              value={affiliation}
+              onChange={(event) => setAffiliation(event.target.value)}
+              aria-label={t("Trait d'affiliation", "Affiliation trait")}
+              className={`${FIELD} max-w-full`}
+            >
+              <option value="">{t("Tous les traits", "All traits")}</option>
+              {affiliations.map((option) => (
+                <option key={option.label} value={option.label}>
+                  {option.label} · {option.trait}
+                  {option.count > 0 && t(` · ${option.count} à bord`, ` · ${option.count} aboard`)}
+                </option>
+              ))}
+            </select>
+            <label className="flex min-h-11 cursor-pointer items-center gap-2 text-sm text-mist">
+              <input type="checkbox" checked={hideInPost} onChange={(event) => setHideInPost(event.target.checked)} className="size-[18px] accent-straw" />
+              {t("Masquer ceux déjà en poste", "Hide those already in a post")}
+            </label>
+          </div>
+        </div>
+        <p className="flex flex-wrap items-baseline gap-x-3 text-sm text-mist">
+          <span>
+            {t(
+              `${shown.length} personnage${shown.length > 1 ? "s" : ""}`,
+              `${shown.length} ${shown.length === 1 ? "character" : "characters"}`,
+            )}
+          </span>
+          {active > 0 && (
+            <button type="button" onClick={clear} className="cursor-pointer font-bold underline underline-offset-4 hover:text-foam">
+              {t("Effacer les filtres", "Clear filters")}
+            </button>
+          )}
+        </p>
+      </div>
+
+      {shown.length === 0 ? (
+        <p className="p-4 text-mist">{t("Aucun personnage ne correspond à ces filtres.", "No character matches these filters.")}</p>
+      ) : (
+        <ul className="grid grid-cols-3 gap-3 p-4 sm:grid-cols-4 md:grid-cols-5 xl:grid-cols-6">
+          {shown.map(({ character, strength }) => {
+            const entry = state.collection[character.id];
+            const current = holderId === character.id;
+            const other = current ? undefined : postOf(character.id);
+            return (
+              <li key={character.id} className={`relative rounded-md ${current ? "ring-4 ring-emerald-400" : ""}`}>
+                <CharacterCard
+                  character={character}
+                  golden={entry.golden > 0}
+                  note={`${percent(strength, locale)}${current ? t(" · en poste", " · in this post") : other ? ` · ${POSTS[other].label[locale]}` : ""}`}
+                />
+                {/* Pour composer un trait : l'affiliation, et le nombre de ses membres déjà à bord */}
+                {character.affiliation && (
+                  <p className="mt-1 truncate text-center text-xs text-mist" title={character.affiliation}>
+                    {character.affiliation}
+                    {aboard.get(character.affiliation)
+                      ? t(` · ${aboard.get(character.affiliation)} à bord`, ` · ${aboard.get(character.affiliation)} aboard`)
+                      : ""}
+                  </p>
+                )}
+                <button
+                  type="button"
+                  onClick={() => onPick(character.id)}
+                  disabled={current}
+                  aria-label={t(
+                    `Placer ${character.name} au poste de ${POSTS[post].label.fr}`,
+                    `Assign ${character.name} to the ${POSTS[post].label.en} post`,
+                  )}
+                  aria-pressed={current}
+                  className="absolute inset-0 cursor-pointer rounded-md focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-straw disabled:cursor-default"
+                />
+              </li>
+            );
+          })}
+        </ul>
+      )}
+    </section>
+  );
+}
 
 const percent = (value: number, locale: Locale) => `+${Math.round(value * 100)}${locale === "en" ? "%" : " %"}`;
 
@@ -324,13 +589,13 @@ function Crew({ data }: { data: ResolvedData }) {
     [data.characters, state.collection, locale],
   );
   const bonuses = crewBonuses(state, data.characterById);
-  const postOf = (characterId: string) => POST_IDS.find((post) => state.crew[post] === characterId);
-  const aboard = new Map(bonuses.traits.map((trait) => [trait.affiliation, trait.count]));
   const free = POST_IDS.filter((post) => !state.crew[post] || !data.characterById.get(state.crew[post]!)).length;
 
+  /** Place quelqu'un, puis passe au poste libre suivant : on remplit l'équipage d'une traite. */
   async function change(post: PostId, characterId: string | null) {
     setError(null);
-    setPicking(null);
+    const after = assignPost(state, post, characterId);
+    if (characterId && typeof after !== "string") setPicking(nextVacant(after.crew, post) ?? post);
     const result = await assign(post, characterId);
     if (!result.ok) setError(t("Ce changement n'a pas pu être enregistré.", "This change couldn't be saved."));
   }
@@ -373,6 +638,7 @@ function Crew({ data }: { data: ResolvedData }) {
                 <button
                   type="button"
                   onClick={() => setPicking(post)}
+                  aria-pressed={picking === post}
                   aria-label={
                     member
                       ? t(
@@ -385,6 +651,8 @@ function Crew({ data }: { data: ResolvedData }) {
                         )
                   }
                   className={`flex h-full w-full cursor-pointer items-center gap-3 overflow-hidden rounded-xl p-2 text-left transition-colors sm:flex-col sm:items-stretch sm:gap-0 sm:p-0 ${
+                    picking === post ? "ring-4 ring-emerald-400 " : ""
+                  }${
                     member
                       ? `bg-sea-800 hover:border-straw ${golden ? "border-[3px] border-straw" : "border border-sea-600"}`
                       : "border-2 border-dashed border-sea-600 hover:border-mist"
@@ -419,12 +687,24 @@ function Crew({ data }: { data: ResolvedData }) {
             );
           })}
         </ul>
-        <p className="text-[13px] text-mist">
-          {t(
-            "Touche un poste pour changer son occupant. Plus le personnage est rare, plus le bonus du poste est fort ; un avis doré le renforce encore.",
-            "Tap a post to change who holds it. The rarer the character, the stronger the post's bonus; a golden poster boosts it even more.",
-          )}
-        </p>
+        {picking ? (
+          <PostBench
+            post={picking}
+            data={data}
+            owned={owned}
+            onPick={(id) => change(picking, id)}
+            onVacate={() => change(picking, null)}
+            onSwitch={setPicking}
+            onClose={() => setPicking(null)}
+          />
+        ) : (
+          <p className="text-[13px] text-mist">
+            {t(
+              "Touche un poste pour changer son occupant. Plus le personnage est rare, plus le bonus du poste est fort ; un avis doré le renforce encore.",
+              "Tap a post to change who holds it. The rarer the character, the stronger the post's bonus; a golden poster boosts it even more.",
+            )}
+          </p>
+        )}
         {error && (
           <p role="alert" className="font-semibold text-vest">
             {error}
@@ -433,7 +713,7 @@ function Crew({ data }: { data: ResolvedData }) {
         <SavedCrews data={data} />
       </section>
 
-      <aside className="space-y-4">
+      <aside className="space-y-4 lg:sticky lg:top-4 lg:max-h-[calc(100dvh-2rem)] lg:self-start lg:overflow-y-auto">
         <Summary bonuses={bonuses} />
         <Traits traits={bonuses.traits} />
         <p className="text-[13px] text-mist">
@@ -449,75 +729,6 @@ function Crew({ data }: { data: ResolvedData }) {
         </p>
       </aside>
 
-      {picking && (
-        <Modal title={POSTS[picking].label[locale]} onClose={() => setPicking(null)} wide>
-          <p className="text-mist">
-            {POSTS[picking].effect[locale]}.{" "}
-            {t(
-              "Choisis le personnage qui tiendra ce poste ; s'il en occupe déjà un autre, il échange sa place avec l'occupant actuel.",
-              "Choose the character who will hold this post; if they already hold another one, they swap places with whoever holds this one.",
-            )}
-          </p>
-          {state.crew[picking] && (
-            <Button variant="secondary" onClick={() => change(picking, null)}>
-              {t("Libérer le poste", "Vacate the post")}
-            </Button>
-          )}
-          {/* Ceux qui tiennent déjà un poste d'abord, à part : les placer ici déplace quelqu'un */}
-          {[
-            { title: t("Déjà en poste", "Already in a post"), members: owned.filter((character) => postOf(character.id)) },
-            { title: t("Disponibles", "Available"), members: owned.filter((character) => !postOf(character.id)) },
-          ]
-            .filter((group) => group.members.length > 0)
-            .map((group) => (
-              <section key={group.title} className="space-y-2">
-                <h3 className="text-sm font-extrabold tracking-wide text-mist uppercase">
-                  {group.title} · {group.members.length}
-                </h3>
-                <ul className="grid grid-cols-3 gap-3 sm:grid-cols-4 md:grid-cols-5">
-                  {group.members.map((character) => {
-                    const entry = state.collection[character.id];
-                    const current = state.crew[picking] === character.id;
-                    const other = postOf(character.id);
-                    return (
-                      <li key={character.id} className={`relative rounded-md ${current ? "ring-4 ring-emerald-400" : ""}`}>
-                        <CharacterCard
-                          character={character}
-                          golden={entry.golden > 0}
-                          note={`${percent(postStrength(character, entry, picking), locale)}${
-                            current ? t(" · en poste", " · in this post") : other ? ` · ${POSTS[other].label[locale]}` : ""
-                          }`}
-                        />
-                        {/* Pour composer un trait : l'affiliation, et le nombre de ses membres déjà à bord */}
-                        {character.affiliation && (
-                          <p className="mt-1 truncate text-center text-xs text-mist" title={character.affiliation}>
-                            {character.affiliation}
-                            {aboard.get(character.affiliation)
-                              ? t(
-                                  ` · ${aboard.get(character.affiliation)} à bord`,
-                                  ` · ${aboard.get(character.affiliation)} aboard`,
-                                )
-                              : ""}
-                          </p>
-                        )}
-                        <button
-                          type="button"
-                          onClick={() => change(picking, character.id)}
-                          aria-label={t(
-                            `Placer ${character.name} au poste de ${POSTS[picking].label.fr}`,
-                            `Assign ${character.name} to the ${POSTS[picking].label.en} post`,
-                          )}
-                          aria-pressed={current}
-                          className="absolute inset-0 cursor-pointer rounded-md focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-straw"
-                        />
-                      </li>
-                    );
-                  })}
-                </ul>
-              </section>
-            ))}
-        </Modal>
-      )}
     </div>
   );
 }
