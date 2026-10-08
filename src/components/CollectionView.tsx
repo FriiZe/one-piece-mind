@@ -6,13 +6,14 @@ import type { ResolvedData } from "@/games/cards";
 import { formatNumber } from "@/games/engine/text";
 import { Button, Panel } from "@/games/ui/primitives";
 import { WithGameData } from "@/games/ui/WithGameData";
-import { collectionCopies, duplicatesValue, RARITY_LABELS, spareCopies } from "@/lib/economy";
+import { collectionCopies, duplicatesValue, RARITY_LABELS, spareCopies, TRAIT_STEPS, traitOf } from "@/lib/economy";
 import { useLocale, useT } from "@/lib/i18n/client";
 import { usePlayer } from "@/lib/player/PlayerProvider";
 import { CharacterCard } from "./CharacterCard";
 import { CharacterDetails } from "./CharacterDetails";
 
 const TIERS = [1, 2, 3, 4];
+const FIELD = "h-11 max-w-full rounded-[10px] border border-sea-700 bg-sea-900 px-3 text-sm font-bold text-mist focus:border-straw focus:outline-none";
 
 /** Avis manquants affichés d'un coup : au-delà, on se contente de les compter. */
 const MISSING_SHOWN = 30;
@@ -88,6 +89,7 @@ function Collection({ data }: { data: ResolvedData }) {
   const t = useT();
   const locale = useLocale();
   const [tier, setTier] = useState<number | null>(null);
+  const [org, setOrg] = useState("");
   const [withMissing, setWithMissing] = useState(false);
   const [opened, setOpened] = useState<{ id: string; golden: boolean } | null>(null);
   const open = opened ? data.characterById.get(opened.id) : undefined;
@@ -99,13 +101,38 @@ function Collection({ data }: { data: ResolvedData }) {
         .sort((a, b) => a.tier - b.tier || a.name.localeCompare(b.name, locale)),
     [data.characters, state.collection, locale],
   );
+  const byTier = (c: { tier: number }) => tier === null || c.tier === tier;
+  const byOrg = (c: { org: string | null }) => !org || c.org === org;
   // Un avis doré ne s'empile pas avec les ordinaires du même personnage : chacun a sa carte
-  const shown = collectionCopies(tier === null ? owned : owned.filter((c) => c.tier === tier), state.collection);
+  const shown = collectionCopies(owned.filter((c) => byTier(c) && byOrg(c)), state.collection);
   const missing = useMemo(
-    () => (withMissing ? data.characters.filter((c) => !state.collection[c.id] && (tier === null || c.tier === tier)).sort((a, b) => a.tier - b.tier) : []),
-    [withMissing, data.characters, state.collection, tier],
+    () =>
+      withMissing
+        ? data.characters.filter((c) => !state.collection[c.id] && (tier === null || c.tier === tier) && (!org || c.org === org)).sort((a, b) => a.tier - b.tier)
+        : [],
+    [withMissing, data.characters, state.collection, tier, org],
   );
   const hidden = missing.length - MISSING_SHOWN;
+  const filtered = tier !== null || org !== "";
+
+  // Les affiliations assez nombreuses pour former un trait d'équipage, celles de la collection en tête :
+  // on y voit ce qui manque pour le compléter
+  const affiliations = useMemo(() => {
+    const options = new Map<string, { label: string; trait: string; members: number; have: number; total: number }>();
+    for (const c of data.characters) {
+      if (!c.org || !c.affiliation) continue;
+      const option = options.get(c.org) ?? { label: c.affiliation, trait: traitOf(c.org).name[locale], members: 0, have: 0, total: 0 };
+      option.members += 1;
+      if (tier === null || c.tier === tier) {
+        option.total += 1;
+        if (state.collection[c.id]) option.have += 1;
+      }
+      options.set(c.org, option);
+    }
+    return [...options.entries()]
+      .filter(([, option]) => option.members >= TRAIT_STEPS[0])
+      .sort(([, a], [, b]) => Number(b.have > 0) - Number(a.have > 0) || a.label.localeCompare(b.label, locale));
+  }, [data.characters, state.collection, locale, tier]);
 
   return (
     <section aria-labelledby="avis" className="space-y-5">
@@ -134,8 +161,9 @@ function Collection({ data }: { data: ResolvedData }) {
           className="-mx-4 flex gap-2 overflow-x-auto px-4 [scrollbar-width:none] sm:mx-0 sm:flex-wrap sm:overflow-visible sm:px-0"
         >
           {[null, ...TIERS].map((value) => {
-            const total = value === null ? data.characters.length : data.characters.filter((c) => c.tier === value).length;
-            const have = value === null ? owned.length : owned.filter((c) => c.tier === value).length;
+            const inTier = (c: { tier: number; org: string | null }) => (value === null || c.tier === value) && byOrg(c);
+            const total = data.characters.filter(inTier).length;
+            const have = owned.filter(inTier).length;
             return (
               <button
                 key={value ?? "tous"}
@@ -151,6 +179,14 @@ function Collection({ data }: { data: ResolvedData }) {
             );
           })}
         </div>
+        <select value={org} onChange={(event) => setOrg(event.target.value)} aria-label={t("Filtrer par trait", "Filter by trait")} className={FIELD}>
+          <option value="">{t("Tous les traits", "All traits")}</option>
+          {affiliations.map(([key, option]) => (
+            <option key={key} value={key}>
+              {option.label} · {option.trait} · {option.have} / {option.total}
+            </option>
+          ))}
+        </select>
         <label className="flex min-h-11 cursor-pointer items-center gap-2 px-1 text-sm font-bold text-mist">
           <input type="checkbox" checked={withMissing} onChange={(event) => setWithMissing(event.target.checked)} className="size-[18px] accent-straw" />
           {t("Montrer les manquants", "Show missing ones")}
@@ -166,7 +202,7 @@ function Collection({ data }: { data: ResolvedData }) {
                   "Ta collection est vide. Valide un jeu du jour, ou passe à la boutique, pour recruter ton premier personnage.",
                   "Your collection is empty. Clear a daily game, or drop by the shop, to recruit your first character.",
                 )
-              : t("Aucun avis de cette rareté pour l'instant.", "No posters of this rarity yet.")}
+              : t("Aucun avis ne correspond à ces filtres pour l'instant.", "No posters match these filters yet.")}
           </p>
           {owned.length === 0 && (
             <p className="mt-3 flex flex-wrap gap-x-5 gap-y-2 font-bold">
@@ -214,8 +250,8 @@ function Collection({ data }: { data: ResolvedData }) {
       {hidden > 0 && (
         <p className="text-sm text-mist">
           {t(
-            `Et ${formatNumber(hidden, locale)} autres avis à recruter${tier === null ? "" : " dans cette rareté"}.`,
-            `And ${formatNumber(hidden, locale)} more ${hidden === 1 ? "poster" : "posters"} to recruit${tier === null ? "" : " in this rarity"}.`,
+            `Et ${formatNumber(hidden, locale)} autres avis à recruter${filtered ? " avec ces filtres" : ""}.`,
+            `And ${formatNumber(hidden, locale)} more ${hidden === 1 ? "poster" : "posters"} to recruit${filtered ? " with these filters" : ""}.`,
           )}
         </p>
       )}
