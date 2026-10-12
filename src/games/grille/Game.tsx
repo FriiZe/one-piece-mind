@@ -9,7 +9,7 @@ import { Button, Panel } from "../ui/primitives";
 import type { GameProps } from "../ui/types";
 import { useRun } from "../ui/useRun";
 import { useT } from "@/lib/i18n/client";
-import { CELLS, exampleFor, fits, generate, SIZE } from "./logic";
+import { CELLS, examplesFor, fits, generate, SIZE } from "./logic";
 
 const NO_ANSWERS: (string | null)[] = Array(CELLS).fill(null);
 
@@ -19,12 +19,15 @@ export default function Grille({ data }: GameProps) {
   /** Réponse donnée dans chaque case ; `null` tant qu'elle n'a pas été tentée. */
   const [answers, setAnswers] = useState<(string | null)[]>(NO_ANSWERS);
   const [active, setActive] = useState<number | null>(null);
+  /** Dernière case ratée, pour dire quel critère le personnage ne remplissait pas. */
+  const [miss, setMiss] = useState<number | null>(null);
   const [stopped, setStopped] = useState(false);
   const game = {
     ...base,
     start: (difficulty: Parameters<typeof base.start>[0]) => {
       setAnswers(NO_ANSWERS);
       setActive(null);
+      setMiss(null);
       setStopped(false);
       base.start(difficulty);
     },
@@ -50,14 +53,25 @@ export default function Grille({ data }: GameProps) {
   const right = answers.map((id, cell) => !!id && fits(grid, cell, data.characterById.get(id)!));
   const score = right.filter(Boolean).length;
   const over = stopped || answers.every((id) => id !== null);
+  // Partie finie : chaque case vide ou ratée montre une réponse qui convenait, chacune la sienne, en
+  // laissant de côté les personnages des cases justes
+  const failed = right.flatMap((ok, cell) => (ok ? [] : [cell]));
+  const examples = over ? examplesFor(grid, failed, data, new Set(answers.flatMap((id, cell) => (id && right[cell] ? [id] : [])))) : null;
 
   if (finished) return <GameEnd game={game} data={data} max={CELLS} />;
 
   function answer(character: PlayCharacter) {
-    if (active === null || answers[active] !== null) return;
+    if (active === null || !grid || answers[active] !== null) return;
     setAnswers(answers.map((id, cell) => (cell === active ? character.id : id)));
+    setMiss(fits(grid, active, character) ? null : active);
     setActive(null);
   }
+
+  /** Les critères que le personnage de la case ratée ne remplit pas. */
+  const missed = (cell: number): string[] => {
+    const character = data.characterById.get(answers[cell]!)!;
+    return [grid.rows[Math.floor(cell / SIZE)], grid.columns[cell % SIZE]].filter((criterion) => !criterion.test(character)).map((c) => c.label);
+  };
 
   function finish() {
     if (!run) return;
@@ -90,9 +104,8 @@ export default function Grille({ data }: GameProps) {
             const cell = r * SIZE + c;
             const id = answers[cell];
             const character = id ? data.characterById.get(id) : null;
-            // Partie arrêtée : une case vide ou ratée montre une réponse qui convenait
-            const example = over && !right[cell] ? exampleFor(grid, cell, data, used) : null;
-            const shown = character ?? example;
+            const example = examples?.get(cell) ?? null;
+            const shown = example ?? character;
             const tone = character
               ? right[cell]
                 ? "border-emerald-400 bg-emerald-600/25"
@@ -110,7 +123,7 @@ export default function Grille({ data }: GameProps) {
                   `Case ${grid.rows[r].label} et ${grid.columns[c].label}${character ? ` : ${character.name}` : ""}`,
                   `Square ${grid.rows[r].label} and ${grid.columns[c].label}${character ? `: ${character.name}` : ""}`,
                 )}
-                onClick={() => setActive(cell)}
+                onClick={() => setActive(active === cell ? null : cell)}
                 className={`flex aspect-square flex-col items-center justify-center gap-1 overflow-hidden rounded-xl border-2 p-1 text-center transition-colors disabled:cursor-default ${tone}`}
               >
                 {shown?.img && (
@@ -119,19 +132,31 @@ export default function Grille({ data }: GameProps) {
                   </span>
                 )}
                 <span className="text-[0.7rem] leading-tight font-bold break-words text-foam sm:text-xs">
-                  {character
-                    ? `${right[cell] ? "✓" : "✗"} ${character.name}`
-                    : example
-                      ? t(`Par exemple : ${example.name}`, `For example: ${example.name}`)
-                      : active === cell
-                        ? "…"
-                        : "?"}
+                  {character ? `${right[cell] ? "✓" : "✗"} ${character.name}` : active === cell ? "…" : "?"}
                 </span>
+                {example && (
+                  <span className="text-[0.65rem] leading-tight break-words text-mist sm:text-[0.7rem]">
+                    {t(`Par exemple : ${example.name}`, `For example: ${example.name}`)}
+                  </span>
+                )}
               </button>
             );
           }),
         ])}
       </div>
+
+      {miss !== null && !over && (
+        <p className="text-sm font-semibold text-vest" aria-live="polite">
+          {t(
+            `${data.characterById.get(answers[miss]!)!.name} ne remplit pas ${missed(miss)
+              .map((label) => `« ${label} »`)
+              .join(" ni ")}.`,
+            `${data.characterById.get(answers[miss]!)!.name} doesn't meet ${missed(miss)
+              .map((label) => `“${label}”`)
+              .join(" nor ")}.`,
+          )}
+        </p>
+      )}
 
       {over ? (
         <div className="flex flex-wrap items-center justify-between gap-3" aria-live="polite">
@@ -147,31 +172,36 @@ export default function Grille({ data }: GameProps) {
             {t("Voir mon score", "See my score")}
           </Button>
         </div>
-      ) : active === null || !row || !column ? (
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <p className="text-mist">
-            {t(
-              "Choisis une case, puis donne un personnage qui remplit ses deux critères.",
-              "Pick a square, then name a character who meets both of its criteria.",
-            )}
-          </p>
-          <Button variant="secondary" onClick={() => setStopped(true)}>
-            {t("Arrêter là", "Stop here")}
-          </Button>
-        </div>
       ) : (
         <div className="space-y-2">
-          <p className="font-semibold text-foam">
-            {row.label} <span className="text-mist">{t("et", "and")}</span> {column.label}
-          </p>
-          <CharacterSearch
-            key={active}
-            characters={data.characters}
-            excludeIds={used}
-            onPick={answer}
-            label={t("Personnage pour cette case", "Character for this square")}
-            placeholder={t("Qui remplit cette case ?", "Who fits this square?")}
-          />
+          {active === null || !row || !column ? (
+            <p className="text-mist">
+              {t(
+                "Choisis une case, puis donne un personnage qui remplit ses deux critères.",
+                "Pick a square, then name a character who meets both of its criteria.",
+              )}
+            </p>
+          ) : (
+            <>
+              <p className="font-semibold text-foam">
+                {row.label} <span className="text-mist">{t("et", "and")}</span> {column.label}
+              </p>
+              <CharacterSearch
+                key={active}
+                characters={data.characters}
+                excludeIds={used}
+                onPick={answer}
+                label={t("Personnage pour cette case", "Character for this square")}
+                placeholder={t("Qui remplit cette case ?", "Who fits this square?")}
+              />
+            </>
+          )}
+          {/* On peut s'arrêter à tout moment, une case choisie ou non : la cliquer de nouveau la relâche */}
+          <div className="flex justify-end">
+            <Button variant="secondary" onClick={() => setStopped(true)}>
+              {t("Arrêter là", "Stop here")}
+            </Button>
+          </div>
         </div>
       )}
     </Panel>

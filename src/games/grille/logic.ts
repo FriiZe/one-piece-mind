@@ -22,12 +22,12 @@ const MIN_ANSWERS: Record<Difficulty, number> = { facile: 3, normal: 2, expert: 
 const FAMOUS_TIER: Record<Difficulty, number> = { facile: 2, normal: 3, expert: 4 };
 
 /**
- * Peut-on remplir toutes les cases sans réutiliser personne ? `candidates` donne, case par case, qui y
- * convient. Avoir une réponse par case ne suffit pas : si le même personnage est le seul à convenir à
- * deux cases, l'une des deux restera vide. On cherche donc un personnage différent pour chaque case,
- * en déplaçant au besoin ceux déjà placés (couplage par chemins augmentants).
+ * Un personnage différent pour chaque case, parmi ceux qui lui conviennent (`candidates`, case par
+ * case, les premiers de préférence). Avoir une réponse par case ne suffit pas : si le même personnage
+ * est le seul à convenir à deux cases, l'une des deux reste vide. On déplace donc au besoin ceux déjà
+ * placés (couplage par chemins augmentants). Rend le personnage de chaque case, `null` si elle reste vide.
  */
-function fillable(candidates: readonly (readonly string[])[]): boolean {
+function assign(candidates: readonly (readonly string[])[]): (string | null)[] {
   const cellOf = new Map<string, number>();
   const place = (cell: number, tried: Set<string>): boolean => {
     for (const id of candidates[cell]) {
@@ -42,8 +42,14 @@ function fillable(candidates: readonly (readonly string[])[]): boolean {
     }
     return false;
   };
-  return candidates.every((_, cell) => place(cell, new Set()));
+  for (let cell = 0; cell < candidates.length; cell++) place(cell, new Set());
+  const chosen: (string | null)[] = candidates.map(() => null);
+  for (const [id, cell] of cellOf) chosen[cell] = id;
+  return chosen;
 }
+
+/** Peut-on remplir toutes les cases sans réutiliser personne ? */
+const fillable = (candidates: readonly (readonly string[])[]) => assign(candidates).every((id) => id !== null);
 
 /** La grille se remplit-elle entièrement avec ces personnages, sans en réutiliser aucun ? */
 export function solvable(grid: Grid, characters: readonly PlayCharacter[]): boolean {
@@ -92,10 +98,21 @@ export function fits(grid: Grid, cell: number, character: PlayCharacter): boolea
   return grid.rows[Math.floor(cell / SIZE)].test(character) && grid.columns[cell % SIZE].test(character);
 }
 
+/**
+ * Une réponse possible pour chacune de ces cases, parmi les personnages les plus connus et pas encore
+ * utilisés : un personnage différent par case, puisque la grille se joue ainsi. `null` pour une case
+ * qu'on ne peut plus remplir sans reprendre un personnage déjà donné ailleurs.
+ */
+export function examplesFor(grid: Grid, cells: readonly number[], data: ResolvedData, used: ReadonlySet<string>): Map<number, PlayCharacter | null> {
+  const known = [...data.characters].sort((a, b) => a.tier - b.tier || a.name.localeCompare(b.name, "fr"));
+  const candidates = cells.map((cell) => known.filter((c) => !used.has(c.id) && fits(grid, cell, c)).map((c) => c.id));
+  const chosen = assign(candidates);
+  return new Map(cells.map((cell, index) => [cell, chosen[index] ? (data.characterById.get(chosen[index]) ?? null) : null]));
+}
+
 /** Une réponse possible pour la case, parmi les personnages les plus connus et pas encore utilisés. */
 export function exampleFor(grid: Grid, cell: number, data: ResolvedData, used: ReadonlySet<string>): PlayCharacter | null {
-  const answers = data.characters.filter((c) => !used.has(c.id) && fits(grid, cell, c));
-  return answers.sort((a, b) => a.tier - b.tier || a.name.localeCompare(b.name, "fr"))[0] ?? null;
+  return examplesFor(grid, [cell], data, used).get(cell) ?? null;
 }
 
 /** Cases bien remplies : la réponse convient, et le personnage n'a pas déjà servi dans une case précédente. */

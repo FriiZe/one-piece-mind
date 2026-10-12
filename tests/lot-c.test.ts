@@ -185,6 +185,30 @@ describe("Grille 3×3", () => {
     }
   });
 
+  it("donne aux cases ratées des exemples tous différents", () => {
+    for (const data of modes) {
+      for (const difficulty of DIFFICULTIES) {
+        for (const seed of SEEDS) {
+          const grid = grille.generate(seed, difficulty, data)!;
+          const cells = Array.from({ length: grille.CELLS }, (_, cell) => cell);
+          const examples = [...grille.examplesFor(grid, cells, data, new Set()).values()];
+          expect(examples.every((c) => c !== null), `${data.mode} ${difficulty} ${seed}`).toBe(true);
+          expect(new Set(examples.map((c) => c!.id)).size, `${data.mode} ${difficulty} ${seed}`).toBe(grille.CELLS);
+          cells.forEach((cell) => expect(grille.fits(grid, cell, examples[cell]!)).toBe(true));
+        }
+      }
+    }
+    // Un seul personnage pour deux cases : l'une des deux reste sans exemple plutôt que de le répéter
+    type Row = grille.Grid["rows"][number];
+    const [solo] = anime.characters;
+    const criterion = (id: string, test: Row["test"]): Row => ({ id, kind: "initial", label: id, question: `${id} ?`, test });
+    const only = criterion("seul", (c) => c.id === solo.id);
+    const any = criterion("tous", () => true);
+    const twice = [...grille.examplesFor({ rows: [only, any, any], columns: [any, any, any] }, [0, 1], anime, new Set()).values()];
+    expect(twice.filter((c) => c?.id === solo.id)).toHaveLength(1);
+    expect(twice.filter((c) => c === null)).toHaveLength(1);
+  });
+
   it("note les cases justes et refuse un personnage utilisé deux fois", () => {
     const seed = SEEDS[2];
     const grid = grille.generate(seed, "normal", anime)!;
