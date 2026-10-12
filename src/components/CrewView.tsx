@@ -367,8 +367,8 @@ function Traits({ traits }: { traits: CrewTrait[] }) {
         </h2>
         <p className="mt-1 text-sm text-mist">
           {t(
-            `${TRAIT_STEPS[0]} membres d'une même affiliation activent son trait ; il se renforce à ${TRAIT_STEPS.slice(1).join(" et ")}.`,
-            `${TRAIT_STEPS[0]} members of the same affiliation activate its trait; it gets stronger at ${TRAIT_STEPS.slice(1).join(" and ")}.`,
+            `${TRAIT_STEPS[0]} membres d'une même affiliation activent son trait ; il se renforce à ${TRAIT_STEPS[1]} et ${TRAIT_STEPS[2]}, ou dès que la famille est au complet si elle est plus petite. Réunir une famille vaut bien plus qu'en disperser plusieurs.`,
+            `${TRAIT_STEPS[0]} members of the same affiliation activate its trait; it gets stronger at ${TRAIT_STEPS[1]} and ${TRAIT_STEPS[2]}, or as soon as the whole family is aboard if it is smaller. Gathering one family is worth far more than scattering several.`,
           )}
         </p>
       </div>
@@ -380,8 +380,10 @@ function Traits({ traits }: { traits: CrewTrait[] }) {
       ) : (
         <ul className="space-y-4">
           {traits.map((trait) => {
-            const next = TRAIT_STEPS[trait.level];
+            const next = trait.steps[trait.level];
             const effect = midSentence(trait.effect, locale);
+            // Une famille de moins de sept membres a son dernier palier quand elle est au complet
+            const complete = trait.count >= trait.size;
             return (
               <li key={trait.affiliation} className="space-y-1.5">
                 <p className="flex items-baseline justify-between gap-3">
@@ -396,26 +398,28 @@ function Traits({ traits }: { traits: CrewTrait[] }) {
                   className="flex gap-1.5"
                   role="img"
                   aria-label={t(
-                    `Palier ${trait.level} sur ${TRAIT_STEPS.length}`,
-                    `Tier ${trait.level} of ${TRAIT_STEPS.length}`,
+                    `Palier ${trait.level} sur ${trait.steps.length}`,
+                    `Tier ${trait.level} of ${trait.steps.length}`,
                   )}
                 >
-                  {TRAIT_STEPS.map((step, index) => (
+                  {trait.steps.map((step, index) => (
                     <span key={step} className={`h-2 flex-1 rounded-full ${index < trait.level ? "bg-straw" : "bg-sea-700"}`} />
                   ))}
                 </span>
                 <p className="text-[13px] text-mist">
                   {t(
-                    `${trait.count} membre${trait.count > 1 ? "s" : ""}`,
-                    `${trait.count} ${trait.count === 1 ? "member" : "members"}`,
+                    `${trait.count} membre${trait.count > 1 ? "s" : ""} sur ${trait.size}`,
+                    `${trait.count} of ${trait.size} ${trait.size === 1 ? "member" : "members"}`,
                   )}{" "}
                   · {trait.affiliation}
                   {next !== undefined
                     ? t(
-                        ` · encore ${next - trait.count} pour ${percent(trait.values[trait.level], locale)} (${effect})`,
-                        ` · ${next - trait.count} more for ${percent(trait.values[trait.level], locale)} (${effect})`,
+                        ` · encore ${next - trait.count} pour ${percent(trait.values[trait.level], locale)} (${effect})${next === trait.size ? ", famille au complet" : ""}`,
+                        ` · ${next - trait.count} more for ${percent(trait.values[trait.level], locale)} (${effect})${next === trait.size ? ", the whole family" : ""}`,
                       )
-                    : t(` · ${effect}, palier maximal`, ` · ${effect}, max tier`)}
+                    : complete
+                      ? t(` · ${effect}, famille au complet`, ` · ${effect}, the whole family is aboard`)
+                      : t(` · ${effect}, palier maximal`, ` · ${effect}, max tier`)}
                 </p>
               </li>
             );
@@ -439,6 +443,12 @@ function Traits({ traits }: { traits: CrewTrait[] }) {
             </li>
           ))}
         </ul>
+        <p className="mt-2">
+          {t(
+            `Une famille de 5 ou 6 membres franchit ses paliers à ${TRAIT_STEPS[0]}, 4 ou 5, puis au complet ; une famille de 4, à ${TRAIT_STEPS[0]} puis au complet, jusqu'au deuxième bonus ; une famille de ${TRAIT_STEPS[0]} n'a que le premier.`,
+            `A family of 5 or 6 members reaches its tiers at ${TRAIT_STEPS[0]}, 4 or 5, then when complete; a family of 4, at ${TRAIT_STEPS[0]} then when complete, up to the second bonus; a family of ${TRAIT_STEPS[0]} only has the first.`,
+          )}
+        </p>
       </details>
     </section>
   );

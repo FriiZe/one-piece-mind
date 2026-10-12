@@ -45,6 +45,7 @@ import {
   postStrength,
   TRAIT_STEPS,
   TRAITS,
+  traitSteps,
   rankOf,
   OFF_DAY_RECRUIT_CHANCE,
   recruitChance,
@@ -386,8 +387,8 @@ describe("équipage", () => {
   it("récompense trois membres de la même affiliation et un équipage complet", () => {
     const trio: PlayerState = { ...owning("luffy", "zoro", "nami"), crew: { sabreur: "zoro", navigateur: "nami", tireur: "luffy" } };
     const bonuses = crewBonuses(trio, byId);
-    // Une affiliation sans trait à elle partage le trait commun
-    expect(bonuses.traits).toMatchObject([{ affiliation: "Chapeau de paille", name: DEFAULT_TRAIT.name, count: 3, level: 1 }]);
+    // Une affiliation sans trait à elle partage le trait commun ; la famille a trois membres dans ce jeu d'essai
+    expect(bonuses.traits).toMatchObject([{ affiliation: "Chapeau de paille", name: DEFAULT_TRAIT.name, count: 3, size: 3, steps: [3], level: 1 }]);
     expect(bonuses.berrys.all).toBeCloseTo(DEFAULT_TRAIT.values[0]);
 
     const ids = pool.slice(5, 15).map((c) => c.id);
@@ -396,14 +397,16 @@ describe("équipage", () => {
   });
 
   it("renforce un trait à mesure que l'équipage compte de membres de l'affiliation", () => {
-    // L'organisation porte son nom du wiki : c'est lui, et non le libellé affiché, qui décide du trait
-    const crewOf = (org: string, count: number, affiliation = org) => {
-      const members: Recruitable[] = Array.from({ length: count }, (_, i) => ({ id: `m${i}`, tier: 4, org, affiliation }));
+    // L'organisation porte son nom du wiki : c'est lui, et non le libellé affiché, qui décide du trait.
+    // La famille compte `size` membres dans le jeu, dont `count` sont placés.
+    const crewOf = (org: string, count: number, affiliation = org, size = 12) => {
+      const members: Recruitable[] = Array.from({ length: size }, (_, i) => ({ id: `m${i}`, tier: 4, org, affiliation }));
+      const placed = members.slice(0, count);
       const state: PlayerState = {
         ...EMPTY_PLAYER,
-        collection: Object.fromEntries(members.map((m) => [m.id, { count: 1, golden: 0 }])),
+        collection: Object.fromEntries(placed.map((m) => [m.id, { count: 1, golden: 0 }])),
         // Du dernier poste au premier : le capitaine, qui agit sur tous les jeux, n'est pourvu qu'à dix
-        crew: Object.fromEntries(members.map((m, i) => [POST_IDS[POST_IDS.length - 1 - i], m.id])),
+        crew: Object.fromEntries(placed.map((m, i) => [POST_IDS[POST_IDS.length - 1 - i], m.id])),
       };
       return crewBonuses(state, new Map(members.map((m) => [m.id, m])));
     };
@@ -411,13 +414,12 @@ describe("équipage", () => {
     expect(TRAIT_STEPS).toEqual([3, 5, 7]);
     const whitebeard = "Whitebeard Pirates";
     expect(crewOf(whitebeard, 2, "Équipage de Barbe Blanche").traits).toMatchObject([
-      { org: whitebeard, affiliation: "Équipage de Barbe Blanche", count: 2, level: 0, value: 0 },
+      { org: whitebeard, affiliation: "Équipage de Barbe Blanche", count: 2, size: 12, steps: [3, 5, 7], level: 0, value: 0 },
     ]);
     expect(crewOf(whitebeard, 2).berrys.all).toBeUndefined();
     const values = [3, 5, 7].map((count) => crewOf(whitebeard, count).berrys.all!);
     expect(values).toEqual([...TRAITS[whitebeard].values]);
-    expect(values[0]).toBeLessThan(values[1]);
-    expect(values[1]).toBeLessThan(values[2]);
+    expect(crewOf(whitebeard, 4).berrys.all).toBe(values[0]);
     expect(crewOf(whitebeard, 9).traits[0]).toMatchObject({ level: 3, name: { fr: "Fils de Barbe Blanche", en: "Sons of Whitebeard" } });
     // Le libellé affiché, lui, suit la langue du joueur sans rien changer au trait
     expect(crewOf(whitebeard, 3, "Whitebeard Pirates").berrys.all).toBe(values[0]);
@@ -425,14 +427,33 @@ describe("équipage", () => {
     // L'Armée révolutionnaire fait baisser les prix de la boutique : le timonier et le musicien sont pourvus à trois
     const revolution = crewOf("Revolutionary Army", 3);
     expect(revolution.traits[0]).toMatchObject({ level: 1, effect: { fr: "Réduction à la boutique", en: "Discount at the shop" } });
-    expect(revolution.discount).toBeCloseTo(postStrength({ id: "m", tier: 4, org: null, affiliation: null }, undefined, "musicien") + 0.1);
+    expect(revolution.discount).toBeCloseTo(postStrength({ id: "m", tier: 4, org: null, affiliation: null }, undefined, "musicien") + 0.06);
+
+    // Une petite famille atteint son dernier palier au complet : les Cinq Doyens à cinq, une famille de quatre à quatre
+    expect(traitSteps(12)).toEqual([3, 5, 7]);
+    expect(traitSteps(7)).toEqual([3, 5, 7]);
+    expect(traitSteps(6)).toEqual([3, 5, 6]);
+    expect(traitSteps(5)).toEqual([3, 4, 5]);
+    expect(traitSteps(4)).toEqual([3, 4]);
+    expect(traitSteps(3)).toEqual([3]);
+    expect(traitSteps(2)).toEqual([]);
+    const elders = "Five Elders";
+    expect(crewOf(elders, 4, elders, 5).traits[0]).toMatchObject({ size: 5, steps: [3, 4, 5], level: 2, value: DEFAULT_TRAIT.values[1] });
+    expect(crewOf(elders, 5, elders, 5).traits[0]).toMatchObject({ level: 3, value: DEFAULT_TRAIT.values[2], values: DEFAULT_TRAIT.values });
+    expect(crewOf("Kid Pirates", 4, "Kid Pirates", 4).traits[0]).toMatchObject({ steps: [3, 4], level: 2, value: DEFAULT_TRAIT.values[1], values: DEFAULT_TRAIT.values.slice(0, 2) });
+    expect(crewOf("Arlong Pirates", 3, "Arlong Pirates", 3).traits[0]).toMatchObject({ steps: [3], level: 1, value: DEFAULT_TRAIT.values[0] });
+    // Deux membres dans tout le jeu : pas de trait possible, donc rien à afficher
+    expect(crewOf("Crocus", 2, "Crocus", 2).traits).toEqual([]);
   });
 
-  it("donne à chaque trait trois paliers croissants et un libellé", () => {
+  it("donne à chaque trait trois paliers croissants et un libellé, et récompense la famille réunie plus que dispersée", () => {
     for (const [affiliation, trait] of Object.entries({ ...TRAITS, defaut: DEFAULT_TRAIT })) {
       expect(trait.values[0], affiliation).toBeGreaterThan(0);
       expect(trait.values[1], affiliation).toBeGreaterThan(trait.values[0]);
       expect(trait.values[2], affiliation).toBeGreaterThan(trait.values[1]);
+      // Cinq membres valent plus que deux fois trois, sept plus que cinq et trois
+      expect(trait.values[1], affiliation).toBeGreaterThan(2 * trait.values[0]);
+      expect(trait.values[2], affiliation).toBeGreaterThan(trait.values[0] + trait.values[1]);
       expect(trait.name.fr, affiliation).not.toBe("");
       expect(trait.name.en, affiliation).not.toBe("");
       expect(bonusLabel(trait.bonus).fr).not.toBe("");

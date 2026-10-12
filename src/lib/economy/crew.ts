@@ -69,10 +69,25 @@ export const GOLDEN_FACTOR = 1.5;
 export const CAPTAIN_FACTOR = 0.5;
 /**
  * Traits d'équipage : plusieurs membres d'une même affiliation, placés à des
- * postes, activent le trait de cette affiliation. Il a trois paliers, selon
- * le nombre de membres : plus ils sont nombreux, plus le bonus est fort.
+ * postes, activent le trait de cette affiliation. Il a jusqu'à trois paliers,
+ * selon le nombre de membres : plus ils sont nombreux, plus le bonus est fort,
+ * et bien plus que proportionnellement. Cinq membres d'une même famille valent
+ * davantage que deux fois trois : c'est la famille réunie qu'on récompense.
  */
 export const TRAIT_STEPS = [3, 5, 7] as const;
+
+/**
+ * Paliers d'une famille selon le nombre de ses membres dans le jeu. Une famille
+ * de moins de sept membres atteint son dernier palier quand elle est au complet,
+ * et une famille trop petite pour trois membres n'a pas de trait.
+ */
+export function traitSteps(size: number): number[] {
+  const [first, , last] = TRAIT_STEPS;
+  if (size < first) return [];
+  const top = Math.min(size, last);
+  const middle = Math.ceil((first + top) / 2);
+  return [...new Set([first, middle, top])];
+}
 
 type TraitDefinition = { name: Localized; bonus: BonusKind; values: readonly [number, number, number] };
 const allGames = { kind: "berrys", scope: "all" } as const;
@@ -83,22 +98,22 @@ const category = (scope: GameCategoryId) => ({ kind: "berrys", scope }) as const
  * le wiki (`org` d'un personnage) : il ne dépend pas de la langue du joueur.
  */
 export const TRAITS: Record<string, TraitDefinition> = {
-  "Straw Hat Pirates": { name: { fr: "Nakama", en: "Nakama" }, bonus: allGames, values: [0.08, 0.14, 0.22] },
-  "Whitebeard Pirates": { name: { fr: "Fils de Barbe Blanche", en: "Sons of Whitebeard" }, bonus: allGames, values: [0.05, 0.09, 0.14] },
-  "Revolutionary Army": { name: { fr: "Vent de révolte", en: "Winds of Revolt" }, bonus: { kind: "discount" }, values: [0.1, 0.18, 0.25] },
-  "Blackbeard Pirates": { name: { fr: "Pillage", en: "Plunder" }, bonus: { kind: "discount" }, values: [0.08, 0.15, 0.22] },
-  Marines: { name: { fr: "Justice", en: "Justice" }, bonus: category("savoir"), values: [0.1, 0.18, 0.28] },
-  "Beasts Pirates": { name: { fr: "Loi du plus fort", en: "Survival of the Fittest" }, bonus: category("defis"), values: [0.1, 0.18, 0.28] },
-  "Cipher Pol": { name: { fr: "Agents de l'ombre", en: "Shadow Agents" }, bonus: category("oeil"), values: [0.1, 0.18, 0.28] },
-  "Donquixote Pirates": { name: { fr: "Marionnettes", en: "Puppets" }, bonus: category("mots"), values: [0.1, 0.18, 0.28] },
-  "Kouzuki Family": { name: { fr: "Fourreaux rouges", en: "Red Scabbards" }, bonus: category("primes"), values: [0.1, 0.18, 0.28] },
-  "Red Hair Pirates": { name: { fr: "Banquet", en: "Feast" }, bonus: { kind: "berrys", scope: "daily" }, values: [0.15, 0.3, 0.5] },
-  "Charlotte Family": { name: { fr: "Thé de la reine", en: "The Queen's Tea Party" }, bonus: { kind: "recruit" }, values: [0.1, 0.2, 0.3] },
-  "Big Mom Pirates": { name: { fr: "Totto Land", en: "Totto Land" }, bonus: { kind: "recruit" }, values: [0.1, 0.2, 0.3] },
-  "Roger Pirates": { name: { fr: "Laugh Tale", en: "Laugh Tale" }, bonus: { kind: "golden" }, values: [0.2, 0.4, 0.6] },
+  "Straw Hat Pirates": { name: { fr: "Nakama", en: "Nakama" }, bonus: allGames, values: [0.05, 0.12, 0.22] },
+  "Whitebeard Pirates": { name: { fr: "Fils de Barbe Blanche", en: "Sons of Whitebeard" }, bonus: allGames, values: [0.03, 0.08, 0.14] },
+  "Revolutionary Army": { name: { fr: "Vent de révolte", en: "Winds of Revolt" }, bonus: { kind: "discount" }, values: [0.06, 0.14, 0.25] },
+  "Blackbeard Pirates": { name: { fr: "Pillage", en: "Plunder" }, bonus: { kind: "discount" }, values: [0.05, 0.12, 0.22] },
+  Marines: { name: { fr: "Justice", en: "Justice" }, bonus: category("savoir"), values: [0.06, 0.15, 0.28] },
+  "Beasts Pirates": { name: { fr: "Loi du plus fort", en: "Survival of the Fittest" }, bonus: category("defis"), values: [0.06, 0.15, 0.28] },
+  "Cipher Pol": { name: { fr: "Agents de l'ombre", en: "Shadow Agents" }, bonus: category("oeil"), values: [0.06, 0.15, 0.28] },
+  "Donquixote Pirates": { name: { fr: "Marionnettes", en: "Puppets" }, bonus: category("mots"), values: [0.06, 0.15, 0.28] },
+  "Kouzuki Family": { name: { fr: "Fourreaux rouges", en: "Red Scabbards" }, bonus: category("primes"), values: [0.06, 0.15, 0.28] },
+  "Red Hair Pirates": { name: { fr: "Banquet", en: "Feast" }, bonus: { kind: "berrys", scope: "daily" }, values: [0.11, 0.28, 0.5] },
+  "Charlotte Family": { name: { fr: "Thé de la reine", en: "The Queen's Tea Party" }, bonus: { kind: "recruit" }, values: [0.07, 0.17, 0.3] },
+  "Big Mom Pirates": { name: { fr: "Totto Land", en: "Totto Land" }, bonus: { kind: "recruit" }, values: [0.07, 0.17, 0.3] },
+  "Roger Pirates": { name: { fr: "Laugh Tale", en: "Laugh Tale" }, bonus: { kind: "golden" }, values: [0.13, 0.33, 0.6] },
 };
 /** Les autres affiliations partagent un trait plus modeste. */
-export const DEFAULT_TRAIT: TraitDefinition = { name: { fr: "Esprit d'équipage", en: "Crew Spirit" }, bonus: allGames, values: [0.04, 0.07, 0.1] };
+export const DEFAULT_TRAIT: TraitDefinition = { name: { fr: "Esprit d'équipage", en: "Crew Spirit" }, bonus: allGames, values: [0.02, 0.05, 0.1] };
 
 export const traitOf = (org: string): TraitDefinition => TRAITS[org] ?? DEFAULT_TRAIT;
 
@@ -124,27 +139,47 @@ export type CrewTrait = {
   effect: Localized;
   /** Membres de cette affiliation placés à un poste. */
   count: number;
-  /** Palier atteint : 0 (inactif) à 3. */
+  /** Membres de cette affiliation dans le jeu : une petite famille a moins de paliers, atteints plus tôt. */
+  size: number;
+  /** Nombre de membres de chaque palier de cette famille. */
+  steps: readonly number[];
+  /** Palier atteint : 0 (inactif) jusqu'au dernier palier de la famille. */
   level: number;
   /** Bonus du palier atteint, 0 s'il est inactif. */
   value: number;
-  /** Bonus de chaque palier, pour l'affichage. */
+  /** Bonus de chaque palier de cette famille, pour l'affichage. */
   values: readonly number[];
 };
 
-export function traitFor(org: string, affiliation: string, count: number): CrewTrait {
+export function traitFor(org: string, affiliation: string, count: number, size: number): CrewTrait {
   const definition = traitOf(org);
-  const level = TRAIT_STEPS.filter((step) => count >= step).length;
+  const steps = traitSteps(size);
+  const level = steps.filter((step) => count >= step).length;
   return {
     org,
     affiliation,
     name: definition.name,
     effect: bonusLabel(definition.bonus),
     count,
+    size,
+    steps,
     level,
     value: level > 0 ? definition.values[level - 1] : 0,
-    values: definition.values,
+    values: definition.values.slice(0, steps.length),
   };
+}
+
+const familySizesByPool = new WeakMap<ReadonlyMap<string, Recruitable>, Map<string, number>>();
+
+/** Membres de chaque organisation parmi les personnages que le joueur peut voir. */
+function familySizes(characterById: ReadonlyMap<string, Recruitable>): Map<string, number> {
+  let sizes = familySizesByPool.get(characterById);
+  if (!sizes) {
+    sizes = new Map();
+    for (const character of characterById.values()) if (character.org) sizes.set(character.org, (sizes.get(character.org) ?? 0) + 1);
+    familySizesByPool.set(characterById, sizes);
+  }
+  return sizes;
 }
 /** Les dix postes pourvus. */
 export const FULL_CREW_BONUS = 0.05;
@@ -190,8 +225,11 @@ export function crewBonuses(
     else bonuses[bonus.kind] += strength;
   }
 
+  const sizes = familySizes(characterById);
   for (const [org, { label, count }] of affiliations) {
-    const trait = traitFor(org, label, count);
+    const trait = traitFor(org, label, count, sizes.get(org) ?? count);
+    // Une famille trop petite pour trois membres n'a pas de trait : rien à montrer
+    if (trait.steps.length === 0) continue;
     bonuses.traits.push(trait);
     if (trait.level === 0) continue;
     const { bonus } = traitOf(org);
