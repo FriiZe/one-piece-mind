@@ -113,7 +113,7 @@ export const TRAITS: Record<string, TraitDefinition> = {
   "Roger Pirates": { name: { fr: "Laugh Tale", en: "Laugh Tale" }, bonus: { kind: "golden" }, values: [0.13, 0.33, 0.6] },
 };
 /** Les autres affiliations partagent un trait plus modeste. */
-export const DEFAULT_TRAIT: TraitDefinition = { name: { fr: "Esprit d'équipage", en: "Crew Spirit" }, bonus: allGames, values: [0.02, 0.05, 0.1] };
+export const DEFAULT_TRAIT: TraitDefinition = { name: { fr: "Esprit d'équipage", en: "Crew Spirit" }, bonus: allGames, values: [0.04, 0.09, 0.14] };
 
 export const traitOf = (org: string): TraitDefinition => TRAITS[org] ?? DEFAULT_TRAIT;
 
