@@ -98,19 +98,19 @@ const category = (scope: GameCategoryId) => ({ kind: "berrys", scope }) as const
  * le wiki (`org` d'un personnage) : il ne dépend pas de la langue du joueur.
  */
 export const TRAITS: Record<string, TraitDefinition> = {
-  "Straw Hat Pirates": { name: { fr: "Nakama", en: "Nakama" }, bonus: allGames, values: [0.05, 0.12, 0.22] },
-  "Whitebeard Pirates": { name: { fr: "Fils de Barbe Blanche", en: "Sons of Whitebeard" }, bonus: allGames, values: [0.03, 0.08, 0.14] },
-  "Revolutionary Army": { name: { fr: "Vent de révolte", en: "Winds of Revolt" }, bonus: { kind: "discount" }, values: [0.06, 0.14, 0.25] },
-  "Blackbeard Pirates": { name: { fr: "Pillage", en: "Plunder" }, bonus: { kind: "discount" }, values: [0.05, 0.12, 0.22] },
-  Marines: { name: { fr: "Justice", en: "Justice" }, bonus: category("savoir"), values: [0.06, 0.15, 0.28] },
-  "Beasts Pirates": { name: { fr: "Loi du plus fort", en: "Survival of the Fittest" }, bonus: category("defis"), values: [0.06, 0.15, 0.28] },
-  "Cipher Pol": { name: { fr: "Agents de l'ombre", en: "Shadow Agents" }, bonus: category("oeil"), values: [0.06, 0.15, 0.28] },
-  "Donquixote Pirates": { name: { fr: "Marionnettes", en: "Puppets" }, bonus: category("mots"), values: [0.06, 0.15, 0.28] },
-  "Kouzuki Family": { name: { fr: "Fourreaux rouges", en: "Red Scabbards" }, bonus: category("primes"), values: [0.06, 0.15, 0.28] },
-  "Red Hair Pirates": { name: { fr: "Banquet", en: "Feast" }, bonus: { kind: "berrys", scope: "daily" }, values: [0.11, 0.28, 0.5] },
-  "Charlotte Family": { name: { fr: "Thé de la reine", en: "The Queen's Tea Party" }, bonus: { kind: "recruit" }, values: [0.07, 0.17, 0.3] },
-  "Big Mom Pirates": { name: { fr: "Totto Land", en: "Totto Land" }, bonus: { kind: "recruit" }, values: [0.07, 0.17, 0.3] },
-  "Roger Pirates": { name: { fr: "Laugh Tale", en: "Laugh Tale" }, bonus: { kind: "golden" }, values: [0.13, 0.33, 0.6] },
+  "Straw Hat Pirates": { name: { fr: "Nakama", en: "Nakama" }, bonus: allGames, values: [0.08, 0.17, 0.26] },
+  "Whitebeard Pirates": { name: { fr: "Fils de Barbe Blanche", en: "Sons of Whitebeard" }, bonus: allGames, values: [0.05, 0.11, 0.17] },
+  "Revolutionary Army": { name: { fr: "Vent de révolte", en: "Winds of Revolt" }, bonus: { kind: "discount" }, values: [0.1, 0.21, 0.32] },
+  "Blackbeard Pirates": { name: { fr: "Pillage", en: "Plunder" }, bonus: { kind: "discount" }, values: [0.08, 0.17, 0.26] },
+  Marines: { name: { fr: "Justice", en: "Justice" }, bonus: category("savoir"), values: [0.1, 0.21, 0.32] },
+  "Beasts Pirates": { name: { fr: "Loi du plus fort", en: "Survival of the Fittest" }, bonus: category("defis"), values: [0.1, 0.21, 0.32] },
+  "Cipher Pol": { name: { fr: "Agents de l'ombre", en: "Shadow Agents" }, bonus: category("oeil"), values: [0.1, 0.21, 0.32] },
+  "Donquixote Pirates": { name: { fr: "Marionnettes", en: "Puppets" }, bonus: category("mots"), values: [0.1, 0.21, 0.32] },
+  "Kouzuki Family": { name: { fr: "Fourreaux rouges", en: "Red Scabbards" }, bonus: category("primes"), values: [0.1, 0.21, 0.32] },
+  "Red Hair Pirates": { name: { fr: "Banquet", en: "Feast" }, bonus: { kind: "berrys", scope: "daily" }, values: [0.15, 0.31, 0.5] },
+  "Charlotte Family": { name: { fr: "Thé de la reine", en: "The Queen's Tea Party" }, bonus: { kind: "recruit" }, values: [0.1, 0.21, 0.32] },
+  "Big Mom Pirates": { name: { fr: "Totto Land", en: "Totto Land" }, bonus: { kind: "recruit" }, values: [0.1, 0.21, 0.32] },
+  "Roger Pirates": { name: { fr: "Laugh Tale", en: "Laugh Tale" }, bonus: { kind: "golden" }, values: [0.2, 0.41, 0.62] },
 };
 /** Les autres affiliations partagent un trait plus modeste. */
 export const DEFAULT_TRAIT: TraitDefinition = { name: { fr: "Esprit d'équipage", en: "Crew Spirit" }, bonus: allGames, values: [0.04, 0.09, 0.14] };

@@ -427,7 +427,7 @@ describe("équipage", () => {
     // L'Armée révolutionnaire fait baisser les prix de la boutique : le timonier et le musicien sont pourvus à trois
     const revolution = crewOf("Revolutionary Army", 3);
     expect(revolution.traits[0]).toMatchObject({ level: 1, effect: { fr: "Réduction à la boutique", en: "Discount at the shop" } });
-    expect(revolution.discount).toBeCloseTo(postStrength({ id: "m", tier: 4, org: null, affiliation: null }, undefined, "musicien") + 0.06);
+    expect(revolution.discount).toBeCloseTo(postStrength({ id: "m", tier: 4, org: null, affiliation: null }, undefined, "musicien") + 0.1);
 
     // Une petite famille atteint son dernier palier au complet : les Cinq Doyens à cinq, une famille de quatre à quatre
     expect(traitSteps(12)).toEqual([3, 5, 7]);
