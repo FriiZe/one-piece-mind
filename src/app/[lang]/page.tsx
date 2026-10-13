@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { DailyGames } from "@/components/DailyGames";
 import { CATEGORY_TONES } from "@/components/GameBadge";
+import { HomeRaid } from "@/components/HomeRaid";
 import { HomeStrip } from "@/components/HomeStrip";
 import { HomeTogether } from "@/components/HomeTogether";
 import { JsonLd } from "@/components/JsonLd";
@@ -67,6 +68,7 @@ export default async function Home() {
       </div>
 
       <DailyGames />
+      <HomeRaid />
       <HomeStrip />
       <HomeTogether locale={locale} />
 
