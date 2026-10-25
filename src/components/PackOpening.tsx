@@ -186,7 +186,8 @@ export function PackOpening({
           <div className="flex flex-wrap items-center justify-between gap-3" aria-live="polite">
             {allFlipped ? (
               <>
-                <p className="font-semibold text-foam">
+                {/* Le texte se replie sur lui-même : les boutons restent à droite, sauf sur un écran étroit */}
+                <p className="min-w-64 flex-1 basis-0 font-semibold text-foam">
                   {sealed
                     ? t(
                         `${fresh === 0 ? "Aucun nouvel" : fresh === 1 ? "1 nouvel" : `${fresh} nouveaux`} avis, ${recruits.length - fresh} doublon${recruits.length - fresh > 1 ? "s" : ""}.`,
@@ -199,7 +200,7 @@ export function PackOpening({
                     {t("Voir ma collection", "View my collection")}
                   </Link>
                 </p>
-                <span className="flex flex-wrap gap-2">
+                <span className="flex shrink-0 flex-wrap gap-2">
                   <Button onClick={again.run} disabled={again.disabled}>
                     {again.label}
                   </Button>
