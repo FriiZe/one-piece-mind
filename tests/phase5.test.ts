@@ -169,10 +169,26 @@ describe("raid : adversaire, dégâts et butin", () => {
     expect(raidCrewBonus(player(), anime.characterById)).toBe(0);
   });
 
-  it("règle les points de vie sur le nombre de joueurs actifs", () => {
+  it("règle les points de vie sur le nombre de joueurs actifs, faute de raid la semaine passée", () => {
     expect(raidHp(0)).toBe(40_000);
     expect(raidHp(50)).toBe(200_000);
+    expect(raidHp(50, null)).toBe(200_000);
     expect(raidHp(10_000_000)).toBe(5_000_000);
+  });
+
+  it("règle les points de vie sur le rythme de la semaine passée", () => {
+    const openedAt = new Date("2026-10-19T06:00:00Z");
+    const after = (days: number) => new Date(openedAt.getTime() + days * 86_400_000);
+    // Pas vaincu : ce qu'il a encaissé, un peu moins pour qu'il tombe avant lundi
+    expect(raidHp(50, { damage: 300_000, openedAt, defeatedAt: null })).toBe(270_000);
+    // Vaincu en deux jours : au même rythme, il en aurait encaissé trois fois et demie plus
+    expect(raidHp(50, { damage: 100_000, openedAt, defeatedAt: after(2) })).toBe(315_000);
+    // Vaincu en une heure : compté comme un jour
+    expect(raidHp(50, { damage: 100_000, openedAt, defeatedAt: after(1 / 24) })).toBe(630_000);
+    // Personne n'a frappé : on revient aux joueurs actifs ; plancher et plafond tiennent
+    expect(raidHp(50, { damage: 0, openedAt, defeatedAt: null })).toBe(200_000);
+    expect(raidHp(0, { damage: 1000, openedAt, defeatedAt: null })).toBe(40_000);
+    expect(raidHp(0, { damage: 4_000_000, openedAt, defeatedAt: after(1) })).toBe(5_000_000);
   });
 });
 
@@ -284,6 +300,7 @@ describe.skipIf(!accountsEnabled)("phase 5, en base", () => {
   const season = seasonKey(dailyKey());
   const raidDay = "2031-03-05";
   const raidWeek = weekKey(raidDay);
+  const nextRaidDay = "2031-03-12";
   const users: { id: string; username: string }[] = [];
   const roomCodes: string[] = [];
 
@@ -301,7 +318,7 @@ describe.skipIf(!accountsEnabled)("phase 5, en base", () => {
     const ids = users.map((u) => u.id);
     await db().room.deleteMany({ where: { code: { in: roomCodes } } });
     await db().rankedMatch.deleteMany({ where: { OR: [{ playerAId: { in: ids } }, { playerBId: { in: ids } }] } });
-    await db().raid.deleteMany({ where: { week: raidWeek } });
+    await db().raid.deleteMany({ where: { week: { in: [raidWeek, weekKey(nextRaidDay)] } } });
     await db().user.deleteMany({ where: { id: { in: ids } } });
     await db().$disconnect();
   });
@@ -538,6 +555,15 @@ describe.skipIf(!accountsEnabled)("phase 5, en base", () => {
       expect(loot.state.cosmetics.owned).toContain(RAID_LOOT.cosmetic);
       expect(await claimRaidLoot(a.id, raidWeek)).toEqual({ ok: false, error: "not-found" });
       expect(await pendingCounts(a.id, false)).toMatchObject({ loot: 0 });
+    });
+
+    it("règle les points de vie du raid suivant sur le rythme de celui-ci", async () => {
+      const openedAt = new Date("2031-03-03T06:00:00Z");
+      await db().raid.update({
+        where: { week: raidWeek },
+        data: { damage: 100_000, createdAt: openedAt, defeatedAt: new Date(openedAt.getTime() + 2 * 86_400_000) },
+      });
+      expect(await raidView(null, nextRaidDay)).toMatchObject({ week: weekKey(nextRaidDay), hp: 315_000, damage: 0 });
     });
   });
 

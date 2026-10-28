@@ -30,14 +30,21 @@ type RaidRow = { week: string; bossId: string; hp: number; damage: number; defea
 /**
  * Raid de la semaine, ouvert par la première requête qui le demande : aucune
  * tâche ne tourne le lundi. Ses points de vie sont fixés à ce moment-là,
- * d'après le nombre de joueurs venus dans les sept derniers jours.
+ * d'après les dégâts du raid de la semaine passée, ou à défaut le nombre de
+ * joueurs venus dans les sept derniers jours.
  */
-async function ensureRaid(week: string): Promise<RaidRow> {
+async function ensureRaid(today: string): Promise<RaidRow> {
+  const week = weekKey(today);
   const existing = await db().raid.findUnique({ where: { week } });
   if (existing) return existing;
-  const active = await db().user.count({ where: { lastSeenAt: { gte: new Date(Date.now() - WEEK_MS) } } });
+  const lastWeek = weekKey(new Date(Date.parse(`${today}T00:00:00Z`) - WEEK_MS).toISOString().slice(0, 10));
+  const [active, previous] = await Promise.all([
+    db().user.count({ where: { lastSeenAt: { gte: new Date(Date.now() - WEEK_MS) } } }),
+    db().raid.findUnique({ where: { week: lastWeek }, select: { damage: true, createdAt: true, defeatedAt: true } }),
+  ]);
+  const hp = raidHp(active, previous && { damage: previous.damage, openedAt: previous.createdAt, defeatedAt: previous.defeatedAt });
   try {
-    return await db().raid.create({ data: { week, bossId: raidBoss(week).id, hp: raidHp(active) } });
+    return await db().raid.create({ data: { week, bossId: raidBoss(week).id, hp } });
   } catch (error) {
     // Une autre requête vient de l'ouvrir
     if (!isUniqueViolation(error)) throw error;
@@ -80,7 +87,7 @@ export function pendingLootCount(userId: string): Promise<number> {
 
 export async function raidView(userId: string | null, today = dailyKey()): Promise<RaidView> {
   const week = weekKey(today);
-  const raid = await ensureRaid(week);
+  const raid = await ensureRaid(today);
   const [top, participants, mine, attacksToday, loot] = await Promise.all([
     db().raidParticipant.findMany({
       where: { week, damage: { gt: 0 } },
@@ -131,7 +138,7 @@ const questionsOf = (attack: { seed: number; mode: string; lang: string }) =>
  * on ne relance pas un tirage qui déplaît.
  */
 export async function startRaidAttack(userId: string, mode: SpoilerMode, lang: Locale, today = dailyKey()): Promise<RaidStartResult> {
-  const raid = await ensureRaid(weekKey(today));
+  const raid = await ensureRaid(today);
   if (raid.defeatedAt) return { ok: false, error: "defeated" };
   const used = await db().raidAttack.count({ where: { userId, dayKey: today } });
   if (used >= RAID_ATTACKS_PER_DAY) return { ok: false, error: "limit" };

@@ -77,14 +77,34 @@ export function raidAttackBerrys(damage: number): number {
 const HP_PER_PLAYER = 4000;
 const MIN_HP = 40_000;
 const MAX_HP = 5_000_000;
+const DAY_MS = 86_400_000;
+const WEEK_MS = 7 * DAY_MS;
+/** Part des dégâts de la semaine passée qu'il faut infliger : à rythme égal, l'adversaire tombe le dimanche. */
+const HP_PACE_SHARE = 0.9;
+
+/** Raid de la semaine passée, tel qu'il s'est terminé. */
+export type PreviousRaid = { damage: number; openedAt: Date; defeatedAt: Date | null };
 
 /**
- * Points de vie de l'adversaire, fixés à l'ouverture du raid d'après le nombre
- * de joueurs venus dans la semaine : quatre ou cinq bons assauts par joueur
- * actif suffisent à le vaincre.
+ * Dégâts que la communauté aurait infligés en sept jours au rythme d'un raid :
+ * un adversaire vaincu tôt aurait encaissé bien davantage. Un raid vaincu en
+ * moins d'un jour compte pour un jour, que l'extrapolation ne s'emballe pas.
  */
-export function raidHp(activePlayers: number): number {
-  return Math.min(MAX_HP, Math.max(MIN_HP, Math.round((activePlayers * HP_PER_PLAYER) / 1000) * 1000));
+function weeklyPace({ damage, openedAt, defeatedAt }: PreviousRaid): number {
+  if (!defeatedAt) return damage;
+  const elapsed = Math.max(DAY_MS, defeatedAt.getTime() - openedAt.getTime());
+  return damage * Math.max(1, WEEK_MS / elapsed);
+}
+
+/**
+ * Points de vie de l'adversaire, fixés à l'ouverture du raid d'après les
+ * dégâts de la semaine passée : à rythme égal, il tient jusqu'au dimanche.
+ * Sans raid la semaine passée, ils suivent le nombre de joueurs venus dans
+ * la semaine.
+ */
+export function raidHp(activePlayers: number, previous?: PreviousRaid | null): number {
+  const target = previous && previous.damage > 0 ? weeklyPace(previous) * HP_PACE_SHARE : activePlayers * HP_PER_PLAYER;
+  return Math.min(MAX_HP, Math.max(MIN_HP, Math.round(target / 1000) * 1000));
 }
 
 /**
